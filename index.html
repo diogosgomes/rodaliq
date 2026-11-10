@@ -163,6 +163,12 @@ h3{font-size:13px;margin:0 0 8px;color:var(--muted);text-transform:uppercase;let
 .bell .hd{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap}
 .bell .it{border:1px solid var(--line);border-radius:10px;padding:9px 10px;margin-bottom:8px;font-size:13px}
 .bell .it.nova{border-left:4px solid var(--blue)}
+.bell .it.imp{border:2px solid var(--amber);background:var(--amberSoft)}
+.bell .tagImp{display:inline-block;font-size:11px;font-weight:800;color:var(--amberInk);letter-spacing:.3px;margin-bottom:3px}
+.bell .al .acts{margin-top:4px}
+.bell .al.lida{opacity:.75}
+.bell .it.al.crit{border:2px solid var(--red);background:var(--redSoft);color:var(--red);font-weight:600}
+.bell .al .nota{font-size:11.5px;color:var(--muted);font-weight:400;margin-top:3px}
 .bell .it .ttl{font-weight:700}
 .bell .it .meta{font-size:11px;color:var(--muted);margin:2px 0 4px}
 .bell .it .acts{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
@@ -213,7 +219,7 @@ svg text{font-family:Inter,system-ui,sans-serif}
     </form>
   </div>
   <div class="selo" id="seloLogin"></div>
-  <footer>© 2026 Diogo Gomes · Todos os direitos reservados.</footer>
+  <footer>© 2026 Rodaliq · Todos os direitos reservados.</footer>
 </div>
 
 <!-- ============ APP ============ -->
@@ -234,6 +240,7 @@ svg text{font-family:Inter,system-ui,sans-serif}
         <div class="who">Conectado como <b id="whoName">—</b></div>
         <button data-m="cfg">🎯 Metas e preferências</button>
         <button data-m="veic">🚗 Veículos</button>
+        <button data-m="cnh">🪪 Minha CNH</button>
         <button data-m="aud">🕘 Histórico de auditoria</button>
         <button data-m="pass">🔑 Trocar senha</button>
         <button data-m="exp">⬇ Exportar backup</button>
@@ -261,13 +268,13 @@ svg text{font-family:Inter,system-ui,sans-serif}
   <button data-fab="multa">🚨 Multas</button>
   <button data-fab="carne">🧾 Carnê-Leão do mês anterior</button>
 </div><button class="btn fab" id="fab" aria-haspopup="true">＋ Lançar</button></div>
-<footer>© 2026 Diogo Gomes · Todos os direitos reservados.</footer>
+<footer>© 2026 Rodaliq · Todos os direitos reservados.</footer>
 <input type="file" id="impFile" accept=".json,application/json" class="hidden">
 </div>
 
 <script>
 "use strict";
-const VERSAO='V15';
+const VERSAO='V19';
 /* ---------- utilidades ---------- */
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -352,13 +359,13 @@ async function carregar(){
       DB.from('tb_release_reads').select('dados').maybeSingle()]);
     AUD.seq=cn.data?+cn.data.seq||0:0;AUD.mes[ym]=[];AUD.mes[ya]=[];
     ev.forEach(e=>{const m=isoOf(new Date(e.ts)).slice(0,7);(AUD.mes[m]=AUD.mes[m]||[]).push(audRow(e))});
-    NOT.reads=Object.assign({lidas:[],ocultas:[]},rr.data&&rr.data.dados||{});
+    NOT.reads=Object.assign({lidas:[],ocultas:[],exclEm:{}},rr.data&&rr.data.dados||{});
     await carregarNotas();
     clearTimeout(t);setSync('Sincronizado ✓');
   }catch(e){clearTimeout(t);setSync('⚠ erro ao carregar');toast('Erro ao carregar dados ('+(e&&(e.message||e.code)||'erro')+').')}
 }
 const audRow=e=>{const o={seq:e.seq,ts:new Date(e.ts).toISOString(),acao:e.acao,area:e.area,resumo:e.resumo||'',usuario:e.usuario||''};if(e.extra)o.extra=e.extra;return o};
-async function carregarNotas(){const {data,error}=await DB.from('tb_release_notes').select('id,ts,titulo,texto,versao').order('ts',{ascending:false});if(error)throw error;NOT.notes=(data||[]).map(n=>Object.assign({},n,{ts:new Date(n.ts).toISOString()}))}
+async function carregarNotas(){const {data,error}=await DB.from('tb_release_notes').select('id,ts,titulo,texto,versao,importante,validade').order('ts',{ascending:false});if(error)throw error;NOT.notes=(data||[]).map(n=>Object.assign({},n,{ts:new Date(n.ts).toISOString()}))}
 
 /* ---------- auditoria (numeração H gravada) ---------- */
 const AUD={seq:0,mes:{}};let audChain=Promise.resolve();
@@ -402,47 +409,82 @@ async function verAuditoria(){
 }
 
 /* ---------- notificações: alertas + novidades ---------- */
-const NOT={notes:[],reads:{lidas:[],ocultas:[]}};let readChain=Promise.resolve();
-const DIAS_NOV=15;
+const NOT={notes:[],reads:{lidas:[],ocultas:[],exclEm:{}}};let readChain=Promise.resolve();
+const DIAS_NOV=15,MAX_NOV=5,DIAS_EXCL=30;
+let CAD=null; // data de cadastro do usuário (ISO): novidades e alertas de meses anteriores não aparecem
 function salvarReads(){if(!DB||!UID)return;const v=JSON.parse(JSON.stringify(NOT.reads));readChain=readChain.then(()=>DB.from('tb_release_reads').upsert({user_id:UID,dados:v,atualizado_em:new Date().toISOString()},{onConflict:'user_id'}).then(r=>{if(r.error)console.warn(r.error)}))}
 const recente=n=>Date.now()-new Date(n.ts).getTime()<=DIAS_NOV*864e5;
+const impValida=n=>{if(!n.importante)return false;const fim=n.validade?new Date(n.validade.length<=10?n.validade+'T23:59:59':n.validade).getTime():new Date(n.ts).getTime()+7*864e5;return Date.now()<=fim};
+const cadMes=()=>CAD?isoOf(new Date(CAD)).slice(0,7):'';
+const notasVis=()=>NOT.notes.filter(n=>!CAD||n.ts>=CAD);
+const ocultas=()=>NOT.reads.ocultas||[];
+const diasEntre=(a,b)=>Math.round((new Date(b+'T12:00:00')-new Date(a+'T12:00:00'))/864e5);
+function diasUteis(de,ate){let n=0;const d=new Date(de+'T12:00:00'),f=new Date(ate+'T12:00:00');while(d<f){d.setDate(d.getDate()+1);const w=d.getDay();if(w&&w<6)n++}return n}
+// CNH: ciclo semanal a partir de 30 dias (30, 23, 16 e 9 dias antes)
+function cnhInfo(){const c=cfg().cnh;if(!c||!c.validade)return null;const d=diasEntre(hoje(),c.validade);
+  if(d<0)return{d,vencida:1,chave:null};if(d>30)return{d,fora:1};const ciclo=[9,16,23,30].find(x=>d<=x);return{d,chave:c.validade+'|'+ciclo}}
+function pontosCnh(ign,extra){const c=cfg().cnh||{},tit=(c.titular||cfg().condutores[0]||'').trim().toLowerCase(),lim12=isoOf(new Date(new Date().setFullYear(new Date().getFullYear()-1)));
+  const ms=[...S.tb_multas.filter(r=>r.id!==ign),...(extra?[extra]:[])].filter(r=>r.ocorr&&r.ocorr>lim12&&+r.pontos>0&&(!r.infrator||!tit||r.infrator.trim().toLowerCase()===tit));
+  const pts=ms.reduce((a,r)=>a+(+r.pontos||0),0),grav=ms.filter(r=>+r.pontos===7).length;
+  const lim=c.ear?40:grav>=2?20:grav===1?30:40;return{pts,lim,grav,ear:!!c.ear,temCnh:!!c.validade}}
 function alertas(){
-  const out=[],hj=hoje();
+  const out=[],hj=hoje(),cm=cadMes();
   const ant=addMes(mesAtual(),-1),reg=S.tb_carne[ant];
-  if(!(reg&&reg.bruto!=null&&reg.bruto!==''))out.push({n:'a',t:`Atualize o Carnê-Leão de ${mesNome(ant)} com o extrato da Uber.`,tab:'impostos'});
-  const ano=+mesAtual().slice(0,4);[ano-1,ano].forEach(a=>linhasAno(a).forEach(l=>{if(l.darf>0&&!l.reg.pago)out.push({n:l.venc<hj?'r':'a',t:`DARF de ${mesNome(l.ym)}: ${brl(l.darf)} · vence ${fmtBR(l.venc)}${l.venc<hj?' (vencido)':''}.`,tab:'impostos'})}));
-  S.tb_multas.filter(r=>!r.pagto).forEach(r=>{const v=r.venc;const lim=isoOf(new Date(Date.now()+10*864e5));
-    if(v&&v<hj)out.push({n:'r',t:`Multa vencida em ${fmtBR(v)}: ${r.motivo} (${r.veiculo}).`,tab:'multas'});
-    else if(v&&v<=lim)out.push({n:'a',t:`Multa vence em ${fmtBR(v)}: ${brl(r.vDesc??r.vOrig)} (${r.veiculo}).`,tab:'multas'});
-    else if(!v)out.push({n:'a',t:`Multa a pagar sem vencimento informado: ${r.motivo} (${r.veiculo}).`,tab:'multas'})});
+  if(!(cm&&ant<cm)&&!(reg&&reg.bruto!=null&&reg.bruto!==''))out.push({n:'a',t:`Atualize o Carnê-Leão de ${mesNome(ant)} com o extrato da Uber.`,tab:'impostos'});
+  const ano=+mesAtual().slice(0,4);[ano-1,ano].forEach(a=>linhasAno(a).forEach(l=>{if(l.darf>0&&!l.reg.pago)out.push({n:l.venc<hj?'r':'a',t:`DARF de ${mesNome(l.ym)}: ${brl(l.darf)} · vence ${fmtBR(l.venc)}${l.venc<hj?' (vencido)':''}.`,nota:l.venc<hj?'O valor mostrado não inclui multa e juros por atraso; gere a guia atualizada no Sicalc da Receita.':'',tab:'impostos'})}));
+  S.tb_multas.filter(r=>!r.pagto).forEach(r=>{const v=r.venc;const lim=isoOf(new Date(Date.now()+10*864e5));const val=brl(r.vDesc??r.vOrig);
+    if(v&&v<hj)out.push({n:'r',t:`Multa atrasada (venceu em ${fmtBR(v)}): ${val} · ${r.motivo} (${r.veiculo}).`,tab:'multas',multa:r.id});
+    else if(v===hj)out.push({n:'r',t:`Multa vence hoje: ${val} · ${r.motivo} (${r.veiculo}).`,tab:'multas',multa:r.id});
+    else if(v&&v<=lim){const du=diasUteis(hj,v);out.push({n:'a',t:`Multa vence em ${du} ${du===1?'dia útil':'dias úteis'} (${fmtBR(v)}): ${val} · ${r.motivo} (${r.veiculo}).`,tab:'multas',multa:r.id})}
+    else if(!v)out.push({n:'a',t:`Multa a pagar sem vencimento informado: ${r.motivo} (${r.veiculo}).`,tab:'multas',multa:r.id})});
+  const p=pontosCnh();if(p.pts>=Math.ceil(p.lim*.75))out.push({n:p.pts>=p.lim?'r':'a',t:`Pontos na CNH: ${p.pts} de ${p.lim} nos últimos 12 meses${p.pts>=p.lim?' (limite atingido)':''}.${p.ear?' Limite de 40 por ter EAR.':''}`,tab:'multas'});
+  const c=cnhInfo();if(c&&!c.fora){
+    if(c.vencida){const dv=-c.d,lim=isoOf(new Date(new Date(cfg().cnh.validade+'T12:00:00').getTime()+30*864e5));out.unshift(dv<=30?{n:'r',crit:1,t:`CNH vencida há ${dv} ${dv===1?'dia':'dias'}: você tem até ${fmtBR(lim)} para renovar sem multa.`,nota:'Depois de atualizar a validade em ⚙ Opções > Minha CNH, o alerta some.',tab:'cnh'}:{n:'r',crit:1,t:'CNH vencida há mais de 30 dias: dirigir agora é infração gravíssima.',nota:`Venceu em ${fmtBR(cfg().cnh.validade)}. Renove e atualize a validade em ⚙ Opções > Minha CNH.`,tab:'cnh'})}
+    else out.push({n:'a',t:c.d===0?`CNH vence hoje (${fmtBR(cfg().cnh.validade)}). Agende a renovação.`:`CNH vence em ${c.d} ${c.d===1?'dia':'dias'} (${fmtBR(cfg().cnh.validade)}). Agende a renovação.`,tab:'cnh',cnh:c.chave,lida:NOT.reads.cnhLida===c.chave})}
   proximasManut().filter(x=>x.prox-x.ult<=1500).forEach(x=>out.push({n:x.prox<=x.ult?'r':'a',t:`Manutenção ${x.prox<=x.ult?'vencida':'próxima'}: ${x.desc} (${x.veiculo}) em ${x.prox.toLocaleString('pt-BR')} km.`,tab:'custos'}));
   return out;
 }
-function naoLidas(){return NOT.notes.filter(n=>recente(n)&&!NOT.reads.ocultas.includes(n.id)&&!NOT.reads.lidas.includes(n.id))}
+const visNovs=()=>notasVis().filter(n=>!ocultas().includes(n.id));
+function naoLidas(){return visNovs().filter(n=>(recente(n)||impValida(n))&&!NOT.reads.lidas.includes(n.id))}
 let notesUnsub=null;
 function ouvirNovidades(){if(!DB||notesUnsub)return;const upd=()=>carregarNotas().then(()=>{atualizaSino();if(!$('#bellMenu').classList.contains('hidden'))renderSino()}).catch(()=>{});
   try{notesUnsub=DB.channel('novidades').on('postgres_changes',{event:'*',schema:'public',table:'tb_release_notes'},upd).subscribe()}catch(e){notesUnsub=1}
   document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')upd()})}
-function atualizaSino(){const n=alertas().length+naoLidas().length;$('#bellN').textContent=n?String(n):''}
+function atualizaSino(){const n=alertas().filter(a=>!a.lida).length+naoLidas().length;$('#bellN').textContent=n>9?'9+':n?String(n):''}
 function renderSino(){
-  const tab=UI.bell||'alertas',al=alertas();
-  const vis=NOT.notes.filter(n=>!NOT.reads.ocultas.includes(n.id)).sort((a,b)=>b.ts.localeCompare(a.ts));
-  const rec=vis.filter(recente),ant=vis.filter(n=>!recente(n));
-  const item=n=>{const lida=NOT.reads.lidas.includes(n.id);return `<div class="it${lida?'':' nova'}"><div class="ttl">${lida?'':'● '}${esc(n.titulo)}</div><div class="meta">${dataHora(n.ts)}${n.versao?' · '+esc(n.versao):''}</div><div>${esc(n.texto).replace(/\n/g,'<br>')}</div><div class="acts"><button data-nl="${esc(n.id)}">${lida?'Marcar como não lida':'Marcar como lida'}</button><button data-nx="${esc(n.id)}">Excluir da minha tela</button></div></div>`};
-  let h=`<div class="hd"><button class="chip${tab==='alertas'?' on':''}" data-bt="alertas">Alertas (${al.length})</button><button class="chip${tab==='novidades'?' on':''}" data-bt="novidades">Novidades (${naoLidas().length})</button></div>`;
-  if(tab==='alertas')h+=al.length?al.map(a=>`<div class="it al" data-go="${a.tab}"><span class="tag ${a.n}">${a.n==='r'?'✕':'⚠'}</span><span>${esc(a.t)}</span></div>`).join(''):'<div class="empty">Nenhum alerta agora. ✓</div>';
-  else{h+=rec.length?`<div style="text-align:right;margin-bottom:6px"><button class="lnk" data-nall="1">Marcar todas como lidas</button></div>`+rec.map(item).join(''):'<div class="empty">Nenhuma novidade nos últimos 15 dias.</div>';
-    if(ant.length)h+=UI.bellAnt?`<div class="small muted" style="margin:6px 0">Anteriores</div>`+ant.map(item).join('')+'<button class="lnk" data-bant="0">Ocultar anteriores</button>':`<button class="lnk" data-bant="1">Ver anteriores (${ant.length})</button>`}
+  const tab=UI.bell||'alertas',al=alertas(),r=NOT.reads;
+  const vis=visNovs().sort((a,b)=>b.ts.localeCompare(a.ts));
+  const imps=vis.filter(impValida),comuns=vis.filter(n=>!impValida(n));
+  const rec=comuns.filter(recente),princ=rec.slice(0,MAX_NOV),ant=[...rec.slice(MAX_NOV),...comuns.filter(n=>!recente(n))];
+  const lim30=Date.now()-DIAS_EXCL*864e5;
+  const excl=notasVis().filter(n=>ocultas().includes(n.id)&&(!(r.exclEm||{})[n.id]||new Date(r.exclEm[n.id]).getTime()>=lim30)).sort((a,b)=>b.ts.localeCompare(a.ts));
+  const corpo=n=>`<div class="meta">${dataHora(n.ts)}${n.versao?' · '+esc(n.versao):''}</div><div>${esc(n.texto).replace(/\n/g,'<br>')}</div>`;
+  const item=n=>{const lida=r.lidas.includes(n.id),imp=impValida(n);return `<div class="it${imp?' imp':''}${lida?'':' nova'}">${imp?'<div class="tagImp">⚠ IMPORTANTE</div>':''}<div class="ttl">${lida?'':'● '}${esc(n.titulo)}</div>${corpo(n)}<div class="acts"><button data-nl="${esc(n.id)}">${lida?'Marcar como não lida':'Marcar como lida'}</button><button data-nx="${esc(n.id)}">🗑 Excluir</button></div></div>`};
+  const nl=naoLidas().length;
+  let h=`<div class="hd"><button class="chip${tab==='alertas'?' on':''}" data-bt="alertas">Alertas (${al.filter(a=>!a.lida).length})</button><button class="chip${tab==='novidades'?' on':''}" data-bt="novidades">Novidades (${nl})</button></div>`;
+  if(tab==='alertas')h+=al.length?al.map((a,i)=>`<div class="it al${a.lida?' lida':''}${a.crit?' crit':''}" data-ai="${i}"><span class="tag ${a.n}">${a.n==='r'?'✕':'⚠'}</span><div><div>${esc(a.t)}</div>${a.nota?`<div class="nota">${esc(a.nota)}</div>`:''}${a.cnh?`<div class="acts"><button data-cl="${esc(a.cnh)}">${a.lida?'Marcar como não lida':'Marcar como lida'}</button></div>`:''}</div></div>`).join(''):'<div class="empty">Nenhum alerta agora. ✓</div>';
+  else if(UI.bellExc){h+=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><b class="small">🗑 Excluídas (últimos ${DIAS_EXCL} dias)</b><button class="lnk" data-bexc="0">Voltar</button></div>`+(excl.length?excl.map(n=>`<div class="it"><div class="ttl">${esc(n.titulo)}</div>${corpo(n)}<div class="acts"><button data-nr="${esc(n.id)}">↩ Restaurar</button></div></div>`).join(''):'<div class="empty">Nenhuma novidade excluída nos últimos 30 dias.</div>')}
+  else{h+=nl?`<div style="text-align:right;margin-bottom:6px"><button class="lnk" data-nall="1">Marcar todas como lidas (${nl})</button></div>`:'';
+    h+=imps.map(item).join('');
+    h+=princ.length?princ.map(item).join(''):(imps.length?'':'<div class="empty">Nenhuma novidade nos últimos 15 dias.</div>');
+    if(ant.length)h+=UI.bellAnt?`<div class="small muted" style="margin:6px 0">Anteriores</div>`+ant.map(item).join('')+'<button class="lnk" data-bant="0">Ocultar anteriores</button>':`<button class="lnk" data-bant="1">Ver anteriores (${ant.length})</button>`;
+    if(excl.length)h+=`<div style="margin-top:8px"><button class="lnk" data-bexc="1">🗑 Ver excluídas (${excl.length})</button></div>`}
   $('#bellMenu').innerHTML=h;
 }
 $('#bellBtn').onclick=e=>{e.stopPropagation();$('#optMenu').classList.add('hidden');const m=$('#bellMenu');m.classList.toggle('hidden');if(!m.classList.contains('hidden'))renderSino()};
-$('#bellMenu').addEventListener('click',e=>{e.stopPropagation();const t=e.target;const r=NOT.reads;
-  if(t.dataset.bt){UI.bell=t.dataset.bt}
+$('#bellMenu').addEventListener('click',e=>{e.stopPropagation();const t=e.target;const r=NOT.reads;r.exclEm=r.exclEm||{};
+  if(t.dataset.bt){UI.bell=t.dataset.bt;UI.bellExc=false}
   else if(t.dataset.nl){const id=t.dataset.nl;r.lidas=r.lidas.includes(id)?r.lidas.filter(x=>x!==id):[...r.lidas,id];salvarReads()}
-  else if(t.dataset.nx){r.ocultas=[...new Set([...r.ocultas,t.dataset.nx])];salvarReads();toast('Novidade removida da sua tela')}
-  else if(t.dataset.nall){NOT.notes.filter(recente).forEach(n=>{if(!r.lidas.includes(n.id))r.lidas.push(n.id)});salvarReads()}
+  else if(t.dataset.nx){const id=t.dataset.nx;r.ocultas=[...new Set([...ocultas(),id])];r.exclEm[id]=new Date().toISOString();salvarReads();toast('Novidade excluída da sua tela')}
+  else if(t.dataset.nr){const id=t.dataset.nr;r.ocultas=ocultas().filter(x=>x!==id);delete r.exclEm[id];if(!r.lidas.includes(id))r.lidas.push(id);salvarReads();toast('Novidade restaurada');if(!notasVis().some(n=>ocultas().includes(n.id)))UI.bellExc=false}
+  else if(t.dataset.nall){naoLidas().forEach(n=>{if(!r.lidas.includes(n.id))r.lidas.push(n.id)});salvarReads()}
+  else if(t.dataset.cl){r.cnhLida=r.cnhLida===t.dataset.cl?null:t.dataset.cl;salvarReads()}
   else if(t.dataset.bant){UI.bellAnt=t.dataset.bant==='1'}
-  else{const g=t.closest('[data-go]');if(g){UI.tab=g.dataset.go;$('#bellMenu').classList.add('hidden');render();window.scrollTo(0,0);return}else return}
+  else if(t.dataset.bexc){UI.bellExc=t.dataset.bexc==='1'}
+  else{const g=t.closest('[data-ai]');if(g){const a=alertas()[+g.dataset.ai];$('#bellMenu').classList.add('hidden');if(!a)return;
+      if(a.tab==='cnh'){formCnh();return}
+      UI.tab=a.tab;render();window.scrollTo(0,0);
+      if(a.multa){const m=S.tb_multas.find(x=>x.id===a.multa);if(m)formMulta(JSON.parse(JSON.stringify(m)))}return}else return}
   renderSino();atualizaSino()});
 
 /* ---------- login (Supabase Auth: e-mail e senha) ---------- */
@@ -455,7 +497,7 @@ async function iniciar(){
   if(!window.supabase){$('#lErr').textContent='Não foi possível conectar. Verifique a internet e recarregue a página.';return}
   DB=supabase.createClient(SB_URL,SB_KEY);
   $('#lBtn').disabled=false;$('#lErr').textContent='';
-  try{const {data}=await DB.auth.getSession();const u=data&&data.session&&data.session.user;if(u){UID=u.id;LOGADO=u.email;entrar(null)}}catch(e){}
+  try{const {data}=await DB.auth.getSession();const u=data&&data.session&&data.session.user;if(u){UID=u.id;LOGADO=u.email;CAD=u.created_at?new Date(u.created_at).toISOString():null;entrar(null)}}catch(e){}
 }
 $('#fLogin').onsubmit=async e=>{
   e.preventDefault();const u=$('#lUser').value.trim().toLowerCase(),p=$('#lPass').value;$('#lErr').textContent='';
@@ -464,7 +506,7 @@ $('#fLogin').onsubmit=async e=>{
   const {data,error}=await DB.auth.signInWithPassword({email:u,password:p});
   $('#lBtn').disabled=false;
   if(error){$('#lErr').textContent=/invalid/i.test(error.message)?'E-mail ou senha inválidos.':'Não foi possível entrar ('+error.message+').';return}
-  UID=data.user.id;LOGADO=data.user.email;$('#lPass').value='';$('#lErr').textContent='';entrar('Entrada');
+  UID=data.user.id;LOGADO=data.user.email;CAD=data.user.created_at?new Date(data.user.created_at).toISOString():null;$('#lPass').value='';$('#lErr').textContent='';entrar('Entrada');
 };
 async function entrar(evento){
   $('#login').classList.add('hidden');$('#app').classList.remove('hidden');$('#whoName').textContent=LOGADO;
@@ -629,7 +671,7 @@ function formMulta(r){
     campos:[{k:'notif',l:'Data da notificação',t:'date'},{k:'ocorr',l:'Data da infração',t:'date',req:1,help:' '},
       {k:'orgao',l:'Órgão autuador',t:'text',list:['Detran DF','DER DF','PRF','ANTT','DNIT']},{k:'auto',l:'Nº do auto de infração',t:'text'},
       {k:'motivo',l:'Motivo',t:'text',full:1,req:1},{k:'veiculo',l:'Veículo',t:'select',op:VEICS()},
-      {k:'infrator',l:'Real infrator (condutor)',t:'text',list:cfg().condutores},{k:'pontos',l:'Pontos',t:'int'},
+      {k:'infrator',l:'Real infrator (condutor)',t:'text',list:cfg().condutores},{k:'pontos',l:'Pontos',t:'int',help:' '},
       {k:'vOrig',l:'Valor original (R$)',t:'money'},{k:'vDesc',l:'Valor com desconto (R$)',t:'money'},
       {k:'venc',l:'Vencimento do boleto',t:'date',allowFuture:1},{k:'pagto',l:'Data do pagamento',t:'date'},{k:'vPago',l:'Valor pago (R$)',t:'money',help:'Preenchido com o valor com desconto; altere se pagou outro valor.'}],
     val:r,onSave:o=>{if(o.vPago==null)o.vPago=o.vDesc??null;if(o.infrator&&!cfg().condutores.includes(o.infrator)){cfg().condutores.push(o.infrator);salvar('tb_config')}upsert('tb_multas',Object.assign({id:r.id||uid('m')},o))},
@@ -640,6 +682,15 @@ function formMulta(r){
   vd.addEventListener('input',copia);vd.addEventListener('blur',copia);if(!r.id||r.vPago==null)copia();
   const ex=()=>{const v=f.g('ocorr').value,h=f.ov.querySelector('#h_ocorr');if(h)h.textContent=v?'Pontos expiram em '+fmtBR(statusMulta({ocorr:v}).exp):''};
   f.g('ocorr').addEventListener('input',ex);f.g('ocorr').addEventListener('change',ex);ex();
+  const NIV={3:'leve',4:'média',5:'grave',7:'gravíssima'};
+  const ajudaPts=()=>{const h=f.ov.querySelector('#h_pontos');if(!h)return;const n=parseInt(f.g('pontos').value,10)||0,oc=f.g('ocorr').value,inf=f.g('infrator').value;
+    const p=pontosCnh(r.id,n?{ocorr:oc||hoje(),pontos:n,infrator:inf}:null);
+    const niv=n?(NIV[n]?`Infração ${NIV[n]} (${n} pontos). `:'Pontos fora da tabela (3 leve, 4 média, 5 grave, 7 gravíssima). '):'';
+    let t;if(!p.temCnh)t='Limite em 12 meses: 20 pontos com 2 ou mais gravíssimas, 30 com 1 gravíssima e 40 sem gravíssimas; com EAR na CNH, 40. Cadastre sua CNH em ⚙ Opções > Minha CNH.';
+    else if(p.ear)t=`Limite de 40 pontos em 12 meses (sua CNH tem EAR). Você está com ${p.pts} pontos válidos.`;
+    else t=`Limite em 12 meses: 20 pontos com 2 ou mais gravíssimas, 30 com 1 gravíssima, 40 sem gravíssimas. Você tem ${p.grav} gravíssima${p.grav===1?'':'s'}: seu limite é ${p.lim} e você está com ${p.pts} pontos.`;
+    h.textContent=niv+t+(p.temCnh&&p.pts>=p.lim?' ⚠ Limite atingido.':'')};
+  ['pontos','ocorr','infrator'].forEach(k=>{f.g(k).addEventListener('input',ajudaPts);f.g(k).addEventListener('change',ajudaPts)});ajudaPts();
 }
 function formCarne(ym){
   const L=linhaCarne(ym);const reg=L.reg;
@@ -1069,7 +1120,7 @@ async function exportarRel(fmt,btn){
         if(s.cols){doc.autoTable({startY:y,head:[s.cols.map(c=>pdfTxt(c[0]))],body:s.rows.length?s.rows.map(r=>r.map((v,ci)=>pdfTxt(fmtCell(v,s.cols[ci][1])))):[[{content:'Sem dados para o filtro.',colSpan:s.cols.length}]],theme:'striped',headStyles:{fillColor:blue},styles:{fontSize:8,cellPadding:3},
           columnStyles:Object.fromEntries(s.cols.map((c,ci)=>[ci,['money','int','pct','hm'].includes(c[1])?{halign:'right',cellWidth:'wrap'}:c[1]==='date'?{cellWidth:'wrap'}:{}])),margin:{left:40,right:40}});y=doc.lastAutoTable.finalY+(s.nota?4:18)}
         if(s.nota){doc.setFontSize(8);doc.setTextColor(91,100,120);doc.text(pdfTxt(s.nota),40,y+8);y+=24}});
-      const n=doc.getNumberOfPages();for(let p=1;p<=n;p++){doc.setPage(p);doc.setFontSize(8);doc.setTextColor(140);doc.text('© 2026 Diogo Gomes · Todos os direitos reservados. · Página '+p+' de '+n,40,doc.internal.pageSize.getHeight()-20)}
+      const n=doc.getNumberOfPages();for(let p=1;p<=n;p++){doc.setPage(p);doc.setFontSize(8);doc.setTextColor(140);doc.text('© 2026 Rodaliq · Todos os direitos reservados. · Página '+p+' de '+n,40,doc.internal.pageSize.getHeight()-20)}
       data=doc.output('arraybuffer')}
     else if(fmt==='docx'){await carregaLib('jszip');data=await gerarDocx(M,geradoEm)}
     if(DL){await DL.save({filename:fn,data});audit('Exportação','Relatórios',fn+' · '+M.filtroTxt);toast('Relatório gerado')}
@@ -1088,7 +1139,7 @@ async function gerarDocx(M,geradoEm){
     if(s.kpis)b+=tbl(null,s.kpis.map(k=>[k[0],String(k[1]).replace(/<[^>]+>/g,'')]),[0,1]);
     if(s.cols){if(s.kpis)b+=par('');const al=s.cols.map(c=>['money','int','pct','hm'].includes(c[1]));b+=s.rows.length?tbl(s.cols.map(c=>c[0]),s.rows.map(r=>r.map((v,ci)=>fmtCell(v,s.cols[ci][1]))),al):par('Sem dados para o filtro.',{sz:18,cor:'5B6478'})}
     if(s.nota)b+=par(s.nota,{sz:16,cor:'5B6478'})});
-  b+=par('')+par('© 2026 Diogo Gomes · Todos os direitos reservados.',{sz:16,cor:'5B6478'});
+  b+=par('')+par('© 2026 Rodaliq · Todos os direitos reservados.',{sz:16,cor:'5B6478'});
   const doc=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body>${b}<w:sectPr><w:pgSz w:w="16838" w:h="11906" w:orient="landscape"/><w:pgMar w:top="720" w:right="720" w:bottom="720" w:left="720" w:header="0" w:footer="0" w:gutter="0"/></w:sectPr></w:body></w:document>`;
   const z=new JSZip();
   z.file('[Content_Types].xml','<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/></Types>');
@@ -1179,7 +1230,7 @@ document.addEventListener('click',e=>{if(!e.target.closest('#fabWrap'))$('#fabMe
 $('#optBtn').onclick=e=>{e.stopPropagation();$('#bellMenu').classList.add('hidden');$('#optMenu').classList.toggle('hidden')};
 document.addEventListener('click',e=>{if(!e.target.closest('#optWrap'))$('#optMenu').classList.add('hidden');if(!e.target.closest('#bellWrap'))$('#bellMenu').classList.add('hidden')});
 $('#optMenu').onclick=e=>{const b=e.target.closest('[data-m]');if(!b)return;$('#optMenu').classList.add('hidden');
-  ({cfg:formCfg,veic:formVeic,aud:verAuditoria,pass:formSenha,exp:exportar,imp:()=>$('#impFile').click(),out:sair})[b.dataset.m]()};
+  ({cfg:formCfg,veic:formVeic,cnh:formCnh,aud:verAuditoria,pass:formSenha,exp:exportar,imp:()=>$('#impFile').click(),out:sair})[b.dataset.m]()};
 (()=>{const h=(location.hash||'').slice(1);if(['painel','corridas','carona','custos','multas','impostos','relatorios'].includes(h))UI.tab=h})();
 iniciar();
 if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
