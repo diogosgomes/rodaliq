@@ -313,6 +313,7 @@ svg text{font-family:Inter,system-ui,sans-serif}
   <button data-fab="carne">🧾 Carnê-Leão do mês anterior</button>
   <div class="sep"></div>
   <button data-fab="tema">🌓 Tema</button>
+  <button data-fab="sair">↩ Sair</button>
   <div class="dica">Dica: segure e arraste o botão ⚡ Atalhos para qualquer ponto da tela.</div>
 </div><button class="btn fab" id="fab" aria-haspopup="true">⚡ Atalhos</button></div>
 <footer>© 2026 Rodaliq · Todos os direitos reservados.</footer>
@@ -321,7 +322,7 @@ svg text{font-family:Inter,system-ui,sans-serif}
 
 <script>
 "use strict";
-const VERSAO='V25';
+const VERSAO='V26';
 /* ---------- utilidades ---------- */
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -1320,7 +1321,7 @@ let fabDrag=null,fabArrastou=false;
     try{localStorage.setItem(FABK,JSON.stringify(p))}catch(er){}aplicaFab(p)};
   window.addEventListener('pointerup',solta);window.addEventListener('pointercancel',solta)})();
 $('#fab').onclick=e=>{e.stopPropagation();if(fabArrastou){fabArrastou=false;return}fab()};
-$('#fabMenu').onclick=e=>{const b=e.target.closest('[data-fab]');if(!b)return;$('#fabMenu').classList.add('hidden');if(b.dataset.fab==='tema'){formTema();return}NOVO[b.dataset.fab]()};
+$('#fabMenu').onclick=e=>{const b=e.target.closest('[data-fab]');if(!b)return;$('#fabMenu').classList.add('hidden');if(b.dataset.fab==='tema'){formTema();return}if(b.dataset.fab==='sair'){sair();return}NOVO[b.dataset.fab]()};
 document.addEventListener('click',e=>{if(!e.target.closest('#fabWrap'))$('#fabMenu').classList.add('hidden')});
 $('#optBtn').onclick=e=>{e.stopPropagation();$('#bellMenu').classList.add('hidden');const m=$('#optMenu');m.classList.toggle('hidden');if(!m.classList.contains('hidden'))posMenu(m,$('#optBtn'))};
 window.addEventListener('scroll',()=>{['bellMenu','optMenu'].forEach(id=>{const m=document.getElementById(id);if(m&&!m.classList.contains('hidden')&&window.innerWidth<=640)posMenu(m,document.getElementById(id==='bellMenu'?'bellBtn':'optBtn'))})},{passive:true});
