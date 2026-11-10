@@ -1184,6 +1184,16 @@ function formSenha(){
       audit('Troca de senha','Acesso','Senha alterada');ov.remove();toast('Senha alterada')})();return 'Verificando…'}});
   setTimeout(()=>document.querySelectorAll('.modal input.inp').forEach(i=>i.type='password'),0);
 }
+function formCnh(){
+  const c=cfg().cnh||{};
+  openForm({titulo:'Minha CNH',sub:'Usado só para os alertas de renovação e de pontos. Não guardamos número da CNH, CPF nem foto.',
+    campos:[{k:'validade',l:'Validade',t:'date',req:1,allowFuture:1},{k:'categoria',l:'Categoria',t:'select',op:['','A','B','AB','C','D','E','AC','AD','AE']},
+      {k:'primeiraHab',l:'1ª habilitação (opcional)',t:'date'},{k:'titular',l:'Condutor titular (para somar pontos)',t:'text',list:cfg().condutores},
+      {k:'ear',l:'EAR',t:'check',txt:'Minha CNH tem “Exerce Atividade Remunerada” (EAR)',full:1}],
+    val:Object.assign({titular:cfg().condutores[0]||''},c),
+    onSave:o=>{cfg().cnh=o;salvar('tb_config');if(NOT.reads.cnhLida&&!String(NOT.reads.cnhLida).startsWith(o.validade+'|')){NOT.reads.cnhLida=null;salvarReads()}
+      audit('Edição','Configurações','Minha CNH · validade '+fmtBR(o.validade)+(o.categoria?' · cat. '+o.categoria:'')+(o.ear?' · EAR':''));render();toast('CNH salva')}});
+}
 function contagem(o){const c=t=>Array.isArray(o[t])?o[t].length:0;return `${c('tb_corridas')} dias, ${c('tb_repasses')} repasses, ${c('tb_carona')} caronas, ${c('tb_custos')} custos, ${c('tb_multas')} multas, ${Object.keys(o.tb_carne||{}).length} meses de carnê-leão`}
 function nomeArq(){const d=new Date();return pad(d.getDate())+pad(d.getMonth()+1)+String(d.getFullYear()).slice(2)+'_'+pad(d.getHours())+pad(d.getMinutes())+'_backup_Rodaliq.json'}
 async function exportar(){
