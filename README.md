@@ -1,2 +1,2 @@
 # rodaliq
-odaliq – gestão de ganhos para motoristas de app
+Rodaliq – gestão de ganhos para motoristas de app
