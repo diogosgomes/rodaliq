@@ -12,6 +12,8 @@
 <meta name="apple-mobile-web-app-title" content="Rodaliq">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgcng9IjI0IiBmaWxsPSIjMWY2ZmViIi8+PHBhdGggZD0iTTIyIDY2IEEyOCAyOCAwIDAgMSA3OCA2NiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmZmZmIiBzdHJva2Utd2lkdGg9IjkiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjxwYXRoIGQ9Ik01MCA2NiBMNjcgNDUiIHN0cm9rZT0iI2ZmZmZmZiIgc3Ryb2tlLXdpZHRoPSI4IiBzdHJva2UtbGluZWNhcD0icm91bmQiLz48Y2lyY2xlIGN4PSI1MCIgY3k9IjY2IiByPSI3LjUiIGZpbGw9IiNmNTllMGIiLz48cGF0aCBkPSJNMjIgODIgSDc4IiBzdHJva2U9IiNiZmQ0ZmYiIHN0cm9rZS13aWR0aD0iNCIgc3Ryb2tlLWRhc2hhcnJheT0iOSA3IiBzdHJva2UtbGluZWNhcD0icm91bmQiLz48L3N2Zz4=">
+<meta name="color-scheme" content="light dark">
+<script>/* tema por aparelho: claro, escuro ou automático */(function(){var t='claro';try{t=localStorage.getItem('rodaliq_tema')||'claro'}catch(e){}var d=t==='escuro'||(t==='auto'&&window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.setAttribute('data-tema',d?'escuro':'claro')})();</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
 <style>
@@ -157,6 +159,39 @@ h3{font-size:13px;margin:0 0 8px;color:var(--muted);text-transform:uppercase;let
 .menu .who{padding:8px 10px;font-size:12px;color:var(--muted);border-bottom:1px solid var(--line);margin-bottom:4px}
 .menu button{display:block;width:100%;text-align:left;border:0;background:none;padding:9px 10px;border-radius:8px;cursor:pointer}
 .menu button:hover{background:var(--blueSoft)}
+/* ===== tema escuro (azul-noite da marca; contraste também por claro/escuro, pensado para daltonismo) ===== */
+html[data-tema="escuro"]{color-scheme:dark;
+  --bg:#0B1222;--card:#141E33;--ink:#E8EEF8;--muted:#9AA7BF;--line:#26334F;
+  --blue:#3B82F6;--blue2:#2563EB;--blueSoft:#18294A;
+  --amber:#F59E0B;--amberInk:#FBBF4A;--amberSoft:#3A2A0C;
+  --red:#F87171;--redSoft:#3B1717;--gray:#5B6785;
+  --sh:0 1px 2px rgba(0,0,0,.4),0 2px 12px rgba(0,0,0,.35)}
+html[data-tema="escuro"] header{background:rgba(15,24,48,.96)}
+html[data-tema="escuro"] .inp,html[data-tema="escuro"] .btn.sec{background:#1A2640;color:var(--ink)}
+html[data-tema="escuro"] .btn.sec:hover,html[data-tema="escuro"] .menu button:hover,html[data-tema="escuro"] .bell .al:hover{background:#1F2D4D}
+html[data-tema="escuro"] .brand .t1 b{color:#7FB0FF}
+html[data-tema="escuro"] .tab.on{color:#7FB0FF;border-bottom-color:#7FB0FF}
+html[data-tema="escuro"] .hmo{border-color:#6B4A12}
+html[data-tema="escuro"] .par{border-color:#C9D3E6}
+html[data-tema="escuro"] [style*="#f3f7ff"]{background:var(--card)!important;border-color:#24406E!important}
+html[data-tema="escuro"] svg text[fill="#14213d"],html[data-tema="escuro"] svg text[fill="#5b6478"]{fill:#C9D3E6}
+html[data-tema="escuro"] svg [stroke="#e3e7ef"]{stroke:#26334F}
+html[data-tema="escuro"] .modal .lgdot,html[data-tema="escuro"] select option{background:#141E33;color:var(--ink)}
+html[data-tema="escuro"]{--blue2:#7FB0FF}
+html[data-tema="escuro"] .btn:hover{background:#2563EB}
+html[data-tema="escuro"] .mpick,html[data-tema="escuro"] .ib,html[data-tema="escuro"] .chip,html[data-tema="escuro"] .menu,html[data-tema="escuro"] .modal,html[data-tema="escuro"] .fabMenu,html[data-tema="escuro"] .bell .hd button.chip{background:var(--card)}
+html[data-tema="escuro"] .chip.on,html[data-tema="escuro"] .bell .hd button.chip.on{background:var(--blue);border-color:var(--blue);color:#fff}
+html[data-tema="escuro"] .bloco{background:#111A2E}
+html[data-tema="escuro"] .bar,html[data-tema="escuro"] .hbars .tr{background:#26334F}
+html[data-tema="escuro"] .cal .d{background:#1A2640}
+html[data-tema="escuro"] .cal .d.ok .n{color:#DBE7FF}
+html[data-tema="escuro"] .tbl tr.tot td{background:#1A2640}
+html[data-tema="escuro"] .tag.g{background:#26334F;color:#C9D3E6}
+html[data-tema="escuro"] .note{color:#C9D8F2}
+html[data-tema="escuro"] .ib:hover,html[data-tema="escuro"] .chip:hover{background:#1F2D4D}
+html[data-tema="escuro"] .toast{background:#E8EEF8;color:#0B1222}
+html[data-tema="escuro"] i[style*="#f6f8fb"]{background:#1A2640!important;border-color:#26334F!important}
+
 /* celular: menus do sino e de Opções ocupam a largura da tela, logo abaixo do botão */
 @media(max-width:640px){.menu{position:fixed;left:10px;right:10px;width:auto;min-width:0;max-height:calc(100vh - 140px);overflow-y:auto}.menu.bell{width:auto}}
 .badge{display:inline-block;min-width:18px;height:18px;line-height:18px;border-radius:99px;background:var(--red);color:#fff;font-size:11px;font-weight:700;padding:0 5px;margin-left:4px;vertical-align:1px}
@@ -188,10 +223,16 @@ h3{font-size:13px;margin:0 0 8px;color:var(--muted);text-transform:uppercase;let
 @media(max-width:520px){.fgrid{grid-template-columns:1fr}}
 .mfoot{display:flex;gap:8px;justify-content:flex-end;margin-top:18px}
 .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 16px;border-radius:10px;z-index:80;font-weight:600;box-shadow:0 10px 30px rgba(0,0,0,.2)}
-.fabMenu{position:fixed;right:18px;bottom:76px;z-index:31;background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 12px 32px rgba(20,33,61,.2);padding:6px;min-width:240px}
+.fabMenu{position:fixed;right:18px;bottom:76px;z-index:31;max-height:calc(100vh - 16px);overflow-y:auto;width:270px;max-width:calc(100vw - 16px);background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 12px 32px rgba(20,33,61,.2);padding:6px;min-width:240px}
 .fabMenu button{display:block;width:100%;text-align:left;border:0;background:none;padding:10px 12px;border-radius:9px;cursor:pointer;font-weight:600}
 .fabMenu button:hover{background:var(--blueSoft)}
-.fab{position:fixed;right:18px;bottom:18px;z-index:30;border-radius:999px;padding:13px 18px;box-shadow:0 8px 22px rgba(31,111,235,.35)}
+.fab{position:fixed;right:18px;bottom:18px;z-index:30;border-radius:999px;padding:13px 18px;box-shadow:0 8px 22px rgba(31,111,235,.35);touch-action:none;user-select:none;-webkit-user-select:none}
+.fab.drag{opacity:.9;box-shadow:0 14px 30px rgba(31,111,235,.5)}
+/* cursor do mouse: mão aberta branca sobre o botão, mão fechada ao segurar e arrastar */
+.fab{cursor:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2232%22%20height%3D%2232%22%20viewBox%3D%220%200%2032%2032%22%3E%3Cg%20fill%3D%22%23fff%22%20stroke%3D%22%2314213D%22%20stroke-width%3D%221.6%22%20stroke-linejoin%3D%22round%22%3E%3Crect%20x%3D%229%22%20y%3D%225%22%20width%3D%223.6%22%20height%3D%2212%22%20rx%3D%221.8%22/%3E%3Crect%20x%3D%2212.6%22%20y%3D%223%22%20width%3D%223.6%22%20height%3D%2214%22%20rx%3D%221.8%22/%3E%3Crect%20x%3D%2216.2%22%20y%3D%224%22%20width%3D%223.6%22%20height%3D%2213%22%20rx%3D%221.8%22/%3E%3Crect%20x%3D%2219.8%22%20y%3D%227%22%20width%3D%223.6%22%20height%3D%2211%22%20rx%3D%221.8%22/%3E%3Cpath%20d%3D%22M8.5%2014.5c-1.6-2.2-4.6-1.3-3.6%201.2l3.4%207.6c1.3%203%203.8%205.2%207.6%205.2h1.6c4%200%206.3-3%206.3-7v-5H8.6z%22/%3E%3C/g%3E%3Cg%20fill%3D%22%23fff%22%3E%3Crect%20x%3D%229.8%22%20y%3D%2213.5%22%20width%3D%2213%22%20height%3D%225%22/%3E%3C/g%3E%3Cpath%20d%3D%22M12.6%2012v4.5M16.2%2012v4.5M19.8%2012v4.5%22%20stroke%3D%22%2314213D%22%20stroke-width%3D%221.2%22%20stroke-linecap%3D%22round%22/%3E%3C/svg%3E") 16 16,grab}
+html.fab-segura,html.fab-segura *{cursor:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2232%22%20height%3D%2232%22%20viewBox%3D%220%200%2032%2032%22%3E%3Cg%20fill%3D%22%23fff%22%20stroke%3D%22%2314213D%22%20stroke-width%3D%221.6%22%20stroke-linejoin%3D%22round%22%3E%3Crect%20x%3D%228%22%20y%3D%2210.5%22%20width%3D%224%22%20height%3D%227%22%20rx%3D%222%22/%3E%3Crect%20x%3D%2212%22%20y%3D%229.5%22%20width%3D%224%22%20height%3D%228%22%20rx%3D%222%22/%3E%3Crect%20x%3D%2216%22%20y%3D%229.5%22%20width%3D%224%22%20height%3D%228%22%20rx%3D%222%22/%3E%3Crect%20x%3D%2220%22%20y%3D%2210.5%22%20width%3D%224%22%20height%3D%227.5%22%20rx%3D%222%22/%3E%3Cpath%20d%3D%22M8%2015h16v6c0%204-2.8%206.5-6.5%206.5h-3C10.8%2027.5%208%2025%208%2021z%22/%3E%3Crect%20x%3D%225.5%22%20y%3D%2215.5%22%20width%3D%2210%22%20height%3D%224%22%20rx%3D%222%22/%3E%3C/g%3E%3C/svg%3E") 16 16,grabbing!important}
+.fabMenu .sep{border-top:1px solid var(--line);margin:4px 6px}
+.fabMenu .dica{font-size:11px;color:var(--muted);padding:4px 12px 6px}
 svg text{font-family:Inter,system-ui,sans-serif}
 @media(max-width:560px){
   main{padding:12px}
@@ -243,6 +284,7 @@ svg text{font-family:Inter,system-ui,sans-serif}
         <button data-m="cfg">🎯 Metas e preferências</button>
         <button data-m="veic">🚗 Veículos</button>
         <button data-m="cnh">🪪 Minha CNH</button>
+        <button data-m="tema">🌓 Tema</button>
         <button data-m="aud">🕘 Histórico de auditoria</button>
         <button data-m="pass">🔑 Trocar senha</button>
         <button data-m="exp">⬇ Exportar backup</button>
@@ -269,14 +311,17 @@ svg text{font-family:Inter,system-ui,sans-serif}
   <button data-fab="custo">⛽ Custos</button>
   <button data-fab="multa">🚨 Multas</button>
   <button data-fab="carne">🧾 Carnê-Leão do mês anterior</button>
-</div><button class="btn fab" id="fab" aria-haspopup="true">＋ Lançar</button></div>
+  <div class="sep"></div>
+  <button data-fab="tema">🌓 Tema</button>
+  <div class="dica">Dica: segure e arraste o botão ⚡ Atalhos para qualquer ponto da tela.</div>
+</div><button class="btn fab" id="fab" aria-haspopup="true">⚡ Atalhos</button></div>
 <footer>© 2026 Rodaliq · Todos os direitos reservados.</footer>
 <input type="file" id="impFile" accept=".json,application/json" class="hidden">
 </div>
 
 <script>
 "use strict";
-const VERSAO='V20';
+const VERSAO='V25';
 /* ---------- utilidades ---------- */
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -705,7 +750,21 @@ function formCarne(ym){
     val:reg,onSave:o=>{S.tb_carne[ym]=o;salvar('tb_carne');audit('Edição','Carnê-Leão',`${mesNome(ym)} · recebido ${o.bruto==null?'(soma dos repasses)':brl(o.bruto)}${o.pago?' · DARF pago'+(o.valorPago?' '+brl(o.valorPago):''):''}`);render()}});
 }
 const NOVO={corrida:()=>formCorrida(),carona:()=>formCarona(),repasse:()=>formRepasse(),custo:()=>formCusto(),multa:()=>formMulta(),carne:()=>formCarne(addMes(mesAtual(),-1))};
-function fab(){$('#fabMenu').classList.toggle('hidden')}
+const FABK='rodaliq_fab';
+// posição livre, guardada em proporção da tela (0 a 1) para servir em qualquer tamanho e ao girar o celular
+function fabPos(){let p=null;try{p=JSON.parse(localStorage.getItem(FABK)||'null')}catch(e){}
+  if(p&&p.fx!=null&&p.fy!=null)return p;return{fx:1,fy:1}}
+function fabLimites(){const f=$('#fab');return{w:f.offsetWidth||130,h:f.offsetHeight||46,minY:60}}
+function aplicaFab(p){const f=$('#fab');if(!f)return;if(!f.offsetWidth){clearTimeout(aplicaFab.t);aplicaFab.t=setTimeout(()=>aplicaFab(fabPos()),300);return}const L=fabLimites(),mx=window.innerWidth-L.w-18,my=window.innerHeight-L.h-18;
+  const x=18+Math.max(0,Math.min(1,p.fx))*(mx-18),y=L.minY+Math.max(0,Math.min(1,p.fy))*(my-L.minY);
+  f.style.left=Math.round(x)+'px';f.style.top=Math.round(y)+'px';f.style.right='auto';f.style.bottom='auto'}
+function posFabMenu(){const f=$('#fab').getBoundingClientRect(),m=$('#fabMenu'),W=window.innerWidth,H=window.innerHeight,mw=m.offsetWidth,mh=m.offsetHeight;
+  // horizontal: abre para o lado com mais espaço, alinhado à borda do botão
+  let x=(f.left+f.width/2)<W/2?f.left:f.right-mw;x=Math.max(8,Math.min(x,W-mw-8));
+  // vertical: acima do botão se couber; senão, abaixo; senão, o que tiver mais espaço
+  let y;if(f.top-8-mh>=8)y=f.top-8-mh;else if(f.bottom+8+mh<=H-8)y=f.bottom+8;else y=Math.max(8,Math.min(H-mh-8,f.top>H-f.bottom?8:f.bottom+8));
+  m.style.left=Math.round(x)+'px';m.style.top=Math.round(y)+'px';m.style.right='auto';m.style.bottom='auto'}
+function fab(){const m=$('#fabMenu');m.classList.toggle('hidden');if(!m.classList.contains('hidden'))posFabMenu()}
 
 /* ---------- componentes ---------- */
 function monthPicker(){return `<div class="mpick"><button data-mp="-1" aria-label="Mês anterior">‹</button><span>${mesNome(UI.mes)}</span><button data-mp="1" aria-label="Próximo mês">›</button></div>`}
@@ -1187,6 +1246,17 @@ function formSenha(){
       audit('Troca de senha','Acesso','Senha alterada');ov.remove();toast('Senha alterada')})();return 'Verificando…'}});
   setTimeout(()=>document.querySelectorAll('.modal input.inp').forEach(i=>i.type='password'),0);
 }
+function temaAtual(){try{return localStorage.getItem('rodaliq_tema')||'claro'}catch(e){return 'claro'}}
+function aplicaTema(t){const d=t==='escuro'||(t==='auto'&&window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches);
+  document.documentElement.setAttribute('data-tema',d?'escuro':'claro');const m=document.querySelector('meta[name=theme-color]');if(m)m.content=d?'#0B1222':'#14213D'}
+try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{if(temaAtual()==='auto')aplicaTema('auto')})}catch(e){}
+function formTema(){
+  const ov=document.createElement('div');ov.className='ov';document.body.appendChild(ov);const at=temaAtual();
+  const op=[['claro','☀ Claro','Fundo claro, como hoje.'],['escuro','🌙 Escuro','Fundo azul-noite, mais confortável à noite.'],['auto','📱 Automático','Segue o modo claro ou escuro do aparelho.']];
+  ov.innerHTML=`<div class="modal" style="max-width:420px"><h2>Tema</h2><div class="small muted" style="margin-bottom:10px">Vale só para este aparelho.</div>${op.map(o=>`<label style="display:flex;gap:10px;align-items:flex-start;padding:10px;border:1px solid var(--line);border-radius:10px;margin-bottom:8px;cursor:pointer"><input type="radio" name="tema" value="${o[0]}"${at===o[0]?' checked':''} style="margin-top:3px"><span><b>${o[1]}</b><br><span class="small muted">${o[2]}</span></span></label>`).join('')}<div class="mfoot"><button class="btn" id="tOk">Fechar</button></div></div>`;
+  ov.addEventListener('change',e=>{if(e.target.name==='tema'){try{localStorage.setItem('rodaliq_tema',e.target.value)}catch(er){}aplicaTema(e.target.value);render()}});
+  ov.addEventListener('click',e=>{if(e.target.id==='tOk'||e.target===ov)ov.remove()});
+}
 function formCnh(){
   const c=cfg().cnh||{};
   openForm({titulo:'Minha CNH',sub:'Usado só para os alertas de renovação e de pontos. Não guardamos número da CNH, CPF nem foto.',
@@ -1237,14 +1307,26 @@ $('#view').addEventListener('click',e=>{
   else if(t.dataset.carne)formCarne(t.dataset.carne);
   else if(t.dataset.ano){const a=UI.ano+(+t.dataset.ano);if(a>new Date().getFullYear()||a<2025)return;UI.ano=a;render()}
 });
-$('#fab').onclick=e=>{e.stopPropagation();fab()};
-$('#fabMenu').onclick=e=>{const b=e.target.closest('[data-fab]');if(!b)return;$('#fabMenu').classList.add('hidden');NOVO[b.dataset.fab]()};
+let fabDrag=null,fabArrastou=false;
+(()=>{const f=$('#fab');aplicaFab(fabPos());window.addEventListener('resize',()=>aplicaFab(fabPos()));
+  f.addEventListener('pointerdown',e=>{fabDrag={x:e.clientX,y:e.clientY,r:f.getBoundingClientRect(),id:e.pointerId};fabArrastou=false;if(e.pointerType==='mouse')document.documentElement.classList.add('fab-segura')});
+  window.addEventListener('pointermove',e=>{if(!fabDrag)return;const dx=e.clientX-fabDrag.x,dy=e.clientY-fabDrag.y;
+    if(!fabArrastou){if(Math.hypot(dx,dy)<8)return;fabArrastou=true;$('#fabMenu').classList.add('hidden');f.classList.add('drag')}
+    const L=Math.min(Math.max(fabDrag.r.left+dx,4),window.innerWidth-fabDrag.r.width-4),T=Math.min(Math.max(fabDrag.r.top+dy,60),window.innerHeight-fabDrag.r.height-4);
+    f.style.left=L+'px';f.style.top=T+'px';f.style.right='auto';f.style.bottom='auto'});
+  const solta=()=>{document.documentElement.classList.remove('fab-segura');if(!fabDrag)return;fabDrag=null;f.classList.remove('drag');if(!fabArrastou)return;const r=f.getBoundingClientRect();
+    const L=fabLimites(),mx=window.innerWidth-L.w-18,my=window.innerHeight-L.h-18;
+    const p={fx:+Math.max(0,Math.min(1,(r.left-18)/Math.max(1,mx-18))).toFixed(4),fy:+Math.max(0,Math.min(1,(r.top-L.minY)/Math.max(1,my-L.minY))).toFixed(4)};
+    try{localStorage.setItem(FABK,JSON.stringify(p))}catch(er){}aplicaFab(p)};
+  window.addEventListener('pointerup',solta);window.addEventListener('pointercancel',solta)})();
+$('#fab').onclick=e=>{e.stopPropagation();if(fabArrastou){fabArrastou=false;return}fab()};
+$('#fabMenu').onclick=e=>{const b=e.target.closest('[data-fab]');if(!b)return;$('#fabMenu').classList.add('hidden');if(b.dataset.fab==='tema'){formTema();return}NOVO[b.dataset.fab]()};
 document.addEventListener('click',e=>{if(!e.target.closest('#fabWrap'))$('#fabMenu').classList.add('hidden')});
 $('#optBtn').onclick=e=>{e.stopPropagation();$('#bellMenu').classList.add('hidden');const m=$('#optMenu');m.classList.toggle('hidden');if(!m.classList.contains('hidden'))posMenu(m,$('#optBtn'))};
 window.addEventListener('scroll',()=>{['bellMenu','optMenu'].forEach(id=>{const m=document.getElementById(id);if(m&&!m.classList.contains('hidden')&&window.innerWidth<=640)posMenu(m,document.getElementById(id==='bellMenu'?'bellBtn':'optBtn'))})},{passive:true});
 document.addEventListener('click',e=>{if(!e.target.closest('#optWrap'))$('#optMenu').classList.add('hidden');if(!e.target.closest('#bellWrap'))$('#bellMenu').classList.add('hidden')});
 $('#optMenu').onclick=e=>{const b=e.target.closest('[data-m]');if(!b)return;$('#optMenu').classList.add('hidden');
-  ({cfg:formCfg,veic:formVeic,cnh:formCnh,aud:verAuditoria,pass:formSenha,exp:exportar,imp:()=>$('#impFile').click(),out:sair})[b.dataset.m]()};
+  ({cfg:formCfg,veic:formVeic,cnh:formCnh,tema:formTema,aud:verAuditoria,pass:formSenha,exp:exportar,imp:()=>$('#impFile').click(),out:sair})[b.dataset.m]()};
 (()=>{const h=(location.hash||'').slice(1);if(['painel','corridas','carona','custos','multas','impostos','relatorios'].includes(h))UI.tab=h})();
 iniciar();
 if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
