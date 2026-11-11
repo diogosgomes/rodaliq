@@ -182,6 +182,26 @@ html[data-tema="escuro"] .ivOk{color:#4ADE80}
 .ivNome{font-weight:700;word-break:break-word}.ivBday{color:var(--amberInk);font-weight:600;margin-top:4px}
 .ivActs{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.ivActs .btn{width:auto;text-decoration:none}
 .ivDel{color:var(--red)!important;border-color:var(--red)!important}
+.ivDelTxt{color:var(--red)!important}
+.termos{max-width:640px}.termosTxt{max-height:52vh;overflow-y:auto;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:13px;line-height:1.5}.termosTxt h3{margin:0 0 4px;font-size:15px}.termosTxt p{margin:0 0 8px}
+.onbBar{height:6px;background:var(--line);border-radius:9px;margin:6px 0 10px;overflow:hidden}.onbBar i{display:block;height:100%;background:var(--blue)}
+.onbDias{display:flex;flex-wrap:wrap;gap:8px}.onbDias label{display:flex;gap:4px;align-items:center;font-size:13px;border:1px solid var(--line);border-radius:8px;padding:5px 8px}
+.kpi .dica{margin-top:6px;padding:6px 8px;background:var(--amberSoft);color:var(--amberInk);border-radius:8px;font-size:11.5px;line-height:1.4}
+.lnk{display:inline;width:auto;border:0;background:none;color:var(--blue);padding:0;font-size:13px;font-weight:600;cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+footer .lnk{font-size:12px;font-weight:500;color:var(--muted)}
+.kpi .lnk{margin-top:6px;font-size:12px;display:inline-block}
+.kpi.wide{grid-column:1/-1}.prevT td{white-space:nowrap}
+.guiaX{font-size:14px;line-height:1.55}.guiaM{margin-top:10px;padding:8px 10px;background:var(--blueSoft);border-radius:10px;font-size:12.5px;line-height:1.45}
+.guiaA{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}.guiaA .btn{width:auto}
+.card.passos{margin-bottom:14px;border:2px solid var(--amber)}.passosHd{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}
+.passosL{display:flex;flex-wrap:wrap;gap:6px}.passosL .pOk{font-size:12.5px;color:var(--muted);padding:5px 8px;border:1px dashed var(--line);border-radius:8px}
+.passosL .pTodo{font-size:12.5px;font-weight:600;color:var(--ink);background:var(--amberSoft);border:1px solid var(--amber);border-radius:8px;padding:5px 8px;cursor:pointer;width:auto}
+.prevT{width:100%;border-collapse:collapse;font-size:12px;margin-top:6px}.prevT th{text-align:right;font-weight:600;padding:2px 0}.prevT th:first-child,.prevT td:first-child{text-align:left}.prevT td{text-align:right;padding:3px 0;border-top:1px solid var(--line)}.prevT b{color:var(--ink)}
+.prevComo{margin-top:8px;padding:6px 8px;background:var(--blueSoft);border-radius:8px;font-size:11.5px;line-height:1.4;color:var(--ink)}
+.cmpM{margin-top:8px;padding-top:8px;border-top:1px dashed var(--line);line-height:1.5}.cmpM b{color:var(--ink)}.cmpM .neg b{color:var(--red)}.cmpM .pos b{color:var(--blue2)}
+.cmpBar{height:6px;background:var(--line);border-radius:9px;margin-top:6px;overflow:hidden}.cmpBar i{display:block;height:100%;background:var(--blue)}.cmpBar i.over{background:var(--red)}
+.novInfo{margin:0 0 8px}.novInfo .lnk{font-size:12px}.novInfo ul{margin:6px 0 0;padding:8px 10px 8px 24px;background:var(--blueSoft);border-radius:10px;font-size:12px;line-height:1.45;color:var(--ink)}.novInfo li{margin:2px 0}
+.btn.ivDelBtn{background:var(--red);border-color:var(--red);color:#fff}
 .ivLixHd{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px}.ivLixHd .btn{width:auto}
 .ivRow{display:flex;justify-content:space-between;align-items:center;gap:8px}.ivRow .btn{width:auto;text-decoration:none;flex:0 0 auto}
 .ivCalHd{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}.ivCalHd .btn{width:auto}
@@ -321,7 +341,7 @@ svg text{font-family:Inter,system-ui,sans-serif}
     </form>
   </div>
   <div class="selo" id="seloLogin"></div>
-  <footer>© 2026 Rodaliq · Todos os direitos reservados.</footer>
+  <footer>© 2026 Rodaliq · Todos os direitos reservados.<br><button class="lnk" type="button" onclick="verTermos('termos')">Termos de uso</button> · <button class="lnk" type="button" onclick="verTermos('priv')">Privacidade</button></footer>
 </div>
 
 <!-- ============ APP ============ -->
@@ -341,10 +361,13 @@ svg text{font-family:Inter,system-ui,sans-serif}
       <div class="menu hidden" id="optMenu">
         <div class="who">Conectado como <b id="whoName">—</b></div>
         <button data-m="cfg">🎯 Metas e preferências</button>
+        <button data-m="rsv">📅 Despesas programadas</button>
+        <button data-m="onb">🧭 Guia do Rodaliq</button>
         <button data-m="veic">🚗 Veículos</button>
         <button data-m="cnh">🪪 Minha CNH</button>
         <button data-m="inv" id="btnInvites" class="hidden">📨 Pedidos de convite<span id="invBadge" class="mBadge hidden"></span></button>
         <button data-m="tema">🌓 Tema</button>
+        <button data-m="termos">📄 Termos e privacidade</button>
         <button data-m="aud">🕘 Histórico de auditoria</button>
         <button data-m="pass">🔑 Trocar senha</button>
         <button data-m="exp">⬇ Exportar backup</button>
@@ -365,6 +388,7 @@ svg text{font-family:Inter,system-ui,sans-serif}
 </header>
 <main id="view"></main>
 <div class="fabWrap" id="fabWrap"><div class="fabMenu hidden" id="fabMenu">
+  <button data-fab="dia">⚡ Lançar o dia (Uber + 99)</button>
   <button data-fab="corrida">🚕 Corridas (Uber / 99)</button>
   <button data-fab="carona">🧑‍🤝‍🧑 Caronas</button>
   <button data-fab="repasse">🏦 Repasse semanal</button>
@@ -383,7 +407,7 @@ svg text{font-family:Inter,system-ui,sans-serif}
 
 <script>
 "use strict";
-const VERSAO='V32';
+const VERSAO='V44';
 /* ---------- utilidades ---------- */
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -560,6 +584,18 @@ let notesUnsub=null;
 function ouvirNovidades(){if(!DB||notesUnsub)return;const upd=()=>carregarNotas().then(()=>{atualizaSino();if(!$('#bellMenu').classList.contains('hidden'))renderSino()}).catch(()=>{});
   try{notesUnsub=DB.channel('novidades').on('postgres_changes',{event:'*',schema:'public',table:'tb_release_notes'},upd).subscribe()}catch(e){notesUnsub=1}
   document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')upd()})}
+// Esvaziar a lixeira de Novidades: some de vez da tela do usuário (a novidade continua no banco, para os outros usuários)
+function esvaziarExcluidas(){
+  const r=NOT.reads,lista=notasVis().filter(n=>ocultas().includes(n.id)&&!(r.apagadas||[]).includes(n.id));if(!lista.length)return;
+  const d=document.createElement('div');d.className='ov';d.style.zIndex='80';
+  d.innerHTML=`<div class="modal" style="max-width:420px"><h2>⚠ Esvaziar a lixeira?</h2><p>${lista.length===1?'A novidade excluída será apagada':'As '+lista.length+' novidades excluídas serão apagadas'} <b>definitivamente</b> da sua tela.</p><p class="small muted">Não será possível restaurar depois.</p><div class="mfoot"><button class="btn sec" id="esC">Cancelar</button><button class="btn ivDelBtn" id="esS">Esvaziar</button></div></div>`;
+  document.body.appendChild(d);d.__fechar=()=>d.remove();
+  d.addEventListener('click',e=>e.stopPropagation()); // mantém o sino aberto atrás do alerta
+  d.addEventListener('mousedown',e=>{if(e.target===d)d.remove()});
+  d.querySelector('#esC').onclick=()=>d.remove();
+  d.querySelector('#esS').onclick=()=>{r.apagadas=[...new Set([...(r.apagadas||[]),...lista.map(n=>n.id)])];lista.forEach(n=>{if(r.exclEm)delete r.exclEm[n.id]});
+    salvarReads();d.remove();UI.bellExc=false;renderSino();atualizaSino();toast('Lixeira de Novidades esvaziada')};
+}
 function atualizaSino(){const n=alertas().filter(a=>!a.lida).length+naoLidas().length;$('#bellN').textContent=n>9?'9+':n?String(n):''}
 function renderSino(){
   const tab=UI.bell||'alertas',al=alertas(),r=NOT.reads;
@@ -567,14 +603,20 @@ function renderSino(){
   const imps=vis.filter(impValida),comuns=vis.filter(n=>!impValida(n));
   const rec=comuns.filter(recente),princ=rec.slice(0,MAX_NOV),ant=[...rec.slice(MAX_NOV),...comuns.filter(n=>!recente(n))];
   const lim30=Date.now()-DIAS_EXCL*864e5;
-  const excl=notasVis().filter(n=>ocultas().includes(n.id)&&(!(r.exclEm||{})[n.id]||new Date(r.exclEm[n.id]).getTime()>=lim30)).sort((a,b)=>b.ts.localeCompare(a.ts));
+  const excl=notasVis().filter(n=>ocultas().includes(n.id)&&!(r.apagadas||[]).includes(n.id)&&(!(r.exclEm||{})[n.id]||new Date(r.exclEm[n.id]).getTime()>=lim30)).sort((a,b)=>b.ts.localeCompare(a.ts));
   const corpo=n=>`<div class="meta">${dataHora(n.ts)}${n.versao?' · '+esc(n.versao):''}</div><div>${esc(n.texto).replace(/\n/g,'<br>')}</div>`;
   const item=n=>{const lida=r.lidas.includes(n.id),imp=impValida(n);return `<div class="it${imp?' imp':''}${lida?'':' nova'}">${imp?'<div class="tagImp">⚠ IMPORTANTE</div>':''}<div class="ttl">${lida?'':'● '}${esc(n.titulo)}</div>${corpo(n)}<div class="acts"><button data-nl="${esc(n.id)}">${lida?'Marcar como não lida':'Marcar como lida'}</button><button data-nx="${esc(n.id)}">🗑 Excluir</button></div></div>`};
   const nl=naoLidas().length;
   let h=`<div class="hd"><button class="chip${tab==='alertas'?' on':''}" data-bt="alertas">Alertas (${al.filter(a=>!a.lida).length})</button><button class="chip${tab==='novidades'?' on':''}" data-bt="novidades">Novidades (${nl})</button></div>`;
-  if(tab==='alertas')h+=al.length?al.map((a,i)=>`<div class="it al${a.lida?' lida':''}${a.crit?' crit':''}${a.inv?' inv':''}" data-ai="${i}"><span class="tag ${a.n}">${a.n==='r'?'✕':'⚠'}</span><div><div>${esc(a.t)}</div>${a.nota?`<div class="nota">${esc(a.nota)}</div>`:''}${a.cnh?`<div class="acts"><button data-cl="${esc(a.cnh)}">${a.lida?'Marcar como não lida':'Marcar como lida'}</button></div>`:''}</div></div>`).join(''):'<div class="empty">Nenhum alerta agora. ✓</div>';
-  else if(UI.bellExc){h+=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><b class="small">🗑 Excluídas (últimos ${DIAS_EXCL} dias)</b><button class="lnk" data-bexc="0">Voltar</button></div>`+(excl.length?excl.map(n=>`<div class="it"><div class="ttl">${esc(n.titulo)}</div>${corpo(n)}<div class="acts"><button data-nr="${esc(n.id)}">↩ Restaurar</button></div></div>`).join(''):'<div class="empty">Nenhuma novidade excluída nos últimos 30 dias.</div>')}
-  else{h+=nl?`<div style="text-align:right;margin-bottom:6px"><button class="lnk" data-nall="1">Marcar todas como lidas (${nl})</button></div>`:'';
+  if(tab==='alertas')h+=al.length?al.map((a,i)=>`<div class="it al${a.lida?' lida':''}${a.crit?' crit':''}${a.inv?' inv':''}" data-ai="${i}"><span class="tag ${a.n}">${a.n==='r'?'✕':'⚠'}</span><div><div>${esc(a.t)}</div>${a.nota?`<div class="nota">${esc(a.nota)}</div>`:''}${a.cnh?`<div class="acts"><button data-cl="${esc(a.cnh)}">${a.lida?'Marcar como não lida':'Marcar como lida'}</button></div>`:''}${a.sup?`<div class="acts"><button data-sl="${esc(a.sup)}">${a.lida?'Marcar como não lida':'Marcar como lida'}</button></div>`:''}</div></div>`).join(''):'<div class="empty">Nenhum alerta agora. ✓</div>';
+  else if(UI.bellExc){h+=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><b class="small">🗑 Excluídas (últimos ${DIAS_EXCL} dias)</b><span style="display:flex;gap:12px">${excl.length?'<button class="lnk ivDelTxt" data-besv="1">🗑 Esvaziar</button>':''}<button class="lnk" data-bexc="0">Voltar</button></span></div><div class="small muted" style="margin:-2px 0 8px">As novidades ficam aqui por 30 dias. <b>Esvaziar</b> apaga de vez.</div>`+(excl.length?excl.map(n=>`<div class="it"><div class="ttl">${esc(n.titulo)}</div>${corpo(n)}<div class="acts"><button data-nr="${esc(n.id)}">↩ Restaurar</button></div></div>`).join(''):'<div class="empty">Nenhuma novidade excluída nos últimos 30 dias.</div>')}
+  else{h+=nl?`<div style="text-align:right;margin-bottom:4px"><button class="lnk" data-nall="1">Marcar todas como lidas (${nl})</button></div>`:'';
+    h+=`<div class="novInfo"><button class="lnk" data-binfo="1">ℹ Como funcionam as novidades ${UI.bellInfo?'▴':'▾'}</button>${UI.bellInfo?`<ul>
+      <li>A lista mostra até <b>5 novidades dos últimos 15 dias</b>. As mais antigas ficam em <b>Ver anteriores</b>.</li>
+      <li>Avisos <b>⚠ IMPORTANTE</b> ficam no topo até a data de validade (ou por 7 dias, se não tiverem data).</li>
+      <li>O número do sino conta só as <b>não lidas</b> desses 15 dias e os avisos importantes válidos.</li>
+      <li><b>🗑 Excluir</b> tira a novidade só da sua tela. Ela fica <b>30 dias em Ver excluídas</b>, onde você pode restaurar ou <b>esvaziar de vez</b>.</li>
+      <li>Novidades publicadas antes do seu cadastro não aparecem.</li></ul>`:''}</div>`;
     h+=imps.map(item).join('');
     h+=princ.length?princ.map(item).join(''):(imps.length?'':'<div class="empty">Nenhuma novidade nos últimos 15 dias.</div>');
     if(ant.length)h+=UI.bellAnt?`<div class="small muted" style="margin:6px 0">Anteriores</div>`+ant.map(item).join('')+'<button class="lnk" data-bant="0">Ocultar anteriores</button>':`<button class="lnk" data-bant="1">Ver anteriores (${ant.length})</button>`;
@@ -589,12 +631,16 @@ $('#bellMenu').addEventListener('click',e=>{e.stopPropagation();const t=e.target
   else if(t.dataset.nx){const id=t.dataset.nx;r.ocultas=[...new Set([...ocultas(),id])];r.exclEm[id]=new Date().toISOString();salvarReads();toast('Novidade excluída da sua tela')}
   else if(t.dataset.nr){const id=t.dataset.nr;r.ocultas=ocultas().filter(x=>x!==id);delete r.exclEm[id];if(!r.lidas.includes(id))r.lidas.push(id);salvarReads();toast('Novidade restaurada');if(!notasVis().some(n=>ocultas().includes(n.id)))UI.bellExc=false}
   else if(t.dataset.nall){naoLidas().forEach(n=>{if(!r.lidas.includes(n.id))r.lidas.push(n.id)});salvarReads()}
+  else if(t.dataset.sl){r.supaLida=r.supaLida===t.dataset.sl?null:t.dataset.sl;salvarReads()}
   else if(t.dataset.cl){r.cnhLida=r.cnhLida===t.dataset.cl?null:t.dataset.cl;salvarReads()}
   else if(t.dataset.bant){UI.bellAnt=t.dataset.bant==='1'}
   else if(t.dataset.bexc){UI.bellExc=t.dataset.bexc==='1'}
+  else if(t.dataset.besv){esvaziarExcluidas();return}
+  else if(t.dataset.binfo){UI.bellInfo=!UI.bellInfo}
   else{const g=t.closest('[data-ai]');if(g){const a=alertas()[+g.dataset.ai];$('#bellMenu').classList.add('hidden');if(!a)return;
       if(a.tab==='cnh'){formCnh();return}
       if(a.tab==='inv'){openInvitesModal();return}
+      if(a.tab==='supa')return;
       UI.tab=a.tab;render();window.scrollTo(0,0);
       if(a.multa){const m=S.tb_multas.find(x=>x.id===a.multa);if(m)formMulta(JSON.parse(JSON.stringify(m)))}return}else return}
   renderSino();atualizaSino()});
@@ -622,7 +668,7 @@ $('#fLogin').onsubmit=async e=>{
 };
 async function entrar(evento){
   $('#login').classList.add('hidden');$('#app').classList.remove('hidden');$('#whoName').textContent=LOGADO;
-  await carregar();render();ouvirNovidades();invAdminInit();navInicia();
+  await carregar();render();ouvirNovidades();invAdminInit();navInicia();checarTermos().then(checarPrimeiroAcesso);
   if(evento)audit(evento,'Acesso','Login de '+LOGADO);
 }
 async function sair(){await audit('Saída','Acesso','Logout de '+LOGADO);try{await DB.auth.signOut()}catch(e){}location.reload()}
@@ -692,7 +738,7 @@ function openForm({titulo,sub,campos,val={},onSave,onDel}){
     else if(c.t==='time')inp=`<input class="inp num" inputmode="numeric" id="${id}" value="${esc(v)}" placeholder="hh:mm" maxlength="6">`;
     else if(c.t==='int'||c.t==='num')inp=`<input class="inp num" inputmode="decimal" id="${id}" value="${esc(v)}"${req}>`;
     else if(c.t==='check')inp=`<label style="display:flex;gap:8px;align-items:center;font-weight:500;color:var(--ink)"><input type="checkbox" id="${id}"${v?' checked':''}> ${esc(c.txt||'')}</label>`;
-    else inp=`<input class="inp" id="${id}" value="${esc(v)}"${c.list?` list="dl_${c.k}"`:''}${req}>${c.list?`<datalist id="dl_${c.k}">${c.list.map(o=>`<option value="${esc(o)}">`).join('')}</datalist>`:''}`;
+    else inp=`<input class="inp" id="${id}" value="${esc(v)}"${c.ph?` placeholder="${esc(c.ph)}"`:''}${c.list?` list="dl_${c.k}"`:''}${req}>${c.list?`<datalist id="dl_${c.k}">${c.list.map(o=>`<option value="${esc(o)}">`).join('')}</datalist>`:''}`;
     return `<div class="${cls}${c.hide?' hidden':''}" data-w="${c.k}"><label>${esc(c.l)}${c.req?' *':''}</label>${inp}${c.help?`<span class="small muted" id="h_${c.k}">${c.help}</span>`:''}</div>`;
   }).join('');
   ov.innerHTML=`<form class="modal" novalidate><h2>${esc(titulo)}</h2>${sub?`<div class="small muted">${sub}</div>`:''}<div class="fgrid">${h}</div><div class="err" id="fErr"></div><div class="mfoot">${onDel?'<button type="button" class="btn warn sm" id="fDel" style="margin-right:auto">Excluir</button>':''}<button type="button" class="btn sec" id="fCan">Cancelar</button><button class="btn" type="submit">Salvar</button></div></form>`;
@@ -727,12 +773,13 @@ function upsert(tb,rec){const a=S[tb];const i=a.findIndex(x=>x.id===rec.id);cons
 function remover(tb,id){const r=S[tb].find(x=>x.id===id);S[tb]=S[tb].filter(x=>x.id!==id);salvar(tb);if(r)audit('Exclusão',NOME_TB[tb],resumoReg(tb,r));render()}
 
 /* ---------- formulários por tabela ---------- */
+const AJUDA_KM='📏 Usado no Painel para R$ por km, Custo por km e Lucro por km. É opcional, mas sem ele esses indicadores não aparecem.';
 function formCorrida(r){
   r=r||{data:hoje(),plataforma:'Uber',veiculo:cfg().veiculoPadrao};
-  const f=openForm({titulo:r.id?'Editar dia de corridas':'Novo lançamento do dia',sub:'Ganho do dia em Uber ou 99. Caronas são lançadas na aba Caronas (também somam na meta diária).',
+  const f=openForm({titulo:r.id?'Editar dia de corridas':'Novo lançamento do dia',sub:'Ganho do dia em Uber ou 99. Caronas são lançadas na aba Caronas (também somam na meta diária).'+(r.id?'':'<br>💡 Rodou nas duas no mesmo dia? Use ⚡ Atalhos &gt; Lançar o dia (Uber + 99).'),
     campos:[{k:'data',l:'Data',t:'date',req:1},{k:'plataforma',l:'Plataforma',t:'select',op:['Uber','99']},
       {k:'valor',l:'Ganho do dia (R$)',t:'money',req:1},{k:'viagens',l:'Qtd. viagens',t:'int'},
-      {k:'min',l:'Tempo online (hh:mm)',t:'time'},{k:'km',l:'Km rodados (opcional)',t:'num'},
+      {k:'min',l:'Tempo online (hh:mm)',t:'time'},{k:'km',l:'Km rodados (opcional)',t:'num',help:AJUDA_KM},
       {k:'veiculo',l:'Veículo',t:'select',op:VEICS()},{k:'obs',l:'Observação',t:'text',full:1}],
     val:Object.assign({},r,{min:minToInp(r.min)}),
     onSave:o=>upsert('tb_corridas',Object.assign({id:r.id||uid('d')},o)),onDel:r.id?()=>remover('tb_corridas',r.id):null});
@@ -860,6 +907,15 @@ function chartDias(ym,pa,pcr){
   return s+`<div class="legend"><span><i style="background:#1f6feb"></i>Uber + 99 (meta batida)</span><span><i style="background:#9ec2ff;border:1px dashed #1f6feb"></i>Carona (meta batida)</span><span><i style="background:#f59e0b"></i>Uber + 99 (abaixo)</span><span><i style="background:#fcd9a0;border:1px dashed #d98a00"></i>Carona (abaixo)</span></div>`;
 }
 
+/* Custos do veículo: mês selecionado (até hoje, se for o atual) × mês anterior inteiro. Recalcula sempre a partir dos lançamentos. */
+function cmpMesPassado(ym,vAtual){
+  const pm=addMes(ym,-1),pc=custosMes(pm),pv=sum(pc,r=>r.valor),nome=mesNome(pm),curto=MESES[+pm.slice(5,7)-1].toLowerCase();
+  if(!pc.length)return `<div class="cmpM">${nome}: sem custos lançados</div>`;
+  const dif=Math.round((vAtual-pv)*100)/100,pct=pv>0?Math.round(vAtual/pv*100):null;
+  const txt=dif>0?`<span class="neg"><b>▲ ${brl(dif)} a mais</b></span>`:dif<0?`<span class="pos"><b>▼ ${brl(-dif)} a menos</b></span>`:'<b>= igual</b>';
+  return `<div class="cmpM">${nome}: <b>${brl(pv)}</b> · ${pc.length} ${pc.length===1?'lançamento':'lançamentos'}<br>${txt}${pct!=null?` · ${pct}% de ${curto}`:''}`+
+    (pct!=null?`<div class="cmpBar" role="img" aria-label="${pct}% de ${curto}"><i class="${pct>100?'over':''}" style="width:${Math.min(pct,100)}%"></i></div>`:'')+`</div>`;
+}
 /* ---------- telas ---------- */
 function vPainel(){
   const ym=UI.mes,G=ganhosMes(ym),car=caronaMes(ym),cus=custosMes(ym),meta=cfg().metaDiaria;
@@ -892,7 +948,7 @@ function vPainel(){
     const cr=sum(S.tb_carona.filter(f),r=>r.valor),k=sum(todasDespesas().filter(f),r=>r.valor);return{v,ent,cr,k,s:ent+cr-k}}).filter(x=>x.ent||x.cr||x.k);
   const T=totaisGerais();
   const filtroTxt=mesNome(ym)+' · '+(UI.veic==='Todos'?'todos os veículos':UI.veic);
-  return `
+  return `${cardPassos()}
   <div class="card" style="margin-bottom:14px;background:linear-gradient(180deg,#f3f7ff,#fff);border:1px solid #cfe0ff">
     <div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:10px"><h2 style="margin:0">Desde o início</h2><span class="small muted">tudo o que já foi lançado${T.desde?' desde '+fmtBR(T.desde):''} · não muda com o mês nem com o filtro de veículo</span></div>
     <div class="grid cards">
@@ -913,8 +969,9 @@ function vPainel(){
     ${kpi('R$ por viagem',G.viagens?brl(G.valor/G.viagens):'—',G.viagens?G.viagens+' viagens':'')}
     ${G.km?kpi('R$ por km',brl(G.valor/G.km),G.km+' km rodados'):''}`)}
   ${bloco('🧾 Despesas e resultado do mês',filtroTxt,`
-    ${(()=>{const mu=cus.filter(r=>r.virtual);return kpi('Custos do veículo',brl(vCus),cus.length+(cus.length===1?' lançamento':' lançamentos')+(mu.length?'<br>inclui multas pagas '+brl(sum(mu,r=>r.valor)):''))})()}
+    ${(()=>{const mu=cus.filter(r=>r.virtual);return kpi('Custos do veículo',brl(vCus),cus.length+(cus.length===1?' lançamento':' lançamentos')+(mu.length?'<br>inclui multas pagas '+brl(sum(mu,r=>r.valor)):'')+cmpMesPassado(ym,vCus))})()}
     ${kpi('Resultado líquido',`<span class="${res>=0?'pos':'neg'}">${brl(res)}</span>`,'Ganhos + carona − custos do veículo<br>'+brl(vMeta)+' (meta do mês) − '+brl(vCus)+' (custos)','hl')}
+    ${cardsExtras(ym,G,vMeta,vCus,res,cus,pd,ehMesAtual,decorridos,n)}
     ${(()=>{const cb=combMes(ym);let partes;if(G.fonte==='diário'){const c=doMes(S.tb_corridas,ym).filter(fVeic);partes=[['Uber',sum(c.filter(r=>r.plataforma==='Uber'),r=>r.valor)],['99',sum(c.filter(r=>r.plataforma==='99'),r=>r.valor)],['Carona',vCar]]}else partes=[['Uber/99 (repasses)',G.valor],['Carona',vCar]];
       const ab=custosMes(ym).filter(r=>r.cat==='Combustível'),cl=ab.filter(r=>r.litros),lt=sum(cl,r=>r.litros);
       const kComb=kpi('⛽ Combustível',brl(cb),ab.length?ab.length+(ab.length===1?' abastecimento':' abastecimentos')+(lt?' · '+lt.toLocaleString('pt-BR')+' L · média '+brl(sum(cl,r=>r.valor)/lt)+'/L':''):'Nenhum abastecimento lançado no mês');
@@ -1287,7 +1344,7 @@ function formCfg(){
     {k:'descontoSimplificado',l:'Carnê-Leão',t:'check',txt:'Usar desconto simplificado mensal (R$ 607,20)',full:1}],
     val:{metaDiaria:c.metaDiaria,precoCarona:c.precoCarona,dias:c.diasMeta.join(','),veiculoPadrao:c.veiculoPadrao,descontoSimplificado:c.descontoSimplificado},
     onSave:o=>{const d=[...new Set(o.dias.split(/[,; ]+/).map(Number).filter(x=>x>=0&&x<=6))].sort();if(!d.length)return'Informe ao menos um dia.';
-      Object.assign(c,{metaDiaria:o.metaDiaria,precoCarona:o.precoCarona||10,diasMeta:d,veiculoPadrao:o.veiculoPadrao,descontoSimplificado:o.descontoSimplificado});salvar('tb_config');audit('Edição','Configurações',`Meta diária ${brl(c.metaDiaria)} · carona ${brl(c.precoCarona)}/pass. · veículo padrão ${c.veiculoPadrao}`);render();toast('Preferências salvas')}});
+      Object.assign(c,{metaDiaria:o.metaDiaria,precoCarona:o.precoCarona||10,diasMeta:d,veiculoPadrao:o.veiculoPadrao,descontoSimplificado:o.descontoSimplificado,ok_meta:true});salvar('tb_config');audit('Edição','Configurações',`Meta diária ${brl(c.metaDiaria)} · carona ${brl(c.precoCarona)}/pass. · veículo padrão ${c.veiculoPadrao}`);render();toast('Preferências salvas')}});
 }
 function formVeic(){
   const ov=document.createElement('div');ov.className='ov';
@@ -1299,7 +1356,7 @@ function formVeic(){
     ov.querySelector('#vCan').onclick=()=>ov.__fechar();ov.querySelector('#vAdd').onclick=()=>{ler();tmp.push({nome:'Novo',desc:'',desde:'',ativo:true});cfg().veiculos=tmp;draw()};
     ov.querySelector('#vOk').onclick=()=>{ler();const nomes=tmp.map(v=>v.nome.trim());if(nomes.some(n=>!n)||new Set(nomes).size!==nomes.length){toast('Nomes vazios ou repetidos.');return}
       orig.forEach((o,i)=>{const n=tmp[i]&&tmp[i].nome;if(n&&n!==o.nome)['tb_corridas','tb_repasses','tb_carona','tb_custos','tb_multas'].forEach(tb=>{let mud=false;S[tb].forEach(r=>{if(r.veiculo===o.nome){r.veiculo=n;mud=true}});if(mud)salvar(tb)})});
-      cfg().veiculos=tmp;if(!nomes.includes(cfg().veiculoPadrao))cfg().veiculoPadrao=nomes[0];salvar('tb_config');audit('Edição','Veículos',nomes.join(', '));ov.remove();render();toast('Veículos salvos')}};
+      cfg().veiculos=tmp;cfg().ok_veic=true;if(!nomes.includes(cfg().veiculoPadrao))cfg().veiculoPadrao=nomes[0];salvar('tb_config');audit('Edição','Veículos',nomes.join(', '));ov.remove();render();toast('Veículos salvos')}};
   const orig=JSON.parse(JSON.stringify(cfg().veiculos));let tmp=JSON.parse(JSON.stringify(orig));
   const ler=()=>ov.querySelectorAll('[data-vi]').forEach(el=>{const v=tmp[+el.dataset.vi];v[el.dataset.vk]=el.type==='checkbox'?el.checked:el.value});
   ov.__fechar=()=>fechaComPerda(ov,()=>{cfg().veiculos=orig;ov.remove()});
@@ -1384,9 +1441,17 @@ function invBdayOn(x,off){
 const invBdayTomorrow=x=>invBdayOn(x,1);
 const invBdayNear=x=>{const h=invBdayOn(x,0);if(h)return{...h,when:'hoje'};const a=invBdayOn(x,1);return a?{...a,when:'amanhã'}:null};
 // Alertas do sino (só administrador): entram no topo da aba Alertas
+// V44: lembrete semanal (sextas-feiras, só admin) para manter o projeto do Supabase ativo — o plano gratuito pausa após 7 dias seguidos sem uso
+function supaAlerta(){
+  const d=new Date();if(d.getDay()!==5)return null;const k=isoOf(d);
+  return {n:'r',crit:1,tab:'supa',sup:k,lida:NOT.reads.supaLida===k,
+    t:'Lembrete semanal: use o Rodaliq em produção (rodaliq.com.br) para o Supabase não pausar o projeto.',
+    nota:'No plano gratuito, o Supabase pausa o projeto após 7 dias seguidos sem atividade. Basta entrar no app e abrir o Painel ou fazer um lançamento. Se pausar, reative em supabase.com > projeto rodaliq > Restore project.'};
+}
 function invAlerts(){
   if(!invIsAdmin)return [];
-  const out=[],nw=invCache.filter(x=>invVivo(x)&&x.status==='novo'&&!x.archived);
+  const out=[],sa=supaAlerta();if(sa)out.push(sa);
+  const nw=invCache.filter(x=>invVivo(x)&&x.status==='novo'&&!x.archived);
   if(nw.length)out.push({n:'a',inv:1,tab:'inv',t:nw.length===1?'1 pedido de convite novo':nw.length+' pedidos de convite novos',
     nota:nw.slice(0,5).map(x=>`${x.name}${invUfOf(x.whatsapp)?' ('+invUfOf(x.whatsapp)+')':''}`).join(' · ')+(nw.length>5?' · … e mais '+(nw.length-5):'')+'. Responda pelo WhatsApp e marque como convidado ou recusado.'});
   invCache.filter(invVivo).forEach(x=>{const bd=invBdayTomorrow(x);if(!bd)return;
@@ -1587,6 +1652,202 @@ window.addEventListener('popstate',async()=>{
   navRev=true;UI.tab=NAVT.length?NAVT.pop():'painel';render();window.scrollTo(0,0);
 });
 
+/* ===================== V36: termos, primeiro acesso, por km, projeção, reservas e fechar o dia ===================== */
+/* ---------- 1. Termos de uso e Política de privacidade ---------- */
+const TERMOS_V='T1-2026-11-11',TERMOS_DATA='11/11/2026',TERMOS_RESP='Rodaliq',TERMOS_MAIL='rodaliq.app@gmail.com';
+const TXT_TERMOS=`<h3>Termos de uso do Rodaliq</h3><p class="small muted">Versão de ${TERMOS_DATA}</p>
+<p><b>1. O que é o Rodaliq.</b> Um aplicativo de gestão para motoristas de aplicativo: registra ganhos (Uber, 99 e Carona Solidária), custos do veículo, multas e o Carnê-Leão, e mostra indicadores, alertas e relatórios.</p>
+<p><b>2. Quem pode usar.</b> Somente maiores de 18 anos (Código Civil, art. 5º), com acesso liberado por convite. A conta é pessoal: login e senha não devem ser compartilhados.</p>
+<p><b>3. Responsabilidade pelas informações.</b> Os valores mostrados vêm do que você lança. Os cálculos de Carnê-Leão, previsões, despesas programadas e indicadores são <b>estimativas de apoio</b> e não substituem a orientação de um profissional de Contabilidade nem os sistemas oficiais da Receita Federal (como o Carnê-Leão Web e o Sicalc).</p>
+<p><b>4. Disponibilidade.</b> Seus dados ficam guardados em um banco de dados na nuvem: não se perdem se você trocar de celular ou se o app ficar fora do ar por um tempo. O app pode ter pausas rápidas para manutenção. O backup (⚙ Opções &gt; Exportar backup) é uma cópia extra, útil para guardar um retrato dos seus dados ou recuperar algo excluído por engano.</p>
+<p><b>5. Segurança dos dados.</b> O Rodaliq adota medidas técnicas para proteger seus dados contra acessos não autorizados, como conexão criptografada e acesso restrito a cada conta, conforme a LGPD (Lei nº 13.709/2018, art. 46).</p>
+<p><b>6. Propriedade.</b> A marca, o nome, a identidade visual e o código do Rodaliq pertencem ao seu responsável. Os dados que você lança são seus.</p>
+<p><b>7. Encerramento.</b> Você pode pedir a exclusão da conta e dos dados a qualquer momento pelo e-mail ${TERMOS_MAIL}.</p>
+<p><b>8. Mudanças.</b> Estes termos podem ser atualizados. Quando isso acontecer, o app pedirá um novo aceite.</p>
+<p><b>9. Lei aplicável.</b> Legislação brasileira. Contato: ${TERMOS_MAIL}.</p>`;
+const TXT_PRIV=`<h3>Política de privacidade do Rodaliq</h3><p class="small muted">Versão de ${TERMOS_DATA} · em conformidade com a LGPD (Lei nº 13.709/2018)</p>
+<p><b>1. Controlador.</b> ${TERMOS_RESP}. Contato para assuntos de dados pessoais: ${TERMOS_MAIL}.</p>
+<p><b>2. Dados tratados.</b><br>• <b>Pedido de convite:</b> nome, e-mail, WhatsApp (com DDD), data de nascimento e como soube do app.<br>• <b>Conta:</b> e-mail e senha (a senha fica protegida pelo provedor de login e não é vista por ninguém).<br>• <b>Uso do app:</b> lançamentos de ganhos, caronas, repasses, custos, multas (inclusive pontos e condutor informado), Carnê-Leão, veículos, metas e despesas programadas.<br>• <b>Minha CNH:</b> somente validade, categoria, EAR e data da 1ª habilitação. Não guardamos número da CNH, CPF nem foto.<br>• <b>No aparelho:</b> tema escolhido e posição do botão Atalhos (ficam só no seu aparelho).</p>
+<p><b>3. Para que usamos.</b> Prestar o serviço (calcular indicadores, alertas, relatórios e o Carnê-Leão estimado), liberar o acesso, falar com você pelo WhatsApp sobre o acesso e enviar felicitações de aniversário (com a sua autorização), e manter a segurança. Não vendemos dados nem os usamos para publicidade.</p>
+<p><b>4. Bases legais.</b> Execução do serviço que você contratou (art. 7º, V), consentimento para contato por WhatsApp e felicitações (art. 7º, I) e legítimo interesse para segurança e prevenção de fraudes (art. 7º, IX).</p>
+<p><b>5. Onde ficam e com quem são compartilhados.</b> Os dados ficam no Supabase (banco de dados e login, servidores em São Paulo). O site é publicado pelo GitHub Pages. Esses fornecedores só armazenam e processam os dados para o app funcionar. Não há outro compartilhamento, salvo obrigação legal.</p>
+<p><b>6. Segurança.</b> Conexão criptografada (HTTPS) e regras no banco que fazem cada usuário ver e alterar somente os próprios dados dentro de sua respectiva área logada.</p>
+<p><b>7. Por quanto tempo.</b> Enquanto a conta estiver ativa. Pedidos de convite ficam até serem excluídos (na lixeira, por até 15 dias). Após o pedido de exclusão da conta, os dados são apagados, salvo o que a lei obrigar a guardar.</p>
+<p><b>8. Seus direitos (art. 18).</b> Confirmar se tratamos seus dados, acessar, corrigir, pedir a exclusão, a portabilidade (o backup em ⚙ Opções &gt; Exportar já entrega seus dados) e revogar o consentimento. Peça pelo e-mail ${TERMOS_MAIL}.</p>
+<p><b>9. Menores de idade.</b> O app não é destinado a menores de 18 anos e não aceita pedidos deles (LGPD, art. 14).</p>
+<p><b>10. Mudanças.</b> Esta política pode ser atualizada; o app pedirá um novo aceite quando isso acontecer.</p>`;
+function verTermos(aba){
+  const ov=document.createElement('div');ov.className='ov';ov.style.zIndex='70';let at=aba||'termos';
+  const draw=()=>{ov.innerHTML=`<div class="modal termos"><div class="chips" style="margin-bottom:10px"><button class="chip${at==='termos'?' on':''}" data-ta="termos">Termos de uso</button><button class="chip${at==='priv'?' on':''}" data-ta="priv">Privacidade</button></div>
+    <div class="termosTxt">${at==='termos'?TXT_TERMOS:TXT_PRIV}</div><div class="mfoot"><button class="btn" id="tmF">Fechar</button></div></div>`};
+  draw();document.body.appendChild(ov);ov.__fechar=()=>ov.remove();
+  ov.addEventListener('click',e=>{e.stopPropagation();if(e.target.dataset.ta){at=e.target.dataset.ta;draw()}else if(e.target.id==='tmF'||e.target===ov)ov.remove()});
+}
+function checarTermos(){return new Promise(res=>{
+  const a=cfg().aceite;if(a&&a.versao===TERMOS_V)return res(true);
+  const ov=document.createElement('div');ov.className='ov';ov.id='termosDlg';ov.style.zIndex='75';let at='termos';
+  const draw=()=>{const ok=ov.querySelector('#tmOk')?.checked;ov.innerHTML=`<div class="modal termos"><h2>Antes de continuar</h2>
+    <p class="small muted">${a?'Os Termos de uso e a Política de privacidade foram atualizados.':'Para usar o Rodaliq, leia e aceite os Termos de uso e a Política de privacidade.'}</p>
+    <div class="chips" style="margin:8px 0"><button class="chip${at==='termos'?' on':''}" data-ta="termos">Termos de uso</button><button class="chip${at==='priv'?' on':''}" data-ta="priv">Privacidade</button></div>
+    <div class="termosTxt">${at==='termos'?TXT_TERMOS:TXT_PRIV}</div>
+    <label class="ivCheck"><input type="checkbox" id="tmOk"${ok?' checked':''}><span>Li e aceito os <b>Termos de uso</b> e a <b>Política de privacidade</b> do Rodaliq.</span></label>
+    <div id="tmErr" class="err"></div><div class="mfoot"><button class="btn sec" id="tmSair">Sair</button><button class="btn" id="tmAc">Aceitar e continuar</button></div></div>`};
+  draw();document.body.appendChild(ov);ov.__fechar=()=>{}; // não fecha pelo gesto de voltar
+  ov.addEventListener('click',e=>{e.stopPropagation();const t=e.target;
+    if(t.dataset.ta){at=t.dataset.ta;draw()}
+    else if(t.id==='tmSair'){t.disabled=true;audit('Termos não aceitos','Configurações','📄 Termos não aceitos · versão '+TERMOS_V).then(()=>sair())}
+    else if(t.id==='tmAc'){if(!ov.querySelector('#tmOk').checked){ov.querySelector('#tmErr').textContent='Marque “Li e aceito” para continuar.';return}
+      cfg().aceite={versao:TERMOS_V,em:new Date().toISOString()};salvar('tb_config');audit('Termos aceitos','Configurações','📄 Termos aceitos · versão '+TERMOS_V);ov.remove();res(true)}});
+})}
+/* ---------- 3. Primeiro acesso guiado ---------- */
+const contaVazia=()=>['tb_corridas','tb_repasses','tb_carona','tb_custos','tb_multas'].every(t=>!S[t].length)&&!Object.keys(S.tb_carne||{}).length;
+function checarPrimeiroAcesso(){if(!cfg().onboardingOk&&contaVazia())primeiroAcesso(true)}
+/* ---------- 3. Guia do Rodaliq (passo a passo) e card "Primeiros passos" ---------- */
+const GUIA=[
+ {t:'👋 Bem-vindo ao Rodaliq',x:`O Rodaliq organiza o seu dia a dia de motorista: ganhos, custos do carro, multas e o Carnê-Leão.<br><br><b>Regra de ouro:</b> os números do Painel vêm do que você lança. Quanto mais completo o lançamento, mais o app consegue mostrar. Este guia mostra o que lançar e onde cada informação aparece.`},
+ {t:'🚗 Seu veículo',cfg:'veic'},
+ {t:'🎯 Sua meta diária',cfg:'meta'},
+ {t:'🚕 Seus ganhos (Uber e 99)',x:`Lance o ganho de cada dia em <b>Corridas &gt; ＋ Corridas</b> ou, mais rápido, em <b>⚡ Atalhos &gt; Lançar o dia (Uber + 99)</b>.<br>Preencha também viagens, tempo online e <b>km rodados</b>: sem km, os indicadores por km não aparecem.`,
+   m:'Meta do dia e do mês, calendário, ganhos, R$/hora, R$/viagem, R$/km, previsão do mês e Carnê-Leão.',acts:[['⚡ Lançar meu primeiro dia',()=>fecharDia()],['＋ Corridas',()=>formCorrida()]]},
+ {t:'🧾 Repasses semanais',x:`É o valor que a Uber ou a 99 deposita na sua conta a cada semana. Lançar o repasse permite <b>conferir</b> se bate com a soma dos dias lançados e ajuda a calcular o Carnê-Leão quando não há extrato.`,
+   m:'Conciliação na aba Corridas e base do Carnê-Leão.',acts:[['＋ Repasse semanal',()=>formRepasse()]]},
+ {t:'🧑‍🤝‍🧑 Carona Solidária',x:`Se você leva passageiros fixos (casa–trabalho), lance cada viagem na aba <b>Caronas</b>. A carona tem card próprio e <b>soma na meta</b> do dia.`,
+   m:'Card da Carona, meta do dia e do mês, Carnê-Leão.',acts:[['＋ Caronas',()=>formCarona()]]},
+ {t:'⛽ Custos do veículo',x:`Lance tudo o que gasta com o carro em <b>Custos &gt; ＋ Custos</b>.<br>• <b>Combustível:</b> informe os litros para ver o preço médio e quanto os ganhos cobrem.<br>• <b>Manutenção:</b> informe o km da próxima troca para receber o alerta.<br>• <b>Parcela/Aluguel</b>, seguro, IPVA, lavagem e estacionamento também entram.`,
+   m:'Custos do veículo e comparação com o mês passado, resultado líquido, combustível, custo e lucro por km, alertas de manutenção.',acts:[['＋ Custos',()=>formCusto()]]},
+ {t:'🚨 Multas',x:`Lance cada multa na aba <b>Multas</b>, com pontos e vencimento. Quando preencher a data de pagamento, ela entra sozinha nos custos do mês.`,
+   m:'Pontos da CNH, alertas de vencimento e de limite de pontos, custos do mês (quando paga).',acts:[['＋ Multas',()=>formMulta()]]},
+ {t:'🧮 Impostos (Carnê-Leão)',x:`Todo mês, lance o valor do <b>extrato da Uber/99</b> do mês anterior em <b>Impostos</b>. O app calcula o Carnê-Leão estimado, o DARF e avisa o vencimento.`,
+   m:'DARF do mês, alerta de vencimento no sino e relatórios de impostos.',acts:[['🧾 Carnê-Leão do mês anterior',()=>formCarne(addMes(mesAtual(),-1))]]},
+ {t:'📅 Despesas programadas',x:`IPVA, seguro e revisão chegam de uma vez. Programe a despesa com o valor e a data de pagamento: o app divide o valor pelos meses até lá e mostra quanto separar por mês. Para não gastar sem querer, deixe esse valor numa conta separada da do dia a dia.`,
+   m:'Card Despesas programadas e lucro livre, no Painel.',acts:[['＋ Programar despesa',()=>formReserva()]]},
+ {t:'🪪 Sua CNH (opcional)',cfg:'cnh'},
+ {t:'📊 Para acompanhar',x:`• <b>Painel:</b> meta, ganhos, custos, resultado, previsão e despesas programadas (troque o mês e o veículo no topo).<br>• <b>🔔 Sino:</b> alertas (DARF, multas, CNH, manutenção) e novidades.<br>• <b>⚡ Atalhos:</b> todos os lançamentos num toque; arraste o botão para onde preferir.<br>• <b>Relatórios:</b> filtros e download em PDF, Word, Excel e CSV.<br>• <b>⚙ Opções:</b> veículos, metas, tema, backup e este guia.`}
+];
+function primeiroAcesso(auto){
+  const c=cfg(),DS=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];let passo=0;
+  const ov=document.createElement('div');ov.className='ov';ov.id='onbDlg';
+  const fim=()=>{c.onboardingOk=true;salvar('tb_config');ov.remove();render();if(auto)toast('Tudo pronto! Acompanhe os “Primeiros passos” no Painel.')};
+  const draw=()=>{const g=GUIA[passo],v=c.veiculos.find(x=>x.nome===c.veiculoPadrao)||c.veiculos[0]||{nome:'',desc:''},cnh=c.cnh||{},ult=passo===GUIA.length-1;
+    let corpo='';
+    if(g.cfg==='veic')corpo=`<p class="small muted">Usado nos lançamentos, nos custos e no custo-benefício. Você pode cadastrar outros em ⚙ Opções &gt; Veículos.</p>
+      <div class="field"><label>Nome curto</label><input class="inp" id="obN" maxlength="20" value="${esc(v.nome)}" placeholder="Ex.: Onix"></div>
+      <div class="field"><label>Descrição</label><input class="inp" id="obD" maxlength="60" value="${esc(v.desc||'')}" placeholder="Ex.: Chevrolet Onix 1.0 2022"></div>`;
+    else if(g.cfg==='meta')corpo=`<p class="small muted">Quanto quer ganhar por dia (Uber + 99 + Carona) e em quais dias. É a base da meta do Painel e da previsão do mês.</p>
+      <div class="field"><label>Meta diária (R$)</label><input class="inp" id="obM" inputmode="decimal" value="${brl(c.metaDiaria).replace('R$','').trim()}"></div>
+      <div class="field"><label>Dias que conta a meta</label><div class="onbDias">${DS.map((d,i)=>`<label><input type="checkbox" data-od="${i}"${c.diasMeta.includes(i)?' checked':''}> ${d}</label>`).join('')}</div></div>`;
+    else if(g.cfg==='cnh')corpo=`<p class="small muted">Para avisar a renovação e acompanhar os pontos das multas. Não guardamos número, CPF nem foto.</p>
+      <div class="field"><label>Validade</label><input class="inp" type="date" id="obV" value="${esc(cnh.validade||'')}"></div>
+      <div class="field"><label>Categoria</label><select class="inp" id="obC">${['','A','B','AB','C','D','E','AC','AD','AE'].map(x=>`<option${x===(cnh.categoria||'')?' selected':''}>${x}</option>`).join('')}</select></div>
+      <label class="ivCheck"><input type="checkbox" id="obE"${cnh.ear?' checked':''}><span>Minha CNH tem “Exerce Atividade Remunerada” (EAR)</span></label>`;
+    else corpo=`<div class="guiaX">${g.x}</div>${g.m?`<div class="guiaM"><b>📊 Movimenta no Painel:</b> ${g.m}</div>`:''}${g.acts?`<div class="guiaA">${g.acts.map((a,i)=>`<button class="btn ${i?'sec':''} sm" data-ga="${i}">${a[0]}</button>`).join('')}</div>`:''}`;
+    ov.innerHTML=`<div class="modal" style="max-width:500px"><div class="small muted">Guia do Rodaliq · passo ${passo+1} de ${GUIA.length}</div><div class="onbBar"><i style="width:${(passo+1)/GUIA.length*100}%"></i></div>
+      <h2>${g.t}</h2>${corpo}<div id="obErr" class="err"></div>
+      <div class="mfoot"><button class="btn sec" id="obPularTudo">${auto?'Pular tudo':'Fechar'}</button><span style="flex:1"></span>${passo>0?'<button class="btn sec" id="obVoltar">← Voltar</button>':''}${g.cfg?'<button class="btn sec" id="obPular">Pular</button>':''}<button class="btn" id="obOk">${ult?'Concluir':g.cfg?'Salvar e continuar':'Próximo'}</button></div></div>`};
+  const grava=()=>{const g=GUIA[passo],err=ov.querySelector('#obErr');if(!g.cfg)return true;
+    if(g.cfg==='veic'){const n=ov.querySelector('#obN').value.trim(),d=ov.querySelector('#obD').value.trim();if(!n){err.textContent='Informe o nome curto do veículo.';return false}
+      const ex=c.veiculos.find(x=>x.nome.toLowerCase()===n.toLowerCase());
+      if(ex){ex.desc=d||ex.desc;ex.ativo=true}else if(contaVazia()&&c.veiculos.length===1){c.veiculos[0]={nome:n,desc:d,desde:'',ativo:true}}else c.veiculos.push({nome:n,desc:d,desde:'',ativo:true});
+      c.veiculoPadrao=ex?ex.nome:n;c.ok_veic=true}
+    if(g.cfg==='meta'){const m=parseBRL(ov.querySelector('#obM').value);const ds=[...ov.querySelectorAll('[data-od]')].filter(x=>x.checked).map(x=>+x.dataset.od);
+      if(!(m>0)){err.textContent='Informe a meta diária.';return false}if(!ds.length){err.textContent='Marque ao menos um dia.';return false}c.metaDiaria=m;c.diasMeta=ds;c.ok_meta=true}
+    if(g.cfg==='cnh'){const v=ov.querySelector('#obV').value;if(v)c.cnh=Object.assign({},c.cnh||{},{validade:v,categoria:ov.querySelector('#obC').value,ear:ov.querySelector('#obE').checked,titular:(c.cnh&&c.cnh.titular)||c.condutores[0]||''})}
+    salvar('tb_config');return true};
+  const prox=()=>{if(passo<GUIA.length-1){passo++;draw()}else fim()};
+  draw();document.body.appendChild(ov);ov.__fechar=fim;
+  ov.addEventListener('click',e=>{e.stopPropagation();const t=e.target;
+    if(t.id==='obOk'){if(grava())prox()}else if(t.id==='obPular')prox();else if(t.id==='obVoltar'){passo--;draw()}else if(t.id==='obPularTudo')fim();
+    else if(t.dataset.ga!=null){GUIA[passo].acts[+t.dataset.ga][1]()}});
+}
+// card "Primeiros passos": marca sozinho conforme o uso e some quando tudo estiver feito
+const PASSOS=[
+ {k:'veic',t:'Veículo cadastrado',ok:()=>cfg().ok_veic||['tb_corridas','tb_custos'].some(tb=>S[tb].length),go:()=>formVeic()},
+ {k:'meta',t:'Meta diária definida',ok:()=>cfg().ok_meta||cfg().metaDiaria!==CFG_PADRAO.metaDiaria,go:()=>formCfg()},
+ {k:'dia',t:'Primeiro dia de corridas com km',ok:()=>S.tb_corridas.some(r=>+r.km>0),go:()=>fecharDia()},
+ {k:'custo',t:'Primeiro custo do veículo',ok:()=>S.tb_custos.length>0,go:()=>formCusto()},
+ {k:'litros',t:'Primeiro abastecimento com litros',ok:()=>S.tb_custos.some(r=>r.cat==='Combustível'&&+r.litros>0),go:()=>formCusto({data:hoje(),cat:'Combustível',veiculo:cfg().veiculoPadrao})},
+ {k:'carne',t:'Carnê-Leão de um mês',ok:()=>Object.values(S.tb_carne||{}).some(r=>r&&r.bruto!=null&&r.bruto!==''),go:()=>formCarne(addMes(mesAtual(),-1))},
+ {k:'cnh',t:'Minha CNH',ok:()=>!!(cfg().cnh&&cfg().cnh.validade),go:()=>formCnh()}];
+function cardPassos(){
+  if(cfg().passosOk)return '';const st=PASSOS.map(p=>({...p,feito:!!p.ok()})),n=st.filter(p=>p.feito).length;if(n===st.length)return '';
+  return `<div class="card passos"><div class="passosHd"><h2 style="margin:0">🚀 Primeiros passos</h2><span class="small muted"><b>${n} de ${st.length}</b> concluídos</span></div>
+    <div class="onbBar"><i style="width:${n/st.length*100}%"></i></div>
+    <div class="passosL">${st.map(p=>p.feito?`<span class="pOk">✓ ${p.t}</span>`:`<button class="pTodo" data-acao="passo:${p.k}">☐ ${p.t} ›</button>`).join('')}</div>
+    <div class="small muted" style="margin-top:6px">Cada item pendente abre o lançamento certo. <button class="lnk" data-acao="guia">Ver o guia completo</button> · <button class="lnk" data-acao="passos-off">Dispensar</button></div></div>`;
+}
+
+/* ---------- 6. Reservas para despesas grandes ---------- */
+const mesesEntre=(a,b)=>(+b.slice(0,4)-+a.slice(0,4))*12+(+b.slice(5,7)-+a.slice(5,7))+1; // inclusivo
+const reservas=()=>cfg().reservas||[];
+function reservasDoMes(ym){return reservas().filter(r=>r.criado<=ym&&ym<=r.venc.slice(0,7)).map(r=>({...r,parcela:Math.round(r.valor/Math.max(1,mesesEntre(r.criado,r.venc.slice(0,7)))*100)/100}))}
+function sugestaoReserva(cat){const lim=isoOf(new Date(new Date().setFullYear(new Date().getFullYear()-1)));return sum(todasDespesas().filter(r=>r.cat===cat&&r.data>lim),r=>r.valor)}
+function formReserva(r){
+  r=r||{cat:'IPVA/Licenciamento',venc:''};const novo=!r.id;
+  const f=openForm({titulo:novo?'Nova despesa programada':'Editar despesa programada',sub:'<div class="prevComo" style="margin:0"><b>Como funciona:</b> cadastre uma despesa grande que vai chegar e a data em que vai pagar. O app divide o valor pelos meses até lá e mostra, no Painel, quanto separar por mês. Exemplo: IPVA de R$ 2.160 em 31/01, cadastrado em novembro, dá R$ 720 por mês (novembro, dezembro e janeiro).</div>',
+    campos:[{k:'nome',l:'O que é a despesa?',t:'text',req:1,full:1,ph:'Ex.: IPVA 2027, Seguro anual, Revisão dos 60 mil km, Pneus'},{k:'cat',l:'Categoria',t:'select',op:comSep(CATS_FORM)},{k:'valor',l:'Valor previsto (R$)',t:'money',req:1,help:' '},{k:'venc',l:'Data de pagamento',t:'date',req:1,allowFuture:1}],
+    val:Object.assign({nome:r.nome||''},r),
+    onSave:o=>{if(!(o.valor>0))return 'Informe o valor previsto.';const criado=r.criado||mesAtual();if(o.venc.slice(0,7)<criado)return 'A data precisa ser deste mês em diante.';
+      const lista=reservas().filter(x=>x.id!==r.id);lista.push({id:r.id||uid('rv'),nome:o.nome,cat:o.cat,valor:o.valor,venc:o.venc,criado});cfg().reservas=lista;salvar('tb_config');render();toast('Despesa programada salva')},
+    onDel:novo?null:()=>{cfg().reservas=reservas().filter(x=>x.id!==r.id);salvar('tb_config');render()}});
+  const ajuda=()=>{const h=f.ov.querySelector('#h_valor');if(!h)return;const s=sugestaoReserva(f.g('cat').value);h.textContent=s?`Últimos 12 meses em ${f.g('cat').value}: ${brl(s)}`:'Sem lançamentos dessa categoria nos últimos 12 meses.';
+    if(novo&&!f.g('valor').value&&s){f.g('valor').value=brl(s).replace('R$','').trim()}};
+  f.g('cat').addEventListener('change',()=>{if(novo)f.g('valor').value='';ajuda()});ajuda();if(novo)setTimeout(()=>{f.ov.__snap=navSerial(f.ov)},80);
+}
+function verReservas(){
+  const ov=document.createElement('div');ov.className='ov';
+  const draw=()=>{const ym=mesAtual(),l=reservas().slice().sort((a,b)=>a.venc.localeCompare(b.venc)),dm=reservasDoMes(ym);
+    ov.innerHTML=`<div class="modal" style="max-width:520px"><h2>📅 Despesas programadas</h2><p class="small muted">Despesas grandes que vão chegar. O app sugere quanto separar por mês até a data de pagamento.</p>
+      ${l.length?l.map(r=>{const p=dm.find(x=>x.id===r.id),venc=r.venc.slice(0,7)<ym;return `<div class="ivCard" style="display:flex;justify-content:space-between;gap:8px;align-items:center"><div><b>${esc(r.nome)}</b><div class="small muted">${esc(r.cat)} · ${brl(r.valor)} · até ${fmtBR(r.venc)}</div><div class="small">${venc?'⏰ Data já passou: lance o pagamento em Custos e exclua esta despesa programada.':p?`Separar <b>${brl(p.parcela)}</b>/mês`:'Começa no próximo mês'}</div></div><button class="btn sec sm" data-rv="${esc(r.id)}">✎</button></div>`}).join(''):'<div class="empty">Nenhuma despesa programada.</div>'}
+      <div class="mfoot"><button class="btn sec" id="rvF">Fechar</button><button class="btn" id="rvN">＋ Programar despesa</button></div></div>`};
+  draw();document.body.appendChild(ov);ov.__fechar=()=>ov.remove();
+  ov.addEventListener('click',e=>{e.stopPropagation();const t=e.target;if(t.id==='rvF'||t===ov){ov.remove();return}
+    if(t.id==='rvN'){ov.remove();formReserva()}else if(t.dataset.rv){ov.remove();formReserva(JSON.parse(JSON.stringify(reservas().find(x=>x.id===t.dataset.rv))))}});
+}
+/* ---------- 4, 5 e 6: cards do bloco "Despesas e resultado do mês" ---------- */
+function cardsExtras(ym,G,vMeta,vCus,res,cus,pd,ehMesAtual,decorridos,n){
+  let h='';
+  // 4. por km
+  if(G.km){h+=kpi('Custo por km',brl(vCus/G.km),G.km.toLocaleString('pt-BR')+' km nas corridas do mês')+kpi('Lucro por km',`<span class="${res>=0?'pos':'neg'}">${brl(res/G.km)}</span>`,'Resultado líquido ÷ km rodados')}
+  else h+=kpi('Custo e lucro por km','—','Lance os km rodados nas corridas para ver quanto custa e quanto sobra por km.');
+  // 5. projeção (mês em andamento, a partir do 3º dia)
+  const diasTrab=Object.keys(pd).length;
+  if(ehMesAtual&&decorridos>=3&&diasTrab){
+    const hj=hoje(),media=vMeta/diasTrab;let faltam=0;for(let d=decorridos+1;d<=n;d++)if(diaConta(ym+'-'+pad(d)))faltam++;if(!pd[hj]&&diaConta(hj))faltam++;
+    const VAR=['Combustível','Lavagem','Estacionamento'],vVar=sum(cus.filter(r=>VAR.includes(r.cat)),r=>r.valor);
+    const pG=vMeta+media*faltam,pC=(vCus-vVar)+vVar/decorridos*n,pR=pG-pC;
+    h+=kpi('📈 Previsão para o fim de '+MESES[+ym.slice(5,7)-1].toLowerCase(),`<span class="${pR>=0?'pos':'neg'}">${brl(pR)}</span>`,`resultado previsto se mantiver o ritmo
+      <table class="prevT"><tr><th></th><th>Até hoje</th><th>Previsto</th></tr><tr><td>Ganhos</td><td>${brl(vMeta)}</td><td><b>${brl(pG)}</b></td></tr><tr><td>Custos</td><td>${brl(vCus)}</td><td><b>${brl(pC)}</b></td></tr></table>
+      <div class="prevComo">Como calculamos: você ganhou em média ${brl(media)} por dia trabalhado. ${faltam?`Faltam ${faltam} ${faltam===1?'dia':'dias'} de meta em ${MESES[+ym.slice(5,7)-1].toLowerCase()}.`:'Não faltam dias de meta no mês.'} Combustível, lavagem e estacionamento seguem o ritmo do mês; parcela, seguro e IPVA entram só como já lançados.</div>`,'wide');
+  }
+  // 6. reservas
+  const rv=reservasDoMes(ym),vr=sum(rv,r=>r.parcela);
+  if(rv.length){h+=kpi('📅 Despesas programadas',brl(vr),'<span class="small muted">separar este mês</span><br>'+rv.slice(0,3).map(r=>`${esc(r.nome)} (${fmtBR(r.venc).slice(0,5)}): ${brl(r.parcela)}/mês`).join('<br>')+(rv.length>3?`<br>… e mais ${rv.length-3}`:'')+
+      `<div class="dica">💡 Para não gastar sem querer, deixe esse valor numa conta separada da do dia a dia até a data de pagamento.</div><button class="lnk" data-acao="reservas">Ver despesas programadas</button>`)
+    +kpi('💰 Lucro livre',`<span class="${res-vr>=0?'pos':'neg'}">${brl(res-vr)}</span>`,'Resultado líquido − valor a separar para as despesas programadas.','hl')}
+  else h+=kpi('📅 Despesas programadas','—',`IPVA, seguro e revisão chegam de uma vez. Programe a despesa e o app mostra quanto separar por mês.<div class="dica">💡 Para não gastar sem querer, deixe esse valor numa conta separada da do dia a dia até a data de pagamento.</div><button class="lnk" data-acao="reservas">＋ Programar despesa</button>`);
+  return h;
+}
+/* ---------- 7. Fechar o dia ---------- */
+function escolhaDup(msg){return new Promise(res=>{const d=document.createElement('div');d.className='ov';d.style.zIndex='80';
+  d.innerHTML=`<div class="modal" style="max-width:420px"><h2>Já existe lançamento</h2><p>${msg}</p><div class="mfoot"><button class="btn sec" data-e="cancelar">Cancelar</button><button class="btn sec" data-e="substituir">Substituir</button><button class="btn" data-e="somar">Somar</button></div></div>`;
+  document.body.appendChild(d);d.__fechar=()=>{d.remove();res('cancelar')};d.addEventListener('click',e=>{e.stopPropagation();const v=e.target.dataset.e;if(v){d.remove();res(v)}})})}
+function fecharDia(){
+  const ult=S.tb_corridas.slice().sort((a,b)=>(b.data||'').localeCompare(a.data||''))[0],vei=ult&&VEICS().includes(ult.veiculo)?ult.veiculo:cfg().veiculoPadrao;
+  const P=[['u','Uber'],['n','99']],campos=[{k:'data',l:'Data',t:'date',req:1},{k:'veiculo',l:'Veículo',t:'select',op:VEICS()}];
+  P.forEach(([k,n])=>campos.push({k:k+'V',l:`${n} · Ganho do dia (R$)`,t:'money'},{k:k+'Q',l:`${n} · Qtd. viagens`,t:'int'},{k:k+'M',l:`${n} · Tempo online (hh:mm)`,t:'time'},{k:k+'K',l:`${n} · Km rodados (opcional)`,t:'num',help:AJUDA_KM}));
+  openForm({titulo:'⚡ Lançar o dia (Uber + 99)',sub:'É o mesmo <b>Novo lançamento do dia</b> da aba Corridas, só que com Uber e 99 numa tela só. Deixe em branco a plataforma em que não rodou.',campos,val:{data:hoje(),veiculo:vei},
+    onSave:(o,ov)=>{const recs=P.filter(([k])=>o[k+'V']>0).map(([k,n])=>({plataforma:n,valor:o[k+'V'],viagens:o[k+'Q']||0,min:o[k+'M']||0,km:o[k+'K']||null}));
+      if(!recs.length)return 'Preencha o ganho de Uber ou de 99.';
+      (async()=>{for(const r of recs){const ex=S.tb_corridas.find(x=>x.data===o.data&&x.plataforma===r.plataforma&&x.veiculo===o.veiculo);
+          if(ex){const esc2=await escolhaDup(`Já há ${r.plataforma} em ${fmtBR(o.data)} (${brl(ex.valor)}). Somar ${brl(r.valor)} ou substituir?`);
+            if(esc2==='cancelar')continue;
+            if(esc2==='somar')upsert('tb_corridas',Object.assign({},ex,{valor:(+ex.valor||0)+r.valor,viagens:(+ex.viagens||0)+r.viagens,min:(+ex.min||0)+r.min,km:(ex.km||r.km)?(+ex.km||0)+(+r.km||0):null}));
+            else upsert('tb_corridas',Object.assign({},ex,r));}
+          else upsert('tb_corridas',{id:uid('d'),data:o.data,veiculo:o.veiculo,obs:'',...r})}
+        ov.remove();UI.tab='corridas';try{history.replaceState(history.state,'','#corridas')}catch(e){}render();window.scrollTo(0,0);toast('Dia lançado: veja na aba Corridas')})();
+      return 'Salvando…'}});
+}
+
 function temaAtual(){try{return localStorage.getItem('rodaliq_tema')||'claro'}catch(e){return 'claro'}}
 function aplicaTema(t){const d=t==='escuro'||(t==='auto'&&window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches);
   document.documentElement.setAttribute('data-tema',d?'escuro':'claro');const m=document.querySelector('meta[name=theme-color]');if(m)m.content=d?'#0B1222':'#14213D'}
@@ -1638,6 +1899,11 @@ function render(){
 }
 $('#tabs').onclick=e=>{const b=e.target.closest('.tab');if(!b)return;UI.tab=b.dataset.t;try{history.replaceState(history.state,'','#'+UI.tab)}catch(er){}render();window.scrollTo(0,0)};
 $('#view').addEventListener('click',e=>{
+  if(e.target.closest('[data-acao=reservas]')){verReservas();return}
+  const pa=e.target.closest('[data-acao]');if(pa){const a=pa.dataset.acao;
+    if(a==='guia'){primeiroAcesso(false);return}
+    if(a==='passos-off'){cfg().passosOk=true;salvar('tb_config');render();toast('Primeiros passos dispensado. O guia continua em ⚙ Opções.');return}
+    if(a.startsWith('passo:')){const p=PASSOS.find(x=>x.k===a.slice(6));if(p)p.go();return}}
   const t=e.target.closest('[data-mp],[data-grp],[data-sub],[data-new],[data-ed],[data-del],[data-carne],[data-ano],[data-rel]');if(!t)return;
   if(t.dataset.rel){relAcao(t);return}
   if(t.dataset.del){const [tb,id]=t.dataset.del.split(':');const r=S[tb].find(x=>x.id===id);if(!r)return;confirma('Excluir este lançamento?<br><b>'+esc(resumoReg(tb,r))+'</b>','Excluir').then(ok=>{if(ok){remover(tb,id);toast('Lançamento excluído')}});return}
@@ -1662,13 +1928,13 @@ let fabDrag=null,fabArrastou=false;
     try{localStorage.setItem(FABK,JSON.stringify(p))}catch(er){}aplicaFab(p)};
   window.addEventListener('pointerup',solta);window.addEventListener('pointercancel',solta)})();
 $('#fab').onclick=e=>{e.stopPropagation();if(fabArrastou){fabArrastou=false;return}fab()};
-$('#fabMenu').onclick=e=>{const b=e.target.closest('[data-fab]');if(!b)return;$('#fabMenu').classList.add('hidden');if(b.dataset.fab==='tema'){formTema();return}if(b.dataset.fab==='sair'){sair();return}if(b.dataset.fab==='inv'){openInvitesModal();return}NOVO[b.dataset.fab]()};
+$('#fabMenu').onclick=e=>{const b=e.target.closest('[data-fab]');if(!b)return;$('#fabMenu').classList.add('hidden');if(b.dataset.fab==='tema'){formTema();return}if(b.dataset.fab==='dia'){fecharDia();return}if(b.dataset.fab==='sair'){sair();return}if(b.dataset.fab==='inv'){openInvitesModal();return}NOVO[b.dataset.fab]()};
 document.addEventListener('click',e=>{if(!e.target.closest('#fabWrap'))$('#fabMenu').classList.add('hidden')});
 $('#optBtn').onclick=e=>{e.stopPropagation();$('#bellMenu').classList.add('hidden');const m=$('#optMenu');m.classList.toggle('hidden');if(!m.classList.contains('hidden'))posMenu(m,$('#optBtn'))};
 window.addEventListener('scroll',()=>{['bellMenu','optMenu'].forEach(id=>{const m=document.getElementById(id);if(m&&!m.classList.contains('hidden')&&window.innerWidth<=640)posMenu(m,document.getElementById(id==='bellMenu'?'bellBtn':'optBtn'))})},{passive:true});
 document.addEventListener('click',e=>{if(!e.target.closest('#optWrap'))$('#optMenu').classList.add('hidden');if(!e.target.closest('#bellWrap'))$('#bellMenu').classList.add('hidden')});
 $('#optMenu').onclick=e=>{const b=e.target.closest('[data-m]');if(!b)return;$('#optMenu').classList.add('hidden');
-  ({cfg:formCfg,veic:formVeic,cnh:formCnh,tema:formTema,inv:openInvitesModal,aud:verAuditoria,pass:formSenha,exp:exportar,imp:()=>$('#impFile').click(),out:sair})[b.dataset.m]()};
+  ({cfg:formCfg,veic:formVeic,cnh:formCnh,tema:formTema,inv:openInvitesModal,rsv:verReservas,onb:()=>primeiroAcesso(false),termos:()=>verTermos(),aud:verAuditoria,pass:formSenha,exp:exportar,imp:()=>$('#impFile').click(),out:sair})[b.dataset.m]()};
 (()=>{const h=(location.hash||'').slice(1);if(['painel','corridas','carona','custos','multas','impostos','relatorios'].includes(h))UI.tab=h})();
 iniciar();
 if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
