@@ -159,6 +159,37 @@ h3{font-size:13px;margin:0 0 8px;color:var(--muted);text-transform:uppercase;let
 .menu .who{padding:8px 10px;font-size:12px;color:var(--muted);border-bottom:1px solid var(--line);margin-bottom:4px}
 .menu button{display:block;width:100%;text-align:left;border:0;background:none;padding:9px 10px;border-radius:8px;cursor:pointer}
 .menu button:hover{background:var(--blueSoft)}
+/* ===== Pedidos de convite ===== */
+.invLink{text-align:center;margin-top:12px}
+#invForm .field{margin-top:10px}
+.ivWarn{margin-top:12px;border:1px solid var(--amber);background:var(--amberSoft);color:var(--amberInk);border-radius:10px;padding:8px 10px;font-size:12px;line-height:1.4}
+.ivMinor{margin-top:8px;border:2px solid var(--red);background:var(--redSoft);color:var(--red);border-radius:10px;padding:8px 10px;font-size:12.5px;font-weight:600;line-height:1.4}
+.ivTel{display:flex;align-items:center;gap:6px}.ivTel .inp:first-of-type{width:64px;text-align:center;flex:0 0 auto}.ivTel .inp:last-of-type{flex:1;min-width:0}
+.ivOk{color:#15803D;font-weight:600}.ivBad{color:var(--red);font-weight:600}
+html[data-tema="escuro"] .ivOk{color:#4ADE80}
+.ivInfo{color:var(--amberInk);font-size:13px;margin-top:10px;min-height:18px;font-weight:600}
+.ivCheck{display:flex;gap:8px;align-items:flex-start;font-size:12px;color:var(--muted);margin-top:12px;line-height:1.4}.ivCheck input{margin-top:2px;width:auto}
+.ivDone{text-align:center;padding:14px 0}.ivDone .big{font-size:30px}
+.modal.iv{max-width:600px}
+.ivHd{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px}.ivHd h2{margin:0}.ivHdB{display:flex;gap:6px}
+.ivSearch{position:relative;margin-bottom:10px}.ivSearch span{position:absolute;left:10px;top:50%;transform:translateY(-50%)}.ivSearch .inp{padding-left:34px}
+#ivTabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}#ivTabs .chip{font-size:12px;padding:5px 10px}
+.chip.on{background:var(--blue);border-color:var(--blue);color:#fff}
+.ivCard{border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:10px}
+.ivTop{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}.ivTags{display:flex;flex-direction:column;gap:4px;align-items:flex-end;flex:0 0 auto}
+.ivNome{font-weight:700;word-break:break-word}.ivBday{color:var(--amberInk);font-weight:600;margin-top:4px}
+.ivActs{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.ivActs .btn{width:auto;text-decoration:none}
+.ivDel{color:var(--red)!important;border-color:var(--red)!important}
+.ivLixHd{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px}.ivLixHd .btn{width:auto}
+.ivRow{display:flex;justify-content:space-between;align-items:center;gap:8px}.ivRow .btn{width:auto;text-decoration:none;flex:0 0 auto}
+.ivCalHd{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}.ivCalHd .btn{width:auto}
+.ivGrid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}.ivDow span{text-align:center;font-size:11px;color:var(--muted)}
+.ivDay{height:44px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--muted);font-size:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0;cursor:pointer}
+.ivDay.tem{border-color:var(--amber);color:var(--ink);font-weight:600}.ivDay.hoje span{font-weight:800;text-decoration:underline}.ivDay.sel{border:2px solid var(--blue);background:var(--blueSoft);color:var(--ink)}
+.ivDay small{font-size:10px;line-height:1}
+.mBadge{display:inline-block;margin-left:6px;background:var(--amber);color:#14213D;border-radius:99px;font-size:10px;font-weight:800;padding:1px 6px;vertical-align:middle}
+.bell .it.al.inv{border:2px solid var(--amber);background:var(--amberSoft)}
+
 /* ===== tema escuro (azul-noite da marca; contraste também por claro/escuro, pensado para daltonismo) ===== */
 html[data-tema="escuro"]{color-scheme:dark;
   --bg:#0B1222;--card:#141E33;--ink:#E8EEF8;--muted:#9AA7BF;--line:#26334F;
@@ -260,6 +291,32 @@ svg text{font-family:Inter,system-ui,sans-serif}
       <button class="btn block" id="lBtn" type="submit">Entrar</button>
       <div class="err" id="lErr"></div>
     </form>
+    <div class="invLink"><button type="button" class="lnk" id="invOpen">Quer usar o app? Peça um convite</button></div>
+    <form id="invForm" class="hidden" autocomplete="off" novalidate>
+      <div id="invFields">
+        <div class="ivWarn" role="note">🔞 <b>Somente para maiores de 18 anos.</b> A maioridade civil começa aos 18 anos completos (Código Civil, Lei nº 10.406/2002, art. 5º) e os dados de crianças e adolescentes têm regras próprias na LGPD (Lei nº 13.709/2018, art. 14). Por isso, este app não aceita pedidos de menores de 18 anos.</div>
+        <div class="field"><label for="invName">Nome e sobrenome</label><input class="inp" type="text" id="invName" maxlength="80" autocomplete="name" placeholder="Ex.: Maria Souza"></div>
+        <div class="field"><label for="invEmail">E-mail</label><input class="inp" type="email" id="invEmail" maxlength="120" autocomplete="email" autocapitalize="none"></div>
+        <div class="field"><label for="invBirth">Data de nascimento</label><input class="inp" type="date" id="invBirth" min="1900-01-01" autocomplete="bday"></div>
+        <div id="invMinor" class="ivMinor hidden" role="alert">⛔ Menores de 18 anos não podem pedir convite nem usar o app (Código Civil, art. 5º; LGPD, art. 14). Seu pedido não será enviado.</div>
+        <div class="field"><label for="invDdd">💬 WhatsApp</label>
+          <div class="ivTel"><span class="muted">(</span><input class="inp" type="tel" id="invDdd" inputmode="numeric" maxlength="2" placeholder="DDD" aria-label="DDD" autocomplete="tel-area-code"><span class="muted">)</span><input class="inp" type="tel" id="invPhone" inputmode="numeric" maxlength="10" placeholder="9xxxx-xxxx" aria-label="Número com 9 dígitos" autocomplete="tel-local"></div>
+          <div id="invUf" class="small" aria-live="polite" style="min-height:16px;margin-top:4px"></div>
+          <div class="small muted">💬 O número precisa ter WhatsApp: é por ele que vamos te responder.</div></div>
+        <div class="field"><label for="invHow">Como soube do app?</label><input class="inp" type="text" id="invHow" maxlength="140"></div>
+        <div style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden" aria-hidden="true"><label>Não preencha<input type="text" id="invWeb" tabindex="-1" autocomplete="off"></label></div>
+        <label class="ivCheck"><input type="checkbox" id="invOk"><span>Em conformidade com a Lei Geral de Proteção de Dados (LGPD, Lei nº 13.709/2018), autorizo o contato por WhatsApp sobre o meu acesso e o uso dos meus dados somente para essa finalidade e para receber felicitações de aniversário.</span></label>
+        <div id="invMsg" class="err" role="alert"></div>
+        <button type="submit" class="btn block" id="invBtn">Enviar pedido</button>
+        <button type="button" class="btn sec block hidden" id="invClose">Fechar</button>
+      </div>
+      <div id="invDone" class="ivDone hidden">
+        <div class="big">✅</div>
+        <p style="font-weight:700;margin:6px 0">Recebemos seu pedido!</p>
+        <p class="small muted">Em breve entraremos em contato com você pelo WhatsApp que informou.</p>
+        <button type="button" class="btn block" id="invDoneBack" style="margin-top:12px">Fechar</button>
+      </div>
+    </form>
   </div>
   <div class="selo" id="seloLogin"></div>
   <footer>© 2026 Rodaliq · Todos os direitos reservados.</footer>
@@ -284,6 +341,7 @@ svg text{font-family:Inter,system-ui,sans-serif}
         <button data-m="cfg">🎯 Metas e preferências</button>
         <button data-m="veic">🚗 Veículos</button>
         <button data-m="cnh">🪪 Minha CNH</button>
+        <button data-m="inv" id="btnInvites" class="hidden">📨 Pedidos de convite<span id="invBadge" class="mBadge hidden"></span></button>
         <button data-m="tema">🌓 Tema</button>
         <button data-m="aud">🕘 Histórico de auditoria</button>
         <button data-m="pass">🔑 Trocar senha</button>
@@ -313,6 +371,7 @@ svg text{font-family:Inter,system-ui,sans-serif}
   <button data-fab="carne">🧾 Carnê-Leão do mês anterior</button>
   <div class="sep"></div>
   <button data-fab="tema">🌓 Tema</button>
+  <button data-fab="inv" id="fabInv" class="hidden">📨 Pedidos de convite<span id="fabInvBadge" class="mBadge hidden"></span></button>
   <button data-fab="sair">↩ Sair</button>
   <div class="dica">Dica: segure e arraste o botão ⚡ Atalhos para qualquer ponto da tela.</div>
 </div><button class="btn fab" id="fab" aria-haspopup="true">⚡ Atalhos</button></div>
@@ -322,7 +381,7 @@ svg text{font-family:Inter,system-ui,sans-serif}
 
 <script>
 "use strict";
-const VERSAO='V26';
+const VERSAO='V29';
 /* ---------- utilidades ---------- */
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -489,6 +548,7 @@ function alertas(){
   const c=cnhInfo();if(c&&!c.fora){
     if(c.vencida){const dv=-c.d,lim=isoOf(new Date(new Date(cfg().cnh.validade+'T12:00:00').getTime()+30*864e5));out.unshift(dv<=30?{n:'r',crit:1,t:`CNH vencida há ${dv} ${dv===1?'dia':'dias'}: você tem até ${fmtBR(lim)} para renovar sem multa.`,nota:'Depois de atualizar a validade em ⚙ Opções > Minha CNH, o alerta some.',tab:'cnh'}:{n:'r',crit:1,t:'CNH vencida há mais de 30 dias: dirigir agora é infração gravíssima.',nota:`Venceu em ${fmtBR(cfg().cnh.validade)}. Renove e atualize a validade em ⚙ Opções > Minha CNH.`,tab:'cnh'})}
     else out.push({n:'a',t:c.d===0?`CNH vence hoje (${fmtBR(cfg().cnh.validade)}). Agende a renovação.`:`CNH vence em ${c.d} ${c.d===1?'dia':'dias'} (${fmtBR(cfg().cnh.validade)}). Agende a renovação.`,tab:'cnh',cnh:c.chave,lida:NOT.reads.cnhLida===c.chave})}
+  out.unshift(...invAlerts());
   proximasManut().filter(x=>x.prox-x.ult<=1500).forEach(x=>out.push({n:x.prox<=x.ult?'r':'a',t:`Manutenção ${x.prox<=x.ult?'vencida':'próxima'}: ${x.desc} (${x.veiculo}) em ${x.prox.toLocaleString('pt-BR')} km.`,tab:'custos'}));
   return out;
 }
@@ -510,7 +570,7 @@ function renderSino(){
   const item=n=>{const lida=r.lidas.includes(n.id),imp=impValida(n);return `<div class="it${imp?' imp':''}${lida?'':' nova'}">${imp?'<div class="tagImp">⚠ IMPORTANTE</div>':''}<div class="ttl">${lida?'':'● '}${esc(n.titulo)}</div>${corpo(n)}<div class="acts"><button data-nl="${esc(n.id)}">${lida?'Marcar como não lida':'Marcar como lida'}</button><button data-nx="${esc(n.id)}">🗑 Excluir</button></div></div>`};
   const nl=naoLidas().length;
   let h=`<div class="hd"><button class="chip${tab==='alertas'?' on':''}" data-bt="alertas">Alertas (${al.filter(a=>!a.lida).length})</button><button class="chip${tab==='novidades'?' on':''}" data-bt="novidades">Novidades (${nl})</button></div>`;
-  if(tab==='alertas')h+=al.length?al.map((a,i)=>`<div class="it al${a.lida?' lida':''}${a.crit?' crit':''}" data-ai="${i}"><span class="tag ${a.n}">${a.n==='r'?'✕':'⚠'}</span><div><div>${esc(a.t)}</div>${a.nota?`<div class="nota">${esc(a.nota)}</div>`:''}${a.cnh?`<div class="acts"><button data-cl="${esc(a.cnh)}">${a.lida?'Marcar como não lida':'Marcar como lida'}</button></div>`:''}</div></div>`).join(''):'<div class="empty">Nenhum alerta agora. ✓</div>';
+  if(tab==='alertas')h+=al.length?al.map((a,i)=>`<div class="it al${a.lida?' lida':''}${a.crit?' crit':''}${a.inv?' inv':''}" data-ai="${i}"><span class="tag ${a.n}">${a.n==='r'?'✕':'⚠'}</span><div><div>${esc(a.t)}</div>${a.nota?`<div class="nota">${esc(a.nota)}</div>`:''}${a.cnh?`<div class="acts"><button data-cl="${esc(a.cnh)}">${a.lida?'Marcar como não lida':'Marcar como lida'}</button></div>`:''}</div></div>`).join(''):'<div class="empty">Nenhum alerta agora. ✓</div>';
   else if(UI.bellExc){h+=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><b class="small">🗑 Excluídas (últimos ${DIAS_EXCL} dias)</b><button class="lnk" data-bexc="0">Voltar</button></div>`+(excl.length?excl.map(n=>`<div class="it"><div class="ttl">${esc(n.titulo)}</div>${corpo(n)}<div class="acts"><button data-nr="${esc(n.id)}">↩ Restaurar</button></div></div>`).join(''):'<div class="empty">Nenhuma novidade excluída nos últimos 30 dias.</div>')}
   else{h+=nl?`<div style="text-align:right;margin-bottom:6px"><button class="lnk" data-nall="1">Marcar todas como lidas (${nl})</button></div>`:'';
     h+=imps.map(item).join('');
@@ -532,6 +592,7 @@ $('#bellMenu').addEventListener('click',e=>{e.stopPropagation();const t=e.target
   else if(t.dataset.bexc){UI.bellExc=t.dataset.bexc==='1'}
   else{const g=t.closest('[data-ai]');if(g){const a=alertas()[+g.dataset.ai];$('#bellMenu').classList.add('hidden');if(!a)return;
       if(a.tab==='cnh'){formCnh();return}
+      if(a.tab==='inv'){openInvitesModal();return}
       UI.tab=a.tab;render();window.scrollTo(0,0);
       if(a.multa){const m=S.tb_multas.find(x=>x.id===a.multa);if(m)formMulta(JSON.parse(JSON.stringify(m)))}return}else return}
   renderSino();atualizaSino()});
@@ -559,7 +620,7 @@ $('#fLogin').onsubmit=async e=>{
 };
 async function entrar(evento){
   $('#login').classList.add('hidden');$('#app').classList.remove('hidden');$('#whoName').textContent=LOGADO;
-  await carregar();render();ouvirNovidades();
+  await carregar();render();ouvirNovidades();invAdminInit();
   if(evento)audit(evento,'Acesso','Login de '+LOGADO);
 }
 async function sair(){await audit('Saída','Acesso','Logout de '+LOGADO);try{await DB.auth.signOut()}catch(e){}location.reload()}
@@ -1247,6 +1308,225 @@ function formSenha(){
       audit('Troca de senha','Acesso','Senha alterada');ov.remove();toast('Senha alterada')})();return 'Verificando…'}});
   setTimeout(()=>document.querySelectorAll('.modal input.inp').forEach(i=>i.type='password'),0);
 }
+/* ---------- Pedidos de convite (tela de login) e administração (adaptado do kit My Trade Dash V102) ---------- */
+const INV_ST={novo:'Novo',convidado:'Convidado',recusado:'Recusado'};
+const DDD_UF={};
+Object.entries({SP:'11 12 13 14 15 16 17 18 19',RJ:'21 22 24',ES:'27 28',MG:'31 32 33 34 35 37 38',PR:'41 42 43 44 45 46',SC:'47 48 49',RS:'51 53 54 55',DF:'61',GO:'62 64',TO:'63',MT:'65 66',MS:'67',AC:'68',RO:'69',BA:'71 73 74 75 77',SE:'79',PE:'81 87',AL:'82',PB:'83',RN:'84',CE:'85 88',PI:'86 89',PA:'91 93 94',AM:'92 97',RR:'95',AP:'96',MA:'98 99'}).forEach(([uf,l])=>l.split(' ').forEach(d=>{DDD_UF[d]=uf}));
+const UF_NOME={AC:'Acre',AL:'Alagoas',AP:'Amapá',AM:'Amazonas',BA:'Bahia',CE:'Ceará',DF:'Distrito Federal',ES:'Espírito Santo',GO:'Goiás',MA:'Maranhão',MT:'Mato Grosso',MS:'Mato Grosso do Sul',MG:'Minas Gerais',PA:'Pará',PB:'Paraíba',PR:'Paraná',PE:'Pernambuco',PI:'Piauí',RJ:'Rio de Janeiro',RN:'Rio Grande do Norte',RS:'Rio Grande do Sul',RO:'Rondônia',RR:'Roraima',SC:'Santa Catarina',SP:'São Paulo',SE:'Sergipe',TO:'Tocantins'};
+let invIsAdmin=false,invCache=[],invCacheAt=0;
+const invProd=()=>!!(DB&&typeof DB.from==='function'); // produção (Supabase) × HMO (banco do claude.ai)
+const invDigits=v=>String(v||'').replace(/\D/g,'');
+const invUfOf=w=>{const d=String(w||'');return DDD_UF[d.startsWith('55')?d.slice(2,4):d.slice(0,2)]||''};
+const invFmtPhone=d=>{d=String(d||'');if(d.startsWith('55')&&d.length>=12){const l=d.slice(2);return '('+l.slice(0,2)+') '+l.slice(2,l.length-4)+'-'+l.slice(-4)}return d};
+const invWhen=v=>{const t=new Date(v);return isNaN(t)?'':t.toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'})};
+const invBirthBR=s=>{const m=/^(\d{4})-(\d{2})-(\d{2})/.exec(String(s||''));return m?`${m[3]}/${m[2]}/${m[1]}`:''};
+const invNorm=t=>String(t||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();
+const isLeapY=y=>(y%4===0&&y%100!==0)||y%400===0;
+const MESES_INV=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+async function invSubmit(rec){
+  if(!invProd()){
+    const all=(await DB.collection('convites').get()).docs.map(d=>d.data());
+    if(all.some(x=>String(x.email).toLowerCase()===rec.email.toLowerCase()))return{dup:'email'};
+    if(all.some(x=>x.whatsapp===rec.whatsapp))return{dup:'whatsapp'};
+    const id='c'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+    await DB.doc('convites/'+id).set({...rec,consent:true,status:'novo',archived:false,created_at:new Date().toISOString(),handled_at:null});
+    return{dup:null};
+  }
+  const {error}=await DB.from('tb_convites').insert({name:rec.name,email:rec.email,whatsapp:rec.whatsapp,birth_date:rec.birth_date,how_known:rec.how_known,consent:true});
+  if(error){if(error.code==='23505')return{dup:/email/i.test((error.message||'')+(error.details||''))?'email':'whatsapp'};throw error}
+  return{dup:null};
+}
+async function invList(){
+  if(!invProd())return (await DB.collection('convites').get()).docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
+  const {data,error}=await DB.from('tb_convites').select('*').order('created_at',{ascending:false}).limit(1000);
+  if(error)throw error;return data||[];
+}
+async function invPatch(id,patch){
+  if(!invProd()){await DB.doc('convites/'+id).update(patch);return}
+  const {error}=await DB.from('tb_convites').update(patch).eq('id',id);if(error)throw error;
+}
+const invSetStatus=(id,status)=>invPatch(id,{status,handled_at:new Date().toISOString()});
+const invSetArchived=(id,archived)=>invPatch(id,{archived});
+const LIX_DIAS=15;
+const invTrash=(id)=>invPatch(id,{deleted_at:new Date().toISOString()});   // vai para a lixeira
+const invRestore=(id)=>invPatch(id,{deleted_at:null});                       // volta da lixeira
+async function invPurge(id){                                                 // apaga de vez
+  if(!invProd()){await DB.doc('convites/'+id).delete();return}
+  const {error}=await DB.from('tb_convites').delete().eq('id',id);if(error)throw error;
+}
+const invVivo=x=>!x.deleted_at;
+const invLimpaEm=x=>new Date(new Date(x.deleted_at).getTime()+LIX_DIAS*864e5);
+async function invAutoLimpa(list){ // apaga de vez o que está na lixeira há mais de 15 dias
+  const velhos=list.filter(x=>x.deleted_at&&invLimpaEm(x).getTime()<=Date.now());
+  for(const x of velhos){try{await invPurge(x.id)}catch(e){}}
+  return velhos.length?list.filter(x=>!velhos.includes(x)):list;
+}
+async function invLoadCache(force){if(!invIsAdmin){invCache=[];return}if(!force&&Date.now()-invCacheAt<15000)return;invCache=await invAutoLimpa(await invList());invCacheAt=Date.now()}
+function invSetAdmin(on){
+  invIsAdmin=!!on;
+  ['#btnInvites','#fabInv'].forEach(i=>{const b=$(i);if(b)b.classList.toggle('hidden',!invIsAdmin)});
+  if(!invIsAdmin){invCache=[];invCacheAt=0;['#invBadge','#fabInvBadge'].forEach(i=>{const c=$(i);if(c)c.classList.add('hidden')})}
+}
+function invBdayOn(x,off){
+  if(!x||x.status==='recusado'||!x.birth_date)return null;
+  const m=/^(\d{4})-(\d{2})-(\d{2})/.exec(x.birth_date);if(!m)return null;
+  const n=new Date(),t=new Date(n.getFullYear(),n.getMonth(),n.getDate()+off);
+  let d=+m[3];const mo=+m[2];if(mo===2&&d===29&&!isLeapY(t.getFullYear()))d=28;
+  return (t.getMonth()+1===mo&&t.getDate()===d)?{age:t.getFullYear()-+m[1],day:d,month:m[2]}:null;
+}
+const invBdayTomorrow=x=>invBdayOn(x,1);
+const invBdayNear=x=>{const h=invBdayOn(x,0);if(h)return{...h,when:'hoje'};const a=invBdayOn(x,1);return a?{...a,when:'amanhã'}:null};
+// Alertas do sino (só administrador): entram no topo da aba Alertas
+function invAlerts(){
+  if(!invIsAdmin)return [];
+  const out=[],nw=invCache.filter(x=>invVivo(x)&&x.status==='novo'&&!x.archived);
+  if(nw.length)out.push({n:'a',inv:1,tab:'inv',t:nw.length===1?'1 pedido de convite novo':nw.length+' pedidos de convite novos',
+    nota:nw.slice(0,5).map(x=>`${x.name}${invUfOf(x.whatsapp)?' ('+invUfOf(x.whatsapp)+')':''}`).join(' · ')+(nw.length>5?' · … e mais '+(nw.length-5):'')+'. Responda pelo WhatsApp e marque como convidado ou recusado.'});
+  invCache.filter(invVivo).forEach(x=>{const bd=invBdayTomorrow(x);if(!bd)return;
+    out.push({n:'a',inv:1,tab:'inv',t:`Amanhã é aniversário de ${x.name}`,nota:`Faz ${bd.age} anos em ${String(bd.day).padStart(2,'0')}/${bd.month}. WhatsApp: ${invFmtPhone(x.whatsapp)}${invUfOf(x.whatsapp)?' · '+invUfOf(x.whatsapp):''}.`})});
+  return out;
+}
+async function invRefreshBadge(avisa){
+  if(!invIsAdmin)return;
+  try{await invLoadCache(true);const n=invCache.filter(x=>invVivo(x)&&x.status==='novo'&&!x.archived).length;
+    ['#invBadge','#fabInvBadge'].forEach(i=>{const c=$(i);if(c){c.textContent=n;c.classList.toggle('hidden',n===0)}});
+    if(avisa&&n>0)toast(n===1?'1 pedido de convite novo':n+' pedidos de convite novos');
+    atualizaSino();if(!$('#bellMenu').classList.contains('hidden'))renderSino();
+  }catch(e){}
+}
+async function invAdminInit(){
+  if(!invProd()){if(DB&&typeof DB.collection==='function'){invSetAdmin(true);invRefreshBadge(true)}return} // HMO: o usuário de teste é o administrador
+  try{const {data}=await DB.from('tb_admins').select('user_id').eq('user_id',UID).maybeSingle();invSetAdmin(!!data)}catch(e){invSetAdmin(false)}
+  invRefreshBadge(true);
+}
+setInterval(()=>{if(invIsAdmin&&!document.hidden)invRefreshBadge(false)},120000);
+const invPrimeiro=x=>String(x.name||'').trim().split(/\s+/)[0]||'';
+const invBdayLink=x=>'https://wa.me/'+x.whatsapp+'?text='+encodeURIComponent(`Parabéns, ${invPrimeiro(x)}! Muitas felicidades neste dia. Feliz aniversário e um abraço do Rodaliq!`);
+const invWaLink=r=>'https://wa.me/'+r.whatsapp+'?text='+encodeURIComponent(`Olá, ${invPrimeiro(r)}! Seu pedido de convite para o Rodaliq foi recebido e o acesso será liberado. Seu login será o e-mail ${r.email}. A senha provisória será enviada por aqui. Para entrar, acesse https://rodaliq.com.br`);
+async function openInvitesModal(){
+  ['#bellMenu','#optMenu','#fabMenu'].forEach(s=>{const m=$(s);if(m)m.classList.add('hidden')});
+  const ov=document.createElement('div');ov.className='ov';const now0=new Date();
+  let filter='novo',list=[],q='',armed=null,armedT=null,mode='list',calY=now0.getFullYear(),calM=now0.getMonth(),calSel=null;
+  ov.innerHTML=`<div class="modal iv">
+    <div class="ivHd"><h2>📨 Pedidos de convite</h2><div class="ivHdB"><button type="button" class="btn sec sm" id="ivMode">🎂 Aniversariantes</button><button type="button" class="btn sec sm" id="ivClose">Fechar</button></div></div>
+    <div id="ivListBox"><div class="ivSearch"><span aria-hidden="true">🔍</span><input class="inp" type="search" id="ivSearch" placeholder="Pesquisar por nome, telefone ou e-mail" autocomplete="off"></div>
+      <div class="chips" id="ivTabs"></div><div id="ivBody"></div></div>
+    <div id="ivCalBox" class="hidden"></div>
+    <p class="small muted" style="margin-top:10px">Excluir manda o pedido para a 🗑 Lixeira, onde ele fica 15 dias antes de ser apagado de vez. Arquivar tira da lista sem apagar. Nada desta tela vai para o histórico de auditoria.</p></div>`;
+  document.body.appendChild(ov);
+  const close=()=>{ov.remove();invRefreshBadge(false)};
+  ov.querySelector('#ivClose').onclick=close;ov.addEventListener('click',ev=>{if(ev.target===ov)close()});
+  const body=ov.querySelector('#ivBody'),tabs=ov.querySelector('#ivTabs'),search=ov.querySelector('#ivSearch'),calBox=ov.querySelector('#ivCalBox'),listBox=ov.querySelector('#ivListBox'),modeBtn=ov.querySelector('#ivMode');
+  const match=r=>{if(!invVivo(r))return false;const t=invNorm(q.trim());if(!t)return true;const dg=invDigits(q);return invNorm(r.name).includes(t)||invNorm(r.email).includes(t)||(dg.length>=2&&String(r.whatsapp||'').includes(dg))};
+  const inTab=(r,k)=>k==='lixeira'?!invVivo(r):!invVivo(r)?false:k==='arquivado'?!!r.archived:!r.archived&&(k==='todos'||r.status===k);
+  const draw=()=>{
+    const busca=q.trim()!=='',cnt=k=>list.filter(x=>inTab(x,k)).length;
+    tabs.innerHTML=[['novo','Novos'],['convidado','Convidados'],['recusado','Recusados'],['arquivado','Arquivados'],['todos','Todos'],['lixeira','🗑 Lixeira']].map(([k,t])=>`<button type="button" data-t="${k}" class="chip${!busca&&filter===k?' on':''}">${t} (${cnt(k)})</button>`).join('');
+    const items=busca?list.filter(match):list.filter(x=>inTab(x,filter));
+    if(!busca&&filter==='lixeira'){
+      body.innerHTML=`<div class="ivLixHd"><span class="small muted">Os pedidos excluídos ficam aqui por ${LIX_DIAS} dias e depois são apagados de vez.</span>${items.length?`<button type="button" class="btn sec sm ivDel" data-a="esvaziar">${armed==='__all'?'⚠ Confirmar: esvaziar lixeira':'🗑 Esvaziar lixeira'}</button>`:''}</div>`+
+        (items.length?items.map(r=>`<div class="ivCard" data-id="${esc(r.id)}"><div class="ivNome">${esc(r.name)}</div><div class="small muted" style="word-break:break-all">${esc(r.email)} · 💬 ${esc(invFmtPhone(r.whatsapp))}</div>
+          <div class="small muted">Excluído em ${esc(invWhen(r.deleted_at))} · apagado de vez em ${esc(invWhen(invLimpaEm(r)))}</div>
+          <div class="ivActs"><button type="button" class="btn sec sm" data-a="restaurar">↩ Restaurar</button><button type="button" class="btn sec sm ivDel" data-a="apagar">${armed===r.id?'⚠ Confirmar: apagar de vez':'Apagar de vez'}</button></div></div>`).join(''):'<div class="empty">A lixeira está vazia.</div>');
+      return;
+    }
+    body.innerHTML=(busca?`<p class="small muted">Resultado da pesquisa em todos os pedidos, inclusive arquivados: ${items.length}.</p>`:'')+(items.length?items.map(r=>{const uf=invUfOf(r.whatsapp),bd=invBdayNear(r);return `<div class="ivCard" data-id="${esc(r.id)}">
+      <div class="ivTop"><div style="min-width:0"><div class="ivNome">${esc(r.name)}</div><div class="small muted" style="word-break:break-all">${esc(r.email)}</div><div class="small">💬 ${esc(invFmtPhone(r.whatsapp))}${uf?' · '+esc(uf):''}</div>${r.birth_date?`<div class="small">🎂 ${esc(invBirthBR(r.birth_date))}</div>`:''}</div>
+      <div class="ivTags"><span class="tag ${r.status==='novo'?'b':'g'}">${esc(INV_ST[r.status]||r.status)}</span>${r.archived?'<span class="tag g">🗄 Arquivado</span>':''}</div></div>
+      <div class="small muted" style="margin-top:4px">Como soube: <b style="color:var(--ink)">${esc(r.how_known)}</b></div>
+      <div class="small muted">${esc(invWhen(r.created_at))}</div>
+      ${bd?`<div class="small ivBday">🎂 ${bd.when==='hoje'?'Hoje':'Amanhã'} é aniversário (faz ${bd.age} anos)</div>`:''}
+      <div class="ivActs"><a class="btn sm" href="${esc(invWaLink(r))}" target="_blank" rel="noopener">💬 WhatsApp</a>
+        ${bd?`<a class="btn sm" href="${esc(invBdayLink(r))}" target="_blank" rel="noopener">💬 Parabenizar</a>`:''}
+        ${r.status!=='convidado'?'<button type="button" class="btn sec sm" data-a="convidado">Marcar convidado</button>':''}
+        ${r.status!=='recusado'?'<button type="button" class="btn sec sm" data-a="recusado">Recusar</button>':''}
+        ${r.status!=='novo'?'<button type="button" class="btn sec sm" data-a="novo">Reabrir</button>':''}
+        <button type="button" class="btn sec sm" data-a="arq">${r.archived?'♻ Desarquivar':'🗄 Arquivar'}</button>
+        <button type="button" class="btn sec sm ivDel" data-a="del">${armed===r.id?'⚠ Confirmar exclusão':'🗑 Excluir'}</button></div></div>`}).join(''):'<div class="empty">Nenhum pedido nesta lista.</div>');
+  };
+  const drawCal=()=>{
+    const today=new Date(),isCur=calY===today.getFullYear()&&calM===today.getMonth(),byDay={};
+    list.filter(x=>invVivo(x)&&x.status!=='recusado'&&/^\d{4}-\d{2}-\d{2}/.test(x.birth_date||'')).forEach(x=>{const m=+x.birth_date.slice(5,7)-1;let d=+x.birth_date.slice(8,10);
+      if(m!==calM)return;if(m===1&&d===29&&!isLeapY(calY))d=28;(byDay[d]=byDay[d]||[]).push({...x,age:calY-+x.birth_date.slice(0,4),day:d})});
+    const first=new Date(calY,calM,1).getDay(),days=new Date(calY,calM+1,0).getDate();
+    let cells='';for(let i=0;i<first;i++)cells+='<div></div>';
+    for(let d=1;d<=days;d++){const n=(byDay[d]||[]).length,tod=isCur&&d===today.getDate(),sel=calSel===d;
+      cells+=`<button type="button" data-d="${d}" class="ivDay${sel?' sel':''}${tod?' hoje':''}${n?' tem':''}"><span>${d}</span>${n?`<small>🎂${n>1?n:''}</small>`:''}</button>`}
+    const all=Object.values(byDay).flat().sort((a,b)=>a.day-b.day),shown=calSel?all.filter(x=>x.day===calSel):all;
+    calBox.innerHTML=`<div class="ivCalHd"><button type="button" class="btn sec sm" data-n="-1" aria-label="Mês anterior">◀</button><b style="text-transform:capitalize">${MESES_INV[calM]} de ${calY}</b><button type="button" class="btn sec sm" data-n="1" aria-label="Próximo mês">▶</button></div>
+      <div class="ivGrid ivDow">${['D','S','T','Q','Q','S','S'].map(x=>`<span>${x}</span>`).join('')}</div><div class="ivGrid">${cells}</div>
+      <p class="small muted" style="margin-top:8px">🎂 marca dias com aniversariantes (todos os pedidos, menos os recusados, inclusive arquivados). Toque em um dia para filtrar.</p>
+      ${shown.length?shown.map(x=>`<div class="ivCard ivRow"><div style="min-width:0"><div class="ivNome">${String(x.day).padStart(2,'0')}/${String(calM+1).padStart(2,'0')} · ${esc(x.name)}</div><div class="small muted">Faz ${x.age} anos${invUfOf(x.whatsapp)?' · '+esc(invUfOf(x.whatsapp)):''}</div></div><a class="btn sm" href="${esc(invBdayLink(x))}" target="_blank" rel="noopener">💬 Parabenizar</a></div>`).join(''):`<div class="empty">Nenhum aniversariante ${calSel?'neste dia':'neste mês'}.</div>`}`;
+  };
+  const setMode=m=>{mode=m;listBox.classList.toggle('hidden',m==='cal');calBox.classList.toggle('hidden',m!=='cal');modeBtn.textContent=m==='cal'?'📋 Pedidos':'🎂 Aniversariantes';m==='cal'?drawCal():draw()};
+  modeBtn.onclick=()=>setMode(mode==='cal'?'list':'cal');
+  calBox.addEventListener('click',e=>{const n=e.target.closest('[data-n]'),d=e.target.closest('[data-d]');
+    if(n){calM+=+n.dataset.n;if(calM<0){calM=11;calY--}if(calM>11){calM=0;calY++}calSel=null;drawCal()}
+    else if(d){const v=+d.dataset.d;calSel=calSel===v?null:v;drawCal()}});
+  search.addEventListener('input',()=>{q=search.value;draw()});
+  tabs.addEventListener('click',e=>{const b=e.target.closest('[data-t]');if(b){filter=b.dataset.t;q='';search.value='';draw()}});
+  body.addEventListener('click',async e=>{const b=e.target.closest('[data-a]');if(!b)return;
+    const card=b.closest('[data-id]'),id=card?card.dataset.id:null,a=b.dataset.a,r=list.find(x=>x.id===id);
+    try{
+      const arma=k=>{if(armed!==k){armed=k;clearTimeout(armedT);armedT=setTimeout(()=>{armed=null;draw()},4000);draw();return true}armed=null;return false};
+      if(a==='del'){if(arma(id))return;await invTrash(id);r.deleted_at=new Date().toISOString();toast('Pedido movido para a lixeira (fica 15 dias)')}
+      else if(a==='restaurar'){await invRestore(id);r.deleted_at=null;toast('Pedido restaurado')}
+      else if(a==='apagar'){if(arma(id))return;await invPurge(id);list=list.filter(x=>x.id!==id);toast('Pedido apagado de vez')}
+      else if(a==='esvaziar'){if(arma('__all'))return;const lx=list.filter(x=>!invVivo(x));for(const x of lx)await invPurge(x.id);list=list.filter(invVivo);toast('Lixeira esvaziada')}
+      else if(a==='arq'){await invSetArchived(id,!r.archived);r.archived=!r.archived;toast(r.archived?'Pedido arquivado':'Pedido desarquivado')}
+      else{await invSetStatus(id,a);if(r)r.status=a}
+      invCache=list;draw();atualizaSino();['#invBadge','#fabInvBadge'].forEach(i=>{const c=$(i),n=list.filter(x=>invVivo(x)&&x.status==='novo'&&!x.archived).length;if(c){c.textContent=n;c.classList.toggle('hidden',n===0)}});
+    }catch(ex){toast('Não foi possível concluir: '+((ex&&ex.message)||ex))}});
+  body.innerHTML='<div class="empty">Carregando…</div>';
+  try{list=await invAutoLimpa(await invList());invCache=list;invCacheAt=Date.now()}catch(e){body.innerHTML='<div class="err">Não foi possível carregar os pedidos: '+esc((e&&e.message)||e)+'</div>';return}
+  draw();
+}
+// Formulário "Peça um convite" na tela de login
+(function(){
+  const link=$('#invOpen'),form=$('#invForm'),lf=$('#fLogin'),msg=$('#invMsg');if(!link)return;
+  const ymd=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  const info=(t,neutro)=>{msg.className=neutro?'ivInfo':'err';msg.textContent=t};
+  const isMinor=b=>{const lim=new Date();lim.setFullYear(lim.getFullYear()-18);return /^\d{4}-\d{2}-\d{2}$/.test(b)&&b>ymd(lim)};
+  const checkMinor=()=>{const m=isMinor($('#invBirth').value);if(m)msg.textContent='';$('#invMinor').classList.toggle('hidden',!m);$('#invBtn').classList.toggle('hidden',m);$('#invClose').classList.toggle('hidden',!m);return m};
+  const view=on=>{form.classList.toggle('hidden',!on);lf.classList.toggle('hidden',on);link.parentElement.classList.toggle('hidden',on);
+    info('');if(!on){form.reset();$('#invUf').textContent=''}
+    if(on){$('#invDone').classList.add('hidden');$('#invFields').classList.remove('hidden');checkMinor();setTimeout(()=>$('#invName').focus(),50)}};
+  $('#invBirth').max=ymd(new Date());
+  const showUf=()=>{const d=invDigits($('#invDdd').value),el=$('#invUf');if(d.length<2){el.textContent='';return}
+    const uf=DDD_UF[d.slice(0,2)];el.textContent=uf?`📍 ${UF_NOME[uf]} (${uf})`:'✕ DDD não encontrado';el.className='small '+(uf?'ivOk':'ivBad')};
+  $('#invDdd').addEventListener('input',()=>{const i=$('#invDdd');i.value=invDigits(i.value).slice(0,2);showUf();if(i.value.length===2)$('#invPhone').focus()});
+  $('#invPhone').addEventListener('input',()=>{const i=$('#invPhone');const d=invDigits(i.value).slice(0,9);i.value=d.length>5?d.slice(0,5)+'-'+d.slice(5):d});
+  ['input','change'].forEach(ev=>$('#invBirth').addEventListener(ev,checkMinor));
+  link.addEventListener('click',()=>view(true));
+  $('#invClose').addEventListener('click',()=>view(false));
+  $('#invDoneBack').addEventListener('click',()=>view(false));
+  const DUP={email:'Já recebemos um pedido com este e-mail. Em breve entraremos em contato pelo WhatsApp informado.',whatsapp:'Já recebemos um pedido com este WhatsApp. Em breve entraremos em contato.',again:'Seu pedido já foi enviado. Em breve entraremos em contato pelo WhatsApp informado.'};
+  form.addEventListener('submit',async e=>{
+    e.preventDefault();
+    if($('#invWeb').value){$('#invFields').classList.add('hidden');$('#invDone').classList.remove('hidden');return} // campo-isca: finge sucesso
+    const ddd=invDigits($('#invDdd').value),num=invDigits($('#invPhone').value),birth=$('#invBirth').value;
+    const rec={name:$('#invName').value.trim().replace(/\s+/g,' '),email:$('#invEmail').value.trim(),whatsapp:'55'+ddd+num,birth_date:birth,how_known:$('#invHow').value.trim().replace(/\s+/g,' ')};
+    const parts=rec.name.split(' ');
+    if(checkMinor())return info('Menores de 18 anos não podem pedir convite.');
+    if(parts.length<2||parts[0].length<2||parts[1].length<1)return info('Informe nome e sobrenome.');
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(rec.email)||rec.email.length>120)return info('Informe um e-mail válido.');
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(birth)||birth<'1900-01-01')return info('Informe a data de nascimento.');
+    if(!DDD_UF[ddd])return info('Informe um DDD válido.');
+    if(!/^9\d{8}$/.test(num))return info('Informe o número do WhatsApp com 9 dígitos (começa com 9).');
+    if(rec.how_known.length<2)return info('Conte como soube do app.');
+    if(!$('#invOk').checked)return info('Marque a autorização para continuar.');
+    let last=0;try{last=+localStorage.getItem('rodaliq_inv_last')||0}catch(x){}
+    if(Date.now()-last<60000)return info(DUP.again,true);
+    if(!DB){return info('Não foi possível enviar agora. Tente de novo em instantes.')}
+    const btn=$('#invBtn');btn.disabled=true;btn.textContent='Enviando…';msg.textContent='';
+    try{const r=await invSubmit(rec);
+      if(r.dup)info(DUP[r.dup]||DUP.again,true);
+      else{try{localStorage.setItem('rodaliq_inv_last',String(Date.now()))}catch(x){}form.reset();$('#invUf').textContent='';$('#invFields').classList.add('hidden');$('#invDone').classList.remove('hidden')}
+    }catch(ex){info('Não foi possível enviar agora. Tente de novo em instantes.')}
+    btn.disabled=false;btn.textContent='Enviar pedido';
+  });
+})();
+
 function temaAtual(){try{return localStorage.getItem('rodaliq_tema')||'claro'}catch(e){return 'claro'}}
 function aplicaTema(t){const d=t==='escuro'||(t==='auto'&&window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches);
   document.documentElement.setAttribute('data-tema',d?'escuro':'claro');const m=document.querySelector('meta[name=theme-color]');if(m)m.content=d?'#0B1222':'#14213D'}
@@ -1321,13 +1601,13 @@ let fabDrag=null,fabArrastou=false;
     try{localStorage.setItem(FABK,JSON.stringify(p))}catch(er){}aplicaFab(p)};
   window.addEventListener('pointerup',solta);window.addEventListener('pointercancel',solta)})();
 $('#fab').onclick=e=>{e.stopPropagation();if(fabArrastou){fabArrastou=false;return}fab()};
-$('#fabMenu').onclick=e=>{const b=e.target.closest('[data-fab]');if(!b)return;$('#fabMenu').classList.add('hidden');if(b.dataset.fab==='tema'){formTema();return}if(b.dataset.fab==='sair'){sair();return}NOVO[b.dataset.fab]()};
+$('#fabMenu').onclick=e=>{const b=e.target.closest('[data-fab]');if(!b)return;$('#fabMenu').classList.add('hidden');if(b.dataset.fab==='tema'){formTema();return}if(b.dataset.fab==='sair'){sair();return}if(b.dataset.fab==='inv'){openInvitesModal();return}NOVO[b.dataset.fab]()};
 document.addEventListener('click',e=>{if(!e.target.closest('#fabWrap'))$('#fabMenu').classList.add('hidden')});
 $('#optBtn').onclick=e=>{e.stopPropagation();$('#bellMenu').classList.add('hidden');const m=$('#optMenu');m.classList.toggle('hidden');if(!m.classList.contains('hidden'))posMenu(m,$('#optBtn'))};
 window.addEventListener('scroll',()=>{['bellMenu','optMenu'].forEach(id=>{const m=document.getElementById(id);if(m&&!m.classList.contains('hidden')&&window.innerWidth<=640)posMenu(m,document.getElementById(id==='bellMenu'?'bellBtn':'optBtn'))})},{passive:true});
 document.addEventListener('click',e=>{if(!e.target.closest('#optWrap'))$('#optMenu').classList.add('hidden');if(!e.target.closest('#bellWrap'))$('#bellMenu').classList.add('hidden')});
 $('#optMenu').onclick=e=>{const b=e.target.closest('[data-m]');if(!b)return;$('#optMenu').classList.add('hidden');
-  ({cfg:formCfg,veic:formVeic,cnh:formCnh,tema:formTema,aud:verAuditoria,pass:formSenha,exp:exportar,imp:()=>$('#impFile').click(),out:sair})[b.dataset.m]()};
+  ({cfg:formCfg,veic:formVeic,cnh:formCnh,tema:formTema,inv:openInvitesModal,aud:verAuditoria,pass:formSenha,exp:exportar,imp:()=>$('#impFile').click(),out:sair})[b.dataset.m]()};
 (()=>{const h=(location.hash||'').slice(1);if(['painel','corridas','carona','custos','multas','impostos','relatorios'].includes(h))UI.tab=h})();
 iniciar();
 if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
