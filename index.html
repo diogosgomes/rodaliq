@@ -360,18 +360,18 @@ svg text{font-family:Inter,system-ui,sans-serif}
       <button class="btn sec sm" id="optBtn">⚙ Opções</button>
       <div class="menu hidden" id="optMenu">
         <div class="who">Conectado como <b id="whoName">—</b></div>
-        <button data-m="cfg">🎯 Metas e preferências</button>
         <button data-m="rsv">📅 Despesas programadas</button>
+        <button data-m="exp">⬇ Exportar backup</button>
         <button data-m="onb">🧭 Guia do Rodaliq</button>
-        <button data-m="veic">🚗 Veículos</button>
+        <button data-m="aud">🕘 Histórico de auditoria</button>
+        <button data-m="imp">⬆ Importar backup</button>
+        <button data-m="cfg">🎯 Metas e preferências</button>
         <button data-m="cnh">🪪 Minha CNH</button>
         <button data-m="inv" id="btnInvites" class="hidden">📨 Pedidos de convite<span id="invBadge" class="mBadge hidden"></span></button>
         <button data-m="tema">🌓 Tema</button>
         <button data-m="termos">📄 Termos e privacidade</button>
-        <button data-m="aud">🕘 Histórico de auditoria</button>
         <button data-m="pass">🔑 Trocar senha</button>
-        <button data-m="exp">⬇ Exportar backup</button>
-        <button data-m="imp">⬆ Importar backup</button>
+        <button data-m="veic">🚗 Veículos</button>
         <button data-m="out">↩ Sair</button>
       </div>
     </div>
@@ -388,16 +388,16 @@ svg text{font-family:Inter,system-ui,sans-serif}
 </header>
 <main id="view"></main>
 <div class="fabWrap" id="fabWrap"><div class="fabMenu hidden" id="fabMenu">
-  <button data-fab="dia">⚡ Lançar o dia (Uber + 99)</button>
-  <button data-fab="corrida">🚕 Corridas (Uber / 99)</button>
-  <button data-fab="carona">🧑‍🤝‍🧑 Caronas</button>
-  <button data-fab="repasse">🏦 Repasse semanal</button>
-  <button data-fab="custo">⛽ Custos</button>
-  <button data-fab="multa">🚨 Multas</button>
   <button data-fab="carne">🧾 Carnê-Leão do mês anterior</button>
+  <button data-fab="carona">🧑‍🤝‍🧑 Caronas</button>
+  <button data-fab="corrida">🚕 Corridas (Uber / 99)</button>
+  <button data-fab="custo">⛽ Custos</button>
+  <button data-fab="dia">⚡ Lançar o dia (Uber + 99)</button>
+  <button data-fab="multa">🚨 Multas</button>
+  <button data-fab="repasse">🏦 Repasse semanal</button>
   <div class="sep"></div>
-  <button data-fab="tema">🌓 Tema</button>
   <button data-fab="inv" id="fabInv" class="hidden">📨 Pedidos de convite<span id="fabInvBadge" class="mBadge hidden"></span></button>
+  <button data-fab="tema">🌓 Tema</button>
   <button data-fab="sair">↩ Sair</button>
   <div class="dica">Dica: segure e arraste o botão ⚡ Atalhos para qualquer ponto da tela.</div>
 </div><button class="btn fab" id="fab" aria-haspopup="true">⚡ Atalhos</button></div>
@@ -407,7 +407,7 @@ svg text{font-family:Inter,system-ui,sans-serif}
 
 <script>
 "use strict";
-const VERSAO='V44';
+const VERSAO='V45';
 /* ---------- utilidades ---------- */
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
