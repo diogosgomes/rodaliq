@@ -159,6 +159,8 @@ h3{font-size:13px;margin:0 0 8px;color:var(--muted);text-transform:uppercase;let
 .menu .who{padding:8px 10px;font-size:12px;color:var(--muted);border-bottom:1px solid var(--line);margin-bottom:4px}
 .menu button{display:block;width:100%;text-align:left;border:0;background:none;padding:9px 10px;border-radius:8px;cursor:pointer}
 .menu button:hover{background:var(--blueSoft)}
+.subSep{display:inline-block;width:1px;height:22px;background:var(--line);margin:0 4px;vertical-align:middle}
+select.inp hr{border-color:var(--line)}
 /* ===== Pedidos de convite ===== */
 .invLink{text-align:center;margin-top:12px}
 #invForm .field{margin-top:10px}
@@ -381,7 +383,7 @@ svg text{font-family:Inter,system-ui,sans-serif}
 
 <script>
 "use strict";
-const VERSAO='V29';
+const VERSAO='V32';
 /* ---------- utilidades ---------- */
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -620,7 +622,7 @@ $('#fLogin').onsubmit=async e=>{
 };
 async function entrar(evento){
   $('#login').classList.add('hidden');$('#app').classList.remove('hidden');$('#whoName').textContent=LOGADO;
-  await carregar();render();ouvirNovidades();invAdminInit();
+  await carregar();render();ouvirNovidades();invAdminInit();navInicia();
   if(evento)audit(evento,'Acesso','Login de '+LOGADO);
 }
 async function sair(){await audit('Saída','Acesso','Logout de '+LOGADO);try{await DB.auth.signOut()}catch(e){}location.reload()}
@@ -683,7 +685,7 @@ function openForm({titulo,sub,campos,val={},onSave,onDel}){
     const v=val[c.k]??c.def??'';const cls=c.full?'field full':'field';const id='f_'+c.k;
     const req=c.req?' required':'';
     let inp;
-    if(c.t==='select')inp=`<select class="inp" id="${id}"${req}>${c.op.map(o=>`<option${String(o)===String(v)?' selected':''}>${esc(o)}</option>`).join('')}</select>`;
+    if(c.t==='select')inp=`<select class="inp" id="${id}"${req}>${c.op.map(o=>o===SEP_OP?'<hr>':`<option${String(o)===String(v)?' selected':''}>${esc(o)}</option>`).join('')}</select>`;
     else if(c.t==='textarea')inp=`<textarea class="inp" id="${id}" rows="3">${esc(v)}</textarea>`;
     else if(c.t==='date')inp=`<input class="inp" type="date" id="${id}" value="${esc(v)}" max="${c.allowFuture?'':hoje()}"${req}>`;
     else if(c.t==='money')inp=`<input class="inp num" inputmode="decimal" id="${id}" value="${v===''||v==null?'':brl(v,1)}" placeholder="0,00"${req}>`;
@@ -702,8 +704,9 @@ function openForm({titulo,sub,campos,val={},onSave,onDel}){
     if(c.t==='date'){el.addEventListener('click',()=>{try{el.showPicker()}catch(e){}})}
   });
   const fechar=()=>ov.remove();
-  ov.querySelector('#fCan').onclick=fechar;
-  ov.addEventListener('mousedown',e=>{if(e.target===ov)fechar()});
+  ov.__fechar=()=>fechaComPerda(ov,fechar);marcaPerda(ov);
+  ov.querySelector('#fCan').onclick=ov.__fechar;
+  ov.addEventListener('mousedown',e=>{if(e.target===ov)ov.__fechar()});
   if(onDel)ov.querySelector('#fDel').onclick=async()=>{if(await confirma('Excluir este lançamento?')){onDel();fechar()}};
   const ler=()=>{const o={};campos.forEach(c=>{const el=g(c.k);if(!el)return;
     if(c.t==='money')o[c.k]=el.value.trim()===''?null:parseBRL(el.value);
@@ -755,12 +758,15 @@ function formCarona(r,dataPadrao){
     val:r,onSave:o=>upsert('tb_carona',Object.assign({id:r.id||uid('c')},o)),onDel:r.id?()=>remover('tb_carona',r.id):null});
   f.g('passageiros').addEventListener('input',e=>{const n=parseInt(e.target.value,10)||0;f.g('valor').value=brl(n*pc,1)});
 }
-const CATS=['Combustível','Manutenção','Seguro','Estacionamento','IPVA/Licenciamento','Lavagem','Multa','Outros'];
+// categorias em ordem alfabética; "Outros" sempre por último, depois de uma linha
+const CATS=[...['Combustível','Manutenção','Parcela/Aluguel','Seguro','Estacionamento','IPVA/Licenciamento','Lavagem','Multa'].sort((a,b)=>a.localeCompare(b,'pt-BR',{sensitivity:'base'})),'Outros'];
+const SEP_OP='__sep__';
+const comSep=l=>l.flatMap(c=>c==='Outros'?[SEP_OP,c]:[c]);
 const CATS_FORM=CATS.filter(c=>c!=='Multa');
 function formCusto(r){
   r=r||{data:hoje(),cat:'Combustível',veiculo:cfg().veiculoPadrao,combustivel:'Etanol'};
   const f=openForm({titulo:r.id?'Editar custo':'Novo custo do veículo',
-    campos:[{k:'data',l:'Data',t:'date',req:1},{k:'cat',l:'Categoria',t:'select',op:r.cat==='Multa'?CATS:CATS_FORM,help:'Multas são lançadas na aba Multas e entram aqui sozinhas quando pagas.'},
+    campos:[{k:'data',l:'Data',t:'date',req:1},{k:'cat',l:'Categoria',t:'select',op:comSep(r.cat==='Multa'?CATS:CATS_FORM),help:'Parcela/Aluguel: parcela da compra do veículo ou aluguel do veículo. Multas são lançadas na aba Multas e entram aqui sozinhas quando pagas.'},
       {k:'veiculo',l:'Veículo',t:'select',op:VEICS()},{k:'valor',l:'Valor (R$)',t:'money',req:1},
       {k:'combustivel',l:'Combustível',t:'select',op:['Etanol','Gasolina','GNV','Diesel']},{k:'litros',l:'Litros',t:'num',help:''},
       {k:'desc',l:'Descrição',t:'text',full:1},{k:'km',l:'Km do veículo (opcional)',t:'num'},{k:'proxKm',l:'Próxima troca/revisão (km)',t:'num'},
@@ -1028,7 +1034,7 @@ function vCustos(){
     ${kpi('Manutenção',brl(sum(m.filter(r=>r.cat==='Manutenção'),r=>r.valor)),'')}
     ${kpi('Seguro + estacionamento',brl(sum(m.filter(r=>r.cat==='Seguro'||r.cat==='Estacionamento'),r=>r.valor)),'')}
   </div>
-  <div class="subtabs">${['Todos',...CATS].map(x=>`<button class="chip${x===c?' on':''}" data-sub="custos:${x}">${x}</button>`).join('')}</div>`;
+  <div class="subtabs">${['Todos',...CATS].map(x=>`${x==='Outros'?'<span class="subSep" aria-hidden="true"></span>':''}<button class="chip${x===c?' on':''}" data-sub="custos:${x}">${x}</button>`).join('')}</div>`;
   h+=groups(L,{key:'data',chave:'cus'+c,vazio:'Nenhum custo nesta categoria.',
     cab:rows=>`<span class="small muted">${rows.length} lanç.</span><b class="num">${brl(sum(rows,r=>r.valor))}</b>`,
     linha:r=>`<div class="row"><div class="dt">${fmtD(r.data)}<small>${wdOf(r.data)}</small></div><div class="main"><span class="tag b">${esc(r.cat)}</span>${r.virtual?'<span class="tag a">paga · gerenciada na aba Multas</span>':''}<span class="tag g">${esc(r.veiculo)}</span> ${esc(r.desc||'')}<div class="small muted">${[r.litros?r.litros+' L · '+brl(r.valor/r.litros)+'/L':'',r.km?(+r.km).toLocaleString('pt-BR')+' km':'',r.proxKm?'próx. em '+(+r.proxKm).toLocaleString('pt-BR')+' km':'',r.pgto,r.fornecedor].filter(Boolean).map(esc).join(' · ')}</div>${r.obs?`<div class="obs">${esc(r.obs)}</div>`:''}</div><div class="val num">${brl(r.valor)}</div><div class="act">${r.virtual?`<button class="ib" data-ed="tb_multas:${r.ref}" aria-label="Editar na aba Multas" title="Gerenciada na aba Multas">✎</button>`:`<button class="ib" data-ed="tb_custos:${r.id}" aria-label="Editar">✎</button><button class="ib" data-del="tb_custos:${r.id}" aria-label="Excluir" title="Excluir">🗑</button>`}</div></div>`});
@@ -1290,14 +1296,15 @@ function formVeic(){
     ${cfg().veiculos.map((v,i)=>`<tr><td><input class="inp" data-vi="${i}" data-vk="nome" value="${esc(v.nome)}"></td><td><input class="inp" data-vi="${i}" data-vk="desc" value="${esc(v.desc||'')}"></td><td><input class="inp" type="date" data-vi="${i}" data-vk="desde" value="${esc(v.desde||'')}"></td><td style="text-align:center"><input type="checkbox" data-vi="${i}" data-vk="ativo"${v.ativo?' checked':''}></td></tr>`).join('')}</table>
     <button class="btn sec sm" id="vAdd" style="margin-top:8px">＋ Adicionar veículo</button><div class="small muted" style="margin-top:6px">Renomear um veículo atualiza os lançamentos dele.</div>
     <div class="mfoot"><button class="btn sec" id="vCan">Cancelar</button><button class="btn" id="vOk">Salvar</button></div></div>`;
-    ov.querySelector('#vCan').onclick=()=>ov.remove();ov.querySelector('#vAdd').onclick=()=>{ler();tmp.push({nome:'Novo',desc:'',desde:'',ativo:true});cfg().veiculos=tmp;draw()};
+    ov.querySelector('#vCan').onclick=()=>ov.__fechar();ov.querySelector('#vAdd').onclick=()=>{ler();tmp.push({nome:'Novo',desc:'',desde:'',ativo:true});cfg().veiculos=tmp;draw()};
     ov.querySelector('#vOk').onclick=()=>{ler();const nomes=tmp.map(v=>v.nome.trim());if(nomes.some(n=>!n)||new Set(nomes).size!==nomes.length){toast('Nomes vazios ou repetidos.');return}
       orig.forEach((o,i)=>{const n=tmp[i]&&tmp[i].nome;if(n&&n!==o.nome)['tb_corridas','tb_repasses','tb_carona','tb_custos','tb_multas'].forEach(tb=>{let mud=false;S[tb].forEach(r=>{if(r.veiculo===o.nome){r.veiculo=n;mud=true}});if(mud)salvar(tb)})});
       cfg().veiculos=tmp;if(!nomes.includes(cfg().veiculoPadrao))cfg().veiculoPadrao=nomes[0];salvar('tb_config');audit('Edição','Veículos',nomes.join(', '));ov.remove();render();toast('Veículos salvos')}};
   const orig=JSON.parse(JSON.stringify(cfg().veiculos));let tmp=JSON.parse(JSON.stringify(orig));
   const ler=()=>ov.querySelectorAll('[data-vi]').forEach(el=>{const v=tmp[+el.dataset.vi];v[el.dataset.vk]=el.type==='checkbox'?el.checked:el.value});
-  document.body.appendChild(ov);draw();
-  ov.addEventListener('click',e=>{if(e.target.id==='vCan')cfg().veiculos=orig});
+  ov.__fechar=()=>fechaComPerda(ov,()=>{cfg().veiculos=orig;ov.remove()});
+  document.body.appendChild(ov);draw();marcaPerda(ov);
+  ov.addEventListener('mousedown',e=>{if(e.target===ov)ov.__fechar()});
 }
 function formSenha(){
   openForm({titulo:'Trocar senha',campos:[{k:'a',l:'Senha atual',t:'text',full:1},{k:'n',l:'Nova senha',t:'text',full:1},{k:'n2',l:'Repita a nova senha',t:'text',full:1}],
@@ -1414,7 +1421,7 @@ async function openInvitesModal(){
     <div id="ivCalBox" class="hidden"></div>
     <p class="small muted" style="margin-top:10px">Excluir manda o pedido para a 🗑 Lixeira, onde ele fica 15 dias antes de ser apagado de vez. Arquivar tira da lista sem apagar. Nada desta tela vai para o histórico de auditoria.</p></div>`;
   document.body.appendChild(ov);
-  const close=()=>{ov.remove();invRefreshBadge(false)};
+  const close=()=>{ov.remove();invRefreshBadge(false)};ov.__fechar=close;
   ov.querySelector('#ivClose').onclick=close;ov.addEventListener('click',ev=>{if(ev.target===ov)close()});
   const body=ov.querySelector('#ivBody'),tabs=ov.querySelector('#ivTabs'),search=ov.querySelector('#ivSearch'),calBox=ov.querySelector('#ivCalBox'),listBox=ov.querySelector('#ivListBox'),modeBtn=ov.querySelector('#ivMode');
   const match=r=>{if(!invVivo(r))return false;const t=invNorm(q.trim());if(!t)return true;const dg=invDigits(q);return invNorm(r.name).includes(t)||invNorm(r.email).includes(t)||(dg.length>=2&&String(r.whatsapp||'').includes(dg))};
@@ -1488,9 +1495,10 @@ async function openInvitesModal(){
   const info=(t,neutro)=>{msg.className=neutro?'ivInfo':'err';msg.textContent=t};
   const isMinor=b=>{const lim=new Date();lim.setFullYear(lim.getFullYear()-18);return /^\d{4}-\d{2}-\d{2}$/.test(b)&&b>ymd(lim)};
   const checkMinor=()=>{const m=isMinor($('#invBirth').value);if(m)msg.textContent='';$('#invMinor').classList.toggle('hidden',!m);$('#invBtn').classList.toggle('hidden',m);$('#invClose').classList.toggle('hidden',!m);return m};
-  const view=on=>{form.classList.toggle('hidden',!on);lf.classList.toggle('hidden',on);link.parentElement.classList.toggle('hidden',on);
+  const view=(on,doGesto)=>{form.classList.toggle('hidden',!on);if(on&&!NAV_ON&&!invGuarda){try{history.pushState({rq:'inv'},'');invGuarda=true}catch(e){}}if(!on&&invGuarda&&!doGesto){invGuarda=false;navIgnora=true;try{history.back()}catch(e){navIgnora=false}}if(!on&&doGesto)invGuarda=false;lf.classList.toggle('hidden',on);link.parentElement.classList.toggle('hidden',on);
     info('');if(!on){form.reset();$('#invUf').textContent=''}
     if(on){$('#invDone').classList.add('hidden');$('#invFields').classList.remove('hidden');checkMinor();setTimeout(()=>$('#invName').focus(),50)}};
+  form.__fechar=g=>view(false,g);form.__sujo=()=>['#invName','#invEmail','#invBirth','#invDdd','#invPhone','#invHow'].some(k=>$(k).value.trim()!=='')||$('#invOk').checked;
   $('#invBirth').max=ymd(new Date());
   const showUf=()=>{const d=invDigits($('#invDdd').value),el=$('#invUf');if(d.length<2){el.textContent='';return}
     const uf=DDD_UF[d.slice(0,2)];el.textContent=uf?`📍 ${UF_NOME[uf]} (${uf})`:'✕ DDD não encontrado';el.className='small '+(uf?'ivOk':'ivBad')};
@@ -1526,6 +1534,58 @@ async function openInvitesModal(){
     btn.disabled=false;btn.textContent='Enviar pedido';
   });
 })();
+
+/* ---------- Gesto/botão de voltar do celular: fecha janelas, refaz o caminho das abas e, no Painel, pergunta antes de sair ---------- */
+const NAVT=[];let navUlt=null,navRev=false,NAV_ON=false,navIgnora=false,invGuarda=false;
+function navArma(){try{history.pushState({rq:1},'')}catch(e){}}
+function navInicia(){if(NAV_ON)return;NAV_ON=true;if(!(history.state&&history.state.rq))navArma()}
+function navRegistraAba(){ // chamado no render: guarda o caminho das abas
+  if(UI.tab===navUlt)return;
+  if(UI.tab==='painel'){NAVT.length=0}else if(!navRev&&navUlt){if(NAVT[NAVT.length-1]!==navUlt)NAVT.push(navUlt);if(NAVT.length>30)NAVT.shift()}
+  navRev=false;navUlt=UI.tab;
+}
+// "perda de digitação": compara o formulário com o que havia ao abrir
+const navSerial=el=>[...el.querySelectorAll('input,select,textarea')].filter(i=>i.type!=='search'&&i.type!=='hidden'&&!i.closest('[data-semperda]')).map(i=>i.type==='checkbox'||i.type==='radio'?(i.checked?'1':'0'):i.value).join('\u0001');
+function marcaPerda(ov){ov.__perda=true;setTimeout(()=>{ov.__snap=navSerial(ov)},60)}
+const sujo=ov=>!!(ov&&ov.__perda&&ov.__snap!=null&&navSerial(ov)!==ov.__snap);
+function pedePerda(){return new Promise(res=>{
+  const d=document.createElement('div');d.className='ov';d.id='perdaDlg';d.style.zIndex='80';
+  d.innerHTML=`<div class="modal" style="max-width:400px"><h2>Você vai perder o que digitou.</h2><p class="small muted">Se voltar agora, o que foi digitado neste formulário não será salvo.</p><div class="mfoot"><button class="btn sec" id="pdV">Voltar sem salvar</button><button class="btn" id="pdC">Continuar editando</button></div></div>`;
+  document.body.appendChild(d);const fim=v=>{d.remove();res(v)};d.__resolve=fim;
+  d.querySelector('#pdC').onclick=()=>fim(false);d.querySelector('#pdV').onclick=()=>fim(true);
+  d.addEventListener('mousedown',e=>{if(e.target===d)fim(false)})})}
+async function fechaComPerda(ov,fechar){if(sujo(ov)&&!(await pedePerda()))return false;fechar();return true}
+function fechaOv(ov){ // fecha a janela do topo pelo jeito dela
+  if(ov.__fechar)return ov.__fechar();
+  const b=ov.querySelector('#cN,#aOk,#tOk,#ivClose,#vCan,#fCan');if(b)return b.click();
+  ov.remove();
+}
+function sairDlg(){
+  if($('#sairDlg'))return;
+  const d=document.createElement('div');d.className='ov';d.id='sairDlg';d.style.zIndex='80';
+  d.innerHTML=`<div class="modal" style="max-width:400px"><h2>Deseja sair do Rodaliq?</h2><p class="small muted" id="sairTxt">Você continua conectado. Para desconectar, use ⚙ Opções > Sair.</p><div class="mfoot"><button class="btn sec" id="sdS">Sair</button><button class="btn" id="sdC">Continuar</button></div></div>`;
+  document.body.appendChild(d);
+  const cont=()=>{d.remove();navArma()};
+  d.querySelector('#sdC').onclick=cont;d.addEventListener('mousedown',e=>{if(e.target===d)cont()});
+  d.querySelector('#sdS').onclick=()=>{try{window.close()}catch(e){}try{history.back()}catch(e){}
+    setTimeout(()=>{const t=$('#sairTxt');if(t)t.innerHTML='<b>Para fechar, faça o gesto de voltar agora.</b> O sistema do celular não deixa o app se fechar sozinho.'},400)};
+}
+window.addEventListener('popstate',async()=>{
+  if(navIgnora){navIgnora=false;return}
+  // tela de login: só o formulário de pedido de convite é tratado
+  if(!NAV_ON){const f=$('#invForm');if(f&&!f.classList.contains('hidden')){invGuarda=false;
+      if(f.__sujo&&f.__sujo()){try{history.pushState({rq:'inv'},'');invGuarda=true}catch(e){}if(await pedePerda()){f.__fechar(false)}}
+      else f.__fechar(true)}return}
+  const perda=$('#perdaDlg');if(perda){navArma();perda.__resolve(false);return}
+  const sd=$('#sairDlg');if(sd){sd.remove();navArma();return}
+  const ovs=[...document.querySelectorAll('.ov')];
+  const menus=['#bellMenu','#optMenu','#fabMenu'].map(s=>$(s)).filter(m=>m&&!m.classList.contains('hidden'));
+  if(!ovs.length&&!menus.length&&UI.tab==='painel'){sairDlg();return} // Painel: pergunta antes de sair
+  navArma();
+  if(ovs.length){fechaOv(ovs[ovs.length-1]);return}
+  if(menus.length){menus.forEach(m=>m.classList.add('hidden'));return}
+  navRev=true;UI.tab=NAVT.length?NAVT.pop():'painel';render();window.scrollTo(0,0);
+});
 
 function temaAtual(){try{return localStorage.getItem('rodaliq_tema')||'claro'}catch(e){return 'claro'}}
 function aplicaTema(t){const d=t==='escuro'||(t==='auto'&&window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches);
@@ -1569,13 +1629,14 @@ $('#impFile').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(
 /* ---------- render e eventos ---------- */
 function render(){
   const v={painel:vPainel,corridas:vCorridas,carona:vCarona,custos:vCustos,multas:vMultas,impostos:vImpostos,relatorios:vRelatorios}[UI.tab];
+  navRegistraAba();
   $('#view').innerHTML=v();
   document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.dataset.t===UI.tab));
   const vp=$('#vPick');if(vp)vp.onchange=()=>{UI.veic=vp.value.startsWith('Todos')?'Todos':vp.value;render()};
   ['simV','simD','simN'].forEach(i=>{const el=document.getElementById(i);if(el)el.oninput=simular});simular();
   atualizaSino();if(!$('#bellMenu').classList.contains('hidden'))renderSino();
 }
-$('#tabs').onclick=e=>{const b=e.target.closest('.tab');if(!b)return;UI.tab=b.dataset.t;try{location.hash=UI.tab}catch(er){}render();window.scrollTo(0,0)};
+$('#tabs').onclick=e=>{const b=e.target.closest('.tab');if(!b)return;UI.tab=b.dataset.t;try{history.replaceState(history.state,'','#'+UI.tab)}catch(er){}render();window.scrollTo(0,0)};
 $('#view').addEventListener('click',e=>{
   const t=e.target.closest('[data-mp],[data-grp],[data-sub],[data-new],[data-ed],[data-del],[data-carne],[data-ano],[data-rel]');if(!t)return;
   if(t.dataset.rel){relAcao(t);return}
