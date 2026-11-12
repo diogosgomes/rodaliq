@@ -172,7 +172,7 @@ html[data-tema="escuro"] .ivOk{color:#4ADE80}
 .ivInfo{color:var(--amberInk);font-size:13px;margin-top:10px;min-height:18px;font-weight:600}
 .ivCheck{display:flex;gap:8px;align-items:flex-start;font-size:12px;color:var(--muted);margin-top:12px;line-height:1.4}.ivCheck input{margin-top:2px;width:auto}
 .ivDone{text-align:center;padding:14px 0}.ivDone .big{font-size:30px}
-.modal.iv{max-width:600px}
+.modal.iv{max-width:600px}.senG{font-family:ui-monospace,Menlo,monospace;font-size:15px;letter-spacing:.5px}.ov.admPage{padding:0;align-items:stretch;justify-content:stretch;background:var(--bg);overflow:auto}.admWrap{width:100%;max-width:1100px;margin:0 auto;padding:16px 20px 40px;box-sizing:border-box}.admHd{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:12px;margin-bottom:14px}.admHd h2{margin:0}.admHdB{display:flex;gap:8px;flex-wrap:wrap}.admMaster{border-color:var(--amber)!important}.admTabs .chip.on{border-color:var(--amber)}#admBox{margin-top:14px}.modal.iv.inline .ivHd{display:none}.supaLnk{display:inline-block;font-size:12.5px;border:1px solid var(--line);border-radius:8px;padding:3px 8px;margin:4px 0;color:var(--blue)}@media(max-width:640px){.admTabs .chip{flex:1 1 calc(50% - 6px);text-align:center}.admWrap{padding:12px}}.exMot label{display:block;padding:3px 0;font-size:14px}.exChk{display:flex;gap:8px;align-items:flex-start;margin-top:10px}.ivBdBt{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}.modal.iv.inline{max-width:none;box-shadow:none;padding:0;background:transparent}.admTabs{display:flex;gap:6px;flex-wrap:wrap}.uCard{border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-top:8px}.uCard .uMail{font-weight:700;word-break:break-all}.uCard .uLin{font-size:12.5px;color:var(--mut);margin-top:3px}
 .ivHd{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px}.ivHd h2{margin:0}.ivHdB{display:flex;gap:6px}
 .ivSearch{position:relative;margin-bottom:10px}.ivSearch span{position:absolute;left:10px;top:50%;transform:translateY(-50%)}.ivSearch .inp{padding-left:34px}
 #ivTabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}#ivTabs .chip{font-size:12px;padding:5px 10px}
@@ -261,7 +261,7 @@ html[data-tema="escuro"] i[style*="#f6f8fb"]{background:#1A2640!important;border
 .bell .al .nota{font-size:11.5px;color:var(--muted);font-weight:400;margin-top:3px}
 .bell .it .ttl{font-weight:700}
 .bell .it .meta{font-size:11px;color:var(--muted);margin:2px 0 4px}
-.bell .it .acts{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
+.bell .it .acts{display:flex;gap:6px 16px;margin-top:6px;flex-wrap:wrap}.bell .it .acts a.lnk{text-decoration:none}.bell .it .acts button.bkBtn{background:var(--blue);color:#fff;padding:7px 14px;border-radius:9px;font-size:13px;font-weight:700}
 .bell .it .acts button,.bell .lnk{display:inline;width:auto;border:0;background:none;color:var(--blue);padding:0;font-size:12px;font-weight:600;cursor:pointer}
 .bell .al{display:flex;gap:8px;align-items:flex-start;cursor:pointer}
 .bell .al:hover{background:#f7f9fc}
@@ -313,6 +313,7 @@ svg text{font-family:Inter,system-ui,sans-serif}
       <button class="btn block" id="lBtn" type="submit">Entrar</button>
       <div class="err" id="lErr"></div>
     </form>
+    <div class="invLink"><button type="button" class="lnk" id="senOpen">Esqueci minha senha</button></div>
     <div class="invLink"><button type="button" class="lnk" id="invOpen">Quer usar o app? Peça um convite</button></div>
     <form id="invForm" class="hidden" autocomplete="off" novalidate>
       <div id="invFields">
@@ -327,7 +328,7 @@ svg text{font-family:Inter,system-ui,sans-serif}
           <div class="small muted">💬 O número precisa ter WhatsApp: é por ele que vamos te responder.</div></div>
         <div class="field"><label for="invHow">Como soube do app?</label><input class="inp" type="text" id="invHow" maxlength="140"></div>
         <div style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden" aria-hidden="true"><label>Não preencha<input type="text" id="invWeb" tabindex="-1" autocomplete="off"></label></div>
-        <label class="ivCheck"><input type="checkbox" id="invOk"><span>Em conformidade com a Lei Geral de Proteção de Dados (LGPD, Lei nº 13.709/2018), autorizo o contato por WhatsApp sobre o meu acesso e o uso dos meus dados somente para essa finalidade e para receber felicitações de aniversário.</span></label>
+        <label class="ivCheck"><input type="checkbox" id="invOk"><span>Em conformidade com a Lei Geral de Proteção de Dados (LGPD, Lei nº 13.709/2018), autorizo o contato por e-mail e WhatsApp sobre o meu acesso e o uso dos meus dados somente para essa finalidade e para receber felicitações de aniversário.</span></label>
         <div id="invMsg" class="err" role="alert"></div>
         <button type="submit" class="btn block" id="invBtn">Enviar pedido</button>
         <button type="button" class="btn sec block hidden" id="invClose">Fechar</button>
@@ -335,7 +336,7 @@ svg text{font-family:Inter,system-ui,sans-serif}
       <div id="invDone" class="ivDone hidden">
         <div class="big">✅</div>
         <p style="font-weight:700;margin:6px 0">Recebemos seu pedido!</p>
-        <p class="small muted">Em breve entraremos em contato com você pelo WhatsApp que informou.</p>
+        <p class="small muted">Em breve entraremos em contato com você pelo e-mail ou WhatsApp que informou.</p>
         <button type="button" class="btn block" id="invDoneBack" style="margin-top:12px">Fechar</button>
       </div>
     </form>
@@ -367,11 +368,11 @@ svg text{font-family:Inter,system-ui,sans-serif}
         <button data-m="imp">⬆ Importar backup</button>
         <button data-m="cfg">🎯 Metas e preferências</button>
         <button data-m="cnh">🪪 Minha CNH</button>
-        <button data-m="inv" id="btnInvites" class="hidden">📨 Pedidos de convite<span id="invBadge" class="mBadge hidden"></span></button>
         <button data-m="tema">🌓 Tema</button>
         <button data-m="termos">📄 Termos e privacidade</button>
         <button data-m="pass">🔑 Trocar senha</button>
         <button data-m="veic">🚗 Veículos</button>
+        <button data-m="excluir">🗑 Excluir minha conta</button>
         <button data-m="out">↩ Sair</button>
       </div>
     </div>
@@ -384,8 +385,10 @@ svg text{font-family:Inter,system-ui,sans-serif}
     <button class="tab" data-t="multas">🚨 Multas</button>
     <button class="tab" data-t="impostos">🧾 Impostos</button>
     <button class="tab" data-t="relatorios">📑 Relatórios</button>
+    <button class="tab hidden" type="button" id="tabAdmin">🛡 Admin<span id="invBadge" class="mBadge hidden"></span></button>
   </nav>
 </header>
+<div id="excAviso" class="note am small hidden" style="margin:0 0 12px"></div>
 <main id="view"></main>
 <div class="fabWrap" id="fabWrap"><div class="fabMenu hidden" id="fabMenu">
   <button data-fab="carne">🧾 Carnê-Leão do mês anterior</button>
@@ -396,7 +399,7 @@ svg text{font-family:Inter,system-ui,sans-serif}
   <button data-fab="multa">🚨 Multas</button>
   <button data-fab="repasse">🏦 Repasse semanal</button>
   <div class="sep"></div>
-  <button data-fab="inv" id="fabInv" class="hidden">📨 Pedidos de convite<span id="fabInvBadge" class="mBadge hidden"></span></button>
+  <button data-fab="admin" id="fabAdm" class="hidden">🛡 Admin<span id="fabInvBadge" class="mBadge hidden"></span></button>
   <button data-fab="tema">🌓 Tema</button>
   <button data-fab="sair">↩ Sair</button>
   <div class="dica">Dica: segure e arraste o botão ⚡ Atalhos para qualquer ponto da tela.</div>
@@ -407,7 +410,7 @@ svg text{font-family:Inter,system-ui,sans-serif}
 
 <script>
 "use strict";
-const VERSAO='V45';
+const VERSAO='V52';
 /* ---------- utilidades ---------- */
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -445,7 +448,19 @@ document.addEventListener('keydown',e=>{const k=e.key.toUpperCase();if(k==='F12'
 
 /* ---------- estado ---------- */
 const TBS=['tb_corridas','tb_repasses','tb_carona','tb_custos','tb_multas','tb_carne','tb_config'];
-const CFG_PADRAO={metaDiaria:150,diasMeta:[0,1,2,3,4,5,6],precoCarona:10,veiculos:[{nome:'Fastback',desc:'Fiat Fastback Impetus',desde:'',ativo:true}],veiculoPadrao:'Fastback',descontoSimplificado:true,condutores:['Diogo']};
+const CFG_PADRAO={metaDiaria:150,diasMeta:[0,1,2,3,4,5,6],precoCarona:0,caronaIda:'',caronaVolta:'',veiculos:[],veiculoPadrao:'',descontoSimplificado:true,condutores:[]}; // V48: usuário novo começa sem veículo e sem condutor
+// V48: configuração salva sem lista de veículos — recria os veículos usados nos lançamentos (para os filtros baterem) e pede para completar o cadastro
+const VEIC_PEND='Veículo não cadastrado: complete em ⚙ Opções > Veículos';
+function migraVeiculos(bruto){const c=cfg();let mud=false;
+  if(!(bruto&&Array.isArray(bruto.veiculos))){
+    const nomes=[...new Set(['tb_corridas','tb_repasses','tb_carona','tb_custos','tb_multas'].flatMap(tb=>(S[tb]||[]).map(r=>String(r.veiculo||'').trim())).filter(Boolean))];
+    if(nomes.length){c.veiculos=nomes.map(n=>({nome:n,desc:VEIC_PEND,desde:'',ativo:true,pendente:true}));if(!nomes.includes(c.veiculoPadrao))c.veiculoPadrao=nomes[0];mud=true}}
+  if(!(bruto&&Array.isArray(bruto.condutores))){const inf=[...new Set((S.tb_multas||[]).map(r=>String(r.infrator||'').trim()).filter(Boolean))];if(inf.length){c.condutores=inf;mud=true}}
+  if(bruto&&!('caronaIda' in bruto)){c.caronaIda='Val → Brasília';c.caronaVolta='Brasília → Val';if(!('precoCarona' in bruto))c.precoCarona=10;mud=true} // V49: trajeto vira configuração; quem já usava mantém o seu
+  if(mud)salvar('tb_config')}
+function semVeiculo(){if(VEICS().length)return false;
+  const ov=document.createElement('div');ov.className='ov';ov.innerHTML=`<div class="modal" style="max-width:420px"><h2>🚗 Cadastre seu veículo primeiro</h2><p class="small">Os lançamentos são separados por veículo (ganhos, custos, manutenção e multas). Cadastre o seu para continuar.</p><div class="mfoot"><button class="btn sec" id="svN">Agora não</button><button class="btn" id="svS">＋ Cadastrar veículo</button></div></div>`;
+  document.body.appendChild(ov);ov.querySelector('#svN').onclick=()=>ov.remove();ov.querySelector('#svS').onclick=()=>{ov.remove();formVeic()};return true}
 const S={tb_corridas:[],tb_repasses:[],tb_carona:[],tb_custos:[],tb_multas:[],tb_carne:{},tb_config:JSON.parse(JSON.stringify(CFG_PADRAO))};
 let DB=null,UID=null,DL=null,AUTH=null,LOGADO=null;
 const UI={tab:'painel',mes:mesAtual(),veic:'Todos',sub:{corridas:'diario',custos:'Todos'},open:{},ano:new Date().getFullYear()};
@@ -485,7 +500,7 @@ async function carregar(){
       if(LISTAS.includes(tb))S[tb]=rows.map(r=>r.dados);
       else if(tb==='tb_carne')S[tb]=Object.fromEntries(rows.map(r=>[r.id,r.dados]));
       else if(rows[0])S[tb]=rows[0].dados});
-    S.tb_config=Object.assign(JSON.parse(JSON.stringify(CFG_PADRAO)),S.tb_config||{});
+    const brutoCfg=S.tb_config;S.tb_config=Object.assign(JSON.parse(JSON.stringify(CFG_PADRAO)),S.tb_config||{});migraVeiculos(brutoCfg);
     const ym=mesAtual(),ya=addMes(ym,-1);
     const [cn,ev,rr]=await Promise.all([DB.from('tb_audit_counter').select('seq').maybeSingle(),
       selTodos('tb_audit_log','seq,ts,acao,area,resumo,usuario,extra',q=>q.gte('ts',new Date(+ya.slice(0,4),+ya.slice(5,7)-1,1).toISOString())),
@@ -494,7 +509,7 @@ async function carregar(){
     ev.forEach(e=>{const m=isoOf(new Date(e.ts)).slice(0,7);(AUD.mes[m]=AUD.mes[m]||[]).push(audRow(e))});
     NOT.reads=Object.assign({lidas:[],ocultas:[],exclEm:{}},rr.data&&rr.data.dados||{});
     await carregarNotas();
-    clearTimeout(t);setSync('Sincronizado ✓');
+    CARGA_OK=true;clearTimeout(t);setSync('Sincronizado ✓');
   }catch(e){clearTimeout(t);setSync('⚠ erro ao carregar');toast('Erro ao carregar dados ('+(e&&(e.message||e.code)||'erro')+').')}
 }
 const audRow=e=>{const o={seq:e.seq,ts:new Date(e.ts).toISOString(),acao:e.acao,area:e.area,resumo:e.resumo||'',usuario:e.usuario||''};if(e.extra)o.extra=e.extra;return o};
@@ -507,7 +522,7 @@ function resumoReg(tb,r){return({tb_corridas:()=>`${r.plataforma} · ${fmtBR(r.d
   tb_carona:()=>`${r.sentido} · ${fmtBR(r.data)} · ${r.passageiros||0} pass. · ${brl(r.valor)}`,tb_custos:()=>`${r.cat} · ${r.veiculo} · ${fmtBR(r.data)} · ${brl(r.valor)}`,
   tb_multas:()=>`${r.motivo} · ${r.veiculo} · ${fmtBR(r.ocorr)}`}[tb]||(()=>''))()}
 // por enquanto, só estes eventos vão para o histórico de auditoria
-const AUD_ACOES=['Exclusão','Troca de senha','Exportação','Importação'],AUD_AREAS=['Veículos','Configurações'];
+const AUD_ACOES=['Exclusão','Troca de senha','Exportação','Importação'],AUD_AREAS=['Veículos','Configurações','Admin'];
 const audita=(acao,area)=>AUD_ACOES.includes(acao)||AUD_AREAS.includes(area);
 function audit(acao,area,resumo,extra){
   if(!DB||!UID||!audita(acao,area))return Promise.resolve();
@@ -560,11 +575,20 @@ function pontosCnh(ign,extra){const c=cfg().cnh||{},tit=(c.titular||cfg().condut
   const ms=[...S.tb_multas.filter(r=>r.id!==ign),...(extra?[extra]:[])].filter(r=>r.ocorr&&r.ocorr>lim12&&+r.pontos>0&&(!r.infrator||!tit||r.infrator.trim().toLowerCase()===tit));
   const pts=ms.reduce((a,r)=>a+(+r.pontos||0),0),grav=ms.filter(r=>+r.pontos===7).length;
   const lim=c.ear?40:grav>=2?20:grav===1?30:40;return{pts,lim,grav,ear:!!c.ear,temCnh:!!c.validade}}
+// V47: lembrete de backup — aparece se nunca exportou ou se o último backup tem mais de 30 dias; some ao exportar
+const BK_DIAS=30;let CARGA_OK=false; // só avisa depois de ler os dados com sucesso (falha na leitura = sem alerta, para não avisar errado)
+function ultimoBackup(){let u=cfg().backupEm||'';
+  Object.values(AUD.mes||{}).flat().forEach(e=>{if(e&&e.acao==='Exportação'&&e.area==='Backup'&&e.ts>u)u=e.ts}); // backups feitos antes da V47 (histórico de auditoria)
+  return u}
+function backupAlerta(){if(!CARGA_OK||contaVazia())return null;const u=ultimoBackup(),bt={n:'a',tab:'bk',bk:1};
+  if(!u)return{...bt,t:'Você ainda não exportou um backup',nota:'Toque em Exportar backup e guarde o arquivo fora do aparelho. O alerta some ao exportar e volta depois de 30 dias.'};
+  const d=Math.floor((Date.now()-new Date(u).getTime())/864e5);if(d<=BK_DIAS)return null;
+  return{...bt,t:`Seu último backup foi há ${d} dias (${fmtBR(isoOf(new Date(u)))})`,nota:'Exporte um novo backup e guarde o arquivo fora do aparelho. O alerta some ao exportar e volta depois de 30 dias.'}}
 function alertas(){
   const out=[],hj=hoje(),cm=cadMes();
   const ant=addMes(mesAtual(),-1),reg=S.tb_carne[ant];
   if(!(cm&&ant<cm)&&!(reg&&reg.bruto!=null&&reg.bruto!==''))out.push({n:'a',t:`Atualize o Carnê-Leão de ${mesNome(ant)} com o extrato da Uber.`,tab:'impostos'});
-  const ano=+mesAtual().slice(0,4);[ano-1,ano].forEach(a=>linhasAno(a).forEach(l=>{if(l.darf>0&&!l.reg.pago)out.push({n:l.venc<hj?'r':'a',t:`DARF de ${mesNome(l.ym)}: ${brl(l.darf)} · vence ${fmtBR(l.venc)}${l.venc<hj?' (vencido)':''}.`,nota:l.venc<hj?'O valor mostrado não inclui multa e juros por atraso; gere a guia atualizada no Sicalc da Receita.':'',tab:'impostos'})}));
+  const ano=+mesAtual().slice(0,4);[ano-1,ano].forEach(a=>linhasAno(a).forEach(l=>{if(l.darf>0&&!l.reg.pago)out.push({n:l.venc<hj?'r':'a',t:`DARF de ${mesNome(l.ym)}: ${brl(l.darf)} · vence ${fmtBR(l.venc)}${l.venc<hj?' (vencido)':''}.`,nota:l.venc<hj?'Valor estimado, sem multa e juros por atraso: gere a guia oficial atualizada no Sicalc da Receita.':'Valor estimado: gere a guia oficial no Carnê-Leão Web.',tab:'impostos'})}));
   S.tb_multas.filter(r=>!r.pagto).forEach(r=>{const v=r.venc;const lim=isoOf(new Date(Date.now()+10*864e5));const val=brl(r.vDesc??r.vOrig);
     if(v&&v<hj)out.push({n:'r',t:`Multa atrasada (venceu em ${fmtBR(v)}): ${val} · ${r.motivo} (${r.veiculo}).`,tab:'multas',multa:r.id});
     else if(v===hj)out.push({n:'r',t:`Multa vence hoje: ${val} · ${r.motivo} (${r.veiculo}).`,tab:'multas',multa:r.id});
@@ -574,7 +598,9 @@ function alertas(){
   const c=cnhInfo();if(c&&!c.fora){
     if(c.vencida){const dv=-c.d,lim=isoOf(new Date(new Date(cfg().cnh.validade+'T12:00:00').getTime()+30*864e5));out.unshift(dv<=30?{n:'r',crit:1,t:`CNH vencida há ${dv} ${dv===1?'dia':'dias'}: você tem até ${fmtBR(lim)} para renovar sem multa.`,nota:'Depois de atualizar a validade em ⚙ Opções > Minha CNH, o alerta some.',tab:'cnh'}:{n:'r',crit:1,t:'CNH vencida há mais de 30 dias: dirigir agora é infração gravíssima.',nota:`Venceu em ${fmtBR(cfg().cnh.validade)}. Renove e atualize a validade em ⚙ Opções > Minha CNH.`,tab:'cnh'})}
     else out.push({n:'a',t:c.d===0?`CNH vence hoje (${fmtBR(cfg().cnh.validade)}). Agende a renovação.`:`CNH vence em ${c.d} ${c.d===1?'dia':'dias'} (${fmtBR(cfg().cnh.validade)}). Agende a renovação.`,tab:'cnh',cnh:c.chave,lida:NOT.reads.cnhLida===c.chave})}
-  out.unshift(...invAlerts());
+  cfg().veiculos.filter(v=>v.pendente).forEach(v=>out.push({n:'a',tab:'veic',t:`Complete o cadastro do veículo ${v.nome}`,nota:'Ele foi criado a partir dos seus lançamentos. Abra ⚙ Opções > Veículos e informe a descrição (ex.: modelo e ano).'}));
+  const bk=backupAlerta();if(bk)out.push(bk);
+  out.unshift(...invAlerts(),...excAlerts(),...senAlerts());
   proximasManut().filter(x=>x.prox-x.ult<=1500).forEach(x=>out.push({n:x.prox<=x.ult?'r':'a',t:`Manutenção ${x.prox<=x.ult?'vencida':'próxima'}: ${x.desc} (${x.veiculo}) em ${x.prox.toLocaleString('pt-BR')} km.`,tab:'custos'}));
   return out;
 }
@@ -608,7 +634,7 @@ function renderSino(){
   const item=n=>{const lida=r.lidas.includes(n.id),imp=impValida(n);return `<div class="it${imp?' imp':''}${lida?'':' nova'}">${imp?'<div class="tagImp">⚠ IMPORTANTE</div>':''}<div class="ttl">${lida?'':'● '}${esc(n.titulo)}</div>${corpo(n)}<div class="acts"><button data-nl="${esc(n.id)}">${lida?'Marcar como não lida':'Marcar como lida'}</button><button data-nx="${esc(n.id)}">🗑 Excluir</button></div></div>`};
   const nl=naoLidas().length;
   let h=`<div class="hd"><button class="chip${tab==='alertas'?' on':''}" data-bt="alertas">Alertas (${al.filter(a=>!a.lida).length})</button><button class="chip${tab==='novidades'?' on':''}" data-bt="novidades">Novidades (${nl})</button></div>`;
-  if(tab==='alertas')h+=al.length?al.map((a,i)=>`<div class="it al${a.lida?' lida':''}${a.crit?' crit':''}${a.inv?' inv':''}" data-ai="${i}"><span class="tag ${a.n}">${a.n==='r'?'✕':'⚠'}</span><div><div>${esc(a.t)}</div>${a.nota?`<div class="nota">${esc(a.nota)}</div>`:''}${a.cnh?`<div class="acts"><button data-cl="${esc(a.cnh)}">${a.lida?'Marcar como não lida':'Marcar como lida'}</button></div>`:''}${a.sup?`<div class="acts"><button data-sl="${esc(a.sup)}">${a.lida?'Marcar como não lida':'Marcar como lida'}</button></div>`:''}</div></div>`).join(''):'<div class="empty">Nenhum alerta agora. ✓</div>';
+  if(tab==='alertas')h+=al.length?al.map((a,i)=>`<div class="it al${a.lida?' lida':''}${a.crit?' crit':''}${a.inv?' inv':''}" data-ai="${i}"><span class="tag ${a.n}">${a.n==='r'?'✕':'⚠'}</span><div><div>${esc(a.t)}</div>${a.nota?`<div class="nota">${esc(a.nota)}</div>`:''}${a.cnh?`<div class="acts"><button data-cl="${esc(a.cnh)}">${a.lida?'Marcar como não lida':'Marcar como lida'}</button></div>`:''}${a.bd?`<div class="acts"><a class="lnk" href="${esc(a.em)}" target="_blank" rel="noopener">✉ Parabenizar por e-mail</a><a class="lnk" href="${esc(a.wa)}" target="_blank" rel="noopener">💬 Parabenizar pelo WhatsApp</a><button data-bl="${esc(a.bd)}">Marcar como lido</button></div>`:''}${a.bk?`<div class="acts"><button class="bkBtn" data-bk="1">📥 Exportar backup</button></div>`:''}${a.sup?`<div class="acts"><button data-sl="${esc(a.sup)}">${a.lida?'Marcar como não lida':'Marcar como lida'}</button></div>`:''}</div></div>`).join(''):'<div class="empty">Nenhum alerta agora. ✓</div>';
   else if(UI.bellExc){h+=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><b class="small">🗑 Excluídas (últimos ${DIAS_EXCL} dias)</b><span style="display:flex;gap:12px">${excl.length?'<button class="lnk ivDelTxt" data-besv="1">🗑 Esvaziar</button>':''}<button class="lnk" data-bexc="0">Voltar</button></span></div><div class="small muted" style="margin:-2px 0 8px">As novidades ficam aqui por 30 dias. <b>Esvaziar</b> apaga de vez.</div>`+(excl.length?excl.map(n=>`<div class="it"><div class="ttl">${esc(n.titulo)}</div>${corpo(n)}<div class="acts"><button data-nr="${esc(n.id)}">↩ Restaurar</button></div></div>`).join(''):'<div class="empty">Nenhuma novidade excluída nos últimos 30 dias.</div>')}
   else{h+=nl?`<div style="text-align:right;margin-bottom:4px"><button class="lnk" data-nall="1">Marcar todas como lidas (${nl})</button></div>`:'';
     h+=`<div class="novInfo"><button class="lnk" data-binfo="1">ℹ Como funcionam as novidades ${UI.bellInfo?'▴':'▾'}</button>${UI.bellInfo?`<ul>
@@ -625,12 +651,15 @@ function renderSino(){
 }
 function posMenu(m,btn){if(window.innerWidth<=640){m.style.top=(btn.getBoundingClientRect().bottom+6)+'px'}else m.style.top=''}
 $('#bellBtn').onclick=e=>{e.stopPropagation();$('#optMenu').classList.add('hidden');const m=$('#bellMenu');m.classList.toggle('hidden');if(!m.classList.contains('hidden')){renderSino();posMenu(m,$('#bellBtn'))}};
-$('#bellMenu').addEventListener('click',e=>{e.stopPropagation();const t=e.target;const r=NOT.reads;r.exclEm=r.exclEm||{};
+$('#bellMenu').addEventListener('click',e=>{e.stopPropagation();const t=e.target;if(t.closest('a[href]'))return; // Parabenizar: abre o WhatsApp e mantém o sino aberto
+  const r=NOT.reads;r.exclEm=r.exclEm||{};
   if(t.dataset.bt){UI.bell=t.dataset.bt;UI.bellExc=false}
   else if(t.dataset.nl){const id=t.dataset.nl;r.lidas=r.lidas.includes(id)?r.lidas.filter(x=>x!==id):[...r.lidas,id];salvarReads()}
   else if(t.dataset.nx){const id=t.dataset.nx;r.ocultas=[...new Set([...ocultas(),id])];r.exclEm[id]=new Date().toISOString();salvarReads();toast('Novidade excluída da sua tela')}
   else if(t.dataset.nr){const id=t.dataset.nr;r.ocultas=ocultas().filter(x=>x!==id);delete r.exclEm[id];if(!r.lidas.includes(id))r.lidas.push(id);salvarReads();toast('Novidade restaurada');if(!notasVis().some(n=>ocultas().includes(n.id)))UI.bellExc=false}
   else if(t.dataset.nall){naoLidas().forEach(n=>{if(!r.lidas.includes(n.id))r.lidas.push(n.id)});salvarReads()}
+  else if(t.dataset.bl){const lim=isoOf(new Date(Date.now()-400*864e5));r.bdayLidas=[...(r.bdayLidas||[]).filter(k=>k.split('|')[1]>=lim),t.dataset.bl];salvarReads();toast('Alerta de aniversário marcado como lido')}
+  else if(t.closest('[data-bk]')){exportar().then(()=>{renderSino();atualizaSino()});return}
   else if(t.dataset.sl){r.supaLida=r.supaLida===t.dataset.sl?null:t.dataset.sl;salvarReads()}
   else if(t.dataset.cl){r.cnhLida=r.cnhLida===t.dataset.cl?null:t.dataset.cl;salvarReads()}
   else if(t.dataset.bant){UI.bellAnt=t.dataset.bant==='1'}
@@ -639,8 +668,11 @@ $('#bellMenu').addEventListener('click',e=>{e.stopPropagation();const t=e.target
   else if(t.dataset.binfo){UI.bellInfo=!UI.bellInfo}
   else{const g=t.closest('[data-ai]');if(g){const a=alertas()[+g.dataset.ai];$('#bellMenu').classList.add('hidden');if(!a)return;
       if(a.tab==='cnh'){formCnh();return}
-      if(a.tab==='inv'){openInvitesModal();return}
-      if(a.tab==='supa')return;
+      if(a.tab==='inv'){abrirAdmin('convites');return}
+      if(a.tab==='exc'){abrirAdmin('exclusoes');return}
+      if(a.tab==='sen'){abrirAdmin('senhas');return}
+      if(a.tab==='veic'){formVeic();return}
+      if(a.tab==='supa'||a.tab==='bk')return;
       UI.tab=a.tab;render();window.scrollTo(0,0);
       if(a.multa){const m=S.tb_multas.find(x=>x.id===a.multa);if(m)formMulta(JSON.parse(JSON.stringify(m)))}return}else return}
   renderSino();atualizaSino()});
@@ -648,6 +680,9 @@ $('#bellMenu').addEventListener('click',e=>{e.stopPropagation();const t=e.target
 /* ---------- login (Supabase Auth: e-mail e senha) ---------- */
 document.querySelectorAll('[data-eye]').forEach(b=>b.onclick=()=>{const i=document.getElementById(b.dataset.eye);i.type=i.type==='password'?'text':'password';b.textContent=i.type==='password'?'👁':'🙈'});
 DL={save:async({filename,data})=>{const ext=filename.split('.').pop().toLowerCase();
+  // V47: backup (.json) no computador abre "Salvar como" quando o navegador permite; cancelar avisa o app (nada é gravado e o alerta continua)
+  if(ext==='json'&&window.showSaveFilePicker){let h;try{h=await window.showSaveFilePicker({suggestedName:filename,types:[{description:'Backup do Rodaliq',accept:{'application/json':['.json']}}]})}catch(e){if(e&&e.name==='AbortError')throw{code:'declined'};h=null}
+    if(h){const w=await h.createWritable();await w.write(data);await w.close();return}}
   const mime={json:'application/json',csv:'text/csv;charset=utf-8',pdf:'application/pdf',xlsx:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',docx:'application/vnd.openxmlformats-officedocument.wordprocessingml.document'}[ext]||'application/octet-stream';
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([data],{type:mime}));a.download=filename;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},2000)}};
 async function iniciar(){
@@ -668,7 +703,7 @@ $('#fLogin').onsubmit=async e=>{
 };
 async function entrar(evento){
   $('#login').classList.add('hidden');$('#app').classList.remove('hidden');$('#whoName').textContent=LOGADO;
-  await carregar();render();ouvirNovidades();invAdminInit();navInicia();checarTermos().then(checarPrimeiroAcesso);
+  await carregar();render();ouvirNovidades();invAdminInit();navInicia();checarExclusao().then(bloq=>{if(!bloq)checarTermos().then(checarPrimeiroAcesso)});
   if(evento)audit(evento,'Acesso','Login de '+LOGADO);
 }
 async function sair(){await audit('Saída','Acesso','Logout de '+LOGADO);try{await DB.auth.signOut()}catch(e){}location.reload()}
@@ -768,13 +803,14 @@ function openForm({titulo,sub,campos,val={},onSave,onDel}){
   const first=ov.querySelector('input:not([type=checkbox]),select');if(first&&window.innerWidth>700)first.focus();
   return {ov,g};
 }
-function confirma(msg,ok='Confirmar'){return new Promise(res=>{const ov=document.createElement('div');ov.className='ov';ov.innerHTML=`<div class="modal" style="max-width:420px"><h2>Confirmação</h2><p>${msg}</p><div class="mfoot"><button class="btn sec" id="cN">Cancelar</button><button class="btn" id="cS">${ok}</button></div></div>`;document.body.appendChild(ov);ov.querySelector('#cN').onclick=()=>{ov.remove();res(false)};ov.querySelector('#cS').onclick=()=>{ov.remove();res(true)}})}
+function confirma(msg,ok='Confirmar',op={}){return new Promise(res=>{const ov=document.createElement('div');ov.className='ov';ov.innerHTML=`<div class="modal" style="max-width:420px"><h2>${op.titulo||'Confirmação'}</h2><p>${msg}</p><div class="mfoot"><button class="btn sec" id="cN">${op.voltar||'Cancelar'}</button><button class="btn${op.perigo?' warn':''}" id="cS">${ok}</button></div></div>`;document.body.appendChild(ov);ov.querySelector('#cN').onclick=()=>{ov.remove();res(false)};ov.querySelector('#cS').onclick=()=>{ov.remove();res(true)}})}
 function upsert(tb,rec){const a=S[tb];const i=a.findIndex(x=>x.id===rec.id);const novo=i<0;if(novo)a.push(rec);else a[i]=rec;salvar(tb);audit(novo?'Inclusão':'Edição',NOME_TB[tb],resumoReg(tb,rec));render()}
 function remover(tb,id){const r=S[tb].find(x=>x.id===id);S[tb]=S[tb].filter(x=>x.id!==id);salvar(tb);if(r)audit('Exclusão',NOME_TB[tb],resumoReg(tb,r));render()}
 
 /* ---------- formulários por tabela ---------- */
 const AJUDA_KM='📏 Usado no Painel para R$ por km, Custo por km e Lucro por km. É opcional, mas sem ele esses indicadores não aparecem.';
 function formCorrida(r){
+  if(!(r&&r.id)&&semVeiculo())return;
   r=r||{data:hoje(),plataforma:'Uber',veiculo:cfg().veiculoPadrao};
   const f=openForm({titulo:r.id?'Editar dia de corridas':'Novo lançamento do dia',sub:'Ganho do dia em Uber ou 99. Caronas são lançadas na aba Caronas (também somam na meta diária).'+(r.id?'':'<br>💡 Rodou nas duas no mesmo dia? Use ⚡ Atalhos &gt; Lançar o dia (Uber + 99).'),
     campos:[{k:'data',l:'Data',t:'date',req:1},{k:'plataforma',l:'Plataforma',t:'select',op:['Uber','99']},
@@ -785,6 +821,7 @@ function formCorrida(r){
     onSave:o=>upsert('tb_corridas',Object.assign({id:r.id||uid('d')},o)),onDel:r.id?()=>remover('tb_corridas',r.id):null});
 }
 function formRepasse(r){
+  if(!(r&&r.id)&&semVeiculo())return;
   r=r||{data:hoje(),plataforma:'Uber',veiculo:cfg().veiculoPadrao};
   openForm({titulo:r.id?'Editar repasse semanal':'Novo repasse semanal',sub:'O repasse que cai na conta. O app compara com a soma dos dias lançados no período.',
     campos:[{k:'data',l:'Data do repasse',t:'date',req:1},{k:'plataforma',l:'Plataforma',t:'select',op:['Uber','99']},
@@ -796,14 +833,15 @@ function formRepasse(r){
     onDel:r.id?()=>remover('tb_repasses',r.id):null});
 }
 function formCarona(r,dataPadrao){
-  const pc=cfg().precoCarona||10;
-  r=r||{data:dataPadrao||hoje(),sentido:'Val → Brasília',veiculo:cfg().veiculoPadrao,passageiros:3,valor:3*pc};
-  const f=openForm({titulo:r.id?'Editar Carona Solidária':'Nova Carona Solidária',sub:`Soma na meta diária e no Resultado líquido. Valor sugerido: passageiros × ${brl(pc)} (ajuste em Opções › Metas e preferências).`,
-    campos:[{k:'data',l:'Data',t:'date',req:1},{k:'sentido',l:'Sentido',t:'select',op:['Val → Brasília','Brasília → Val','Outro']},
+  if(!(r&&r.id)&&semVeiculo())return;
+  const pc=cfg().precoCarona||0,ti=cfg().caronaIda||'',tv=cfg().caronaVolta||'',ops=[ti,tv].filter(Boolean);
+  r=r||{data:dataPadrao||hoje(),sentido:ti,veiculo:cfg().veiculoPadrao,passageiros:3,valor:3*pc};
+  const f=openForm({titulo:r.id?'Editar Carona Solidária':'Nova Carona Solidária',sub:pc?`Soma na meta diária e no Resultado líquido. Valor sugerido: passageiros × ${brl(pc)} (ajuste em Opções › Metas e preferências).`:'Soma na meta diária e no Resultado líquido. Dica: informe o preço por passageiro e os trajetos em ⚙ Opções › Metas e preferências.',
+    campos:[{k:'data',l:'Data',t:'date',req:1},ops.length?{k:'sentido',l:'Sentido',t:'select',op:[...new Set([...ops,'Outro',...(r.sentido&&!ops.includes(r.sentido)&&r.sentido!=='Outro'?[r.sentido]:[])])]}:{k:'sentido',l:'Trajeto',t:'text',ph:'Ex.: Centro → Aeroporto'},
       {k:'passageiros',l:'Passageiros',t:'int'},{k:'valor',l:'Valor recebido (R$)',t:'money',req:1},
       {k:'veiculo',l:'Veículo',t:'select',op:VEICS()},{k:'obs',l:'Observação (embarque/desembarque)',t:'textarea',full:1}],
     val:r,onSave:o=>upsert('tb_carona',Object.assign({id:r.id||uid('c')},o)),onDel:r.id?()=>remover('tb_carona',r.id):null});
-  f.g('passageiros').addEventListener('input',e=>{const n=parseInt(e.target.value,10)||0;f.g('valor').value=brl(n*pc,1)});
+  f.g('passageiros').addEventListener('input',e=>{if(!pc)return;const n=parseInt(e.target.value,10)||0;f.g('valor').value=brl(n*pc,1)});
 }
 // categorias em ordem alfabética; "Outros" sempre por último, depois de uma linha
 const CATS=[...['Combustível','Manutenção','Parcela/Aluguel','Seguro','Estacionamento','IPVA/Licenciamento','Lavagem','Multa'].sort((a,b)=>a.localeCompare(b,'pt-BR',{sensitivity:'base'})),'Outros'];
@@ -811,6 +849,7 @@ const SEP_OP='__sep__';
 const comSep=l=>l.flatMap(c=>c==='Outros'?[SEP_OP,c]:[c]);
 const CATS_FORM=CATS.filter(c=>c!=='Multa');
 function formCusto(r){
+  if(!(r&&r.id)&&semVeiculo())return;
   r=r||{data:hoje(),cat:'Combustível',veiculo:cfg().veiculoPadrao,combustivel:'Etanol'};
   const f=openForm({titulo:r.id?'Editar custo':'Novo custo do veículo',
     campos:[{k:'data',l:'Data',t:'date',req:1},{k:'cat',l:'Categoria',t:'select',op:comSep(r.cat==='Multa'?CATS:CATS_FORM),help:'Parcela/Aluguel: parcela da compra do veículo ou aluguel do veículo. Multas são lançadas na aba Multas e entram aqui sozinhas quando pagas.'},
@@ -829,7 +868,8 @@ function formCusto(r){
   f.g('cat').onchange=tog;f.g('litros').oninput=ppl;f.g('valor').addEventListener('blur',ppl);tog();ppl();
 }
 function formMulta(r){
-  r=r||{veiculo:cfg().veiculoPadrao,infrator:cfg().condutores[0]||''};
+  if(!(r&&r.id)&&semVeiculo())return;
+  r=r||{veiculo:cfg().veiculoPadrao,infrator:(cfg().cnh&&cfg().cnh.titular)||cfg().condutores[0]||''};
   const f=openForm({titulo:r.id?'Editar multa':'Nova multa',
     campos:[{k:'notif',l:'Data da notificação',t:'date'},{k:'ocorr',l:'Data da infração',t:'date',req:1,help:' '},
       {k:'orgao',l:'Órgão autuador',t:'text',list:['Detran DF','DER DF','PRF','ANTT','DNIT']},{k:'auto',l:'Nº do auto de infração',t:'text'},
@@ -1063,15 +1103,15 @@ function vCorridas(){
 }
 function vCarona(){
   const L=S.tb_carona.filter(fVeic),ym=UI.mes,m=caronaMes(ym);
-  const ida=m.filter(r=>r.sentido==='Val → Brasília'),vol=m.filter(r=>r.sentido==='Brasília → Val');
+  const TI=cfg().caronaIda||'',TV=cfg().caronaVolta||'',ida=TI?m.filter(r=>r.sentido===TI):[],vol=TV?m.filter(r=>r.sentido===TV):[];
   const comb=sum(custosMes(ym).filter(r=>r.cat==='Combustível'),r=>r.valor);
   let h=`<div class="toolbar">${monthPicker()}${veicPicker()}<span class="sp"></span><button class="btn sm" data-new="carona">＋ Caronas</button></div>
   <div class="grid cards" style="margin-bottom:12px">
     ${(()=>{const hj=S.tb_carona.filter(fVeic).filter(r=>r.data===hoje());return kpi('Recebido hoje',brl(sum(hj,r=>r.valor)),hj.length?hj.length+(hj.length===1?' viagem · ':' viagens · ')+sum(hj,r=>r.passageiros)+' passageiros':'Nenhuma carona hoje','hl')})()}
     ${kpi('Recebido no mês',brl(sum(m,r=>r.valor)),m.length+(m.length===1?' viagem':' viagens'),'hl')}
     ${kpi('Passageiros',sum(m,r=>r.passageiros),m.length?'média '+(sum(m,r=>r.passageiros)/m.length).toFixed(1).replace('.',',')+' por viagem':'')}
-    ${kpi('Val → Brasília',brl(sum(ida,r=>r.valor)),ida.length+' viagens')}
-    ${kpi('Brasília → Val',brl(sum(vol,r=>r.valor)),vol.length+' viagens')}
+    ${TI?kpi(esc(TI),brl(sum(ida,r=>r.valor)),ida.length+' viagens'):''}
+    ${TV?kpi(esc(TV),brl(sum(vol,r=>r.valor)),vol.length+' viagens'):''}
     ${kpiComb('Carona × combustível','a carona',sum(m,r=>r.valor),comb)}
   </div>`;
   h+=groups(L,{key:'data',chave:'car',vazio:'Nenhuma carona lançada.',
@@ -1133,12 +1173,23 @@ function linhasAno(ano){
     if(m===mesAtual()){st='<span class="tag g">mês em curso</span>';darf=0}
     return Object.assign(l,{darf,st})});
 }
+// V48: reforço dos impostos — estimativa + referências oficiais (conferidas em 12/11/2026)
+const TXT_EST_IMP='Os valores são estimativas feitas com as regras da Receita Federal e os dados que você lançou. Não substituem o cálculo oficial no Carnê-Leão Web nem a orientação de um profissional de contabilidade (Termos de uso, item 3).';
+const REF_IMP=[
+  ['Apurar Carnê-Leão (gov.br)','https://www.gov.br/pt-br/servicos/apurar-carne-leao','onde se calcula o imposto oficial e se emite o DARF (código 0190)'],
+  ['Emitir DARF (gov.br)','https://www.gov.br/pt-br/servicos/emitir-darf-para-pagamento-de-tributos-federais','DARF atualizado com multa e juros (SicalcWeb), para pagamento em atraso'],
+  ['Lei nº 7.713/1988, art. 9º (Planalto)','https://www.planalto.gov.br/ccivil_03/leis/l7713.htm','transporte de passageiros: 60% do rendimento bruto é tributável'],
+  ['Lei nº 15.270/2025 (Planalto)','https://www.planalto.gov.br/ccivil_03/_ato2023-2026/2025/lei/L15270.htm','redução do imposto mensal a partir de 2026 (até R$ 5.000 e de R$ 5.000,01 a R$ 7.350)'],
+  ['Tabelas do Imposto de Renda (Receita Federal)','https://www.gov.br/receitafederal/pt-br/assuntos/meu-imposto-de-renda/tabelas','tabela progressiva mensal e desconto simplificado (R$ 607,20)']];
+const refImpHtml=()=>`<ul class="small" style="padding-left:18px;margin:6px 0 0">${REF_IMP.map(([t,u,d])=>`<li><a href="${u}" target="_blank" rel="noopener">${esc(t)}</a>: ${esc(d)}.</li>`).join('')}</ul>`;
+const refImpTxt=()=>'Referências oficiais: '+REF_IMP.map(([t,u])=>t+' – '+u).join(' · ');
 function vImpostos(){
   const ano=UI.ano,L=linhasAno(ano);
   const pagoSemDevido=L.filter(l=>l.reg.pago&&l.darf===0&&l.ym!==mesAtual());
   const tot=k=>sum(L,l=>l[k]);
   const lim=brutoSemDarf(ano);const meta=cfg().metaDiaria;
   return `
+  <div class="note am small" style="margin-bottom:12px">⚠ ${TXT_EST_IMP.replace('estimativas','<b>estimativas</b>').replace('profissional de contabilidade','<b>profissional de contabilidade</b>')}</div>
   <div class="toolbar"><div class="mpick"><button data-ano="-1">‹</button><span>${ano}</span><button data-ano="1">›</button></div><span class="sp"></span><button class="btn sm" data-carne="${addMes(mesAtual(),-1)}">Atualizar ${mesNome(addMes(mesAtual(),-1))}</button></div>
   <div class="grid cards" style="margin-bottom:12px">
     ${kpi('Recebido no ano',brl(tot('bruto')),'60% tributável: '+brl(tot('trib')))}
@@ -1167,14 +1218,15 @@ function vImpostos(){
       </ol>
       <div class="note am small" style="margin-top:10px">O carnê-leão olha só o que você recebe de app. Na declaração anual, os 60% da Uber somam com o salário CLT e o imposto é recalculado: ficar isento no mês não garante imposto zero no ajuste. Confira sempre no Carnê-Leão Web (e-CAC).</div>
     </div>
-  </div>`;
+  </div>
+  <div class="card" style="margin-top:12px"><h2>📚 Referências oficiais</h2><p class="small muted" style="margin:0">As regras usadas pelo app vêm destas fontes. Em caso de dúvida, consulte um profissional de contabilidade.</p>${refImpHtml()}</div>`;
 }
 function simular(){
   const out=$('#simOut');if(!out)return;let v=parseBRL($('#simV').value);
   const d=parseBRL($('#simD').value),n=parseInt($('#simN').value,10)||30;if(!v&&d)v=d*n;
   if(!v){out.innerHTML='<div class="small muted">Digite um valor para simular.</div>';return}
   const c=calcCarne(v,UI.ano,0),darf=c.ir<IR.minDarf?0:c.ir;
-  out.innerHTML=`<table class="tbl num small"><tr><td>Ganho bruto</td><td class="r">${brl(c.bruto)}</td></tr><tr><td>Isento (40%)</td><td class="r">${brl(c.isento)}</td></tr><tr><td>Tributável (60%)</td><td class="r">${brl(c.trib)}</td></tr><tr><td>Desconto simplificado</td><td class="r">−${brl(c.ded)}</td></tr><tr><td>Base de cálculo</td><td class="r">${brl(c.base)}</td></tr><tr><td>IR pela tabela</td><td class="r">${brl(c.irT)}</td></tr><tr><td>Redução Lei 15.270</td><td class="r">−${brl(c.red)}</td></tr><tr class="tot"><td>DARF do mês</td><td class="r">${brl(darf)}</td></tr></table><div style="margin-top:8px">${darf?'<span class="tag a">⚠ PAGAR DARF</span>':'<span class="tag b">✓ ISENTO</span>'} <span class="small muted">${v<=brutoSemDarf(UI.ano)?'Folga até o limite sem DARF: '+brl(brutoSemDarf(UI.ano)-v):''}</span></div>`;
+  out.innerHTML=`<table class="tbl num small"><tr><td>Ganho bruto</td><td class="r">${brl(c.bruto)}</td></tr><tr><td>Isento (40%)</td><td class="r">${brl(c.isento)}</td></tr><tr><td>Tributável (60%)</td><td class="r">${brl(c.trib)}</td></tr><tr><td>Desconto simplificado</td><td class="r">−${brl(c.ded)}</td></tr><tr><td>Base de cálculo</td><td class="r">${brl(c.base)}</td></tr><tr><td>IR pela tabela</td><td class="r">${brl(c.irT)}</td></tr><tr><td>Redução Lei 15.270</td><td class="r">−${brl(c.red)}</td></tr><tr class="tot"><td>DARF do mês</td><td class="r">${brl(darf)}</td></tr></table><div style="margin-top:8px">${darf?'<span class="tag a">⚠ PAGAR DARF</span>':'<span class="tag b">✓ ISENTO</span>'} <span class="small muted">${v<=brutoSemDarf(UI.ano)?'Folga até o limite sem DARF: '+brl(brutoSemDarf(UI.ano)-v):''}</span></div>`+'<div class="small muted" style="margin-top:6px">Estimativa. Confira no Carnê-Leão Web.</div>';
 }
 
 /* ---------- relatórios ---------- */
@@ -1227,7 +1279,7 @@ function relModelo(){
   sec.push({id:'conc',t:'Conciliação de repasses',cols:[['Repasse','date'],['Plataforma'],['Período'],['Repasse','money'],['Soma do diário','money'],['Diferença','money']],
     rows:rep.slice().sort((a,b)=>b.data.localeCompare(a.data)).map(r=>{const d=r.ini&&r.fim?S.tb_corridas.filter(x=>x.plataforma===r.plataforma&&x.data>=r.ini&&x.data<=r.fim):[];const sd=sum(d,x=>x.valor);return[r.data,r.plataforma,r.ini?fmtBR(r.ini)+' a '+fmtBR(r.fim):'—',r.valor,d.length?sd:null,d.length?r2(r.valor-sd):null]})});
   const anos=[...new Set(meses.map(m=>+m.slice(0,4)))];const lc=anos.flatMap(a=>linhasAno(a)).filter(l=>meses.includes(l.ym));
-  sec.push({id:'carne',t:'Carnê-Leão',nota:'Recebido = Uber/99 (extrato, repasses ou diário) + Carona Solidária. Não depende dos filtros de veículo e plataforma.',cols:[['Mês'],['Apps','money'],['Carona','money'],['Recebido','money'],['Tributável 60%','money'],['Base','money'],['IR tabela','money'],['Redução','money'],['DARF','money'],['Vencimento','date'],['Pago']],
+  sec.push({id:'carne',t:'Carnê-Leão',refs:1,nota:'Recebido = Uber/99 (extrato, repasses ou diário) + Carona Solidária. Não depende dos filtros de veículo e plataforma. '+TXT_EST_IMP,cols:[['Mês'],['Apps','money'],['Carona','money'],['Recebido','money'],['Tributável 60%','money'],['Base','money'],['IR tabela','money'],['Redução','money'],['DARF','money'],['Vencimento','date'],['Pago']],
     rows:lc.map(l=>[mesNome(l.ym),l.apps,l.car,l.bruto,l.trib,l.base,l.irT,l.red,l.darf,l.venc,l.reg.pago?'Sim'+(l.reg.valorPago?' ('+brl(l.reg.valorPago)+')':''):'Não'])});
   sec.push({id:'multas',t:'Multas e pontos na CNH',nota:'Filtradas pela data da infração. Os pontos expiram 12 meses após a data da infração.',cols:[['Data da infração','date'],['Motivo'],['Veículo'],['Condutor'],['Pontos','int'],['Pontos expiram em','date'],['Pontos'],['Valor','money'],['Situação']],
     rows:mul.map(r=>{const st=statusMulta(r);return[r.ocorr,r.motivo,r.veiculo,r.infrator||'',r.pontos||0,r.pontos?st.exp:null,!r.pontos?'Sem pontos':st.ativa?'Ativos':'Expirados',r.vPago??r.vDesc??r.vOrig,r.pagto?'Paga em '+fmtBR(r.pagto):'A pagar']})});
@@ -1260,7 +1312,7 @@ function vRelatorios(){
     ${F.ver?`<div style="margin-top:12px">${tabelaHTML(lanc)}<div class="small muted" style="margin-top:6px">${lanc.nota}</div></div>`:''}
   </div>`:''}</div>`;
   M.sec.slice(1).forEach((s,i)=>{const op=F.aberto===s.id;
-    h+=`<div class="mgroup"><div class="mhead" data-rel="sec:${s.id}"><span class="sg">${op?'−':'+'}</span><span class="t">${i+2}. ${esc(s.t)}</span></div>${op?`<div class="mbody" style="padding:14px">${kp(s)}${s.cols?tabelaHTML(s):''}${s.nota?`<div class="small muted" style="margin-top:6px">${esc(s.nota)}</div>`:''}</div>`:''}</div>`});
+    h+=`<div class="mgroup"><div class="mhead" data-rel="sec:${s.id}"><span class="sg">${op?'−':'+'}</span><span class="t">${i+2}. ${esc(s.t)}</span></div>${op?`<div class="mbody" style="padding:14px">${kp(s)}${s.cols?tabelaHTML(s):''}${s.nota?`<div class="small muted" style="margin-top:6px">${esc(s.nota)}</div>${s.refs?`<div class="small" style="margin-top:6px"><b>📚 Referências oficiais</b>${refImpHtml()}</div>`:''}`:''}</div>`:''}</div>`});
   return `<div class="toolbar"><h2 style="margin:0">Relatórios</h2><span class="sp"></span></div>`+h;
 }
 function relAcao(t){
@@ -1306,7 +1358,7 @@ async function exportarRel(fmt,btn){
         if(s.kpis){doc.autoTable({startY:y,body:s.kpis.map(k=>[pdfTxt(k[0]),pdfTxt(String(k[1]).replace(/<[^>]+>/g,''))]),theme:'grid',styles:{fontSize:8},columnStyles:{0:{fontStyle:'bold',cellWidth:200}},margin:{left:40,right:40},tableWidth:420});y=doc.lastAutoTable.finalY+8}
         if(s.cols){doc.autoTable({startY:y,head:[s.cols.map(c=>pdfTxt(c[0]))],body:s.rows.length?s.rows.map(r=>r.map((v,ci)=>pdfTxt(fmtCell(v,s.cols[ci][1])))):[[{content:'Sem dados para o filtro.',colSpan:s.cols.length}]],theme:'striped',headStyles:{fillColor:blue},styles:{fontSize:8,cellPadding:3},
           columnStyles:Object.fromEntries(s.cols.map((c,ci)=>[ci,['money','int','pct','hm'].includes(c[1])?{halign:'right',cellWidth:'wrap'}:c[1]==='date'?{cellWidth:'wrap'}:{}])),margin:{left:40,right:40}});y=doc.lastAutoTable.finalY+(s.nota?4:18)}
-        if(s.nota){doc.setFontSize(8);doc.setTextColor(91,100,120);doc.text(pdfTxt(s.nota),40,y+8);y+=24}});
+        if(s.nota){doc.setFontSize(8);doc.setTextColor(91,100,120);const tx=pdfTxt(s.nota+(s.refs?'\n'+refImpTxt():'')),ln=doc.splitTextToSize(tx,doc.internal.pageSize.getWidth()-80);if(y+12+ln.length*10>doc.internal.pageSize.getHeight()-40){doc.addPage();y=40}doc.text(ln,40,y+8);y+=14+ln.length*10}});
       const n=doc.getNumberOfPages();for(let p=1;p<=n;p++){doc.setPage(p);doc.setFontSize(8);doc.setTextColor(140);doc.text('© 2026 Rodaliq · Todos os direitos reservados. · Página '+p+' de '+n,40,doc.internal.pageSize.getHeight()-20)}
       data=doc.output('arraybuffer')}
     else if(fmt==='docx'){await carregaLib('jszip');data=await gerarDocx(M,geradoEm)}
@@ -1325,7 +1377,7 @@ async function gerarDocx(M,geradoEm){
   M.sec.forEach((s,i)=>{b+=par('')+par((i+1)+'. '+s.t,{b:1,sz:26,cor:'1F6FEB'});
     if(s.kpis)b+=tbl(null,s.kpis.map(k=>[k[0],String(k[1]).replace(/<[^>]+>/g,'')]),[0,1]);
     if(s.cols){if(s.kpis)b+=par('');const al=s.cols.map(c=>['money','int','pct','hm'].includes(c[1]));b+=s.rows.length?tbl(s.cols.map(c=>c[0]),s.rows.map(r=>r.map((v,ci)=>fmtCell(v,s.cols[ci][1]))),al):par('Sem dados para o filtro.',{sz:18,cor:'5B6478'})}
-    if(s.nota)b+=par(s.nota,{sz:16,cor:'5B6478'})});
+    if(s.nota)b+=par(s.nota,{sz:16,cor:'5B6478'});if(s.refs)b+=par(refImpTxt(),{sz:16,cor:'5B6478'})});
   b+=par('')+par('© 2026 Rodaliq · Todos os direitos reservados.',{sz:16,cor:'5B6478'});
   const doc=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body>${b}<w:sectPr><w:pgSz w:w="16838" w:h="11906" w:orient="landscape"/><w:pgMar w:top="720" w:right="720" w:bottom="720" w:left="720" w:header="0" w:footer="0" w:gutter="0"/></w:sectPr></w:body></w:document>`;
   const z=new JSZip();
@@ -1338,26 +1390,26 @@ async function gerarDocx(M,geradoEm){
 /* ---------- opções ---------- */
 function formCfg(){
   const c=cfg();
-  openForm({titulo:'Metas e preferências',campos:[{k:'metaDiaria',l:'Meta diária (R$)',t:'money',req:1},{k:'precoCarona',l:'Preço por passageiro na carona (R$)',t:'money'},
+  openForm({titulo:'Metas e preferências',campos:[{k:'metaDiaria',l:'Meta diária (R$)',t:'money',req:1},{k:'precoCarona',l:'Preço por passageiro na carona (R$)',t:'money'},{k:'caronaIda',l:'Trajeto de ida da carona',t:'text',ph:'Ex.: Centro → Aeroporto'},{k:'caronaVolta',l:'Trajeto de volta da carona',t:'text',ph:'Ex.: Aeroporto → Centro'},
     {k:'dias',l:'Dias que contam para a meta',t:'text',full:1,help:'Números separados por vírgula: 0=Dom, 1=Seg … 6=Sáb. Hoje: '+c.diasMeta.map(d=>WD[d]).join(', ')},
     {k:'veiculoPadrao',l:'Veículo padrão nos lançamentos',t:'select',op:VEICS()},
     {k:'descontoSimplificado',l:'Carnê-Leão',t:'check',txt:'Usar desconto simplificado mensal (R$ 607,20)',full:1}],
-    val:{metaDiaria:c.metaDiaria,precoCarona:c.precoCarona,dias:c.diasMeta.join(','),veiculoPadrao:c.veiculoPadrao,descontoSimplificado:c.descontoSimplificado},
+    val:{metaDiaria:c.metaDiaria,precoCarona:c.precoCarona,caronaIda:c.caronaIda||'',caronaVolta:c.caronaVolta||'',dias:c.diasMeta.join(','),veiculoPadrao:c.veiculoPadrao,descontoSimplificado:c.descontoSimplificado},
     onSave:o=>{const d=[...new Set(o.dias.split(/[,; ]+/).map(Number).filter(x=>x>=0&&x<=6))].sort();if(!d.length)return'Informe ao menos um dia.';
-      Object.assign(c,{metaDiaria:o.metaDiaria,precoCarona:o.precoCarona||10,diasMeta:d,veiculoPadrao:o.veiculoPadrao,descontoSimplificado:o.descontoSimplificado,ok_meta:true});salvar('tb_config');audit('Edição','Configurações',`Meta diária ${brl(c.metaDiaria)} · carona ${brl(c.precoCarona)}/pass. · veículo padrão ${c.veiculoPadrao}`);render();toast('Preferências salvas')}});
+      Object.assign(c,{metaDiaria:o.metaDiaria,precoCarona:o.precoCarona||0,caronaIda:(o.caronaIda||'').trim(),caronaVolta:(o.caronaVolta||'').trim(),diasMeta:d,veiculoPadrao:o.veiculoPadrao,descontoSimplificado:o.descontoSimplificado,ok_meta:true});salvar('tb_config');audit('Edição','Configurações',`Meta diária ${brl(c.metaDiaria)} · carona ${brl(c.precoCarona)}/pass. · veículo padrão ${c.veiculoPadrao}`);render();toast('Preferências salvas')}});
 }
 function formVeic(){
   const ov=document.createElement('div');ov.className='ov';
   const draw=()=>{ov.innerHTML=`<div class="modal"><h2>Veículos</h2><div class="small muted">Marque como ativo os que você usa hoje (aparecem nas manutenções previstas).</div>
     <table class="tbl" style="margin-top:10px"><tr><th>Nome curto</th><th>Descrição</th><th>Desde</th><th>Ativo</th></tr>
-    ${cfg().veiculos.map((v,i)=>`<tr><td><input class="inp" data-vi="${i}" data-vk="nome" value="${esc(v.nome)}"></td><td><input class="inp" data-vi="${i}" data-vk="desc" value="${esc(v.desc||'')}"></td><td><input class="inp" type="date" data-vi="${i}" data-vk="desde" value="${esc(v.desde||'')}"></td><td style="text-align:center"><input type="checkbox" data-vi="${i}" data-vk="ativo"${v.ativo?' checked':''}></td></tr>`).join('')}</table>
+    ${tmp.map((v,i)=>`<tr><td><input class="inp" data-vi="${i}" data-vk="nome" value="${esc(v.nome)}" placeholder="Ex.: Onix"></td><td><input class="inp" data-vi="${i}" data-vk="desc" value="${esc(v.desc||'')}"></td><td><input class="inp" type="date" data-vi="${i}" data-vk="desde" value="${esc(v.desde||'')}"></td><td style="text-align:center"><input type="checkbox" data-vi="${i}" data-vk="ativo"${v.ativo?' checked':''}></td></tr>`).join('')}</table>
     <button class="btn sec sm" id="vAdd" style="margin-top:8px">＋ Adicionar veículo</button><div class="small muted" style="margin-top:6px">Renomear um veículo atualiza os lançamentos dele.</div>
     <div class="mfoot"><button class="btn sec" id="vCan">Cancelar</button><button class="btn" id="vOk">Salvar</button></div></div>`;
-    ov.querySelector('#vCan').onclick=()=>ov.__fechar();ov.querySelector('#vAdd').onclick=()=>{ler();tmp.push({nome:'Novo',desc:'',desde:'',ativo:true});cfg().veiculos=tmp;draw()};
+    ov.querySelector('#vCan').onclick=()=>ov.__fechar();ov.querySelector('#vAdd').onclick=()=>{ler();tmp.push({nome:'',desc:'',desde:'',ativo:true});draw()};
     ov.querySelector('#vOk').onclick=()=>{ler();const nomes=tmp.map(v=>v.nome.trim());if(nomes.some(n=>!n)||new Set(nomes).size!==nomes.length){toast('Nomes vazios ou repetidos.');return}
       orig.forEach((o,i)=>{const n=tmp[i]&&tmp[i].nome;if(n&&n!==o.nome)['tb_corridas','tb_repasses','tb_carona','tb_custos','tb_multas'].forEach(tb=>{let mud=false;S[tb].forEach(r=>{if(r.veiculo===o.nome){r.veiculo=n;mud=true}});if(mud)salvar(tb)})});
-      cfg().veiculos=tmp;cfg().ok_veic=true;if(!nomes.includes(cfg().veiculoPadrao))cfg().veiculoPadrao=nomes[0];salvar('tb_config');audit('Edição','Veículos',nomes.join(', '));ov.remove();render();toast('Veículos salvos')}};
-  const orig=JSON.parse(JSON.stringify(cfg().veiculos));let tmp=JSON.parse(JSON.stringify(orig));
+      tmp.forEach(v=>{if(v.pendente&&(v.desc||'').trim()!==VEIC_PEND)delete v.pendente});cfg().veiculos=tmp;cfg().ok_veic=true;if(!nomes.includes(cfg().veiculoPadrao))cfg().veiculoPadrao=nomes[0];salvar('tb_config');audit('Edição','Veículos',nomes.join(', '));ov.remove();render();toast('Veículos salvos')}};
+  const orig=JSON.parse(JSON.stringify(cfg().veiculos));let tmp=JSON.parse(JSON.stringify(orig));if(!tmp.length)tmp.push({nome:'',desc:'',desde:'',ativo:true});
   const ler=()=>ov.querySelectorAll('[data-vi]').forEach(el=>{const v=tmp[+el.dataset.vi];v[el.dataset.vk]=el.type==='checkbox'?el.checked:el.value});
   ov.__fechar=()=>fechaComPerda(ov,()=>{cfg().veiculos=orig;ov.remove()});
   document.body.appendChild(ov);draw();marcaPerda(ov);
@@ -1369,7 +1421,7 @@ function formSenha(){
       if(o.n.length<6){err.textContent='A nova senha precisa de 6+ caracteres.';return}if(o.n!==o.n2){err.textContent='As senhas não conferem.';return}
       const chk=await DB.auth.signInWithPassword({email:LOGADO,password:o.a});if(chk.error){err.textContent='Senha atual incorreta.';return}
       const r=await DB.auth.updateUser({password:o.n});if(r.error){err.textContent=/different/i.test(r.error.message)?'A nova senha precisa ser diferente da atual.':'Erro ao trocar a senha ('+r.error.message+').';return}
-      audit('Troca de senha','Acesso','Senha alterada');ov.remove();toast('Senha alterada')})();return 'Verificando…'}});
+      audit('Troca de senha','Acesso','Senha alterada');marcaSenhaTrocada();ov.remove();toast('Senha alterada')})();return 'Verificando…'}});
   setTimeout(()=>document.querySelectorAll('.modal input.inp').forEach(i=>i.type='password'),0);
 }
 /* ---------- Pedidos de convite (tela de login) e administração (adaptado do kit My Trade Dash V102) ---------- */
@@ -1426,9 +1478,253 @@ async function invAutoLimpa(list){ // apaga de vez o que está na lixeira há ma
   return velhos.length?list.filter(x=>!velhos.includes(x)):list;
 }
 async function invLoadCache(force){if(!invIsAdmin){invCache=[];return}if(!force&&Date.now()-invCacheAt<15000)return;invCache=await invAutoLimpa(await invList());invCacheAt=Date.now()}
+/* ---------- V49: exclusão de conta (LGPD) ---------- */
+const EXC_DIAS=30,SUPA_USERS='https://supabase.com/dashboard/project/zxhgexcaswkvpotwqkqo/auth/users',SUPA_TAB='https://supabase.com/dashboard/project/zxhgexcaswkvpotwqkqo/editor';
+const EXC_MOTIVOS=['Parei de rodar por aplicativo','O app não atendeu o que eu precisava','Achei difícil de usar','Vou usar outro app ou planilha','Preocupação com meus dados','Outro motivo'];
+let EXC_MEU=null; // pedido aberto do usuário (novo ou desativado)
+async function excListar(){
+  if(!invProd())return (await DB.collection('exclusoes').get()).docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>String(b.criado_em).localeCompare(String(a.criado_em)));
+  const {data,error}=await DB.from('tb_exclusoes').select('*').order('criado_em',{ascending:false}).limit(1000);if(error)throw error;return data||[]}
+async function excMeu(){let l;
+  if(!invProd())l=(await DB.collection('exclusoes').get()).docs.map(d=>({id:d.id,...d.data()})).filter(x=>x.user_id===UID);
+  else{const {data,error}=await DB.from('tb_exclusoes').select('*').eq('user_id',UID);if(error)throw error;l=data||[]}
+  return l.find(x=>x.status==='novo'||x.status==='desativado')||null}
+async function excCriar(motivo,comentario){
+  if(!invProd()){const id='e'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);await DB.doc('exclusoes/'+id).set({user_id:UID,email:LOGADO,motivo,comentario:comentario||null,status:'novo',criado_em:new Date().toISOString()});return}
+  const {error}=await DB.from('tb_exclusoes').insert({email:LOGADO,motivo,comentario:comentario||null});if(error)throw error}
+async function excPatch(id,patch){
+  if(!invProd()){await DB.doc('exclusoes/'+id).update(patch);return}
+  const {error}=await DB.from('tb_exclusoes').update(patch).eq('id',id);if(error)throw error}
+// ao entrar: conta desativada mostra o bloqueio; pedido em andamento mostra o aviso no topo
+async function checarExclusao(){try{EXC_MEU=await excMeu()}catch(e){EXC_MEU=null}avisoExclusao();
+  if(EXC_MEU&&EXC_MEU.status==='desativado'){telaDesativada();return true}return false}
+function telaDesativada(){document.querySelectorAll('.ov').forEach(o=>o.remove());
+  const ov=document.createElement('div');ov.className='ov';ov.id='excBloq';
+  ov.innerHTML=`<div class="modal" style="max-width:440px"><h2>🔒 Conta desativada</h2><p>Sua conta está desativada conforme sua solicitação. Fale com <a href="mailto:${MAIL_RODALIQ}">${MAIL_RODALIQ}</a>.</p><p class="small muted">Pedido feito em ${dataHora(EXC_MEU.criado_em)}. Os dados ficam guardados por ${EXC_DIAS} dias após a desativação e depois são apagados de vez.</p><div class="mfoot"><button class="btn" id="excSair">↩ Sair</button></div></div>`;
+  document.body.appendChild(ov);ov.querySelector('#excSair').onclick=()=>{try{sessionStorage.removeItem('mdd_s')}catch(e){}sairSemAudit()}}
+function sairSemAudit(){if(invProd()&&DB&&DB.auth)DB.auth.signOut().finally(()=>location.reload());else location.reload()}
+function avisoExclusao(){const el=$('#excAviso');if(!el)return;const p=EXC_MEU&&EXC_MEU.status==='novo'?EXC_MEU:null;el.classList.toggle('hidden',!p);
+  el.innerHTML=p?`🗑 Pedido de exclusão da conta enviado em ${fmtBR(String(p.criado_em).slice(0,10))}. Você pode continuar usando o app até o acesso ser desativado. <button type="button" class="lnk" id="excDesistir">Desistir do pedido</button>`:'';
+  const b=el.querySelector('#excDesistir');if(b)b.onclick=async()=>{if(!await confirma('Desistir do pedido de exclusão da sua conta? Tudo continua como está.','Desistir do pedido'))return;
+    try{await excPatch(p.id,{status:'desistiu',desistiu_em:new Date().toISOString()});audit('Exclusão de conta','Configurações','Desistiu do pedido de exclusão');EXC_MEU=null;avisoExclusao();toast('Pedido de exclusão cancelado')}catch(e){toast('Não foi possível cancelar agora. Tente de novo.')}}}
+function formExcluirConta(){
+  if(EXC_MEU){toast('Você já tem um pedido de exclusão em andamento');return}
+  const ov=document.createElement('div');ov.className='ov';
+  ov.innerHTML=`<div class="modal" style="max-width:480px"><h2>🗑 Excluir minha conta</h2>
+    <p class="small">Seu acesso será desativado. Seus dados ficam guardados por ${EXC_DIAS} dias (dá para voltar atrás) e depois são apagados de vez.</p>
+    <div class="note am small">💾 Antes, exporte um backup dos seus dados. <button type="button" class="lnk" id="exBk">Exportar backup</button></div>
+    <p style="margin:12px 0 4px"><b>Por que você quer sair?</b></p>
+    <div class="exMot">${EXC_MOTIVOS.map((m,i)=>`<label><input type="radio" name="exM" value="${i}"> ${esc(m)}</label>`).join('')}</div>
+    <label class="small" style="display:block;margin-top:10px"><b>Quer contar mais? (opcional)</b><textarea class="inp" id="exCom" rows="3" maxlength="500" placeholder="O que podemos melhorar" style="margin-top:4px"></textarea></label>
+    <label class="exChk small"><input type="checkbox" id="exOk"> Entendo que, após ${EXC_DIAS} dias da desativação, meus dados serão apagados e não poderão ser recuperados.</label>
+    <div class="err" id="exErr"></div>
+    <div class="mfoot"><button class="btn sec" id="exV">Voltar</button><button class="btn warn" id="exC">Confirmar exclusão</button></div></div>`;
+  document.body.appendChild(ov);const q=x=>ov.querySelector(x),err=t=>{q('#exErr').textContent=t};
+  q('#exV').onclick=()=>ov.remove();q('#exBk').onclick=()=>exportar();
+  ov.querySelectorAll('input').forEach(i=>i.addEventListener('change',()=>err('')));
+  q('#exC').onclick=async()=>{const m=ov.querySelector('input[name=exM]:checked');
+    if(!m)return err('Escolha um motivo.');if(!q('#exOk').checked)return err('Marque a confirmação para continuar.');
+    if(!await confirma('Seu acesso será desativado e, após '+EXC_DIAS+' dias da desativação, seus dados serão apagados de vez.','Confirmar',{titulo:'Confirmar exclusão da conta?',voltar:'Voltar',perigo:1}))return;
+    q('#exC').disabled=true;
+    try{await excCriar(EXC_MOTIVOS[+m.value],q('#exCom').value.trim());audit('Exclusão de conta','Configurações','Pedido de exclusão da conta · '+EXC_MOTIVOS[+m.value]);
+      EXC_MEU=await excMeu();ov.remove();avisoExclusao();toast('Pedido de exclusão enviado')}
+    catch(e){q('#exC').disabled=false;err(/duplicate|23505/i.test((e&&(e.code+e.message))||'')?'Você já tem um pedido de exclusão em andamento.':'Não foi possível enviar agora. Tente de novo em instantes.')}}}
+// ---- Admin > Pedidos de exclusão ----
+let EXC_CACHE=[],EXC_AT=0;
+async function excAdminCache(force){if(!invIsAdmin){EXC_CACHE=[];SEN_CACHE=[];return}if(!force&&Date.now()-EXC_AT<15000)return;try{EXC_CACHE=await excListar();EXC_AT=Date.now()}catch(e){}try{SEN_CACHE=await senListar()}catch(e){}}
+const excDiasDesde=iso=>iso?Math.floor((Date.now()-new Date(iso).getTime())/864e5):0;
+function excAlerts(){if(!invIsAdmin)return [];const out=[],nv=EXC_CACHE.filter(x=>x.status==='novo');
+  if(nv.length)out.push({n:'r',inv:1,tab:'exc',t:`${nv.length} ${nv.length===1?'pedido de exclusão aguardando':'pedidos de exclusão aguardando'}`,nota:nv.slice(0,5).map(x=>x.email).join(' · ')+'. Responda em até 15 dias (prazo da LGPD para pedidos do titular).'});
+  EXC_CACHE.filter(x=>x.status==='desativado'&&excDiasDesde(x.desativado_em)>=EXC_DIAS).forEach(x=>{const c=invCache.find(v=>String(v.email||'').toLowerCase()===String(x.email||'').toLowerCase());
+    out.push({n:'a',inv:1,tab:'exc',t:`Excluir dados de ${c?c.name:x.email}: prazo de ${EXC_DIAS} dias concluído`,nota:'Abra Admin > Pedidos de exclusão e apague o login no painel do Supabase. Os dados são apagados junto.'})});
+  return out}
+function excTexto(x,nome){const d=fmtBR(String(x.criado_em).slice(0,10));
+  if(x.status==='desativado')return `Olá${nome?', '+nome:''}! Conforme sua solicitação de ${d}, sua conta no Rodaliq foi desativada. Seus dados ficam guardados por ${EXC_DIAS} dias e depois são apagados de vez. Se mudar de ideia nesse prazo, é só responder esta mensagem.\n\nEquipe Rodaliq`;
+  return `Olá${nome?', '+nome:''}! Recebemos seu pedido de exclusão da conta no Rodaliq, feito em ${d}. Seu acesso será desativado e seus dados ficarão guardados por ${EXC_DIAS} dias; depois disso, serão apagados de vez. Se mudar de ideia nesse prazo, é só responder esta mensagem.\n\nEquipe Rodaliq`}
+async function excAdminRender(box){
+  let L,us=[];try{L=await excListar();EXC_CACHE=L;EXC_AT=Date.now()}catch(e){box.innerHTML='<div class="empty">Não consegui carregar os pedidos. Tente de novo em instantes.</div>';return}
+  try{us=await admUsuarios()}catch(e){}
+  if(!invCache.length)try{await invRefreshBadge(true)}catch(e){}
+  const F=[['novo','Novos'],['desativado','Desativados'],['excluido','Excluídos'],['desistiu','Desistiram']],f=UI.excF||'novo',cnt=k=>L.filter(x=>x.status===k).length;
+  const lst=L.filter(x=>x.status===f);
+  const card=x=>{const c=invCache.find(v=>String(v.email||'').toLowerCase()===String(x.email||'').toLowerCase()),u=us.find(v=>v.user_id===x.user_id),nome=c?invPrimeiro(c):'',txt=excTexto(x,nome);
+    const dd=excDiasDesde(x.desativado_em),lib=x.desativado_em?fmtBR(isoOf(new Date(new Date(x.desativado_em).getTime()+EXC_DIAS*864e5))):'';
+    const tag={novo:`<span class="tag r">Novo · ${excDiasDesde(x.criado_em)} ${excDiasDesde(x.criado_em)===1?'dia':'dias'}</span>`,desativado:`<span class="tag a">Desativado · ${dd} ${dd===1?'dia':'dias'}</span>`,excluido:'<span class="tag g">Excluído</span>',desistiu:`<span class="tag b">${x.reativado_em?'Reativado':'Desistiu'}</span>`}[x.status]||'';
+    let bt=`<a class="btn sm" href="${esc(invMailLink(x.email,'Seu pedido de exclusão no Rodaliq',txt))}" target="_blank" rel="noopener">✉ Responder por e-mail</a>`+(c?`<a class="btn sm" href="${esc('https://wa.me/'+c.whatsapp+'?text='+encodeURIComponent(txt))}" target="_blank" rel="noopener">💬 Responder pelo WhatsApp</a>`:'');
+    if(x.status==='novo')bt+=`<button class="btn sm warn" data-ex="desativar" data-id="${esc(x.id)}">🔒 Desativar acesso</button>`;
+    if(x.status==='desativado'){bt+=`<button class="btn sm sec" data-ex="reativar" data-id="${esc(x.id)}">↩ Reativar</button>`;
+      bt+=dd>=EXC_DIAS?`<button class="btn sm warn" data-ex="excluir" data-id="${esc(x.id)}">↗ Apagar login (Supabase Users)</button>`:`<span class="small muted">Exclusão definitiva liberada em ${lib}</span>`}
+    if(!['novo','desativado'].includes(x.status))bt='';
+    return `<div class="uCard"><div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start"><div class="uMail">${esc(c?c.name:x.email)}</div>${tag}</div>
+      <a class="supaLnk" href="${SUPA_TAB}" target="_blank" rel="noopener">↗ Tabela tb_exclusoes no Supabase</a>
+      <div class="uLin">${esc(x.email)}${c?` · 💬 ${esc(invFmtPhone(c.whatsapp))}${invUfOf(c.whatsapp)?' · '+esc(invUfOf(c.whatsapp)):''}`:''}</div>
+      <div class="uLin">Cadastro: ${u?admData(u.criado_em):'—'} · Pedido: ${admData(x.criado_em)}${x.desativado_em?' · Desativado: '+admData(x.desativado_em):''}${x.reativado_em?' · Reativado: '+admData(x.reativado_em):''}${x.desistiu_em?' · Desistiu: '+admData(x.desistiu_em):''}${x.excluido_em?' · Excluído: '+admData(x.excluido_em):''}</div>
+      <div class="note small" style="margin-top:8px"><b>Motivo:</b> ${esc(x.motivo)}${x.comentario?`<br><i>“${esc(x.comentario)}”</i>`:''}</div>
+      ${bt?`<div class="ivActs" style="margin-top:8px">${bt}</div>`:''}</div>`};
+  box.innerHTML=`<h3 style="margin:0">🗑 Pedidos de exclusão</h3>
+    <p class="small muted" style="margin:4px 0 8px">Desativar bloqueia o acesso na hora; os dados ficam guardados por ${EXC_DIAS} dias (dá para reativar). Depois de ${EXC_DIAS} dias, “Apagar login” abre o painel do Supabase, onde você apaga o usuário: os dados são apagados junto e fica só o registro do pedido.</p>
+    <div class="admTabs">${F.map(([k,t])=>`<button type="button" class="chip${f===k?' on':''}" data-exf="${k}">${t} (${cnt(k)})</button>`).join('')}</div>
+    ${lst.length?lst.map(card).join(''):'<div class="empty" style="margin-top:8px">Nenhum pedido aqui.</div>'}`;
+  box.querySelectorAll('[data-exf]').forEach(b=>b.onclick=()=>{UI.excF=b.dataset.exf;excAdminRender(box)});
+  box.querySelectorAll('[data-ex]').forEach(b=>b.onclick=async()=>{const x=L.find(v=>v.id===b.dataset.id);if(!x)return;const a=b.dataset.ex,agora=new Date().toISOString();
+    try{
+      if(a==='desativar'){if(!await confirma(`Desativar o acesso de <b>${esc(x.email)}</b>? A pessoa não consegue mais ver nem lançar dados. Os dados ficam guardados por ${EXC_DIAS} dias e você pode reativar nesse prazo.`,'Desativar acesso'))return;
+        await excPatch(x.id,{status:'desativado',desativado_em:agora});audit('Exclusão de conta','Admin','Acesso desativado · '+x.email);toast('Acesso desativado')}
+      else if(a==='reativar'){if(!await confirma(`Reativar o acesso de <b>${esc(x.email)}</b>? Tudo volta como estava.`,'Reativar'))return;
+        await excPatch(x.id,{status:'desistiu',reativado_em:agora});audit('Exclusão de conta','Admin','Acesso reativado · '+x.email);toast('Acesso reativado')}
+      else if(a==='excluir'){if(!await confirma(`Vou abrir o painel do Supabase (Authentication &gt; Users). Lá, procure <b>${esc(x.email)}</b> e apague o usuário (Delete user). Os dados são apagados junto e este pedido passa para “Excluídos” sozinho.`,'Abrir Supabase'))return;
+        window.open(SUPA_USERS,'_blank','noopener');return}
+    }catch(e){toast('Não foi possível concluir agora. Tente de novo.');return}
+    await excAdminCache(true);atualizaSino();excAdminRender(box);admContagens()})}
+/* ---------- V52: senha provisória e pedidos de nova senha ---------- */
+const SUPA_SQL='https://supabase.com/dashboard/project/zxhgexcaswkvpotwqkqo/sql/new';
+const MSG_SENHA='Pedido recebido. Se o e-mail estiver cadastrado no Rodaliq, você vai receber a nova senha temporária no seu e-mail em breve.';
+function geraSenha(){const A='ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';const r=new Uint32Array(10);crypto.getRandomValues(r);return [...r].map(x=>A[x%A.length]).join('')}
+// tela de login: "Esqueci minha senha" (resposta sempre neutra)
+function formPedirSenha(){
+  const ov=document.createElement('div');ov.className='ov';ov.id='pedSenha';
+  ov.innerHTML=`<div class="modal" style="max-width:420px"><h2>🔑 Receber nova senha temporária</h2>
+    <p class="small">Informe o e-mail cadastrado no Rodaliq. A nova senha temporária será enviada por e-mail e, ao entrar com ela, você cria a sua.</p>
+    <div class="field"><label for="psMail">E-mail cadastrado no Rodaliq</label><input class="inp" type="email" id="psMail" maxlength="120" autocomplete="email" autocapitalize="none"></div>
+    <div class="err" id="psErr"></div><div class="note small hidden" id="psOk"></div>
+    <div class="mfoot"><button class="btn sec" id="psV">Voltar</button><button class="btn" id="psS">Pedir nova senha</button></div></div>`;
+  document.body.appendChild(ov);const q=x=>ov.querySelector(x);q('#psV').onclick=()=>ov.remove();setTimeout(()=>q('#psMail').focus(),50);
+  const lu=$('#lUser');if(lu&&/@/.test(lu.value))q('#psMail').value=lu.value.trim();
+  q('#psMail').addEventListener('input',()=>{q('#psErr').textContent=''});
+  q('#psS').onclick=async()=>{const em=q('#psMail').value.trim().toLowerCase();if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)){q('#psErr').textContent='Informe um e-mail válido.';return}
+    q('#psS').disabled=true;
+    try{if(invProd()){const {error}=await DB.rpc('rodaliq_pedir_senha',{p_email:em});if(error)throw error}
+      else{const l=(await DB.collection('senhas').get()).docs.map(d=>d.data());const ab=l.find(x=>x.email===em&&(x.status==='novo'||Date.now()-new Date(x.criado_em).getTime()<36e5));
+        if(!ab)await DB.doc('senhas/s'+Date.now().toString(36)).set({email:em,user_id:null,status:'novo',criado_em:new Date().toISOString()})}
+      q('#psOk').textContent=MSG_SENHA;q('#psOk').classList.remove('hidden');q('#psS').classList.add('hidden');q('#psV').textContent='Voltar ao login';q('#psMail').disabled=true}
+    catch(e){q('#psS').disabled=false;q('#psErr').textContent='Não foi possível enviar agora. Tente de novo em instantes.'}}}
+// ao entrar com senha provisória: precisa criar a própria senha
+async function precisoTrocarSenha(){if(!invProd())return false;try{const {data,error}=await DB.rpc('rodaliq_preciso_trocar_senha');return !error&&data===true}catch(e){return false}}
+function marcaSenhaTrocada(){if(invProd()&&DB&&typeof DB.rpc==='function')try{Promise.resolve(DB.rpc('rodaliq_senha_trocada')).catch(()=>{})}catch(e){}}
+async function checarTrocaSenha(){if(!await precisoTrocarSenha())return;
+  return new Promise(res=>{document.querySelectorAll('.ov').forEach(o=>o.remove());
+    const ov=document.createElement('div');ov.className='ov';ov.id='criaSenha';
+    ov.innerHTML=`<div class="modal" style="max-width:420px"><h2>🔑 Crie sua senha</h2><p class="small">Você entrou com uma senha provisória. Para continuar, crie a sua senha (mínimo de 8 caracteres).</p>
+      <div class="field"><label for="csN">Nova senha</label><div class="pw"><input class="inp" type="password" id="csN" autocomplete="new-password"><button type="button" data-eye="csN" aria-label="Mostrar senha">👁</button></div></div>
+      <div class="field"><label for="csN2">Repita a nova senha</label><div class="pw"><input class="inp" type="password" id="csN2" autocomplete="new-password"><button type="button" data-eye="csN2" aria-label="Mostrar senha">👁</button></div></div>
+      <div class="err" id="csErr"></div><div class="mfoot"><button class="btn sec" id="csSair">↩ Sair</button><button class="btn" id="csOk">Salvar e continuar</button></div></div>`;
+    document.body.appendChild(ov);const q=x=>ov.querySelector(x),err=t=>{q('#csErr').textContent=t};
+    ov.querySelectorAll('[data-eye]').forEach(b=>b.onclick=()=>{const i=q('#'+b.dataset.eye);i.type=i.type==='password'?'text':'password'});
+    q('#csSair').onclick=()=>sairSemAudit();
+    q('#csOk').onclick=async()=>{const n=q('#csN').value,n2=q('#csN2').value;if(n.length<8)return err('A senha precisa de 8 caracteres ou mais.');if(n!==n2)return err('As senhas não conferem.');
+      q('#csOk').disabled=true;
+      try{const r=await DB.auth.updateUser({password:n});if(r.error){q('#csOk').disabled=false;return err(/different|same/i.test(r.error.message)?'A nova senha precisa ser diferente da provisória.':'Não foi possível salvar a senha. Tente de novo.')}
+        const {error}=await DB.rpc('rodaliq_senha_trocada');if(error)throw error;
+        audit('Troca de senha','Acesso','Senha provisória trocada');ov.remove();toast('Senha criada');res()}
+      catch(e){q('#csOk').disabled=false;err('Não foi possível salvar a senha. Tente de novo.')}}})}
+// ---- Admin > Pedidos de senha ----
+let SEN_CACHE=[];const SEN_GERADA={}; // senha gerada fica só na tela, nunca é gravada no app
+async function senListar(){
+  if(!invProd())return (await DB.collection('senhas').get()).docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>String(b.criado_em).localeCompare(String(a.criado_em)));
+  const {data,error}=await DB.from('tb_senhas').select('*').order('criado_em',{ascending:false}).limit(500);if(error)throw error;return data||[]}
+function senAlerts(){if(!invIsAdmin)return [];const nv=SEN_CACHE.filter(x=>x.status==='novo');
+  return nv.length?[{n:'r',inv:1,tab:'sen',t:`${nv.length} ${nv.length===1?'pedido de nova senha aguardando':'pedidos de nova senha aguardando'}`,nota:nv.slice(0,5).map(x=>x.email).join(' · ')}]:[]}
+function senTexto(x,senha,nome){return `Olá${nome?', '+nome:''}! Recebemos seu pedido de nova senha no Rodaliq.\n\nLogin: ${x.email}\nSenha temporária: ${senha}\n\nAcesse https://rodaliq.com.br e entre com esses dados. Ao entrar, o app vai pedir para você criar a sua própria senha.\n\nSe você não fez este pedido, responda esta mensagem.\n\nEquipe Rodaliq`}
+async function senAdminRender(box){
+  let L;try{L=await senListar();SEN_CACHE=L}catch(e){box.innerHTML='<div class="empty">Não consegui carregar os pedidos. Tente de novo em instantes.</div>';return}
+  if(!invCache.length)try{await invRefreshBadge(true)}catch(e){}
+  const f=UI.senF||'novo',lst=L.filter(x=>x.status===f),cnt=k=>L.filter(x=>x.status===k).length;
+  const sql=(email,senha)=>`update auth.users set encrypted_password = extensions.crypt('${senha}', extensions.gen_salt('bf')), updated_at = now() where lower(email) = '${String(email).toLowerCase()}';\nupdate public.tb_usuarios set trocar_senha = true where lower(email) = '${String(email).toLowerCase()}';`;
+  const card=x=>{const c=invCache.find(v=>String(v.email||'').toLowerCase()===String(x.email||'').toLowerCase()),nome=c?invPrimeiro(c):'',sg=SEN_GERADA[x.id];
+    let bt='';
+    if(sg){const txt=senTexto(x,sg,nome);
+      bt=`<div class="note small" style="margin-top:8px">🔑 Senha temporária: <b class="senG">${esc(sg)}</b> <button type="button" class="lnk" data-sc="${esc(x.id)}">Copiar</button><br><span class="muted">Ela aparece só agora: envie em seguida.</span></div>
+        <div class="ivActs" style="margin-top:8px"><a class="btn sm" href="${esc(invMailLink(x.email,'Sua nova senha temporária do Rodaliq',txt))}" target="_blank" rel="noopener">✉ Enviar senha por e-mail</a>${c?`<a class="btn sm" href="${esc('https://wa.me/'+c.whatsapp+'?text='+encodeURIComponent(txt))}" target="_blank" rel="noopener">💬 WhatsApp</a>`:''}</div>`}
+    else bt=`<div class="ivActs" style="margin-top:8px"><button class="btn sm" data-sg="${esc(x.id)}">🔑 ${x.status==='novo'?'Gerar senha temporária':'Gerar outra senha'}</button><button class="btn sm sec" data-sq="${esc(x.id)}">↗ Abrir SQL Editor (Supabase)</button></div>`;
+    return `<div class="uCard"><div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start"><div class="uMail">${esc(c?c.name:x.email)}</div><span class="tag ${x.status==='novo'?'r':'g'}">${x.status==='novo'?'Novo':'Atendido'}</span></div>
+      <div class="uLin">${esc(x.email)}${c?` · 💬 ${esc(invFmtPhone(c.whatsapp))}${invUfOf(c.whatsapp)?' · '+esc(invUfOf(c.whatsapp)):''}`:''}</div>
+      <div class="uLin">Pedido: ${admData(x.criado_em)}${x.atendido_em?' · Atendido: '+admData(x.atendido_em):''}</div>${bt}</div>`};
+  box.innerHTML=`<h3 style="margin:0">🔑 Pedidos de senha</h3>
+    <p class="small muted" style="margin:4px 0 8px">“Gerar senha temporária” grava a senha no Supabase na hora e obriga a pessoa a criar a própria senha ao entrar. A senha aparece só nesta tela: envie por e-mail ou WhatsApp em seguida.${invProd()?'':' <b>No HMO a geração é simulada.</b>'}</p>
+    <div class="admTabs">${[['novo','Novos'],['atendido','Atendidos']].map(([k,t])=>`<button type="button" class="chip${f===k?' on':''}" data-sf="${k}">${t} (${cnt(k)})</button>`).join('')}</div>
+    ${lst.length?lst.map(card).join(''):'<div class="empty" style="margin-top:8px">Nenhum pedido aqui.</div>'}`;
+  box.querySelectorAll('[data-sf]').forEach(b=>b.onclick=()=>{UI.senF=b.dataset.sf;senAdminRender(box)});
+  box.querySelectorAll('[data-sc]').forEach(b=>b.onclick=()=>{try{navigator.clipboard.writeText(SEN_GERADA[b.dataset.sc]);toast('Senha copiada')}catch(e){toast('Não foi possível copiar')}});
+  box.querySelectorAll('[data-sq]').forEach(b=>b.onclick=async()=>{const x=L.find(v=>v.id===b.dataset.sq);if(!x)return;const s2=geraSenha(),cmd=sql(x.email,s2);
+    try{await navigator.clipboard.writeText(cmd)}catch(e){}
+    if(!await confirma(`O comando abaixo foi copiado. No SQL Editor do Supabase, cole e clique em Run. Depois, envie a senha <b>${esc(s2)}</b> para <b>${esc(x.email)}</b>.<br><textarea class="inp" rows="4" readonly style="margin-top:8px;font-size:12px">${esc(cmd)}</textarea>`,'Abrir SQL Editor',{titulo:'Senha pelo SQL Editor'}))return;
+    window.open(SUPA_SQL,'_blank','noopener')});
+  box.querySelectorAll('[data-sg]').forEach(b=>b.onclick=async()=>{const x=L.find(v=>v.id===b.dataset.sg);if(!x)return;
+    if(!await confirma(`Gerar uma senha temporária para <b>${esc(x.email)}</b>? A senha atual da pessoa deixa de valer e, ao entrar, ela vai criar a própria senha.`,'Gerar senha'))return;
+    const sg=geraSenha();
+    try{if(invProd()){const {error}=await DB.rpc('rodaliq_admin_senha_temporaria',{p_pedido:x.id,p_senha:sg});if(error)throw error}
+      else await DB.doc('senhas/'+x.id).update({status:'atendido',atendido_em:new Date().toISOString()});
+      SEN_GERADA[x.id]=sg;audit('Senha temporária','Admin','Senha temporária gerada · '+x.email);toast('Senha temporária gerada')}
+    catch(e){toast('Não foi possível gerar agora. Use o SQL Editor.');return}
+    UI.senF='atendido';await excAdminCache(true);atualizaSino();senAdminRender(box);admContagens()})}
+/* ---------- V48: aba 🛡 Admin (só administradores) ---------- */
+const ADMIN_MASTER='diogogomes2110@gmail.com';
+const ehMaster=()=>invProd()?String(LOGADO||'').toLowerCase()===ADMIN_MASTER:true; // no HMO o cadastro de admin é simulado
+const ADM_T=[['convites','📨 Pedidos de convite'],['ativos','👥 Usuários ativos'],['excluidos','🚫 Usuários excluídos'],['exclusoes','🗑 Pedidos de exclusão'],['senhas','🔑 Pedidos de senha']];
+// V50: Gestão Admin abre como página inteira (computador e celular)
+function abrirAdmin(sub){['#bellMenu','#optMenu','#fabMenu'].forEach(s=>{const m=$(s);if(m)m.classList.add('hidden')});if(!invIsAdmin)return;
+  if(sub)UI.admSub=sub;let ov=$('#admPage');
+  if(!ov){ov=document.createElement('div');ov.className='ov admPage';ov.id='admPage';document.body.appendChild(ov);ov.__fechar=()=>{ov.remove();invRefreshBadge(false);if(typeof atualizaSino==='function')atualizaSino()}}
+  const sub2=UI.admSub||'convites';
+  ov.innerHTML=`<div class="admWrap"><div class="admHd"><h2>🛡 Gestão Admin</h2><div class="admHdB">${ehMaster()?'<button type="button" class="btn sec sm admMaster" id="admCad">➕ Cadastrar admin</button>':''}<button type="button" class="btn sec sm" id="admAniv">🎂 Aniversariantes</button><button type="button" class="btn sec sm" id="admFechar">Fechar</button></div></div>
+    <div class="admTabs">${ADM_T.map(([k,t])=>`<button type="button" class="chip${sub2===k?' on':''}" data-adm="${k}">${t} <span data-admn="${k}"></span></button>`).join('')}</div>
+    <div id="admBox"><div class="empty">Carregando…</div></div></div>`;
+  ov.querySelector('#admFechar').onclick=()=>ov.__fechar();
+  ov.querySelectorAll('[data-adm]').forEach(b=>b.onclick=()=>abrirAdmin(b.dataset.adm));
+  ov.querySelector('#admAniv').onclick=async()=>{if((UI.admSub||'convites')!=='convites')abrirAdmin('convites');for(let i=0;i<40;i++){const m=document.querySelector('#admBox #ivMode');if(m){if(!document.querySelector('#admBox #ivCalBox:not(.hidden)'))m.click();return}await new Promise(r=>setTimeout(r,50))}};
+  const cad=ov.querySelector('#admCad');if(cad)cad.onclick=formCadAdmin;
+  ov.scrollTop=0;montaAdmin();admContagens()}
+async function admContagens(){const put=(k,n)=>{const e=document.querySelector(`[data-admn="${k}"]`);if(e)e.textContent=n==null?'':'('+n+')'};
+  try{if(!invCache.length)await invRefreshBadge(true)}catch(e){}
+  put('convites',invCache.filter(r=>invVivo(r)&&!r.archived&&r.status==='novo').length);
+  try{const us=await admUsuarios();put('ativos',us.filter(u=>!u.excluido_em).length);put('excluidos',us.filter(u=>u.excluido_em).length)}catch(e){}
+  try{const L=await excListar();put('exclusoes',L.filter(x=>x.status==='novo'||x.status==='desativado').length)}catch(e){}
+  try{const L=await senListar();SEN_CACHE=L;put('senhas',L.filter(x=>x.status==='novo').length)}catch(e){}}
+// ➕ Cadastrar admin: só o admin master; no banco, só ele consegue gravar em tb_admins
+function formCadAdmin(){if(!ehMaster())return;
+  const ov=document.createElement('div');ov.className='ov';
+  ov.innerHTML=`<div class="modal" style="max-width:440px"><h2>➕ Cadastrar admin</h2><p class="small">Informe o e-mail de um usuário que já tenha conta ativa no app.</p>
+    <input class="inp" type="email" id="caMail" placeholder="e-mail do usuário" autocomplete="off">
+    <p style="margin:8px 0 0"><a class="supaLnk" href="${SUPA_TAB}" target="_blank" rel="noopener">↗ Abrir tabela tb_admins no Supabase</a></p>
+    <div class="err" id="caErr"></div><div class="mfoot"><button class="btn sec" id="caN">Cancelar</button><button class="btn" id="caS">Cadastrar</button></div></div>`;
+  document.body.appendChild(ov);const q=x=>ov.querySelector(x),err=t=>{q('#caErr').textContent=t};
+  q('#caN').onclick=()=>ov.remove();q('#caMail').addEventListener('input',()=>err(''));setTimeout(()=>q('#caMail').focus(),50);
+  q('#caS').onclick=async()=>{const em=q('#caMail').value.trim().toLowerCase();if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em))return err('Informe um e-mail válido.');
+    q('#caS').disabled=true;
+    try{
+      if(!invProd()){toast('Admin cadastrado (simulação do HMO)');audit('Cadastro de admin','Admin','Admin cadastrado (simulação) · '+em);ov.remove();return}
+      const {data:us,error:e1}=await DB.from('tb_usuarios').select('user_id,email,excluido_em').ilike('email',em);if(e1)throw e1;
+      const u=(us||[]).find(x=>!x.excluido_em);if(!u){q('#caS').disabled=false;return err('Não há usuário ativo com este e-mail.')}
+      const {error:e2}=await DB.from('tb_admins').insert({user_id:u.user_id});
+      if(e2){q('#caS').disabled=false;return err(/23505|duplicate/i.test(e2.code+e2.message)?'Este usuário já é admin.':'Não foi possível cadastrar. Só o admin master pode cadastrar admins.')}
+      audit('Cadastro de admin','Admin','Admin cadastrado · '+em);toast('Admin cadastrado');ov.remove()}
+    catch(e){q('#caS').disabled=false;err('Não foi possível cadastrar agora. Tente de novo.')}}}
+// usuários: produção lê a tabela espelho tb_usuarios (preenchida pelo Supabase); no HMO só existe o usuário de teste
+async function admUsuarios(){
+  if(invProd()){const {data,error}=await DB.from('tb_usuarios').select('user_id,email,criado_em,ultimo_login,ultimo_uso,excluido_em');if(error)throw error;return data||[]}
+  let cri='';try{const a=await DB.doc('hmo/auth').get();cri=a.exists&&a.data().v&&a.data().v.criadoEm||''}catch(e){}
+  return [{user_id:'hmo',email:(LOGADO||'usuário de teste')+' (HMO)',criado_em:cri||null,ultimo_login:null,ultimo_uso:new Date().toISOString(),excluido_em:null}]}
+function registrarUso(){if(!invProd()||!DB||typeof DB.rpc!=='function')return;try{Promise.resolve(DB.rpc('rodaliq_registrar_uso')).catch(()=>{})}catch(e){}} // grava o "último uso" (produção); falha nunca atrapalha o login
+const admData=iso=>iso?dataHora(iso):'—';
+async function montaAdmin(){const box=$('#admBox');if(!box)return;const sub=UI.admSub||'convites';
+  if(sub==='convites'){box.innerHTML='';openInvitesModal(box);return}
+  if(sub==='exclusoes'){excAdminRender(box);return}
+  if(sub==='senhas'){senAdminRender(box);return}
+  let us;try{us=await admUsuarios()}catch(e){box.innerHTML='<div class="empty">Não consegui carregar os usuários. Tente de novo em instantes.</div>';return}
+  if(!invCache.length)try{await invRefreshBadge(true)}catch(e){}
+  const conv=new Map(invCache.map(x=>[String(x.email||'').toLowerCase(),x]));
+  const exc=sub==='excluidos',lst=us.filter(u=>exc?!!u.excluido_em:!u.excluido_em)
+    .sort((a,b)=>String(exc?b.excluido_em:(b.ultimo_uso||b.ultimo_login||'')).localeCompare(String(exc?a.excluido_em:(a.ultimo_uso||a.ultimo_login||'')))) ;
+  const card=u=>{const c=conv.get(String(u.email||'').toLowerCase());
+    return `<div class="uCard"><div class="uMail">${esc(u.email||'(sem e-mail)')}</div>${c?`<div class="uLin">${esc(c.name)} · 💬 ${esc(invFmtPhone(c.whatsapp))}${invUfOf(c.whatsapp)?' · '+esc(invUfOf(c.whatsapp)):''}</div>`:'<div class="uLin">Sem pedido de convite com este e-mail</div>'}
+      <div class="uLin">Cadastro: ${admData(u.criado_em)}${exc?` · <b>Excluído em ${admData(u.excluido_em)}</b>`:` · Último login: ${admData(u.ultimo_login)} · Último uso: ${admData(u.ultimo_uso)}`}</div></div>`};
+  box.innerHTML=`<h3 style="margin:0">${exc?'🗑 Usuários excluídos':'👥 Usuários ativos'} (${lst.length})</h3>
+    <p class="small muted" style="margin:4px 0 0">${exc?'Usuários apagados no painel do Supabase, com a data da exclusão.':'Ordenados pelo último uso. “Último uso” muda sempre que a pessoa abre o app; “Último login”, só quando ela digita a senha.'} Só consulta: para apagar ou desativar, use o painel do Supabase (Authentication &gt; Users).${invProd()?'':' <b>No HMO aparece só o usuário de teste; os dados reais aparecem em produção.</b>'}</p>
+    ${lst.length?lst.map(card).join(''):`<div class="empty">${exc?'Nenhum usuário excluído.':'Nenhum usuário ativo.'}</div>`}`}
 function invSetAdmin(on){
   invIsAdmin=!!on;
-  ['#btnInvites','#fabInv'].forEach(i=>{const b=$(i);if(b)b.classList.toggle('hidden',!invIsAdmin)});
+  ['#tabAdmin','#fabAdm'].forEach(i=>{const b=$(i);if(b)b.classList.toggle('hidden',!invIsAdmin)});
+  if(!invIsAdmin){const pg=$('#admPage');if(pg)pg.remove()}
   if(!invIsAdmin){invCache=[];invCacheAt=0;['#invBadge','#fabInvBadge'].forEach(i=>{const c=$(i);if(c)c.classList.add('hidden')})}
 }
 function invBdayOn(x,off){
@@ -1439,6 +1735,19 @@ function invBdayOn(x,off){
   return (t.getMonth()+1===mo&&t.getDate()===d)?{age:t.getFullYear()-+m[1],day:d,month:m[2]}:null;
 }
 const invBdayTomorrow=x=>invBdayOn(x,1);
+// V46: alerta de aniversário (só admin) começa na véspera e só some quando marcado como lido
+function invBdayData(x,ano){const mo=+x.birth_date.slice(5,7);let d=+x.birth_date.slice(8,10);if(mo===2&&d===29&&!isLeapY(ano))d=28;return ano+'-'+pad(mo)+'-'+pad(d)}
+function invBdayAlerta(x){
+  if(!x||x.status==='recusado'||!/^\d{4}-\d{2}-\d{2}/.test(x.birth_date||''))return null;
+  const hj=hoje(),amanha=isoOf(new Date(Date.now()+864e5)),ano=+hj.slice(0,4);
+  let b=invBdayData(x,ano);if(b>amanha)b=invBdayData(x,ano-1); // aniversário atual (a partir da véspera) ou o último
+  const pedido=x.created_at?isoOf(new Date(x.created_at)):'';if(pedido&&b<pedido)return null; // não avisa aniversário anterior ao pedido
+  if(b<'2026-11-12')return null; // regra nova (V46): não traz de volta aniversários que já passaram antes dela
+  const k=x.id+'|'+b;if((NOT.reads.bdayLidas||[]).includes(k))return null;
+  const dd=fmtBR(b).slice(0,5),idade=+b.slice(0,4)-+x.birth_date.slice(0,4),dias=diasEntre(b,hj);
+  const t=b===amanha?`Amanhã é aniversário de ${x.name}`:b===hj?`Hoje é aniversário de ${x.name}`:(dias===1?`Ontem foi aniversário de ${x.name}`:`Aniversário de ${x.name} foi em ${dd} (há ${dias} dias)`);
+  return {n:'a',inv:1,tab:'inv',bd:k,wa:invBdayLink(x),em:invMailBday(x),t,nota:`${b<hj?'Fez':'Faz'} ${idade} anos em ${dd}. WhatsApp: ${invFmtPhone(x.whatsapp)}${invUfOf(x.whatsapp)?' · '+invUfOf(x.whatsapp):''}.`};
+}
 const invBdayNear=x=>{const h=invBdayOn(x,0);if(h)return{...h,when:'hoje'};const a=invBdayOn(x,1);return a?{...a,when:'amanhã'}:null};
 // Alertas do sino (só administrador): entram no topo da aba Alertas
 // V44: lembrete semanal (sextas-feiras, só admin) para manter o projeto do Supabase ativo — o plano gratuito pausa após 7 dias seguidos sem uso
@@ -1453,9 +1762,8 @@ function invAlerts(){
   const out=[],sa=supaAlerta();if(sa)out.push(sa);
   const nw=invCache.filter(x=>invVivo(x)&&x.status==='novo'&&!x.archived);
   if(nw.length)out.push({n:'a',inv:1,tab:'inv',t:nw.length===1?'1 pedido de convite novo':nw.length+' pedidos de convite novos',
-    nota:nw.slice(0,5).map(x=>`${x.name}${invUfOf(x.whatsapp)?' ('+invUfOf(x.whatsapp)+')':''}`).join(' · ')+(nw.length>5?' · … e mais '+(nw.length-5):'')+'. Responda pelo WhatsApp e marque como convidado ou recusado.'});
-  invCache.filter(invVivo).forEach(x=>{const bd=invBdayTomorrow(x);if(!bd)return;
-    out.push({n:'a',inv:1,tab:'inv',t:`Amanhã é aniversário de ${x.name}`,nota:`Faz ${bd.age} anos em ${String(bd.day).padStart(2,'0')}/${bd.month}. WhatsApp: ${invFmtPhone(x.whatsapp)}${invUfOf(x.whatsapp)?' · '+invUfOf(x.whatsapp):''}.`})});
+    nota:nw.slice(0,5).map(x=>`${x.name}${invUfOf(x.whatsapp)?' ('+invUfOf(x.whatsapp)+')':''}`).join(' · ')+(nw.length>5?' · … e mais '+(nw.length-5):'')+'. Responda por e-mail ou WhatsApp e marque como convidado ou recusado.'});
+  invCache.filter(invVivo).forEach(x=>{const a=invBdayAlerta(x);if(a)out.push(a)});
   return out;
 }
 async function invRefreshBadge(avisa){
@@ -1467,6 +1775,8 @@ async function invRefreshBadge(avisa){
   }catch(e){}
 }
 async function invAdminInit(){
+  registrarUso();
+  excAdminCache(true).then(()=>{if(typeof atualizaSino==='function')atualizaSino()});
   if(!invProd()){if(DB&&typeof DB.collection==='function'){invSetAdmin(true);invRefreshBadge(true)}return} // HMO: o usuário de teste é o administrador
   try{const {data}=await DB.from('tb_admins').select('user_id').eq('user_id',UID).maybeSingle();invSetAdmin(!!data)}catch(e){invSetAdmin(false)}
   invRefreshBadge(true);
@@ -1474,20 +1784,28 @@ async function invAdminInit(){
 setInterval(()=>{if(invIsAdmin&&!document.hidden)invRefreshBadge(false)},120000);
 const invPrimeiro=x=>String(x.name||'').trim().split(/\s+/)[0]||'';
 const invBdayLink=x=>'https://wa.me/'+x.whatsapp+'?text='+encodeURIComponent(`Parabéns, ${invPrimeiro(x)}! Muitas felicidades neste dia. Feliz aniversário e um abraço do Rodaliq!`);
+// V48: e-mail pela conta do Rodaliq — computador abre o Gmail já escrito; celular abre o app de e-mail padrão
+const MAIL_RODALIQ='rodaliq.app@gmail.com';
+const ehCelular=()=>{try{return matchMedia('(pointer:coarse)').matches||/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)}catch(e){return false}};
+function invMailLink(to,assunto,corpo){
+  if(ehCelular())return 'mailto:'+encodeURIComponent(to)+'?subject='+encodeURIComponent(assunto)+'&body='+encodeURIComponent(corpo);
+  return 'https://mail.google.com/mail/?authuser='+encodeURIComponent(MAIL_RODALIQ)+'&view=cm&fs=1&to='+encodeURIComponent(to)+'&su='+encodeURIComponent(assunto)+'&body='+encodeURIComponent(corpo)}
+const invMailConvite=r=>invMailLink(r.email,'Seu acesso ao Rodaliq',`Olá, ${invPrimeiro(r)}!\n\nSeu pedido de convite para o Rodaliq foi recebido e o acesso será liberado.\nSeu login será o e-mail ${r.email}. A senha provisória será enviada por e-mail.\n\nPara entrar, acesse https://rodaliq.com.br\n\nEquipe Rodaliq`);
+const invMailBday=x=>invMailLink(x.email,`Feliz aniversário, ${invPrimeiro(x)}!`,`Parabéns, ${invPrimeiro(x)}! Muitas felicidades neste dia.\n\nFeliz aniversário e um abraço do Rodaliq!`);
 const invWaLink=r=>'https://wa.me/'+r.whatsapp+'?text='+encodeURIComponent(`Olá, ${invPrimeiro(r)}! Seu pedido de convite para o Rodaliq foi recebido e o acesso será liberado. Seu login será o e-mail ${r.email}. A senha provisória será enviada por aqui. Para entrar, acesse https://rodaliq.com.br`);
-async function openInvitesModal(){
+async function openInvitesModal(host){ // V48: com host, a tela é montada dentro da aba 🛡 Admin
   ['#bellMenu','#optMenu','#fabMenu'].forEach(s=>{const m=$(s);if(m)m.classList.add('hidden')});
-  const ov=document.createElement('div');ov.className='ov';const now0=new Date();
+  const ov=host||document.createElement('div');if(!host)ov.className='ov';const now0=new Date();
   let filter='novo',list=[],q='',armed=null,armedT=null,mode='list',calY=now0.getFullYear(),calM=now0.getMonth(),calSel=null;
-  ov.innerHTML=`<div class="modal iv">
-    <div class="ivHd"><h2>📨 Pedidos de convite</h2><div class="ivHdB"><button type="button" class="btn sec sm" id="ivMode">🎂 Aniversariantes</button><button type="button" class="btn sec sm" id="ivClose">Fechar</button></div></div>
+  ov.innerHTML=`<div class="modal iv${host?' inline':''}">
+    <div class="ivHd"><h2>📨 Pedidos de convite</h2><div class="ivHdB"><button type="button" class="btn sec sm" id="ivMode">🎂 Aniversariantes</button>${host?'':'<button type="button" class="btn sec sm" id="ivClose">Fechar</button>'}</div></div>
     <div id="ivListBox"><div class="ivSearch"><span aria-hidden="true">🔍</span><input class="inp" type="search" id="ivSearch" placeholder="Pesquisar por nome, telefone ou e-mail" autocomplete="off"></div>
       <div class="chips" id="ivTabs"></div><div id="ivBody"></div></div>
     <div id="ivCalBox" class="hidden"></div>
     <p class="small muted" style="margin-top:10px">Excluir manda o pedido para a 🗑 Lixeira, onde ele fica 15 dias antes de ser apagado de vez. Arquivar tira da lista sem apagar. Nada desta tela vai para o histórico de auditoria.</p></div>`;
-  document.body.appendChild(ov);
-  const close=()=>{ov.remove();invRefreshBadge(false)};ov.__fechar=close;
-  ov.querySelector('#ivClose').onclick=close;ov.addEventListener('click',ev=>{if(ev.target===ov)close()});
+  if(!host)document.body.appendChild(ov);
+  const close=()=>{if(host)return;ov.remove();invRefreshBadge(false)};ov.__fechar=close;
+  if(!host){ov.querySelector('#ivClose').onclick=close;ov.addEventListener('click',ev=>{if(ev.target===ov)close()})}
   const body=ov.querySelector('#ivBody'),tabs=ov.querySelector('#ivTabs'),search=ov.querySelector('#ivSearch'),calBox=ov.querySelector('#ivCalBox'),listBox=ov.querySelector('#ivListBox'),modeBtn=ov.querySelector('#ivMode');
   const match=r=>{if(!invVivo(r))return false;const t=invNorm(q.trim());if(!t)return true;const dg=invDigits(q);return invNorm(r.name).includes(t)||invNorm(r.email).includes(t)||(dg.length>=2&&String(r.whatsapp||'').includes(dg))};
   const inTab=(r,k)=>k==='lixeira'?!invVivo(r):!invVivo(r)?false:k==='arquivado'?!!r.archived:!r.archived&&(k==='todos'||r.status===k);
@@ -1503,13 +1821,13 @@ async function openInvitesModal(){
       return;
     }
     body.innerHTML=(busca?`<p class="small muted">Resultado da pesquisa em todos os pedidos, inclusive arquivados: ${items.length}.</p>`:'')+(items.length?items.map(r=>{const uf=invUfOf(r.whatsapp),bd=invBdayNear(r);return `<div class="ivCard" data-id="${esc(r.id)}">
-      <div class="ivTop"><div style="min-width:0"><div class="ivNome">${esc(r.name)}</div><div class="small muted" style="word-break:break-all">${esc(r.email)}</div><div class="small">💬 ${esc(invFmtPhone(r.whatsapp))}${uf?' · '+esc(uf):''}</div>${r.birth_date?`<div class="small">🎂 ${esc(invBirthBR(r.birth_date))}</div>`:''}</div>
+      <div class="ivTop"><div style="min-width:0"><div class="ivNome">${esc(r.name)}</div><div class="small muted" style="word-break:break-all">${esc(r.email)}</div><a class="supaLnk" href="${SUPA_USERS}" target="_blank" rel="noopener">↗ Abrir Supabase (Users)</a><div class="small">💬 ${esc(invFmtPhone(r.whatsapp))}${uf?' · '+esc(uf):''}</div>${r.birth_date?`<div class="small">🎂 ${esc(invBirthBR(r.birth_date))}</div>`:''}</div>
       <div class="ivTags"><span class="tag ${r.status==='novo'?'b':'g'}">${esc(INV_ST[r.status]||r.status)}</span>${r.archived?'<span class="tag g">🗄 Arquivado</span>':''}</div></div>
       <div class="small muted" style="margin-top:4px">Como soube: <b style="color:var(--ink)">${esc(r.how_known)}</b></div>
       <div class="small muted">${esc(invWhen(r.created_at))}</div>
       ${bd?`<div class="small ivBday">🎂 ${bd.when==='hoje'?'Hoje':'Amanhã'} é aniversário (faz ${bd.age} anos)</div>`:''}
-      <div class="ivActs"><a class="btn sm" href="${esc(invWaLink(r))}" target="_blank" rel="noopener">💬 WhatsApp</a>
-        ${bd?`<a class="btn sm" href="${esc(invBdayLink(r))}" target="_blank" rel="noopener">💬 Parabenizar</a>`:''}
+      <div class="ivActs"><a class="btn sm" href="${esc(invMailConvite(r))}" target="_blank" rel="noopener">✉ Enviar e-mail</a><a class="btn sm" href="${esc(invWaLink(r))}" target="_blank" rel="noopener">💬 WhatsApp</a>
+        ${bd?`<a class="btn sm" href="${esc(invMailBday(r))}" target="_blank" rel="noopener">✉ Parabenizar por e-mail</a><a class="btn sm" href="${esc(invBdayLink(r))}" target="_blank" rel="noopener">💬 Parabenizar pelo WhatsApp</a>`:''}
         ${r.status!=='convidado'?'<button type="button" class="btn sec sm" data-a="convidado">Marcar convidado</button>':''}
         ${r.status!=='recusado'?'<button type="button" class="btn sec sm" data-a="recusado">Recusar</button>':''}
         ${r.status!=='novo'?'<button type="button" class="btn sec sm" data-a="novo">Reabrir</button>':''}
@@ -1528,7 +1846,7 @@ async function openInvitesModal(){
     calBox.innerHTML=`<div class="ivCalHd"><button type="button" class="btn sec sm" data-n="-1" aria-label="Mês anterior">◀</button><b style="text-transform:capitalize">${MESES_INV[calM]} de ${calY}</b><button type="button" class="btn sec sm" data-n="1" aria-label="Próximo mês">▶</button></div>
       <div class="ivGrid ivDow">${['D','S','T','Q','Q','S','S'].map(x=>`<span>${x}</span>`).join('')}</div><div class="ivGrid">${cells}</div>
       <p class="small muted" style="margin-top:8px">🎂 marca dias com aniversariantes (todos os pedidos, menos os recusados, inclusive arquivados). Toque em um dia para filtrar.</p>
-      ${shown.length?shown.map(x=>`<div class="ivCard ivRow"><div style="min-width:0"><div class="ivNome">${String(x.day).padStart(2,'0')}/${String(calM+1).padStart(2,'0')} · ${esc(x.name)}</div><div class="small muted">Faz ${x.age} anos${invUfOf(x.whatsapp)?' · '+esc(invUfOf(x.whatsapp)):''}</div></div><a class="btn sm" href="${esc(invBdayLink(x))}" target="_blank" rel="noopener">💬 Parabenizar</a></div>`).join(''):`<div class="empty">Nenhum aniversariante ${calSel?'neste dia':'neste mês'}.</div>`}`;
+      ${shown.length?shown.map(x=>`<div class="ivCard ivRow"><div style="min-width:0"><div class="ivNome">${String(x.day).padStart(2,'0')}/${String(calM+1).padStart(2,'0')} · ${esc(x.name)}</div><div class="small muted">Faz ${x.age} anos${invUfOf(x.whatsapp)?' · '+esc(invUfOf(x.whatsapp)):''}</div></div><div class="ivBdBt"><a class="btn sm" href="${esc(invMailBday(x))}" target="_blank" rel="noopener">✉ E-mail</a><a class="btn sm" href="${esc(invBdayLink(x))}" target="_blank" rel="noopener">💬 WhatsApp</a></div></div>`).join(''):`<div class="empty">Nenhum aniversariante ${calSel?'neste dia':'neste mês'}.</div>`}`;
   };
   const setMode=m=>{mode=m;listBox.classList.toggle('hidden',m==='cal');calBox.classList.toggle('hidden',m!=='cal');modeBtn.textContent=m==='cal'?'📋 Pedidos':'🎂 Aniversariantes';m==='cal'?drawCal():draw()};
   modeBtn.onclick=()=>setMode(mode==='cal'?'list':'cal');
@@ -1556,11 +1874,12 @@ async function openInvitesModal(){
 // Formulário "Peça um convite" na tela de login
 (function(){
   const link=$('#invOpen'),form=$('#invForm'),lf=$('#fLogin'),msg=$('#invMsg');if(!link)return;
+  const so0=$('#senOpen');if(so0)so0.onclick=formPedirSenha;
   const ymd=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
   const info=(t,neutro)=>{msg.className=neutro?'ivInfo':'err';msg.textContent=t};
   const isMinor=b=>{const lim=new Date();lim.setFullYear(lim.getFullYear()-18);return /^\d{4}-\d{2}-\d{2}$/.test(b)&&b>ymd(lim)};
   const checkMinor=()=>{const m=isMinor($('#invBirth').value);if(m)msg.textContent='';$('#invMinor').classList.toggle('hidden',!m);$('#invBtn').classList.toggle('hidden',m);$('#invClose').classList.toggle('hidden',!m);return m};
-  const view=(on,doGesto)=>{form.classList.toggle('hidden',!on);if(on&&!NAV_ON&&!invGuarda){try{history.pushState({rq:'inv'},'');invGuarda=true}catch(e){}}if(!on&&invGuarda&&!doGesto){invGuarda=false;navIgnora=true;try{history.back()}catch(e){navIgnora=false}}if(!on&&doGesto)invGuarda=false;lf.classList.toggle('hidden',on);link.parentElement.classList.toggle('hidden',on);
+  const view=(on,doGesto)=>{form.classList.toggle('hidden',!on);if(on&&!NAV_ON&&!invGuarda){try{history.pushState({rq:'inv'},'');invGuarda=true}catch(e){}}if(!on&&invGuarda&&!doGesto){invGuarda=false;navIgnora=true;try{history.back()}catch(e){navIgnora=false}}if(!on&&doGesto)invGuarda=false;lf.classList.toggle('hidden',on);link.parentElement.classList.toggle('hidden',on);if(so0)so0.parentElement.classList.toggle('hidden',on);
     info('');if(!on){form.reset();$('#invUf').textContent=''}
     if(on){$('#invDone').classList.add('hidden');$('#invFields').classList.remove('hidden');checkMinor();setTimeout(()=>$('#invName').focus(),50)}};
   form.__fechar=g=>view(false,g);form.__sujo=()=>['#invName','#invEmail','#invBirth','#invDdd','#invPhone','#invHow'].some(k=>$(k).value.trim()!=='')||$('#invOk').checked;
@@ -1573,7 +1892,7 @@ async function openInvitesModal(){
   link.addEventListener('click',()=>view(true));
   $('#invClose').addEventListener('click',()=>view(false));
   $('#invDoneBack').addEventListener('click',()=>view(false));
-  const DUP={email:'Já recebemos um pedido com este e-mail. Em breve entraremos em contato pelo WhatsApp informado.',whatsapp:'Já recebemos um pedido com este WhatsApp. Em breve entraremos em contato.',again:'Seu pedido já foi enviado. Em breve entraremos em contato pelo WhatsApp informado.'};
+  const DUP={email:'Já recebemos um pedido com este e-mail. Em breve entraremos em contato pelo e-mail ou WhatsApp informado.',whatsapp:'Já recebemos um pedido com este WhatsApp. Em breve entraremos em contato.',again:'Seu pedido já foi enviado. Em breve entraremos em contato pelo e-mail ou WhatsApp informado.'};
   form.addEventListener('submit',async e=>{
     e.preventDefault();
     if($('#invWeb').value){$('#invFields').classList.add('hidden');$('#invDone').classList.remove('hidden');return} // campo-isca: finge sucesso
@@ -1654,7 +1973,7 @@ window.addEventListener('popstate',async()=>{
 
 /* ===================== V36: termos, primeiro acesso, por km, projeção, reservas e fechar o dia ===================== */
 /* ---------- 1. Termos de uso e Política de privacidade ---------- */
-const TERMOS_V='T1-2026-11-11',TERMOS_DATA='11/11/2026',TERMOS_RESP='Rodaliq',TERMOS_MAIL='rodaliq.app@gmail.com';
+const TERMOS_V='T2-2026-11-12',TERMOS_DATA='12/11/2026',TERMOS_RESP='Rodaliq',TERMOS_MAIL='rodaliq.app@gmail.com';
 const TXT_TERMOS=`<h3>Termos de uso do Rodaliq</h3><p class="small muted">Versão de ${TERMOS_DATA}</p>
 <p><b>1. O que é o Rodaliq.</b> Um aplicativo de gestão para motoristas de aplicativo: registra ganhos (Uber, 99 e Carona Solidária), custos do veículo, multas e o Carnê-Leão, e mostra indicadores, alertas e relatórios.</p>
 <p><b>2. Quem pode usar.</b> Somente maiores de 18 anos (Código Civil, art. 5º), com acesso liberado por convite. A conta é pessoal: login e senha não devem ser compartilhados.</p>
@@ -1662,20 +1981,21 @@ const TXT_TERMOS=`<h3>Termos de uso do Rodaliq</h3><p class="small muted">Versã
 <p><b>4. Disponibilidade.</b> Seus dados ficam guardados em um banco de dados na nuvem: não se perdem se você trocar de celular ou se o app ficar fora do ar por um tempo. O app pode ter pausas rápidas para manutenção. O backup (⚙ Opções &gt; Exportar backup) é uma cópia extra, útil para guardar um retrato dos seus dados ou recuperar algo excluído por engano.</p>
 <p><b>5. Segurança dos dados.</b> O Rodaliq adota medidas técnicas para proteger seus dados contra acessos não autorizados, como conexão criptografada e acesso restrito a cada conta, conforme a LGPD (Lei nº 13.709/2018, art. 46).</p>
 <p><b>6. Propriedade.</b> A marca, o nome, a identidade visual e o código do Rodaliq pertencem ao seu responsável. Os dados que você lança são seus.</p>
-<p><b>7. Encerramento.</b> Você pode pedir a exclusão da conta e dos dados a qualquer momento pelo e-mail ${TERMOS_MAIL}.</p>
+<p><b>7. Encerramento.</b> Você pode pedir a exclusão da conta e dos dados a qualquer momento em ⚙ Opções &gt; Excluir minha conta. O acesso é desativado e, após ${EXC_DIAS} dias, os dados são apagados de vez (veja o item “Como excluir sua conta” da Política de privacidade). O pedido de exclusão só pode ser feito pelo app.</p>
 <p><b>8. Mudanças.</b> Estes termos podem ser atualizados. Quando isso acontecer, o app pedirá um novo aceite.</p>
 <p><b>9. Lei aplicável.</b> Legislação brasileira. Contato: ${TERMOS_MAIL}.</p>`;
 const TXT_PRIV=`<h3>Política de privacidade do Rodaliq</h3><p class="small muted">Versão de ${TERMOS_DATA} · em conformidade com a LGPD (Lei nº 13.709/2018)</p>
 <p><b>1. Controlador.</b> ${TERMOS_RESP}. Contato para assuntos de dados pessoais: ${TERMOS_MAIL}.</p>
 <p><b>2. Dados tratados.</b><br>• <b>Pedido de convite:</b> nome, e-mail, WhatsApp (com DDD), data de nascimento e como soube do app.<br>• <b>Conta:</b> e-mail e senha (a senha fica protegida pelo provedor de login e não é vista por ninguém).<br>• <b>Uso do app:</b> lançamentos de ganhos, caronas, repasses, custos, multas (inclusive pontos e condutor informado), Carnê-Leão, veículos, metas e despesas programadas.<br>• <b>Minha CNH:</b> somente validade, categoria, EAR e data da 1ª habilitação. Não guardamos número da CNH, CPF nem foto.<br>• <b>No aparelho:</b> tema escolhido e posição do botão Atalhos (ficam só no seu aparelho).</p>
-<p><b>3. Para que usamos.</b> Prestar o serviço (calcular indicadores, alertas, relatórios e o Carnê-Leão estimado), liberar o acesso, falar com você pelo WhatsApp sobre o acesso e enviar felicitações de aniversário (com a sua autorização), e manter a segurança. Não vendemos dados nem os usamos para publicidade.</p>
-<p><b>4. Bases legais.</b> Execução do serviço que você contratou (art. 7º, V), consentimento para contato por WhatsApp e felicitações (art. 7º, I) e legítimo interesse para segurança e prevenção de fraudes (art. 7º, IX).</p>
+<p><b>3. Para que usamos.</b> Prestar o serviço (calcular indicadores, alertas, relatórios e o Carnê-Leão estimado), liberar o acesso, falar com você por e-mail ou WhatsApp sobre o acesso e enviar felicitações de aniversário (com a sua autorização), e manter a segurança. Não vendemos dados nem os usamos para publicidade.</p>
+<p><b>4. Bases legais.</b> Execução do serviço que você contratou (art. 7º, V), consentimento para contato por e-mail e WhatsApp (art. 7º, I) e legítimo interesse para segurança e prevenção de fraudes (art. 7º, IX).</p>
 <p><b>5. Onde ficam e com quem são compartilhados.</b> Os dados ficam no Supabase (banco de dados e login, servidores em São Paulo). O site é publicado pelo GitHub Pages. Esses fornecedores só armazenam e processam os dados para o app funcionar. Não há outro compartilhamento, salvo obrigação legal.</p>
 <p><b>6. Segurança.</b> Conexão criptografada (HTTPS) e regras no banco que fazem cada usuário ver e alterar somente os próprios dados dentro de sua respectiva área logada.</p>
-<p><b>7. Por quanto tempo.</b> Enquanto a conta estiver ativa. Pedidos de convite ficam até serem excluídos (na lixeira, por até 15 dias). Após o pedido de exclusão da conta, os dados são apagados, salvo o que a lei obrigar a guardar.</p>
-<p><b>8. Seus direitos (art. 18).</b> Confirmar se tratamos seus dados, acessar, corrigir, pedir a exclusão, a portabilidade (o backup em ⚙ Opções &gt; Exportar já entrega seus dados) e revogar o consentimento. Peça pelo e-mail ${TERMOS_MAIL}.</p>
-<p><b>9. Menores de idade.</b> O app não é destinado a menores de 18 anos e não aceita pedidos deles (LGPD, art. 14).</p>
-<p><b>10. Mudanças.</b> Esta política pode ser atualizada; o app pedirá um novo aceite quando isso acontecer.</p>`;
+<p><b>7. Por quanto tempo.</b> Enquanto a conta estiver ativa. Após o pedido de exclusão da conta, os dados são apagados, salvo o que a lei obrigar a guardar.</p>
+<p><b>8. Como excluir sua conta.</b> Em ⚙ Opções &gt; Excluir minha conta, escolha o motivo e confirme. Até o acesso ser desativado, você pode desistir. Depois de desativada, a conta fica bloqueada e seus dados ficam guardados por ${EXC_DIAS} dias, para o caso de você mudar de ideia (é só escrever para ${TERMOS_MAIL}). Passado esse prazo, todos os seus dados são apagados de vez. Guardamos apenas um registro mínimo do pedido (e-mail, motivo, comentário e datas), para comprovar que ele foi atendido. Antes de pedir, exporte um backup em ⚙ Opções &gt; Exportar backup.</p>
+<p><b>9. Seus direitos (art. 18).</b> Confirmar se tratamos seus dados, acessar, corrigir, pedir a exclusão, a portabilidade (o backup em ⚙ Opções &gt; Exportar já entrega seus dados) e revogar o consentimento. A exclusão da conta é pedida pelo app, em ⚙ Opções &gt; Excluir minha conta (veja o item 8). Os demais pedidos, pelo e-mail ${TERMOS_MAIL}.</p>
+<p><b>10. Menores de idade.</b> O app não é destinado a menores de 18 anos e não aceita pedidos deles (LGPD, art. 14).</p>
+<p><b>11. Mudanças.</b> Esta política pode ser atualizada; o app pedirá um novo aceite quando isso acontecer.</p>`;
 function verTermos(aba){
   const ov=document.createElement('div');ov.className='ov';ov.style.zIndex='70';let at=aba||'termos';
   const draw=()=>{ov.innerHTML=`<div class="modal termos"><div class="chips" style="margin-bottom:10px"><button class="chip${at==='termos'?' on':''}" data-ta="termos">Termos de uso</button><button class="chip${at==='priv'?' on':''}" data-ta="priv">Privacidade</button></div>
@@ -1717,12 +2037,12 @@ const GUIA=[
    m:'Custos do veículo e comparação com o mês passado, resultado líquido, combustível, custo e lucro por km, alertas de manutenção.',acts:[['＋ Custos',()=>formCusto()]]},
  {t:'🚨 Multas',x:`Lance cada multa na aba <b>Multas</b>, com pontos e vencimento. Quando preencher a data de pagamento, ela entra sozinha nos custos do mês.`,
    m:'Pontos da CNH, alertas de vencimento e de limite de pontos, custos do mês (quando paga).',acts:[['＋ Multas',()=>formMulta()]]},
- {t:'🧮 Impostos (Carnê-Leão)',x:`Todo mês, lance o valor do <b>extrato da Uber/99</b> do mês anterior em <b>Impostos</b>. O app calcula o Carnê-Leão estimado, o DARF e avisa o vencimento.`,
+ {t:'🧮 Impostos (Carnê-Leão)',x:`Todo mês, lance o valor do <b>extrato da Uber/99</b> do mês anterior em <b>Impostos</b>. O app calcula o Carnê-Leão estimado, o DARF e avisa o vencimento.<br>⚠ Os valores são <b>estimativas</b>: confira no Carnê-Leão Web e, em caso de dúvida, consulte um <b>profissional de contabilidade</b>. As referências oficiais estão na aba Impostos.`,
    m:'DARF do mês, alerta de vencimento no sino e relatórios de impostos.',acts:[['🧾 Carnê-Leão do mês anterior',()=>formCarne(addMes(mesAtual(),-1))]]},
  {t:'📅 Despesas programadas',x:`IPVA, seguro e revisão chegam de uma vez. Programe a despesa com o valor e a data de pagamento: o app divide o valor pelos meses até lá e mostra quanto separar por mês. Para não gastar sem querer, deixe esse valor numa conta separada da do dia a dia.`,
    m:'Card Despesas programadas e lucro livre, no Painel.',acts:[['＋ Programar despesa',()=>formReserva()]]},
  {t:'🪪 Sua CNH (opcional)',cfg:'cnh'},
- {t:'📊 Para acompanhar',x:`• <b>Painel:</b> meta, ganhos, custos, resultado, previsão e despesas programadas (troque o mês e o veículo no topo).<br>• <b>🔔 Sino:</b> alertas (DARF, multas, CNH, manutenção) e novidades.<br>• <b>⚡ Atalhos:</b> todos os lançamentos num toque; arraste o botão para onde preferir.<br>• <b>Relatórios:</b> filtros e download em PDF, Word, Excel e CSV.<br>• <b>⚙ Opções:</b> veículos, metas, tema, backup e este guia.`}
+ {t:'📊 Para acompanhar',x:`• <b>Painel:</b> meta, ganhos, custos, resultado, previsão e despesas programadas (troque o mês e o veículo no topo).<br>• <b>🔔 Sino:</b> alertas (DARF, multas, CNH, manutenção e lembrete de backup) e novidades.<br>• <b>⚡ Atalhos:</b> todos os lançamentos num toque; arraste o botão para onde preferir.<br>• <b>Relatórios:</b> filtros e download em PDF, Word, Excel e CSV.<br>• <b>⚙ Opções:</b> veículos, metas, tema, backup e este guia. Exporte um backup pelo menos a cada 30 dias e guarde o arquivo fora do aparelho: o sino avisa quando passar disso. Se um dia quiser sair, use ⚙ Opções &gt; Excluir minha conta.<br>• <b>Esqueceu a senha?</b> Use “Esqueci minha senha”, na tela de entrada.`}
 ];
 function primeiroAcesso(auto){
   const c=cfg(),DS=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];let passo=0;
@@ -1730,7 +2050,7 @@ function primeiroAcesso(auto){
   const fim=()=>{c.onboardingOk=true;salvar('tb_config');ov.remove();render();if(auto)toast('Tudo pronto! Acompanhe os “Primeiros passos” no Painel.')};
   const draw=()=>{const g=GUIA[passo],v=c.veiculos.find(x=>x.nome===c.veiculoPadrao)||c.veiculos[0]||{nome:'',desc:''},cnh=c.cnh||{},ult=passo===GUIA.length-1;
     let corpo='';
-    if(g.cfg==='veic')corpo=`<p class="small muted">Usado nos lançamentos, nos custos e no custo-benefício. Você pode cadastrar outros em ⚙ Opções &gt; Veículos.</p>
+    if(g.cfg==='veic')corpo=`<p class="small muted">Cadastre seu veículo para separar custos e ganhos por carro. Você pode pular e cadastrar depois em ⚙ Opções &gt; Veículos (ele é pedido no primeiro lançamento).</p>
       <div class="field"><label>Nome curto</label><input class="inp" id="obN" maxlength="20" value="${esc(v.nome)}" placeholder="Ex.: Onix"></div>
       <div class="field"><label>Descrição</label><input class="inp" id="obD" maxlength="60" value="${esc(v.desc||'')}" placeholder="Ex.: Chevrolet Onix 1.0 2022"></div>`;
     else if(g.cfg==='meta')corpo=`<p class="small muted">Quanto quer ganhar por dia (Uber + 99 + Carona) e em quais dias. É a base da meta do Painel e da previsão do mês.</p>
@@ -1832,6 +2152,7 @@ function escolhaDup(msg){return new Promise(res=>{const d=document.createElement
   d.innerHTML=`<div class="modal" style="max-width:420px"><h2>Já existe lançamento</h2><p>${msg}</p><div class="mfoot"><button class="btn sec" data-e="cancelar">Cancelar</button><button class="btn sec" data-e="substituir">Substituir</button><button class="btn" data-e="somar">Somar</button></div></div>`;
   document.body.appendChild(d);d.__fechar=()=>{d.remove();res('cancelar')};d.addEventListener('click',e=>{e.stopPropagation();const v=e.target.dataset.e;if(v){d.remove();res(v)}})})}
 function fecharDia(){
+  if(semVeiculo())return;
   const ult=S.tb_corridas.slice().sort((a,b)=>(b.data||'').localeCompare(a.data||''))[0],vei=ult&&VEICS().includes(ult.veiculo)?ult.veiculo:cfg().veiculoPadrao;
   const P=[['u','Uber'],['n','99']],campos=[{k:'data',l:'Data',t:'date',req:1},{k:'veiculo',l:'Veículo',t:'select',op:VEICS()}];
   P.forEach(([k,n])=>campos.push({k:k+'V',l:`${n} · Ganho do dia (R$)`,t:'money'},{k:k+'Q',l:`${n} · Qtd. viagens`,t:'int'},{k:k+'M',l:`${n} · Tempo online (hh:mm)`,t:'time'},{k:k+'K',l:`${n} · Km rodados (opcional)`,t:'num',help:AJUDA_KM}));
@@ -1874,7 +2195,7 @@ function nomeArq(){const d=new Date();return pad(d.getDate())+pad(d.getMonth()+1
 async function exportar(){
   const data=JSON.stringify(Object.assign({app:'RODALIQ',versaoDados:1,versaoApp:VERSAO,exportadoEm:new Date().toISOString()},Object.fromEntries(TBS.map(t=>[t,S[t]]))),null,1);
   const fn=nomeArq();
-  if(DL){try{await DL.save({filename:fn,data});audit('Exportação','Backup','Arquivo '+fn+' · '+contagem(S));toast('Backup exportado');return}catch(e){if(e&&e.code==='declined')return}}
+  if(DL){try{await DL.save({filename:fn,data});audit('Exportação','Backup','Arquivo '+fn+' · '+contagem(S));cfg().backupEm=new Date().toISOString();salvar('tb_config');atualizaSino();toast('Backup exportado');return}catch(e){if(e&&e.code==='declined')return}}
   try{await navigator.clipboard.writeText(data);audit('Exportação','Backup','Copiado para a área de transferência · '+contagem(S));toast('Download indisponível: backup copiado para a área de transferência')}catch(e){toast('Não foi possível exportar aqui.')}
 }
 $('#impFile').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;
@@ -1882,13 +2203,16 @@ $('#impFile').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(
   if(!['RODALIQ','MDD','MUDD'].includes(o.app)){toast('Este arquivo não é um backup do Rodaliq.');return}
   const cont=t=>Array.isArray(o[t])?o[t].length:0;
   if(!await confirma(`Importar <b>${esc(f.name)}</b> vai <b>substituir</b> todos os dados atuais pelos do arquivo:<br><span class="small">${cont('tb_corridas')} dias · ${cont('tb_repasses')} repasses · ${cont('tb_carona')} caronas · ${cont('tb_custos')} custos · ${cont('tb_multas')} multas · ${Object.keys(o.tb_carne||{}).length} meses de carnê-leão</span>`,'Substituir dados'))return;
-  const antes=contagem(S);
+  const antes=contagem(S),bkEm=cfg().backupEm;
   TBS.forEach(t=>{if(t==='tb_carne')S[t]=o[t]||{};else if(t==='tb_config')S[t]=Object.assign(JSON.parse(JSON.stringify(CFG_PADRAO)),o[t]||{});else S[t]=Array.isArray(o[t])?o[t]:[]});
+  migraVeiculos(o.tb_config);
+  if(bkEm&&!(cfg().backupEm>bkEm))cfg().backupEm=bkEm; // o backup importado não apaga a data do último backup
   for(const t of TBS)await salvar(t);audit('Importação','Backup','Arquivo '+f.name+' (dados substituídos)',{antes,depois:contagem(S)});UI.open={};render();toast('Backup importado');
 };
 
 /* ---------- render e eventos ---------- */
 function render(){
+  if(UI.tab==='admin')UI.tab='painel';
   const v={painel:vPainel,corridas:vCorridas,carona:vCarona,custos:vCustos,multas:vMultas,impostos:vImpostos,relatorios:vRelatorios}[UI.tab];
   navRegistraAba();
   $('#view').innerHTML=v();
@@ -1897,7 +2221,7 @@ function render(){
   ['simV','simD','simN'].forEach(i=>{const el=document.getElementById(i);if(el)el.oninput=simular});simular();
   atualizaSino();if(!$('#bellMenu').classList.contains('hidden'))renderSino();
 }
-$('#tabs').onclick=e=>{const b=e.target.closest('.tab');if(!b)return;UI.tab=b.dataset.t;try{history.replaceState(history.state,'','#'+UI.tab)}catch(er){}render();window.scrollTo(0,0)};
+$('#tabs').onclick=e=>{const b=e.target.closest('.tab');if(!b)return;if(b.id==='tabAdmin'){abrirAdmin();return}UI.tab=b.dataset.t;try{history.replaceState(history.state,'','#'+UI.tab)}catch(er){}render();window.scrollTo(0,0)};
 $('#view').addEventListener('click',e=>{
   if(e.target.closest('[data-acao=reservas]')){verReservas();return}
   const pa=e.target.closest('[data-acao]');if(pa){const a=pa.dataset.acao;
@@ -1928,13 +2252,13 @@ let fabDrag=null,fabArrastou=false;
     try{localStorage.setItem(FABK,JSON.stringify(p))}catch(er){}aplicaFab(p)};
   window.addEventListener('pointerup',solta);window.addEventListener('pointercancel',solta)})();
 $('#fab').onclick=e=>{e.stopPropagation();if(fabArrastou){fabArrastou=false;return}fab()};
-$('#fabMenu').onclick=e=>{const b=e.target.closest('[data-fab]');if(!b)return;$('#fabMenu').classList.add('hidden');if(b.dataset.fab==='tema'){formTema();return}if(b.dataset.fab==='dia'){fecharDia();return}if(b.dataset.fab==='sair'){sair();return}if(b.dataset.fab==='inv'){openInvitesModal();return}NOVO[b.dataset.fab]()};
+$('#fabMenu').onclick=e=>{const b=e.target.closest('[data-fab]');if(!b)return;$('#fabMenu').classList.add('hidden');if(b.dataset.fab==='tema'){formTema();return}if(b.dataset.fab==='dia'){fecharDia();return}if(b.dataset.fab==='sair'){sair();return}if(b.dataset.fab==='admin'){abrirAdmin('convites');return}NOVO[b.dataset.fab]()};
 document.addEventListener('click',e=>{if(!e.target.closest('#fabWrap'))$('#fabMenu').classList.add('hidden')});
 $('#optBtn').onclick=e=>{e.stopPropagation();$('#bellMenu').classList.add('hidden');const m=$('#optMenu');m.classList.toggle('hidden');if(!m.classList.contains('hidden'))posMenu(m,$('#optBtn'))};
 window.addEventListener('scroll',()=>{['bellMenu','optMenu'].forEach(id=>{const m=document.getElementById(id);if(m&&!m.classList.contains('hidden')&&window.innerWidth<=640)posMenu(m,document.getElementById(id==='bellMenu'?'bellBtn':'optBtn'))})},{passive:true});
 document.addEventListener('click',e=>{if(!e.target.closest('#optWrap'))$('#optMenu').classList.add('hidden');if(!e.target.closest('#bellWrap'))$('#bellMenu').classList.add('hidden')});
 $('#optMenu').onclick=e=>{const b=e.target.closest('[data-m]');if(!b)return;$('#optMenu').classList.add('hidden');
-  ({cfg:formCfg,veic:formVeic,cnh:formCnh,tema:formTema,inv:openInvitesModal,rsv:verReservas,onb:()=>primeiroAcesso(false),termos:()=>verTermos(),aud:verAuditoria,pass:formSenha,exp:exportar,imp:()=>$('#impFile').click(),out:sair})[b.dataset.m]()};
+  ({excluir:formExcluirConta,cfg:formCfg,veic:formVeic,cnh:formCnh,tema:formTema,rsv:verReservas,onb:()=>primeiroAcesso(false),termos:()=>verTermos(),aud:verAuditoria,pass:formSenha,exp:exportar,imp:()=>$('#impFile').click(),out:sair})[b.dataset.m]()};
 (()=>{const h=(location.hash||'').slice(1);if(['painel','corridas','carona','custos','multas','impostos','relatorios'].includes(h))UI.tab=h})();
 iniciar();
 if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
