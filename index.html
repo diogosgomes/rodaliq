@@ -461,7 +461,7 @@ svg text{font-family:Inter,system-ui,sans-serif}
 
 <script>
 "use strict";
-const VERSAO='V66';
+const VERSAO='V67';
 /* ---------- utilidades ---------- */
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -2515,7 +2515,7 @@ window.addEventListener('popstate',async()=>{
 
 /* ===================== V36: termos, primeiro acesso, por km, projeção, reservas e fechar o dia ===================== */
 /* ---------- 1. Termos de uso e Política de privacidade ---------- */
-const TERMOS_V='T3-2026-11-13',TERMOS_DATA='13/11/2026',TERMOS_RESP='Rodaliq',TERMOS_MAIL='rodaliq.app@gmail.com';
+const TERMOS_V='T4-2026-11-13',TERMOS_DATA='13/11/2026',TERMOS_RESP='Diogo Gomes',TERMOS_MAIL='rodaliq.app@gmail.com';
 const TXT_TERMOS=`<h3>Termos de uso do Rodaliq</h3><p class="small muted">Versão de ${TERMOS_DATA}</p>
 <p><b>1. O que é o Rodaliq.</b> Um aplicativo de gestão para motoristas de aplicativo: registra ganhos (Uber, 99 e Carona Solidária), custos do veículo, multas e o Carnê-Leão, e mostra indicadores, alertas e relatórios. Ele nasceu de uma necessidade do próprio criador, que controlava essas mesmas informações à mão, espalhadas por mais de uma planilha. Ao perceber que outros motoristas provavelmente passavam pela mesma dificuldade, decidiu transformar esse controle em um aplicativo e compartilhá-lo.</p>
 <p><b>2. Quem pode usar.</b> Somente maiores de 18 anos (Código Civil, art. 5º), com acesso liberado por convite. A conta é pessoal: login e senha não devem ser compartilhados.</p>
@@ -2529,7 +2529,7 @@ const TXT_TERMOS=`<h3>Termos de uso do Rodaliq</h3><p class="small muted">Versã
 <p><b>10. Mudanças.</b> Estes termos podem ser atualizados. Quando isso acontecer, o app pedirá um novo aceite.</p>
 <p><b>11. Lei aplicável.</b> Legislação brasileira. Contato: ${TERMOS_MAIL}.</p>`;
 const TXT_PRIV=`<h3>Política de privacidade do Rodaliq</h3><p class="small muted">Versão de ${TERMOS_DATA} · em conformidade com a LGPD (Lei nº 13.709/2018)</p>
-<p><b>1. Controlador.</b> ${TERMOS_RESP}. Contato para assuntos de dados pessoais: ${TERMOS_MAIL}.</p>
+<p><b>1. Controlador.</b> ${TERMOS_RESP}, pessoa física, responsável pelo Rodaliq. Ele também é o encarregado pelo tratamento de dados pessoais (LGPD, art. 41). Contato: ${TERMOS_MAIL}.</p>
 <p><b>2. Dados tratados.</b><br>• <b>Pedido de convite:</b> nome, e-mail, WhatsApp (com DDD), data de nascimento e como soube do app.<br>• <b>Conta:</b> e-mail e senha (a senha fica protegida pelo provedor de login e não é vista por ninguém).<br>• <b>Uso do app:</b> lançamentos de ganhos, caronas, repasses, custos, multas (inclusive pontos e condutor informado), Carnê-Leão, veículos, metas e despesas programadas.<br>• <b>Minha CNH:</b> somente validade, categoria, EAR e data da 1ª habilitação. Não guardamos número da CNH, CPF nem foto.<br>• <b>Contribuição voluntária:</b> valor, data do aviso, forma, situação (aguardando conferência, confirmada ou não localizada) e número do comprovante. Não recebemos nem guardamos dados de pagamento.<br>• <b>No aparelho:</b> tema escolhido e posição do botão Atalhos (ficam só no seu aparelho).</p>
 <p><b>3. Para que usamos.</b> Prestar o serviço (calcular indicadores, alertas, relatórios e o Carnê-Leão estimado), liberar o acesso, falar com você por e-mail ou WhatsApp sobre o acesso e enviar felicitações de aniversário (com a sua autorização), registrar e dar comprovante das contribuições voluntárias, e manter a segurança. Não vendemos dados nem os usamos para publicidade.</p>
 <p><b>4. Bases legais.</b> Execução do serviço que você contratou (art. 7º, V), consentimento para contato por e-mail e WhatsApp e para o registro da contribuição voluntária, que parte de você (art. 7º, I), e legítimo interesse para segurança e prevenção de fraudes (art. 7º, IX).</p>
