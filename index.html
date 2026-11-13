@@ -165,6 +165,15 @@ h3{font-size:13px;margin:0 0 8px;color:var(--muted);text-transform:uppercase;let
 .apoV,.apoT{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0 4px}
 .apoV .chip{flex:1 1 0;min-width:84px;text-align:center;padding:8px 10px;line-height:1.2}
 .apoPix{display:flex;gap:6px;align-items:center}
+.apoHist{margin-top:16px;border-top:1px solid var(--line);padding-top:12px}
+.apoHd{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:14px;font-weight:700;color:var(--ink)}
+.apoSub{font-size:12px;color:var(--muted);margin-top:2px}
+.apoMes{width:100%;display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:8px;background:#f6f8fb;border:1px solid var(--line);border-radius:9px;padding:8px 11px;font-size:13px;color:var(--ink);cursor:pointer}
+.apoMes.on{background:var(--blueSoft);border-color:var(--blue)}
+html[data-tema=escuro] .apoMes{background:rgba(255,255,255,.05)}
+.apoLin{display:flex;justify-content:space-between;gap:8px;padding:7px 11px;font-size:13px;color:var(--ink);border-bottom:1px solid var(--line)}
+.apoLin:last-child{border-bottom:0}
+.apoLin.pend span,.apoLin.pend b{color:var(--muted);font-weight:500}
 .apoPix code{flex:1;background:#f6f8fb;border:1px solid var(--line);border-radius:9px;padding:9px 11px;font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 html[data-tema=escuro] .apoPix code{background:rgba(255,255,255,.05)}
 .menu button{display:block;width:100%;text-align:left;border:0;background:none;padding:9px 10px;border-radius:8px;cursor:pointer}
@@ -421,7 +430,7 @@ svg text{font-family:Inter,system-ui,sans-serif}
 
 <script>
 "use strict";
-const VERSAO='V57';
+const VERSAO='V61';
 /* ---------- utilidades ---------- */
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -646,7 +655,7 @@ function renderSino(){
   const item=n=>{const lida=r.lidas.includes(n.id),imp=impValida(n);return `<div class="it${imp?' imp':''}${lida?'':' nova'}">${imp?'<div class="tagImp">⚠ IMPORTANTE</div>':''}<div class="ttl">${lida?'':'● '}${esc(n.titulo)}</div>${corpo(n)}<div class="acts"><button data-nl="${esc(n.id)}">${lida?'Marcar como não lida':'Marcar como lida'}</button><button data-nx="${esc(n.id)}">🗑 Excluir</button></div></div>`};
   const nl=naoLidas().length;
   let h=`<div class="hd"><button class="chip${tab==='alertas'?' on':''}" data-bt="alertas">Alertas (${al.filter(a=>!a.lida).length})</button><button class="chip${tab==='novidades'?' on':''}" data-bt="novidades">Novidades (${nl})</button></div>`;
-  if(tab==='alertas')h+=al.length?al.map((a,i)=>`<div class="it al${a.lida?' lida':''}${a.crit?' crit':''}${a.inv?' inv':''}" data-ai="${i}"><span class="tag ${a.n}">${a.n==='r'?'✕':'⚠'}</span><div><div>${esc(a.t)}</div>${a.nota?`<div class="nota">${esc(a.nota)}</div>`:''}${a.cnh?`<div class="acts"><button data-cl="${esc(a.cnh)}">${a.lida?'Marcar como não lida':'Marcar como lida'}</button></div>`:''}${a.bd?`<div class="acts"><a class="lnk" href="${esc(a.em)}" target="_blank" rel="noopener">✉ Parabenizar por e-mail</a><a class="lnk" href="${esc(a.wa)}" target="_blank" rel="noopener">💬 Parabenizar pelo WhatsApp</a><button data-bl="${esc(a.bd)}">Marcar como lido</button></div>`:''}${a.bk?`<div class="acts"><button class="bkBtn" data-bk="1">📥 Exportar backup</button></div>`:''}${a.apo?`<div class="acts"><button data-ap="1">💚 Quero contribuir</button><button data-apn="1">Agora não</button><button data-apx="1">Não mostrar de novo</button></div>`:''}${a.sup?`<div class="acts"><button data-sl="${esc(a.sup)}">${a.lida?'Marcar como não lida':'Marcar como lida'}</button></div>`:''}</div></div>`).join(''):'<div class="empty">Nenhum alerta agora. ✓</div>';
+  if(tab==='alertas')h+=al.length?al.map((a,i)=>`<div class="it al${a.lida?' lida':''}${a.crit?' crit':''}${a.inv?' inv':''}" data-ai="${i}"><span class="tag ${a.n}">${a.n==='r'?'✕':'⚠'}</span><div><div>${esc(a.t)}</div>${a.nota?`<div class="nota">${esc(a.nota)}</div>`:''}${a.cnh?`<div class="acts"><button data-cl="${esc(a.cnh)}">${a.lida?'Marcar como não lida':'Marcar como lida'}</button></div>`:''}${a.bd?`<div class="acts"><a class="lnk" href="${esc(a.em)}" target="_blank" rel="noopener">✉ Parabenizar por e-mail</a><a class="lnk" href="${esc(a.wa)}" target="_blank" rel="noopener">💬 Parabenizar pelo WhatsApp</a><button data-bl="${esc(a.bd)}">Marcar como lido</button></div>`:''}${a.bk?`<div class="acts"><button class="bkBtn" data-bk="1">📥 Exportar backup</button></div>`:''}${a.apoC?`<div class="acts"><button data-apc="1">Para conferir</button></div>`:''}${a.apo?`<div class="acts"><button data-ap="1">💚 Quero contribuir</button><button data-apn="1">Agora não</button><button data-apx="1">Não mostrar de novo</button></div>`:''}${a.sup?`<div class="acts"><button data-sl="${esc(a.sup)}">${a.lida?'Marcar como não lida':'Marcar como lida'}</button></div>`:''}</div></div>`).join(''):'<div class="empty">Nenhum alerta agora. ✓</div>';
   else if(UI.bellExc){h+=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><b class="small">🗑 Excluídas (últimos ${DIAS_EXCL} dias)</b><span style="display:flex;gap:12px">${excl.length?'<button class="lnk ivDelTxt" data-besv="1">🗑 Esvaziar</button>':''}<button class="lnk" data-bexc="0">Voltar</button></span></div><div class="small muted" style="margin:-2px 0 8px">As novidades ficam aqui por 30 dias. <b>Esvaziar</b> apaga de vez.</div>`+(excl.length?excl.map(n=>`<div class="it"><div class="ttl">${esc(n.titulo)}</div>${corpo(n)}<div class="acts"><button data-nr="${esc(n.id)}">↩ Restaurar</button></div></div>`).join(''):'<div class="empty">Nenhuma novidade excluída nos últimos 30 dias.</div>')}
   else{h+=nl?`<div style="text-align:right;margin-bottom:4px"><button class="lnk" data-nall="1">Marcar todas como lidas (${nl})</button></div>`:'';
     h+=`<div class="novInfo"><button class="lnk" data-binfo="1">ℹ Como funcionam as novidades ${UI.bellInfo?'▴':'▾'}</button>${UI.bellInfo?`<ul>
@@ -672,6 +681,7 @@ $('#bellMenu').addEventListener('click',e=>{e.stopPropagation();const t=e.target
   else if(t.dataset.nall){naoLidas().forEach(n=>{if(!r.lidas.includes(n.id))r.lidas.push(n.id)});salvarReads()}
   else if(t.dataset.bl){const lim=isoOf(new Date(Date.now()-400*864e5));r.bdayLidas=[...(r.bdayLidas||[]).filter(k=>k.split('|')[1]>=lim),t.dataset.bl];salvarReads();toast('Alerta de aniversário marcado como lido')}
   else if(t.closest('[data-bk]')){exportar().then(()=>{renderSino();atualizaSino()});return}
+  else if(t.closest('[data-apc]')){$('#bellMenu').classList.add('hidden');abrirAdmin('apoios');return}
   else if(t.closest('[data-ap]')){$('#bellMenu').classList.add('hidden');formApoiar();return}
   else if(t.closest('[data-apn]')){NOT.reads.apoio=Object.assign({},NOT.reads.apoio,{em:new Date().toISOString()});salvarReads();renderSino();atualizaSino();return}
   else if(t.closest('[data-apx]')){NOT.reads.apoio=Object.assign({},NOT.reads.apoio,{nunca:true});salvarReads();renderSino();atualizaSino();toast('Não falo mais nisso.');return}
@@ -1571,7 +1581,7 @@ function formExcluirConta(){
     catch(e){q('#exC').disabled=false;err(/duplicate|23505/i.test((e&&(e.code+e.message))||'')?'Você já tem um pedido de exclusão em andamento.':'Não foi possível enviar agora. Tente de novo em instantes.')}}}
 // ---- Admin > Pedidos de exclusão ----
 let EXC_CACHE=[],EXC_AT=0;
-async function excAdminCache(force){if(!invIsAdmin){EXC_CACHE=[];SEN_CACHE=[];APO_CACHE=[];return}if(!force&&Date.now()-EXC_AT<15000)return;try{EXC_CACHE=await excListar();EXC_AT=Date.now()}catch(e){}try{SEN_CACHE=await senListar()}catch(e){}try{APO_CACHE=await apoListar()}catch(e){}}
+async function excAdminCache(force){if(!invIsAdmin){EXC_CACHE=[];SEN_CACHE=[];APO_CACHE=[];return}if(!force&&Date.now()-EXC_AT<15000)return;try{EXC_CACHE=await excListar();EXC_AT=Date.now()}catch(e){}try{SEN_CACHE=await senListar()}catch(e){}try{APO_CACHE=await apoListar()}catch(e){}await carregaPerfis()}
 const excDiasDesde=iso=>iso?Math.floor((Date.now()-new Date(iso).getTime())/864e5):0;
 function excAlerts(){if(!invIsAdmin)return [];const out=[],nv=EXC_CACHE.filter(x=>x.status==='novo');
   if(nv.length)out.push({n:'r',inv:1,tab:'exc',t:`${nv.length} ${nv.length===1?'pedido de exclusão aguardando':'pedidos de exclusão aguardando'}`,nota:nv.slice(0,5).map(x=>x.email).join(' · ')+'. Responda em até 15 dias (prazo da LGPD para pedidos do titular).'});
@@ -1732,6 +1742,19 @@ const apoBRL=v=>brl(v); // mesmo formato do resto do app: R$ 13.829,33
 async function apoListar(){
   if(!invProd())return (await DB.collection('apoios').get()).docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>String(b.criado_em).localeCompare(String(a.criado_em)));
   const {data,error}=await DB.from('tb_apoios').select('*').order('criado_em',{ascending:false}).limit(1000);if(error)throw error;return data||[]}
+let PERFIS={},EMAILS={};
+async function carregaPerfis(f){ // admin lê o nome em public.profiles e o e-mail em tb_usuarios
+  if(!invIsAdmin||!invProd())return;
+  if(!f&&Object.keys(PERFIS).length&&Object.keys(EMAILS).length)return;
+  try{const {data}=await DB.from('profiles').select('id,display_name');
+    (data||[]).forEach(r=>{if(r.display_name)PERFIS[r.id]=String(r.display_name).trim()})}catch(e){}
+  try{(await admUsuarios()).forEach(u=>{if(u.email)EMAILS[u.user_id]=u.email})}catch(e){}}
+function apoEmail(x){return (x.user_id&&EMAILS[x.user_id])||x.email||''}
+function apoNome(x){
+  if(x.user_id&&PERFIS[x.user_id])return PERFIS[x.user_id]; // 1º: public.profiles
+  const em=String(apoEmail(x)).toLowerCase();
+  const c=invCache.find(v=>String(v.email||'').toLowerCase()===em); // 2º: pedido de convite
+  return (c&&String(c.name||'').trim())||apoEmail(x)||'';}
 async function apoMeus(){
   if(!invProd())return (await DB.collection('apoios').get()).docs.map(d=>({id:d.id,...d.data()})).filter(x=>x.user_id===UID);
   const {data,error}=await DB.from('tb_apoios').select('id,valor,status,criado_em').eq('user_id',UID);if(error)throw error;return data||[]}
@@ -1744,36 +1767,64 @@ async function apoConfirmar(x,meio){
     await DB.doc('apoios/'+x.id).update({status:'confirmado',confirmado_em:new Date().toISOString(),meio,recibo:n});return n}
   const {data,error}=await DB.rpc('rodaliq_confirmar_apoio',{p_id:x.id,p_meio:meio});if(error)throw error;return data}
 async function apoDesfazer(x){
-  if(!invProd()){await DB.doc('apoios/'+x.id).update({status:'informado',confirmado_em:null,meio:null,recibo:null});return}
-  const {error}=await DB.from('tb_apoios').update({status:'informado',confirmado_em:null,meio:null,recibo:null}).eq('id',x.id);if(error)throw error}
-function apoAlerts(){if(!invIsAdmin)return [];const nv=APO_CACHE.filter(x=>x.status==='informado');
-  return nv.length?[{n:'a',inv:1,tab:'apo',t:`${nv.length} ${nv.length===1?'contribuição informada para conferir':'contribuições informadas para conferir'}`,nota:nv.slice(0,5).map(x=>x.email).join(' · ')}]:[]}
-function apoTexto(x,nome){const d=fmtBR(String(x.confirmado_em||x.criado_em).slice(0,10));
-  return `Olá${nome?', '+nome:''}! Recebemos a sua contribuição de ${apoBRL(x.valor)} ao Rodaliq em ${d}.${x.recibo?'\nRecibo nº '+String(x.recibo).padStart(3,'0'):''}\n\nO app continua gratuito para todo mundo. A sua ajuda cobre o domínio, o servidor e as melhorias de cada mês. Muito obrigado por fortalecer o projeto.\n\nEquipe Rodaliq`}
+  if(!invProd()){await DB.doc('apoios/'+x.id).update({status:'informado',confirmado_em:null,meio:null,recibo:null,descartado_em:null});return}
+  const {error}=await DB.from('tb_apoios').update({status:'informado',confirmado_em:null,meio:null,recibo:null,descartado_em:null}).eq('id',x.id);if(error)throw error}
+async function apoDescartar(x){ // não apaga: sai da fila e pode voltar
+  if(!invProd()){await DB.doc('apoios/'+x.id).update({status:'descartado',descartado_em:new Date().toISOString()});return}
+  const {error}=await DB.from('tb_apoios').update({status:'descartado',descartado_em:new Date().toISOString()}).eq('id',x.id);if(error)throw error}
+// lista das contribuições de quem está logado, agrupada por mês
+async function apoHistHtml(){
+  let L=[];try{L=await apoMeus()}catch(e){return ''}
+  if(!L.length)return '';
+  L.sort((a,b)=>String(b.criado_em).localeCompare(String(a.criado_em)));
+  const cf=L.filter(x=>x.status==='confirmado'),pd=L.filter(x=>x.status==='informado'),dc=L.filter(x=>x.status==='descartado');
+  const sub=[cf.length?cf.length+(cf.length===1?' confirmada':' confirmadas'):'',
+    pd.length?pd.length+' aguardando conferência':'',
+    dc.length?dc.length+(dc.length===1?' não localizada':' não localizadas'):''].filter(Boolean).join(' · ');
+  const meses=[...new Set(L.map(x=>String(x.criado_em).slice(0,7)))].sort().reverse();
+  return `<div class="apoHist"><div class="apoHd"><span>💚 Contribuições ao Rodaliq</span><b>${brl(sum(cf,x=>x.valor))}</b></div>
+    <div class="apoSub">${esc(sub)}</div>
+    ${meses.map((m,i)=>{const it=L.filter(x=>String(x.criado_em).slice(0,7)===m),ab=i===0;
+      return `<button type="button" class="apoMes${ab?' on':''}" data-am="${m}"><span>${ab?'▾':'▸'} ${m.slice(5)}/${m.slice(0,4)}</span><b>${brl(sum(it.filter(x=>x.status==='confirmado'),x=>x.valor))}</b></button>
+        <div class="apoMesL${ab?'':' hidden'}" data-aml="${m}">${it.map(x=>{
+          const et=x.status==='confirmado'?'':(x.status==='descartado'?' · não localizada':' · aguardando conferência');
+          return `<div class="apoLin${x.status==='confirmado'?'':' pend'}"><span>${fmtBR(String(x.criado_em).slice(0,10))}${et}</span><b>${brl(x.valor)}</b></div>`}).join('')}</div>`}).join('')}
+  </div>`}
+function apoAlerts(){if(!invIsAdmin)return [];
+  return APO_CACHE.filter(x=>x.status==='informado').map(x=>({n:'a',inv:1,tab:'apo',apoC:1,
+    t:`${apoNome(x)} sinalizou uma contribuição de ${brl(x.valor)}`,
+    nota:'Informada em '+admData(x.criado_em)}))}
+function apoTexto(x,nome){
+  return `Olá${nome?', '+nome:''}!\nEsperamos que você esteja bem!\n\nRecebemos a sua contribuição voluntária e agradecemos muito pelo apoio e confiança no projeto Rodaliq.\n\nRatificamos que o app continua gratuito para todo mundo, independente da possibilidade de contribuição voluntária ou não! A sua ajuda contribui para amenizar alguns custos para mantermos o App no ar, como domínio, servidores e as melhorias.\n\nAbraços,\nEquipe Rodaliq`}
 // tela do usuário: ⚙ Opções > 💚 Apoie o Rodaliq
 function formApoiar(){
   const VL=AJU.valores,SG=VL.includes(AJU.sugerido)?AJU.sugerido:VL[Math.min(1,VL.length-1)];
   const ov=document.createElement('div');ov.className='ov';let sel=SG;
   ov.innerHTML=`<div class="modal" style="max-width:440px"><h2>💚 Ajude a manter o Rodaliq</h2>
-    <p class="small">O Rodaliq é gratuito e vai continuar. Se ele te ajuda, você pode contribuir com o que achar justo: a ajuda cobre o domínio, o servidor e as melhorias de cada mês. Nada no app depende disso.</p>
+    <p class="small">O Rodaliq é gratuito e vai continuar sendo. <b><i>Se ele te ajuda</i></b>, você pode contribuir com o que achar justo: a ajuda contribui para amenizar alguns custos como domínio, servidores e as melhorias. Seu acesso ao Rodaliq não está condicionado a sua colaboração!</p>
     <div class="apoV">${VL.map(v=>`<button type="button" class="chip${v===SG?' on':''}" data-av="${v}">${apoBRL(v)}${v===SG?'<br><span class="small">sugerido</span>':''}</button>`).join('')}
       <button type="button" class="chip" data-av="outro">Outro valor</button></div>
     <div class="field hidden" id="apoOutroW"><label for="apoOutro">Quanto você quer contribuir?</label><input class="inp num" id="apoOutro" inputmode="decimal" placeholder="Ex.: 15,00" autocomplete="off"></div>
     <div class="field"><label>Chave Pix</label><div class="apoPix"><code id="apoPix">${esc(AJU.pix)}</code><button type="button" class="btn sec sm" id="apoCop">Copiar</button></div></div>
-    <p class="small muted" style="margin:6px 0 0">Faça o Pix pelo seu banco e depois avise aqui. Nenhum dado de pagamento passa pelo app.</p>
+    <p class="small muted" style="margin:6px 0 0">Faça o Pix pelo seu banco e depois avise aqui. Nenhum dado de pagamento passa pelo App Rodaliq.</p>
     <div class="err" id="apoErr"></div>
     <div class="mfoot"><button class="btn sec" id="apoN">Fechar</button><button class="btn" id="apoS">Já contribuí</button></div></div>`;
   document.body.appendChild(ov);const q=s=>ov.querySelector(s),err=t=>{q('#apoErr').textContent=t};
   q('#apoN').onclick=()=>ov.remove();
   ov.querySelectorAll('[data-av]').forEach(b=>b.onclick=()=>{ov.querySelectorAll('[data-av]').forEach(o=>o.classList.remove('on'));b.classList.add('on');err('');
     const o=b.dataset.av==='outro';q('#apoOutroW').classList.toggle('hidden',!o);sel=o?null:+b.dataset.av;if(o)setTimeout(()=>q('#apoOutro').focus(),50)});
+  apoHistHtml().then(h=>{if(!h||!ov.isConnected)return;
+    const f=ov.querySelector('.mfoot');f.insertAdjacentHTML('afterend',h);
+    ov.querySelectorAll('[data-am]').forEach(b=>b.onclick=()=>{const l=ov.querySelector(`[data-aml="${b.dataset.am}"]`);
+      const ab=l.classList.toggle('hidden');b.classList.toggle('on',!ab);
+      b.querySelector('span').textContent=(ab?'▸ ':'▾ ')+b.dataset.am.slice(5)+'/'+b.dataset.am.slice(0,4)})});
   q('#apoOutro').addEventListener('blur',()=>{const e=q('#apoOutro'),v=r2(parseBRL(e.value));if(v>0)e.value=brl(v,1)});
   q('#apoCop').onclick=async()=>{try{await navigator.clipboard.writeText(AJU.pix);toast('Chave Pix copiada')}catch(e){toast('Não foi possível copiar')}};
   q('#apoS').onclick=async()=>{let v=sel;if(v==null)v=parseBRL(q('#apoOutro').value);
     if(!v||v<=0)return err('Escolha um valor ou digite quanto você contribuiu.');
     q('#apoS').disabled=true;
     try{await apoCriar(r2(v),'avulso');APO_MEU=true;audit('Apoio','Configurações','Contribuição informada · '+apoBRL(v));ov.remove();atualizaSino();
-      confirma('Obrigado! Avisei o administrador. Assim que ele conferir o Pix, você recebe o recibo por e-mail ou WhatsApp.','Fechar',{titulo:'💚 Contribuição registrada',voltar:null})}
+      confirma('Agradecemos pela sua contribuição e confiança no projeto! Sua ajuda voluntária faz toda a diferença para manter o Rodaliq no ar, contribuindo para amenizar alguns custos estruturais e viabilizando novas evoluções.','Fechar',{titulo:'💚 Contribuição registrada',voltar:null})}
     catch(e){q('#apoS').disabled=false;err('Não foi possível registrar agora. Tente de novo em instantes.')}};
 }
 // recibo em PDF: o WhatsApp e o e-mail abertos por link não aceitam anexo, então você baixa e anexa
@@ -1782,21 +1833,23 @@ async function reciboPDF(x,nome,btn){
   try{
     await carregaLib('jspdf');
     const d=new window.jspdf.jsPDF({unit:'pt',format:'a4'}),W=d.internal.pageSize.getWidth();
-    const n=x.recibo?String(x.recibo).padStart(3,'0'):'—';
+    const nm=nome||x.email||'';
     d.setFontSize(18);d.setTextColor(20,33,61);d.text('Rodaliq',40,56);
     d.setFontSize(9);d.setTextColor(91,100,120);d.text(pdfTxt('rodaliq.com.br · '+AJU.pix),40,70);
     d.setDrawColor(227,231,239);d.line(40,84,W-40,84);
-    d.setFontSize(14);d.setTextColor(20,33,61);d.text(pdfTxt('Recibo de contribuição nº '+n),40,112);
-    const lin=[['Recebido de',pdfTxt(nome||x.email)],['E-mail',pdfTxt(x.email)],['Valor',apoBRL(x.valor)],
-      ['Forma',pdfTxt(x.meio||'Pix')],['Data da contribuição',admData(x.criado_em)],['Confirmado em',admData(x.confirmado_em)]];
-    let y=140;d.setFontSize(10);
-    lin.forEach(([a,b])=>{d.setTextColor(91,100,120);d.text(pdfTxt(a),40,y);d.setTextColor(20,33,61);d.text(pdfTxt(String(b)),200,y);y+=20});
+    d.setFontSize(13);d.setTextColor(20,33,61);
+    d.text(d.splitTextToSize(pdfTxt('Agradecemos por sua contribuição voluntária ao projeto Rodaliq!'),W-80),40,112);
+    const lin=[['Nome',pdfTxt(nm)],['E-mail',pdfTxt(apoEmail(x))],['Valor',apoBRL(x.valor)],
+      ['Forma',pdfTxt(x.meio||'Pix')],['Data de sua sinalização no app',admData(x.criado_em)],['Confirmado em',admData(x.confirmado_em)]];
+    let y=146;d.setFontSize(10);
+    lin.forEach(([a,b])=>{d.setTextColor(91,100,120);d.text(pdfTxt(a),40,y);d.setTextColor(20,33,61);d.text(pdfTxt(String(b)),230,y);y+=20});
     y+=10;d.setDrawColor(227,231,239);d.line(40,y,W-40,y);y+=22;
     d.setFontSize(9);d.setTextColor(91,100,120);
-    const t=pdfTxt('Contribuição voluntária ao projeto Rodaliq. O uso do aplicativo é gratuito e não depende desta contribuição: ela cobre domínio, servidor e as melhorias do app. Este é um recibo simples de quitação, emitido por pessoa física, e não é documento fiscal.');
+    const t=pdfTxt('Contribuição voluntária ao projeto Rodaliq. O App é gratuito e vai continuar sendo! A sua ajuda contribui para amenizar alguns custos para mantermos o App no ar, como domínio, servidores e as melhorias. Seu acesso não está condicionado a sua colaboração! Este é um arquivo simples emitido por pessoa física, não é documento fiscal.');
     d.text(d.splitTextToSize(t,W-80),40,y);
-    const dt=new Date(),fn=pad(dt.getDate())+pad(dt.getMonth()+1)+String(dt.getFullYear()).slice(2)+'_'+pad(dt.getHours())+pad(dt.getMinutes())+'_Rodaliq_Recibo_'+n+'.pdf';
-    if(DL){await DL.save({filename:fn,data:d.output('arraybuffer')});audit('Apoio','Admin','Recibo '+n+' gerado · '+x.email);toast('Recibo gerado')}
+    const dt=new Date(),sl=String(nm).normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^A-Za-z0-9]+/g,'_').replace(/^_+|_+$/g,'')||'Contribuinte';
+    const fn=pad(dt.getDate())+pad(dt.getMonth()+1)+String(dt.getFullYear()).slice(2)+'_'+pad(dt.getHours())+pad(dt.getMinutes())+'_Rodaliq_Contribuicao_Voluntaria_'+sl+'.pdf';
+    if(DL){await DL.save({filename:fn,data:d.output('arraybuffer')});audit('Apoio','Admin','Recibo gerado · '+apoEmail(x));toast('Recibo gerado')}
     else toast('Download indisponível nesta visualização.');
   }catch(e){if(!(e&&e.code==='declined'))toast(e&&String(e.message||'').startsWith('lib')?'Não consegui carregar a biblioteca de PDF.':'Não foi possível gerar o recibo.')}
   finally{if(btn){btn.disabled=false;btn.textContent=old}}
@@ -1830,20 +1883,22 @@ function formAjustes(){if(!ehMaster())return;
     catch(e){q('#ajS2').disabled=false;q('#ajErr').textContent='Não foi possível salvar. Só o admin principal pode.'}};
 }
 async function apoAdminRender(box){
+  await carregaPerfis();
   let L;try{L=await apoListar();APO_CACHE=L}catch(e){box.innerHTML='<div class="empty">Não consegui carregar as contribuições. Tente de novo em instantes.</div>';return}
   if(!invCache.length)try{await invRefreshBadge(true)}catch(e){}
-  const F=[['informado','Para conferir'],['confirmado','Confirmadas'],['todos','Todas']];
+  const F=[['informado','Para conferir'],['confirmado','Confirmadas'],['descartado','Descartadas'],['todos','Todas']];
   const f=UI.apoF||'informado',lst=f==='todos'?L:L.filter(x=>x.status===f),cnt=k=>k==='todos'?L.length:L.filter(x=>x.status===k).length;
   const ym=hoje().slice(0,7),mes=L.filter(x=>x.status==='confirmado'&&String(x.confirmado_em||'').slice(0,7)===ym);
-  const card=x=>{const c=invCache.find(v=>String(v.email||'').toLowerCase()===String(x.email||'').toLowerCase()),nome=c?invPrimeiro(c):'',txt=apoTexto(x,nome);
+  const card=x=>{const nome=apoNome(x),c=invCache.find(v=>String(v.email||'').toLowerCase()===String(x.email||'').toLowerCase()),txt=apoTexto(x,nome);
     ZAP_APO[x.id]={fone:c?c.whatsapp:'',txt,nome};
-    const tag=x.status==='confirmado'?'<span class="tag b">Confirmada</span>':'<span class="tag a">Para conferir</span>';
+    const tag=x.status==='confirmado'?'<span class="tag b">Confirmada</span>':(x.status==='descartado'?'<span class="tag g">Descartada</span>':'<span class="tag a">Para conferir</span>');
     let bt='';
-    if(x.status==='informado')bt=`<button class="btn sm" data-ac="${esc(x.id)}">✓ Confirmar e gerar recibo</button>`;
-    else bt=`<button type="button" class="btn sm" data-ar="${esc(x.id)}">⬇ Baixar recibo (PDF)</button><a class="btn sm" href="${esc(invMailLink(x.email,'Seu recibo de contribuição ao Rodaliq',txt))}" target="_blank" rel="noopener">✉ Enviar por e-mail</a><button type="button" class="btn sm" data-za="${esc(x.id)}">💬 Enviar pelo WhatsApp</button><button class="btn sm sec" data-ad="${esc(x.id)}">↩ Desfazer</button>`;
-    return `<div class="uCard"><div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start"><div class="uMail">${esc(c?c.name:x.email)}</div>${tag}</div>
-      <div class="uLin">${esc(x.email)}${c?` · 💬 ${esc(invFmtPhone(c.whatsapp))}${invUfOf(c.whatsapp)?' · '+esc(invUfOf(c.whatsapp)):''}`:''}</div>
-      <div class="uLin"><b>${apoBRL(x.valor)}</b> · informada em ${admData(x.criado_em)}${x.confirmado_em?' · confirmada em '+admData(x.confirmado_em):''}${x.recibo?' · recibo nº '+String(x.recibo).padStart(3,'0'):''}</div>
+    if(x.status==='descartado')bt=`<button class="btn sm sec" data-ad="${esc(x.id)}">↩ Desfazer</button>`;
+    else if(x.status==='informado')bt=`<button class="btn sm" data-ac="${esc(x.id)}">✓ Confirmar e gerar recibo</button><button class="btn sm sec" data-ax="${esc(x.id)}">✕ Descartar</button>`;
+    else bt=`<button type="button" class="btn sm" data-ar="${esc(x.id)}">⬇ Baixar recibo (PDF)</button><a class="btn sm" href="${esc(invMailLink(apoEmail(x),'Seu recibo de contribuição ao Rodaliq',txt))}" target="_blank" rel="noopener">✉ Enviar por e-mail</a><button type="button" class="btn sm" data-za="${esc(x.id)}">💬 Enviar pelo WhatsApp</button><button class="btn sm sec" data-ad="${esc(x.id)}">↩ Desfazer</button>`;
+    return `<div class="uCard"><div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start"><div class="uMail">${esc(nome)}</div>${tag}</div>
+      <div class="uLin">${esc(apoEmail(x))}${c?` · 💬 ${esc(invFmtPhone(c.whatsapp))}${invUfOf(c.whatsapp)?' · '+esc(invUfOf(c.whatsapp)):''}`:''}</div>
+      <div class="uLin"><b>${apoBRL(x.valor)}</b> · informada em ${admData(x.criado_em)}${x.confirmado_em?' · confirmada em '+admData(x.confirmado_em):''}${x.descartado_em?' · descartada em '+admData(x.descartado_em):''}${x.recibo?' · recibo nº '+String(x.recibo).padStart(3,'0'):''}</div>
       <div class="ivActs" style="margin-top:8px">${bt}</div></div>`};
   box.innerHTML=`<h3 style="margin:0">🤝 Apoiadores</h3>
     <p class="small muted" style="margin:4px 0 8px">Contribuição é voluntária: ninguém fica sem o app por não contribuir, e o app nunca cobra. Confira o Pix no seu banco antes de confirmar; confirmar gera o número do recibo. O WhatsApp e o e-mail abrem com o texto pronto; para mandar o recibo em PDF, baixe e anexe.</p>
@@ -1854,13 +1909,18 @@ async function apoAdminRender(box){
   box.querySelectorAll('[data-za]').forEach(b=>b.onclick=()=>{const z=ZAP_APO[b.dataset.za];if(z)abreZap(z.fone,z.txt)});
   box.querySelectorAll('[data-ar]').forEach(b=>b.onclick=()=>{const x=L.find(v=>v.id===b.dataset.ar);if(x)reciboPDF(x,(ZAP_APO[x.id]||{}).nome,b)});
   box.querySelectorAll('[data-ac]').forEach(b=>b.onclick=async()=>{const x=L.find(v=>v.id===b.dataset.ac);if(!x)return;
-    if(!await confirma(`Confirmar a contribuição de <b>${apoBRL(x.valor)}</b> de <b>${esc(x.email)}</b>? Confira antes no extrato do seu banco. O app gera o número do recibo e você envia por e-mail ou WhatsApp.`,'Confirmar'))return;
-    try{const n=await apoConfirmar(x,'Pix');audit('Apoio','Admin','Contribuição confirmada · '+x.email+' · '+apoBRL(x.valor)+(n?' · recibo '+n:''));toast('Contribuição confirmada')}
+    if(!await confirma(`Confirmar a contribuição de <b>${apoBRL(x.valor)}</b> de <b>${esc(apoNome(x))}</b>? Confira antes no extrato do seu banco. O app gera o número do recibo e você envia por e-mail ou WhatsApp.`,'Confirmar'))return;
+    try{const n=await apoConfirmar(x,'Pix');audit('Apoio','Admin','Contribuição confirmada · '+apoEmail(x)+' · '+apoBRL(x.valor)+(n?' · recibo '+n:''));toast('Contribuição confirmada')}
     catch(e){toast('Não foi possível confirmar agora. Tente de novo.');return}
     UI.apoF='confirmado';await excAdminCache(true);atualizaSino();apoAdminRender(box);admContagens()});
+  box.querySelectorAll('[data-ax]').forEach(b=>b.onclick=async()=>{const x=L.find(v=>v.id===b.dataset.ax);if(!x)return;
+    if(!await confirma(`Descartar a contribuição de <b>${apoBRL(x.valor)}</b> de <b>${esc(apoNome(x))}</b>? Use quando não encontrar o Pix no extrato ou a pessoa tiver avisado duas vezes. Nada é apagado: ela sai da fila, fica em “Descartadas” e você pode desfazer.`,'Descartar'))return;
+    try{await apoDescartar(x);audit('Apoio','Admin','Contribuição descartada · '+apoEmail(x)+' · '+apoBRL(x.valor))}catch(e){toast('Não foi possível descartar agora.');return}
+    await excAdminCache(true);atualizaSino();apoAdminRender(box);admContagens()});
   box.querySelectorAll('[data-ad]').forEach(b=>b.onclick=async()=>{const x=L.find(v=>v.id===b.dataset.ad);if(!x)return;
-    if(!await confirma(`Desfazer a confirmação de <b>${esc(x.email)}</b>? Ela volta para “Para conferir” e o recibo deixa de valer.`,'Desfazer',{perigo:1}))return;
-    try{await apoDesfazer(x);audit('Apoio','Admin','Confirmação desfeita · '+x.email)}catch(e){toast('Não foi possível desfazer agora.');return}
+    const dsc=x.status==='descartado';
+    if(!await confirma(dsc?`Trazer de volta a contribuição de <b>${esc(apoNome(x))}</b>? Ela volta para “Para conferir”.`:`Desfazer a confirmação de <b>${esc(apoNome(x))}</b>? Ela volta para “Para conferir” e o recibo deixa de valer.`,dsc?'Trazer de volta':'Desfazer',dsc?{}:{perigo:1}))return;
+    try{await apoDesfazer(x);audit('Apoio','Admin','Confirmação desfeita · '+apoEmail(x))}catch(e){toast('Não foi possível desfazer agora.');return}
     await excAdminCache(true);atualizaSino();apoAdminRender(box);admContagens()});
 }
 /* ---------- V48: aba 🛡 Admin (só administradores) ---------- */
@@ -1887,7 +1947,8 @@ async function admContagens(){const put=(k,n)=>{const e=document.querySelector(`
   try{const us=await admUsuarios();put('ativos',us.filter(u=>!u.excluido_em).length);put('excluidos',us.filter(u=>u.excluido_em).length)}catch(e){}
   try{const L=await excListar();put('exclusoes',L.filter(x=>x.status==='novo'||x.status==='desativado').length)}catch(e){}
   try{const L=await senListar();SEN_CACHE=L;put('senhas',L.filter(x=>x.status==='novo').length)}catch(e){}
-  try{const L=await apoListar();APO_CACHE=L;put('apoios',L.filter(x=>x.status==='informado').length)}catch(e){}}
+  try{const L=await apoListar();APO_CACHE=L;put('apoios',L.filter(x=>x.status==='informado').length)}catch(e){}
+  await carregaPerfis()}
 // 🛡 Admins: lista, cadastro e remoção. Só o admin master; no banco, só ele grava e apaga em tb_admins
 let ADM_HMO=[]; // no HMO a lista é simulada e vive só nesta sessão
 async function admListar(){
@@ -2229,25 +2290,27 @@ window.addEventListener('popstate',async()=>{
 
 /* ===================== V36: termos, primeiro acesso, por km, projeção, reservas e fechar o dia ===================== */
 /* ---------- 1. Termos de uso e Política de privacidade ---------- */
-const TERMOS_V='T2-2026-11-12',TERMOS_DATA='12/11/2026',TERMOS_RESP='Rodaliq',TERMOS_MAIL='rodaliq.app@gmail.com';
+const TERMOS_V='T3-2026-11-13',TERMOS_DATA='13/11/2026',TERMOS_RESP='Rodaliq',TERMOS_MAIL='rodaliq.app@gmail.com';
 const TXT_TERMOS=`<h3>Termos de uso do Rodaliq</h3><p class="small muted">Versão de ${TERMOS_DATA}</p>
-<p><b>1. O que é o Rodaliq.</b> Um aplicativo de gestão para motoristas de aplicativo: registra ganhos (Uber, 99 e Carona Solidária), custos do veículo, multas e o Carnê-Leão, e mostra indicadores, alertas e relatórios.</p>
+<p><b>1. O que é o Rodaliq.</b> Um aplicativo de gestão para motoristas de aplicativo: registra ganhos (Uber, 99 e Carona Solidária), custos do veículo, multas e o Carnê-Leão, e mostra indicadores, alertas e relatórios. Ele nasceu de uma necessidade do próprio criador, que controlava essas mesmas informações à mão, espalhadas por mais de uma planilha. Ao perceber que outros motoristas provavelmente passavam pela mesma dificuldade, decidiu transformar esse controle em um aplicativo e compartilhá-lo.</p>
 <p><b>2. Quem pode usar.</b> Somente maiores de 18 anos (Código Civil, art. 5º), com acesso liberado por convite. A conta é pessoal: login e senha não devem ser compartilhados.</p>
 <p><b>3. Responsabilidade pelas informações.</b> Os valores mostrados vêm do que você lança. Os cálculos de Carnê-Leão, previsões, despesas programadas e indicadores são <b>estimativas de apoio</b> e não substituem a orientação de um profissional de Contabilidade nem os sistemas oficiais da Receita Federal (como o Carnê-Leão Web e o Sicalc).</p>
-<p><b>4. Disponibilidade.</b> Seus dados ficam guardados em um banco de dados na nuvem: não se perdem se você trocar de celular ou se o app ficar fora do ar por um tempo. O app pode ter pausas rápidas para manutenção. O backup (⚙ Opções &gt; Exportar backup) é uma cópia extra, útil para guardar um retrato dos seus dados ou recuperar algo excluído por engano.</p>
-<p><b>5. Segurança dos dados.</b> O Rodaliq adota medidas técnicas para proteger seus dados contra acessos não autorizados, como conexão criptografada e acesso restrito a cada conta, conforme a LGPD (Lei nº 13.709/2018, art. 46).</p>
-<p><b>6. Propriedade.</b> A marca, o nome, a identidade visual e o código do Rodaliq pertencem ao seu responsável. Os dados que você lança são seus.</p>
-<p><b>7. Encerramento.</b> Você pode pedir a exclusão da conta e dos dados a qualquer momento em ⚙ Opções &gt; Excluir minha conta. O acesso é desativado e, após ${EXC_DIAS} dias, os dados são apagados de vez (veja o item “Como excluir sua conta” da Política de privacidade). O pedido de exclusão só pode ser feito pelo app.</p>
-<p><b>8. Mudanças.</b> Estes termos podem ser atualizados. Quando isso acontecer, o app pedirá um novo aceite.</p>
-<p><b>9. Lei aplicável.</b> Legislação brasileira. Contato: ${TERMOS_MAIL}.</p>`;
+<p><b>4. Contribuição voluntária.</b> O Rodaliq é gratuito e vai continuar sendo. Em ⚙ Opções &gt; 💚 Ajude a manter o Rodaliq você pode, se quiser, contribuir com o valor que achar justo, por Pix, para ajudar a amenizar custos como domínio, servidores e as melhorias do app. A contribuição é opcional e não dá nenhum direito, vantagem ou recurso extra: o seu acesso não está condicionado a ela. O app não processa pagamentos — o Pix é feito pelo seu banco e nenhum dado de pagamento passa pelo Rodaliq. Você avisa pelo app que contribuiu, o responsável confere no extrato e confirma; se o pagamento não for localizado, o registro é descartado e passa a aparecer para você como “não localizada”. O comprovante enviado após a confirmação é um arquivo simples, emitido por pessoa física, e não é documento fiscal.</p>
+<p><b>5. Disponibilidade.</b> Seus dados ficam guardados em um banco de dados na nuvem: não se perdem se você trocar de celular ou se o app ficar fora do ar por um tempo. O app pode ter pausas rápidas para manutenção. O backup (⚙ Opções &gt; Exportar backup) é uma cópia extra, útil para guardar um retrato dos seus dados ou recuperar algo excluído por engano.</p>
+<p><b>6. Segurança dos dados.</b> O Rodaliq adota medidas técnicas para proteger seus dados contra acessos não autorizados, como conexão criptografada e acesso restrito a cada conta, conforme a LGPD (Lei nº 13.709/2018, art. 46).</p>
+<p><b>7. Propriedade.</b> A marca, o nome, a identidade visual e o código do Rodaliq pertencem ao seu responsável. Os dados que você lança são seus.</p>
+<p><b>8. Encerramento da sua conta.</b> Você pode pedir a exclusão da conta e dos dados a qualquer momento em ⚙ Opções &gt; Excluir minha conta. O acesso é desativado e, após ${EXC_DIAS} dias, os dados são apagados de vez (veja o item “Como excluir sua conta” da Política de privacidade). O pedido de exclusão só pode ser feito pelo app.</p>
+<p><b>9. Encerramento do aplicativo.</b> Assim como você pode encerrar a sua conta quando quiser, o Rodaliq também pode ser descontinuado a qualquer momento. Se isso acontecer, todos os usuários serão avisados pelo app com, no mínimo, 30 dias de antecedência, contados a partir do aviso, para que haja tempo de exportar os dados em ⚙ Opções &gt; Exportar backup. Encerrado esse prazo, o acesso é desativado e os dados são apagados. Por se tratar de contribuição voluntária, e não de pagamento por um serviço contratado, não há devolução de valores já contribuídos.</p>
+<p><b>10. Mudanças.</b> Estes termos podem ser atualizados. Quando isso acontecer, o app pedirá um novo aceite.</p>
+<p><b>11. Lei aplicável.</b> Legislação brasileira. Contato: ${TERMOS_MAIL}.</p>`;
 const TXT_PRIV=`<h3>Política de privacidade do Rodaliq</h3><p class="small muted">Versão de ${TERMOS_DATA} · em conformidade com a LGPD (Lei nº 13.709/2018)</p>
 <p><b>1. Controlador.</b> ${TERMOS_RESP}. Contato para assuntos de dados pessoais: ${TERMOS_MAIL}.</p>
-<p><b>2. Dados tratados.</b><br>• <b>Pedido de convite:</b> nome, e-mail, WhatsApp (com DDD), data de nascimento e como soube do app.<br>• <b>Conta:</b> e-mail e senha (a senha fica protegida pelo provedor de login e não é vista por ninguém).<br>• <b>Uso do app:</b> lançamentos de ganhos, caronas, repasses, custos, multas (inclusive pontos e condutor informado), Carnê-Leão, veículos, metas e despesas programadas.<br>• <b>Minha CNH:</b> somente validade, categoria, EAR e data da 1ª habilitação. Não guardamos número da CNH, CPF nem foto.<br>• <b>No aparelho:</b> tema escolhido e posição do botão Atalhos (ficam só no seu aparelho).</p>
-<p><b>3. Para que usamos.</b> Prestar o serviço (calcular indicadores, alertas, relatórios e o Carnê-Leão estimado), liberar o acesso, falar com você por e-mail ou WhatsApp sobre o acesso e enviar felicitações de aniversário (com a sua autorização), e manter a segurança. Não vendemos dados nem os usamos para publicidade.</p>
-<p><b>4. Bases legais.</b> Execução do serviço que você contratou (art. 7º, V), consentimento para contato por e-mail e WhatsApp (art. 7º, I) e legítimo interesse para segurança e prevenção de fraudes (art. 7º, IX).</p>
+<p><b>2. Dados tratados.</b><br>• <b>Pedido de convite:</b> nome, e-mail, WhatsApp (com DDD), data de nascimento e como soube do app.<br>• <b>Conta:</b> e-mail e senha (a senha fica protegida pelo provedor de login e não é vista por ninguém).<br>• <b>Uso do app:</b> lançamentos de ganhos, caronas, repasses, custos, multas (inclusive pontos e condutor informado), Carnê-Leão, veículos, metas e despesas programadas.<br>• <b>Minha CNH:</b> somente validade, categoria, EAR e data da 1ª habilitação. Não guardamos número da CNH, CPF nem foto.<br>• <b>Contribuição voluntária:</b> valor, data do aviso, forma, situação (aguardando conferência, confirmada ou não localizada) e número do comprovante. Não recebemos nem guardamos dados de pagamento.<br>• <b>No aparelho:</b> tema escolhido e posição do botão Atalhos (ficam só no seu aparelho).</p>
+<p><b>3. Para que usamos.</b> Prestar o serviço (calcular indicadores, alertas, relatórios e o Carnê-Leão estimado), liberar o acesso, falar com você por e-mail ou WhatsApp sobre o acesso e enviar felicitações de aniversário (com a sua autorização), registrar e dar comprovante das contribuições voluntárias, e manter a segurança. Não vendemos dados nem os usamos para publicidade.</p>
+<p><b>4. Bases legais.</b> Execução do serviço que você contratou (art. 7º, V), consentimento para contato por e-mail e WhatsApp e para o registro da contribuição voluntária, que parte de você (art. 7º, I), e legítimo interesse para segurança e prevenção de fraudes (art. 7º, IX).</p>
 <p><b>5. Onde ficam e com quem são compartilhados.</b> Os dados ficam no Supabase (banco de dados e login, servidores em São Paulo). O site é publicado pelo GitHub Pages. Esses fornecedores só armazenam e processam os dados para o app funcionar. Não há outro compartilhamento, salvo obrigação legal.</p>
 <p><b>6. Segurança.</b> Conexão criptografada (HTTPS) e regras no banco que fazem cada usuário ver e alterar somente os próprios dados dentro de sua respectiva área logada.</p>
-<p><b>7. Por quanto tempo.</b> Enquanto a conta estiver ativa. Após o pedido de exclusão da conta, os dados são apagados, salvo o que a lei obrigar a guardar.</p>
+<p><b>7. Por quanto tempo.</b> Enquanto a conta estiver ativa. Após o pedido de exclusão da conta, os dados são apagados, inclusive o registro das contribuições voluntárias, salvo o que a lei obrigar a guardar.</p>
 <p><b>8. Como excluir sua conta.</b> Em ⚙ Opções &gt; Excluir minha conta, escolha o motivo e confirme. Até o acesso ser desativado, você pode desistir. Depois de desativada, a conta fica bloqueada e seus dados ficam guardados por ${EXC_DIAS} dias, para o caso de você mudar de ideia (é só escrever para ${TERMOS_MAIL}). Passado esse prazo, todos os seus dados são apagados de vez. Guardamos apenas um registro mínimo do pedido (e-mail, motivo, comentário e datas), para comprovar que ele foi atendido. Antes de pedir, exporte um backup em ⚙ Opções &gt; Exportar backup.</p>
 <p><b>9. Seus direitos (art. 18).</b> Confirmar se tratamos seus dados, acessar, corrigir, pedir a exclusão, a portabilidade (o backup em ⚙ Opções &gt; Exportar já entrega seus dados) e revogar o consentimento. A exclusão da conta é pedida pelo app, em ⚙ Opções &gt; Excluir minha conta (veja o item 8). Os demais pedidos, pelo e-mail ${TERMOS_MAIL}.</p>
 <p><b>10. Menores de idade.</b> O app não é destinado a menores de 18 anos e não aceita pedidos deles (LGPD, art. 14).</p>
@@ -2298,7 +2361,7 @@ const GUIA=[
  {t:'📅 Despesas programadas',x:`IPVA, seguro e revisão chegam de uma vez. Programe a despesa com o valor e a data de pagamento: o app divide o valor pelos meses até lá e mostra quanto separar por mês. Para não gastar sem querer, deixe esse valor numa conta separada da do dia a dia.`,
    m:'Card Despesas programadas e lucro livre, no Painel.',acts:[['＋ Programar despesa',()=>formReserva()]]},
  {t:'🪪 Sua CNH (opcional)',cfg:'cnh'},
- {t:'📊 Para acompanhar',x:`• <b>Painel:</b> meta, ganhos, custos, resultado, previsão e despesas programadas (troque o mês e o veículo no topo).<br>• <b>🔔 Sino:</b> alertas (DARF, multas, CNH, manutenção e lembrete de backup) e novidades.<br>• <b>⚡ Atalhos:</b> todos os lançamentos num toque; arraste o botão para onde preferir.<br>• <b>Relatórios:</b> filtros e download em PDF, Word, Excel e CSV.<br>• <b>⚙ Opções:</b> veículos, metas, tema, backup e este guia. Exporte um backup pelo menos a cada 30 dias e guarde o arquivo fora do aparelho: o sino avisa quando passar disso. Se um dia quiser sair, use ⚙ Opções &gt; Excluir minha conta.<br>• <b>Esqueceu a senha?</b> Use “Esqueci minha senha”, na tela de entrada.<br>• <b>💚 Ajude a manter o Rodaliq:</b> o app é gratuito e vai continuar. Se ele te ajuda, você pode contribuir com o que achar justo, em ⚙ Opções. É opcional e nada aqui depende disso.`}
+ {t:'📊 Para acompanhar',x:`• <b>Painel:</b> meta, ganhos, custos, resultado, previsão e despesas programadas (troque o mês e o veículo no topo).<br>• <b>🔔 Sino:</b> alertas (DARF, multas, CNH, manutenção e lembrete de backup) e novidades.<br>• <b>⚡ Atalhos:</b> todos os lançamentos num toque; arraste o botão para onde preferir.<br>• <b>Relatórios:</b> filtros e download em PDF, Word, Excel e CSV.<br>• <b>⚙ Opções:</b> veículos, metas, tema, backup e este guia. Exporte um backup pelo menos a cada 30 dias e guarde o arquivo fora do aparelho: o sino avisa quando passar disso. Se um dia quiser sair, use ⚙ Opções &gt; Excluir minha conta.<br>• <b>Esqueceu a senha?</b> Use “Esqueci minha senha”, na tela de entrada.<br>• <b>💚 Ajude a manter o Rodaliq:</b> o app é gratuito e vai continuar sendo. Se ele te ajuda, você pode contribuir com o que achar justo, em ⚙ Opções: escolha um valor, copie a chave Pix, faça o Pix pelo seu banco e avise no app. Na mesma tela você acompanha as suas contribuições, mês a mês. É opcional e nada aqui depende disso.`}
 ];
 function primeiroAcesso(auto){
   const c=cfg(),DS=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];let passo=0;
