@@ -167,8 +167,11 @@ h3{font-size:13px;margin:0 0 8px;color:var(--muted);text-transform:uppercase;let
 .apoPix{display:flex;gap:6px;align-items:center}
 .grid2{display:grid;grid-template-columns:1fr;gap:10px}
 @media(min-width:560px){.grid2{grid-template-columns:1fr 1fr}}
-.relTop{display:grid;grid-template-columns:1fr;gap:14px;align-items:start}
-@media(min-width:860px){.relTop{grid-template-columns:minmax(240px,340px) minmax(0,1fr)}}
+.relTop{display:grid;grid-template-columns:1fr;gap:14px;align-items:stretch;margin-top:14px}
+.relTop>div:first-child{display:flex;flex-direction:column}
+.gCard{display:flex;flex-direction:column}
+@media(min-width:860px){.relTop{grid-template-columns:minmax(230px,300px) minmax(0,1fr)}}
+.gSvg{flex:1}
 .gCard{border:1px solid var(--line);border-radius:12px;padding:12px;background:var(--card)}
 .gHd{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:2px}
 .gHd b{font-size:14px;color:var(--ink)}
@@ -458,7 +461,7 @@ svg text{font-family:Inter,system-ui,sans-serif}
 
 <script>
 "use strict";
-const VERSAO='V65';
+const VERSAO='V66';
 /* ---------- utilidades ---------- */
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -2056,15 +2059,15 @@ function admRelGrafico(F){
   const cab=`<div class="gHd"><b>Situação por seção</b><span class="small muted">no período</span></div>
     <div class="gLeg">${G_SER.map(([k,n,c])=>`<span><i style="background:${c}"></i>${n}</span>`).join('')}</div>`;
   if(!ids.length)return `<div class="gCard">${cab}<div class="gVazio">Marque ao menos uma seção para ver o gráfico.</div></div>`;
-  const C=admRelContas(F),W=560,H=230,ml=34,mr=10,mt=16,mb=46,pw=W-ml-mr,ph=H-mt-mb;
+  const C=admRelContas(F),W=560,H=262,ml=30,mr=8,mt=18,mb=44,pw=W-ml-mr,ph=H-mt-mb;
   const topo=Math.max(1,...ids.map(id=>Math.max(C[id].pend,C[id].conc,C[id].outr)));
-  const passo=topo<=4?1:Math.ceil(topo/4),max=passo*Math.ceil(topo/passo);
-  const y=v=>mt+ph-(v/max)*ph,gw=pw/ids.length,bw=Math.min(26,(gw*0.72)/3);
+  const passo=topo<=6?1:topo<=12?2:topo<=30?5:Math.ceil(topo/6/10)*10,max=passo*Math.ceil(topo/passo);
+  const y=v=>mt+ph-(v/max)*ph,gw=pw/ids.length,bw=Math.min(30,(gw*0.78)/3),esp=bw*3+2*5;
   let g='';
   for(let t=0;t<=max;t+=passo)g+=`<line class="gl" x1="${ml}" y1="${y(t)}" x2="${W-mr}" y2="${y(t)}"/><text class="gx" x="${ml-6}" y="${y(t)+3.5}" text-anchor="end">${t}</text>`;
   ids.forEach((id,i)=>{const c=C[id],cx=ml+gw*i+gw/2;
     G_SER.forEach(([k,n,cor],j)=>{const v=c[k];if(!v)return;
-      const bx=cx-(bw*3+8)/2+j*(bw+4),hh=Math.max(2,(v/max)*ph);
+      const bx=cx-esp/2+j*(bw+5),hh=Math.max(2,(v/max)*ph);
       g+=`<rect x="${bx}" y="${y(v)}" width="${bw}" height="${hh}" rx="2" fill="${cor}"><title>${n}: ${v}</title></rect><text class="gv" x="${bx+bw/2}" y="${y(v)-4}" text-anchor="middle">${v}</text>`});
     g+=`<text class="gx" x="${cx}" y="${mt+ph+16}" text-anchor="middle">${esc(G_CURTO[id]||id)}</text>`});
   g+=`<line class="gl" x1="${ml}" y1="${mt+ph}" x2="${W-mr}" y2="${mt+ph}"/>`;
