@@ -165,6 +165,21 @@ h3{font-size:13px;margin:0 0 8px;color:var(--muted);text-transform:uppercase;let
 .apoV,.apoT{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0 4px}
 .apoV .chip{flex:1 1 0;min-width:84px;text-align:center;padding:8px 10px;line-height:1.2}
 .apoPix{display:flex;gap:6px;align-items:center}
+.grid2{display:grid;grid-template-columns:1fr;gap:10px}
+@media(min-width:560px){.grid2{grid-template-columns:1fr 1fr}}
+.relTop{display:grid;grid-template-columns:1fr;gap:14px;align-items:start}
+@media(min-width:860px){.relTop{grid-template-columns:minmax(240px,340px) minmax(0,1fr)}}
+.gCard{border:1px solid var(--line);border-radius:12px;padding:12px;background:var(--card)}
+.gHd{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:2px}
+.gHd b{font-size:14px;color:var(--ink)}
+.gLeg{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin:6px 0 2px;font-size:11.5px;color:var(--muted)}
+.gLeg span{display:inline-flex;align-items:center;gap:5px}
+.gLeg i{width:10px;height:10px;border-radius:2px;display:inline-block}
+.gSvg{width:100%;height:auto;display:block}
+.gSvg .gx{font-size:10px;fill:var(--muted)}
+.gSvg .gv{font-size:10px;fill:var(--ink);font-weight:700}
+.gSvg .gl{stroke:var(--line)}
+.gVazio{padding:28px 10px;text-align:center;color:var(--muted);font-size:12.5px}
 .calHd{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}
 .calW{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
 .calS{text-align:center;font-size:11px;color:var(--mut);padding:4px 0}
@@ -443,7 +458,7 @@ svg text{font-family:Inter,system-ui,sans-serif}
 
 <script>
 "use strict";
-const VERSAO='V64';
+const VERSAO='V65';
 /* ---------- utilidades ---------- */
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -2021,6 +2036,40 @@ function admRelModelo(){
   const filtroTxt=`${fmtBR(F.de)} a ${fmtBR(F.ate)} · ${sec.length} ${sec.length===1?'seção':'seções'} · ${n} ${n===1?'registro':'registros'}`;
   return {titulo:'Rodaliq — Relatório do painel administrativo',area:'Admin',filtroTxt,n,
     sec:sec.concat([{t:'Dados pessoais',nota:'Este relatório contém dados pessoais de terceiros, tratados conforme a Política de privacidade do Rodaliq e a LGPD (Lei nº 13.709/2018). Guarde o arquivo com segurança e apague-o quando não for mais necessário. Esta exportação ficou registrada no histórico de auditoria do app.'}])}}
+// V65: gráfico de colunas agrupadas, desenhado em SVG (sem biblioteca externa)
+const G_SER=[['pend','Pendentes','#f59e0b'],['conc','Concluídos','#1f6feb'],['outr','Outros','#9aa3b2']];
+const G_CURTO={apoios:'Apoiadores',convites:'convite',exclusoes:'exclusão',senhas:'senha',ativos:'Usu. ativos',excluidos:'Usu. excluídos'};
+function admRelContas(F){ // conta por seção, sempre dentro do período
+  const S=admRelSecoes(Object.assign({},F,{sel:Object.fromEntries(ADM_SEC.map(x=>[x[0],true]))}));
+  const por={};
+  S.forEach(sec=>{const i=sec.cols.findIndex(c=>c[0]==='Situação');
+    let pend=0,conc=0,outr=0;
+    if(sec.id==='ativos'||sec.id==='excluidos')conc=sec.rows.length;
+    else sec.rows.forEach(r=>{const v=String((i<0?'':r[i])||'').toLowerCase();
+      if(/aguardando|^novo/.test(v))pend++;
+      else if(/não localizada|nao localizada|recusad|descartad|desist|arquivad/.test(v))outr++;
+      else conc++});
+    por[sec.id]={pend,conc,outr}});
+  return por}
+function admRelGrafico(F){
+  const ids=ADM_SEC.filter(([id])=>F.sel[id]).map(([id])=>id);
+  const cab=`<div class="gHd"><b>Situação por seção</b><span class="small muted">no período</span></div>
+    <div class="gLeg">${G_SER.map(([k,n,c])=>`<span><i style="background:${c}"></i>${n}</span>`).join('')}</div>`;
+  if(!ids.length)return `<div class="gCard">${cab}<div class="gVazio">Marque ao menos uma seção para ver o gráfico.</div></div>`;
+  const C=admRelContas(F),W=560,H=230,ml=34,mr=10,mt=16,mb=46,pw=W-ml-mr,ph=H-mt-mb;
+  const topo=Math.max(1,...ids.map(id=>Math.max(C[id].pend,C[id].conc,C[id].outr)));
+  const passo=topo<=4?1:Math.ceil(topo/4),max=passo*Math.ceil(topo/passo);
+  const y=v=>mt+ph-(v/max)*ph,gw=pw/ids.length,bw=Math.min(26,(gw*0.72)/3);
+  let g='';
+  for(let t=0;t<=max;t+=passo)g+=`<line class="gl" x1="${ml}" y1="${y(t)}" x2="${W-mr}" y2="${y(t)}"/><text class="gx" x="${ml-6}" y="${y(t)+3.5}" text-anchor="end">${t}</text>`;
+  ids.forEach((id,i)=>{const c=C[id],cx=ml+gw*i+gw/2;
+    G_SER.forEach(([k,n,cor],j)=>{const v=c[k];if(!v)return;
+      const bx=cx-(bw*3+8)/2+j*(bw+4),hh=Math.max(2,(v/max)*ph);
+      g+=`<rect x="${bx}" y="${y(v)}" width="${bw}" height="${hh}" rx="2" fill="${cor}"><title>${n}: ${v}</title></rect><text class="gv" x="${bx+bw/2}" y="${y(v)-4}" text-anchor="middle">${v}</text>`});
+    g+=`<text class="gx" x="${cx}" y="${mt+ph+16}" text-anchor="middle">${esc(G_CURTO[id]||id)}</text>`});
+  g+=`<line class="gl" x1="${ml}" y1="${mt+ph}" x2="${W-mr}" y2="${mt+ph}"/>`;
+  return `<div class="gCard">${cab}<svg class="gSvg" viewBox="0 0 ${W} ${H}" role="img" aria-label="Colunas agrupadas por seção: pendentes, concluídos e outros">${g}</svg>
+    <div class="small muted" style="margin-top:2px">Pendentes = esperando você. Concluídos = já tratados. Outros = recusados, descartados ou desistências.</div></div>`}
 async function admRelRender(box){
   if(!ehMaster()){box.innerHTML='<div class="empty">Esta aba é do admin principal.</div>';return}
   const F=UI.admRel||(UI.admRel=admRelPadrao());
@@ -2037,9 +2086,14 @@ async function admRelRender(box){
       <div class="field"><label for="arDe">De</label><div class="dtW"><input class="inp" type="date" id="arDe" value="${F.de}" max="${hoje()}"><button type="button" class="dtB" data-arc="arDe" aria-label="Abrir calendário">📅</button></div></div>
       <div class="field"><label for="arAte">Até</label><div class="dtW"><input class="inp" type="date" id="arAte" value="${F.ate}" max="${hoje()}"><button type="button" class="dtB" data-arc="arAte" aria-label="Abrir calendário">📅</button></div></div>
     </div>
-    <div class="field" style="margin-top:4px"><label>O que entra no relatório</label>
-      ${ADM_SEC.map(([id,nome])=>`<label class="exChk"><input type="checkbox" data-ars="${id}"${F.sel[id]?' checked':''}><span>${nome} <span class="muted" data-arn="${id}">(${cnt(id)})</span></span></label>`).join('')}</div>
-    <div class="toolbar" style="margin:4px 0 0"><button type="button" class="btn sec sm" data-arm="1">Marcar todas</button><button type="button" class="btn sec sm" data-arm="0">Desmarcar</button></div>
+    <div class="relTop">
+      <div>
+        <div class="field" style="margin-top:4px"><label>O que entra no relatório</label>
+          ${ADM_SEC.map(([id,nome])=>`<label class="exChk"><input type="checkbox" data-ars="${id}"${F.sel[id]?' checked':''}><span>${nome} <span class="muted" data-arn="${id}">(${cnt(id)})</span></span></label>`).join('')}</div>
+        <div class="toolbar" style="margin:4px 0 0"><button type="button" class="btn sec sm" data-arm="1">Marcar todas</button><button type="button" class="btn sec sm" data-arm="0">Desmarcar</button></div>
+      </div>
+      <div id="arGraf">${admRelGrafico(F)}</div>
+    </div>
     <div class="small muted" style="margin-top:10px" id="arResumo">${esc(M.filtroTxt)}</div>
     <div class="toolbar" style="margin:10px 0 0">
       <button type="button" class="btn sec sm" data-arv="1" id="arVer">${F.ver?'Ocultar dados':'Ver dados'}</button>
@@ -2057,6 +2111,7 @@ function admRelPinta(box){
   const cnt=id=>{const f=Object.assign({},F,{sel:{[id]:true}}),x=admRelSecoes(f)[0];return x?x.rows.length:0};
   ADM_SEC.forEach(([id])=>{const e=box.querySelector(`[data-arn="${id}"]`);if(e)e.textContent='('+cnt(id)+')'});
   const r=box.querySelector('#arResumo');if(r)r.textContent=M.filtroTxt;
+  const g=box.querySelector('#arGraf');if(g)g.innerHTML=admRelGrafico(F);
   const v=box.querySelector('#arVer');if(v)v.textContent=F.ver?'Ocultar dados':'Ver dados';
   const c=box.querySelector('#arSecs');if(!c)return;
   c.innerHTML=F.ver?(sec.length?sec.map((x,i)=>{const op=F.aberto===x.id;
