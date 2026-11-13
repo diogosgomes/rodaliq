@@ -157,6 +157,16 @@ h3{font-size:13px;margin:0 0 8px;color:var(--muted);text-transform:uppercase;let
 .menuWrap{position:relative}
 .menu{position:absolute;right:0;top:calc(100% + 6px);background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 10px 30px rgba(20,33,61,.15);min-width:240px;padding:6px;z-index:40}
 .menu .who{padding:8px 10px;font-size:12px;color:var(--muted);border-bottom:1px solid var(--line);margin-bottom:4px}
+.menu .who b{display:block;font-size:14px;color:var(--ink);margin-top:2px;word-break:break-all}
+.menu .who .whoE{display:block;word-break:break-all}
+.whoA{color:var(--amberInk);font-weight:700;font-size:12px}
+.admLin{display:flex;align-items:center;justify-content:space-between;gap:8px;border:1px solid var(--line);border-radius:9px;padding:8px 10px;margin-top:6px;background:#fbfcfe}
+.admLin .admEm{word-break:break-all;font-size:13px}
+.apoV,.apoT{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0 4px}
+.apoV .chip{flex:1 1 0;min-width:84px;text-align:center;padding:8px 10px;line-height:1.2}
+.apoPix{display:flex;gap:6px;align-items:center}
+.apoPix code{flex:1;background:#f6f8fb;border:1px solid var(--line);border-radius:9px;padding:9px 11px;font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+html[data-tema=escuro] .apoPix code{background:rgba(255,255,255,.05)}
 .menu button{display:block;width:100%;text-align:left;border:0;background:none;padding:9px 10px;border-radius:8px;cursor:pointer}
 .menu button:hover{background:var(--blueSoft)}
 .subSep{display:inline-block;width:1px;height:22px;background:var(--line);margin:0 4px;vertical-align:middle}
@@ -360,7 +370,8 @@ svg text{font-family:Inter,system-ui,sans-serif}
     <div class="menuWrap" id="optWrap">
       <button class="btn sec sm" id="optBtn">⚙ Opções</button>
       <div class="menu hidden" id="optMenu">
-        <div class="who">Conectado como <b id="whoName">—</b></div>
+        <div class="who">Conectado como<b id="whoName">—</b><span class="whoE" id="whoMail"></span></div>
+        <button data-m="apoio">💚 Ajude a manter o Rodaliq</button>
         <button data-m="rsv">📅 Despesas programadas</button>
         <button data-m="exp">⬇ Exportar backup</button>
         <button data-m="onb">🧭 Guia do Rodaliq</button>
@@ -410,7 +421,7 @@ svg text{font-family:Inter,system-ui,sans-serif}
 
 <script>
 "use strict";
-const VERSAO='V52';
+const VERSAO='V57';
 /* ---------- utilidades ---------- */
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -600,7 +611,8 @@ function alertas(){
     else out.push({n:'a',t:c.d===0?`CNH vence hoje (${fmtBR(cfg().cnh.validade)}). Agende a renovação.`:`CNH vence em ${c.d} ${c.d===1?'dia':'dias'} (${fmtBR(cfg().cnh.validade)}). Agende a renovação.`,tab:'cnh',cnh:c.chave,lida:NOT.reads.cnhLida===c.chave})}
   cfg().veiculos.filter(v=>v.pendente).forEach(v=>out.push({n:'a',tab:'veic',t:`Complete o cadastro do veículo ${v.nome}`,nota:'Ele foi criado a partir dos seus lançamentos. Abra ⚙ Opções > Veículos e informe a descrição (ex.: modelo e ano).'}));
   const bk=backupAlerta();if(bk)out.push(bk);
-  out.unshift(...invAlerts(),...excAlerts(),...senAlerts());
+  const av=apoAviso();if(av)out.push(av);
+  out.unshift(...invAlerts(),...excAlerts(),...senAlerts(),...apoAlerts());
   proximasManut().filter(x=>x.prox-x.ult<=1500).forEach(x=>out.push({n:x.prox<=x.ult?'r':'a',t:`Manutenção ${x.prox<=x.ult?'vencida':'próxima'}: ${x.desc} (${x.veiculo}) em ${x.prox.toLocaleString('pt-BR')} km.`,tab:'custos'}));
   return out;
 }
@@ -634,7 +646,7 @@ function renderSino(){
   const item=n=>{const lida=r.lidas.includes(n.id),imp=impValida(n);return `<div class="it${imp?' imp':''}${lida?'':' nova'}">${imp?'<div class="tagImp">⚠ IMPORTANTE</div>':''}<div class="ttl">${lida?'':'● '}${esc(n.titulo)}</div>${corpo(n)}<div class="acts"><button data-nl="${esc(n.id)}">${lida?'Marcar como não lida':'Marcar como lida'}</button><button data-nx="${esc(n.id)}">🗑 Excluir</button></div></div>`};
   const nl=naoLidas().length;
   let h=`<div class="hd"><button class="chip${tab==='alertas'?' on':''}" data-bt="alertas">Alertas (${al.filter(a=>!a.lida).length})</button><button class="chip${tab==='novidades'?' on':''}" data-bt="novidades">Novidades (${nl})</button></div>`;
-  if(tab==='alertas')h+=al.length?al.map((a,i)=>`<div class="it al${a.lida?' lida':''}${a.crit?' crit':''}${a.inv?' inv':''}" data-ai="${i}"><span class="tag ${a.n}">${a.n==='r'?'✕':'⚠'}</span><div><div>${esc(a.t)}</div>${a.nota?`<div class="nota">${esc(a.nota)}</div>`:''}${a.cnh?`<div class="acts"><button data-cl="${esc(a.cnh)}">${a.lida?'Marcar como não lida':'Marcar como lida'}</button></div>`:''}${a.bd?`<div class="acts"><a class="lnk" href="${esc(a.em)}" target="_blank" rel="noopener">✉ Parabenizar por e-mail</a><a class="lnk" href="${esc(a.wa)}" target="_blank" rel="noopener">💬 Parabenizar pelo WhatsApp</a><button data-bl="${esc(a.bd)}">Marcar como lido</button></div>`:''}${a.bk?`<div class="acts"><button class="bkBtn" data-bk="1">📥 Exportar backup</button></div>`:''}${a.sup?`<div class="acts"><button data-sl="${esc(a.sup)}">${a.lida?'Marcar como não lida':'Marcar como lida'}</button></div>`:''}</div></div>`).join(''):'<div class="empty">Nenhum alerta agora. ✓</div>';
+  if(tab==='alertas')h+=al.length?al.map((a,i)=>`<div class="it al${a.lida?' lida':''}${a.crit?' crit':''}${a.inv?' inv':''}" data-ai="${i}"><span class="tag ${a.n}">${a.n==='r'?'✕':'⚠'}</span><div><div>${esc(a.t)}</div>${a.nota?`<div class="nota">${esc(a.nota)}</div>`:''}${a.cnh?`<div class="acts"><button data-cl="${esc(a.cnh)}">${a.lida?'Marcar como não lida':'Marcar como lida'}</button></div>`:''}${a.bd?`<div class="acts"><a class="lnk" href="${esc(a.em)}" target="_blank" rel="noopener">✉ Parabenizar por e-mail</a><a class="lnk" href="${esc(a.wa)}" target="_blank" rel="noopener">💬 Parabenizar pelo WhatsApp</a><button data-bl="${esc(a.bd)}">Marcar como lido</button></div>`:''}${a.bk?`<div class="acts"><button class="bkBtn" data-bk="1">📥 Exportar backup</button></div>`:''}${a.apo?`<div class="acts"><button data-ap="1">💚 Quero contribuir</button><button data-apn="1">Agora não</button><button data-apx="1">Não mostrar de novo</button></div>`:''}${a.sup?`<div class="acts"><button data-sl="${esc(a.sup)}">${a.lida?'Marcar como não lida':'Marcar como lida'}</button></div>`:''}</div></div>`).join(''):'<div class="empty">Nenhum alerta agora. ✓</div>';
   else if(UI.bellExc){h+=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><b class="small">🗑 Excluídas (últimos ${DIAS_EXCL} dias)</b><span style="display:flex;gap:12px">${excl.length?'<button class="lnk ivDelTxt" data-besv="1">🗑 Esvaziar</button>':''}<button class="lnk" data-bexc="0">Voltar</button></span></div><div class="small muted" style="margin:-2px 0 8px">As novidades ficam aqui por 30 dias. <b>Esvaziar</b> apaga de vez.</div>`+(excl.length?excl.map(n=>`<div class="it"><div class="ttl">${esc(n.titulo)}</div>${corpo(n)}<div class="acts"><button data-nr="${esc(n.id)}">↩ Restaurar</button></div></div>`).join(''):'<div class="empty">Nenhuma novidade excluída nos últimos 30 dias.</div>')}
   else{h+=nl?`<div style="text-align:right;margin-bottom:4px"><button class="lnk" data-nall="1">Marcar todas como lidas (${nl})</button></div>`:'';
     h+=`<div class="novInfo"><button class="lnk" data-binfo="1">ℹ Como funcionam as novidades ${UI.bellInfo?'▴':'▾'}</button>${UI.bellInfo?`<ul>
@@ -660,6 +672,9 @@ $('#bellMenu').addEventListener('click',e=>{e.stopPropagation();const t=e.target
   else if(t.dataset.nall){naoLidas().forEach(n=>{if(!r.lidas.includes(n.id))r.lidas.push(n.id)});salvarReads()}
   else if(t.dataset.bl){const lim=isoOf(new Date(Date.now()-400*864e5));r.bdayLidas=[...(r.bdayLidas||[]).filter(k=>k.split('|')[1]>=lim),t.dataset.bl];salvarReads();toast('Alerta de aniversário marcado como lido')}
   else if(t.closest('[data-bk]')){exportar().then(()=>{renderSino();atualizaSino()});return}
+  else if(t.closest('[data-ap]')){$('#bellMenu').classList.add('hidden');formApoiar();return}
+  else if(t.closest('[data-apn]')){NOT.reads.apoio=Object.assign({},NOT.reads.apoio,{em:new Date().toISOString()});salvarReads();renderSino();atualizaSino();return}
+  else if(t.closest('[data-apx]')){NOT.reads.apoio=Object.assign({},NOT.reads.apoio,{nunca:true});salvarReads();renderSino();atualizaSino();toast('Não falo mais nisso.');return}
   else if(t.dataset.sl){r.supaLida=r.supaLida===t.dataset.sl?null:t.dataset.sl;salvarReads()}
   else if(t.dataset.cl){r.cnhLida=r.cnhLida===t.dataset.cl?null:t.dataset.cl;salvarReads()}
   else if(t.dataset.bant){UI.bellAnt=t.dataset.bant==='1'}
@@ -671,6 +686,7 @@ $('#bellMenu').addEventListener('click',e=>{e.stopPropagation();const t=e.target
       if(a.tab==='inv'){abrirAdmin('convites');return}
       if(a.tab==='exc'){abrirAdmin('exclusoes');return}
       if(a.tab==='sen'){abrirAdmin('senhas');return}
+      if(a.tab==='apo'){abrirAdmin('apoios');return}
       if(a.tab==='veic'){formVeic();return}
       if(a.tab==='supa'||a.tab==='bk')return;
       UI.tab=a.tab;render();window.scrollTo(0,0);
@@ -703,7 +719,7 @@ $('#fLogin').onsubmit=async e=>{
 };
 async function entrar(evento){
   $('#login').classList.add('hidden');$('#app').classList.remove('hidden');$('#whoName').textContent=LOGADO;
-  await carregar();render();ouvirNovidades();invAdminInit();navInicia();checarExclusao().then(bloq=>{if(!bloq)checarTermos().then(checarPrimeiroAcesso)});
+  await carregar();render();ouvirNovidades();invAdminInit();carregaPerfil();ajuCarregar();navInicia();checarExclusao().then(async bloq=>{if(bloq)return;await checarTrocaSenha();checarTermos().then(checarPrimeiroAcesso)});
   if(evento)audit(evento,'Acesso','Login de '+LOGADO);
 }
 async function sair(){await audit('Saída','Acesso','Logout de '+LOGADO);try{await DB.auth.signOut()}catch(e){}location.reload()}
@@ -804,6 +820,22 @@ function openForm({titulo,sub,campos,val={},onSave,onDel}){
   return {ov,g};
 }
 function confirma(msg,ok='Confirmar',op={}){return new Promise(res=>{const ov=document.createElement('div');ov.className='ov';ov.innerHTML=`<div class="modal" style="max-width:420px"><h2>${op.titulo||'Confirmação'}</h2><p>${msg}</p><div class="mfoot"><button class="btn sec" id="cN">${op.voltar||'Cancelar'}</button><button class="btn${op.perigo?' warn':''}" id="cS">${ok}</button></div></div>`;document.body.appendChild(ov);ov.querySelector('#cN').onclick=()=>{ov.remove();res(false)};ov.querySelector('#cS').onclick=()=>{ov.remove();res(true)}})}
+/* V53: WhatsApp sempre disponível. Sem telefone guardado, pergunta o número só para este envio (não fica salvo) */
+function pedeFone(){return new Promise(res=>{const ov=document.createElement('div');ov.className='ov';
+  ov.innerHTML=`<div class="modal" style="max-width:400px"><h2>💬 Enviar pelo WhatsApp</h2>
+    <p class="small">Não há telefone guardado para esta pessoa. Informe o número com DDD. Ele não fica salvo.</p>
+    <input class="inp" id="pfN" inputmode="tel" placeholder="Ex.: (61) 99999-9999" autocomplete="off">
+    <div class="err" id="pfE"></div><div class="mfoot"><button class="btn sec" id="pfC">Cancelar</button><button class="btn" id="pfOk">Abrir WhatsApp</button></div></div>`;
+  document.body.appendChild(ov);const q=s=>ov.querySelector(s);setTimeout(()=>q('#pfN').focus(),50);
+  q('#pfC').onclick=()=>{ov.remove();res('')};
+  q('#pfN').addEventListener('keydown',e=>{if(e.key==='Enter')q('#pfOk').click()});
+  q('#pfOk').onclick=()=>{const d=String(q('#pfN').value||'').replace(/\D/g,'');
+    const f=d.length>=12&&d.startsWith('55')?d:((d.length===10||d.length===11)?'55'+d:'');
+    if(!f){q('#pfE').textContent='Informe o número com DDD, só os algarismos.';return}
+    ov.remove();res(f)}})}
+function abreZap(fone,txt){const f=String(fone||'').replace(/\D/g,'');
+  const go=d=>{if(d)window.open('https://wa.me/'+d+'?text='+encodeURIComponent(txt),'_blank','noopener')};
+  if(f)go(f);else pedeFone().then(go)}
 function upsert(tb,rec){const a=S[tb];const i=a.findIndex(x=>x.id===rec.id);const novo=i<0;if(novo)a.push(rec);else a[i]=rec;salvar(tb);audit(novo?'Inclusão':'Edição',NOME_TB[tb],resumoReg(tb,rec));render()}
 function remover(tb,id){const r=S[tb].find(x=>x.id===id);S[tb]=S[tb].filter(x=>x.id!==id);salvar(tb);if(r)audit('Exclusão',NOME_TB[tb],resumoReg(tb,r));render()}
 
@@ -1422,8 +1454,15 @@ function formSenha(){
       const chk=await DB.auth.signInWithPassword({email:LOGADO,password:o.a});if(chk.error){err.textContent='Senha atual incorreta.';return}
       const r=await DB.auth.updateUser({password:o.n});if(r.error){err.textContent=/different/i.test(r.error.message)?'A nova senha precisa ser diferente da atual.':'Erro ao trocar a senha ('+r.error.message+').';return}
       audit('Troca de senha','Acesso','Senha alterada');marcaSenhaTrocada();ov.remove();toast('Senha alterada')})();return 'Verificando…'}});
-  setTimeout(()=>document.querySelectorAll('.modal input.inp').forEach(i=>i.type='password'),0);
+  setTimeout(()=>{const ov=[...document.querySelectorAll('.ov')].pop();if(!ov)return;
+    ov.querySelectorAll('.modal input.inp').forEach(i=>{i.type='password';olhinho(i)})},0);
 }
+/* V53: põe o 👁 ao lado de um campo de senha já desenhado */
+function olhinho(i){if(!i||i.parentElement.classList.contains('pw'))return;
+  const w=document.createElement('div');w.className='pw';i.parentElement.insertBefore(w,i);w.appendChild(i);
+  const b=document.createElement('button');b.type='button';b.textContent='👁';b.setAttribute('aria-label','Mostrar senha');
+  b.onclick=()=>{i.type=i.type==='password'?'text':'password';b.textContent=i.type==='password'?'👁':'🙈'};
+  w.appendChild(b)}
 /* ---------- Pedidos de convite (tela de login) e administração (adaptado do kit My Trade Dash V102) ---------- */
 const INV_ST={novo:'Novo',convidado:'Convidado',recusado:'Recusado'};
 const DDD_UF={};
@@ -1479,6 +1518,7 @@ async function invAutoLimpa(list){ // apaga de vez o que está na lixeira há ma
 }
 async function invLoadCache(force){if(!invIsAdmin){invCache=[];return}if(!force&&Date.now()-invCacheAt<15000)return;invCache=await invAutoLimpa(await invList());invCacheAt=Date.now()}
 /* ---------- V49: exclusão de conta (LGPD) ---------- */
+const ZAP_EXC={},ZAP_SEN={}; // V53: telefone e texto de cada cartão, para o botão de WhatsApp
 const EXC_DIAS=30,SUPA_USERS='https://supabase.com/dashboard/project/zxhgexcaswkvpotwqkqo/auth/users',SUPA_TAB='https://supabase.com/dashboard/project/zxhgexcaswkvpotwqkqo/editor';
 const EXC_MOTIVOS=['Parei de rodar por aplicativo','O app não atendeu o que eu precisava','Achei difícil de usar','Vou usar outro app ou planilha','Preocupação com meus dados','Outro motivo'];
 let EXC_MEU=null; // pedido aberto do usuário (novo ou desativado)
@@ -1531,7 +1571,7 @@ function formExcluirConta(){
     catch(e){q('#exC').disabled=false;err(/duplicate|23505/i.test((e&&(e.code+e.message))||'')?'Você já tem um pedido de exclusão em andamento.':'Não foi possível enviar agora. Tente de novo em instantes.')}}}
 // ---- Admin > Pedidos de exclusão ----
 let EXC_CACHE=[],EXC_AT=0;
-async function excAdminCache(force){if(!invIsAdmin){EXC_CACHE=[];SEN_CACHE=[];return}if(!force&&Date.now()-EXC_AT<15000)return;try{EXC_CACHE=await excListar();EXC_AT=Date.now()}catch(e){}try{SEN_CACHE=await senListar()}catch(e){}}
+async function excAdminCache(force){if(!invIsAdmin){EXC_CACHE=[];SEN_CACHE=[];APO_CACHE=[];return}if(!force&&Date.now()-EXC_AT<15000)return;try{EXC_CACHE=await excListar();EXC_AT=Date.now()}catch(e){}try{SEN_CACHE=await senListar()}catch(e){}try{APO_CACHE=await apoListar()}catch(e){}}
 const excDiasDesde=iso=>iso?Math.floor((Date.now()-new Date(iso).getTime())/864e5):0;
 function excAlerts(){if(!invIsAdmin)return [];const out=[],nv=EXC_CACHE.filter(x=>x.status==='novo');
   if(nv.length)out.push({n:'r',inv:1,tab:'exc',t:`${nv.length} ${nv.length===1?'pedido de exclusão aguardando':'pedidos de exclusão aguardando'}`,nota:nv.slice(0,5).map(x=>x.email).join(' · ')+'. Responda em até 15 dias (prazo da LGPD para pedidos do titular).'});
@@ -1550,7 +1590,8 @@ async function excAdminRender(box){
   const card=x=>{const c=invCache.find(v=>String(v.email||'').toLowerCase()===String(x.email||'').toLowerCase()),u=us.find(v=>v.user_id===x.user_id),nome=c?invPrimeiro(c):'',txt=excTexto(x,nome);
     const dd=excDiasDesde(x.desativado_em),lib=x.desativado_em?fmtBR(isoOf(new Date(new Date(x.desativado_em).getTime()+EXC_DIAS*864e5))):'';
     const tag={novo:`<span class="tag r">Novo · ${excDiasDesde(x.criado_em)} ${excDiasDesde(x.criado_em)===1?'dia':'dias'}</span>`,desativado:`<span class="tag a">Desativado · ${dd} ${dd===1?'dia':'dias'}</span>`,excluido:'<span class="tag g">Excluído</span>',desistiu:`<span class="tag b">${x.reativado_em?'Reativado':'Desistiu'}</span>`}[x.status]||'';
-    let bt=`<a class="btn sm" href="${esc(invMailLink(x.email,'Seu pedido de exclusão no Rodaliq',txt))}" target="_blank" rel="noopener">✉ Responder por e-mail</a>`+(c?`<a class="btn sm" href="${esc('https://wa.me/'+c.whatsapp+'?text='+encodeURIComponent(txt))}" target="_blank" rel="noopener">💬 Responder pelo WhatsApp</a>`:'');
+    ZAP_EXC[x.id]={fone:c?c.whatsapp:'',txt};
+    let bt=`<a class="btn sm" href="${esc(invMailLink(x.email,'Seu pedido de exclusão no Rodaliq',txt))}" target="_blank" rel="noopener">✉ Responder por e-mail</a><button type="button" class="btn sm" data-zx="${esc(x.id)}">💬 Responder pelo WhatsApp</button>`;
     if(x.status==='novo')bt+=`<button class="btn sm warn" data-ex="desativar" data-id="${esc(x.id)}">🔒 Desativar acesso</button>`;
     if(x.status==='desativado'){bt+=`<button class="btn sm sec" data-ex="reativar" data-id="${esc(x.id)}">↩ Reativar</button>`;
       bt+=dd>=EXC_DIAS?`<button class="btn sm warn" data-ex="excluir" data-id="${esc(x.id)}">↗ Apagar login (Supabase Users)</button>`:`<span class="small muted">Exclusão definitiva liberada em ${lib}</span>`}
@@ -1566,6 +1607,7 @@ async function excAdminRender(box){
     <div class="admTabs">${F.map(([k,t])=>`<button type="button" class="chip${f===k?' on':''}" data-exf="${k}">${t} (${cnt(k)})</button>`).join('')}</div>
     ${lst.length?lst.map(card).join(''):'<div class="empty" style="margin-top:8px">Nenhum pedido aqui.</div>'}`;
   box.querySelectorAll('[data-exf]').forEach(b=>b.onclick=()=>{UI.excF=b.dataset.exf;excAdminRender(box)});
+  box.querySelectorAll('[data-zx]').forEach(b=>b.onclick=()=>{const z=ZAP_EXC[b.dataset.zx];if(z)abreZap(z.fone,z.txt)});
   box.querySelectorAll('[data-ex]').forEach(b=>b.onclick=async()=>{const x=L.find(v=>v.id===b.dataset.id);if(!x)return;const a=b.dataset.ex,agora=new Date().toISOString();
     try{
       if(a==='desativar'){if(!await confirma(`Desativar o acesso de <b>${esc(x.email)}</b>? A pessoa não consegue mais ver nem lançar dados. Os dados ficam guardados por ${EXC_DIAS} dias e você pode reativar nesse prazo.`,'Desativar acesso'))return;
@@ -1632,9 +1674,9 @@ async function senAdminRender(box){
   const sql=(email,senha)=>`update auth.users set encrypted_password = extensions.crypt('${senha}', extensions.gen_salt('bf')), updated_at = now() where lower(email) = '${String(email).toLowerCase()}';\nupdate public.tb_usuarios set trocar_senha = true where lower(email) = '${String(email).toLowerCase()}';`;
   const card=x=>{const c=invCache.find(v=>String(v.email||'').toLowerCase()===String(x.email||'').toLowerCase()),nome=c?invPrimeiro(c):'',sg=SEN_GERADA[x.id];
     let bt='';
-    if(sg){const txt=senTexto(x,sg,nome);
+    if(sg){const txt=senTexto(x,sg,nome);ZAP_SEN[x.id]={fone:c?c.whatsapp:'',txt};
       bt=`<div class="note small" style="margin-top:8px">🔑 Senha temporária: <b class="senG">${esc(sg)}</b> <button type="button" class="lnk" data-sc="${esc(x.id)}">Copiar</button><br><span class="muted">Ela aparece só agora: envie em seguida.</span></div>
-        <div class="ivActs" style="margin-top:8px"><a class="btn sm" href="${esc(invMailLink(x.email,'Sua nova senha temporária do Rodaliq',txt))}" target="_blank" rel="noopener">✉ Enviar senha por e-mail</a>${c?`<a class="btn sm" href="${esc('https://wa.me/'+c.whatsapp+'?text='+encodeURIComponent(txt))}" target="_blank" rel="noopener">💬 WhatsApp</a>`:''}</div>`}
+        <div class="ivActs" style="margin-top:8px"><a class="btn sm" href="${esc(invMailLink(x.email,'Sua nova senha temporária do Rodaliq',txt))}" target="_blank" rel="noopener">✉ Enviar senha por e-mail</a><button type="button" class="btn sm" data-zs="${esc(x.id)}">💬 Enviar senha pelo WhatsApp</button></div>`}
     else bt=`<div class="ivActs" style="margin-top:8px"><button class="btn sm" data-sg="${esc(x.id)}">🔑 ${x.status==='novo'?'Gerar senha temporária':'Gerar outra senha'}</button><button class="btn sm sec" data-sq="${esc(x.id)}">↗ Abrir SQL Editor (Supabase)</button></div>`;
     return `<div class="uCard"><div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start"><div class="uMail">${esc(c?c.name:x.email)}</div><span class="tag ${x.status==='novo'?'r':'g'}">${x.status==='novo'?'Novo':'Atendido'}</span></div>
       <div class="uLin">${esc(x.email)}${c?` · 💬 ${esc(invFmtPhone(c.whatsapp))}${invUfOf(c.whatsapp)?' · '+esc(invUfOf(c.whatsapp)):''}`:''}</div>
@@ -1644,6 +1686,7 @@ async function senAdminRender(box){
     <div class="admTabs">${[['novo','Novos'],['atendido','Atendidos']].map(([k,t])=>`<button type="button" class="chip${f===k?' on':''}" data-sf="${k}">${t} (${cnt(k)})</button>`).join('')}</div>
     ${lst.length?lst.map(card).join(''):'<div class="empty" style="margin-top:8px">Nenhum pedido aqui.</div>'}`;
   box.querySelectorAll('[data-sf]').forEach(b=>b.onclick=()=>{UI.senF=b.dataset.sf;senAdminRender(box)});
+  box.querySelectorAll('[data-zs]').forEach(b=>b.onclick=()=>{const z=ZAP_SEN[b.dataset.zs];if(z)abreZap(z.fone,z.txt)});
   box.querySelectorAll('[data-sc]').forEach(b=>b.onclick=()=>{try{navigator.clipboard.writeText(SEN_GERADA[b.dataset.sc]);toast('Senha copiada')}catch(e){toast('Não foi possível copiar')}});
   box.querySelectorAll('[data-sq]').forEach(b=>b.onclick=async()=>{const x=L.find(v=>v.id===b.dataset.sq);if(!x)return;const s2=geraSenha(),cmd=sql(x.email,s2);
     try{await navigator.clipboard.writeText(cmd)}catch(e){}
@@ -1657,48 +1700,243 @@ async function senAdminRender(box){
       SEN_GERADA[x.id]=sg;audit('Senha temporária','Admin','Senha temporária gerada · '+x.email);toast('Senha temporária gerada')}
     catch(e){toast('Não foi possível gerar agora. Use o SQL Editor.');return}
     UI.senF='atendido';await excAdminCache(true);atualizaSino();senAdminRender(box);admContagens()})}
+/* ---------- V55: 🤝 Apoiadores — contribuição voluntária. Não trava nada e não existe cobrança ---------- */
+// V56: ajustes guardados no banco (tb_ajustes), para mudar sem subir versão nova
+const AJU_PADRAO={ativo:true,pix:'rodaliq.app@gmail.com',valores:[10,25,50],sugerido:25,aviso:true,dias:30};
+let AJU=Object.assign({},AJU_PADRAO),APO_MEU=false;
+let APO_CACHE=[];const ZAP_APO={};
+async function ajuCarregar(){
+  try{
+    if(!invProd()){const d=await DB.doc('ajustes/apoio').get();if(d.exists&&d.data().v)AJU=Object.assign({},AJU_PADRAO,d.data().v)}
+    else{const {data}=await DB.from('tb_ajustes').select('valor').eq('chave','apoio').maybeSingle();if(data&&data.valor)AJU=Object.assign({},AJU_PADRAO,data.valor)}
+  }catch(e){AJU=Object.assign({},AJU_PADRAO)}
+  if(!Array.isArray(AJU.valores)||!AJU.valores.length)AJU.valores=AJU_PADRAO.valores.slice();
+  try{APO_MEU=(await apoMeus()).length>0}catch(e){APO_MEU=false}
+  aplicaAjustes();
+}
+async function ajuSalvar(v){const novo=Object.assign({},AJU_PADRAO,AJU,v);
+  if(!invProd())await DB.doc('ajustes/apoio').set({v:novo,at:Date.now()});
+  else{const {error}=await DB.from('tb_ajustes').upsert({chave:'apoio',valor:novo,atualizado_em:new Date().toISOString()},{onConflict:'chave'});if(error)throw error}
+  AJU=novo;aplicaAjustes()}
+function aplicaAjustes(){const b=document.querySelector('#optMenu [data-m="apoio"]');if(b)b.classList.toggle('hidden',!AJU.ativo);
+  if(typeof atualizaSino==='function')atualizaSino()}
+// aviso no sino: uma vez só, depois de usar o app por um tempo; some de vez se a pessoa pedir
+function apoAviso(){
+  if(!AJU.ativo||!AJU.aviso||APO_MEU||!CAD)return null;
+  const r=(NOT.reads&&NOT.reads.apoio)||{};if(r.nunca)return null;
+  if(Math.floor((Date.now()-new Date(CAD).getTime())/864e5)<(AJU.dias||30))return null;
+  if(r.em&&Date.now()-new Date(r.em).getTime()<180*864e5)return null;
+  return {n:'a',apo:1,t:'O Rodaliq é gratuito e vai continuar assim.',nota:'Se ele te ajuda, você pode contribuir com o que achar justo. É opcional: nada no app depende disso.'};
+}
+const apoBRL=v=>brl(v); // mesmo formato do resto do app: R$ 13.829,33
+async function apoListar(){
+  if(!invProd())return (await DB.collection('apoios').get()).docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>String(b.criado_em).localeCompare(String(a.criado_em)));
+  const {data,error}=await DB.from('tb_apoios').select('*').order('criado_em',{ascending:false}).limit(1000);if(error)throw error;return data||[]}
+async function apoMeus(){
+  if(!invProd())return (await DB.collection('apoios').get()).docs.map(d=>({id:d.id,...d.data()})).filter(x=>x.user_id===UID);
+  const {data,error}=await DB.from('tb_apoios').select('id,valor,status,criado_em').eq('user_id',UID);if(error)throw error;return data||[]}
+async function apoCriar(valor,tipo){
+  if(!invProd()){const id='a'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+    await DB.doc('apoios/'+id).set({user_id:UID,email:LOGADO,valor,tipo,status:'informado',criado_em:new Date().toISOString(),confirmado_em:null,recibo:null});return}
+  const {error}=await DB.from('tb_apoios').insert({email:LOGADO,valor,tipo});if(error)throw error}
+async function apoConfirmar(x,meio){
+  if(!invProd()){const n=Math.max(0,...APO_CACHE.map(a=>a.recibo||0))+1;
+    await DB.doc('apoios/'+x.id).update({status:'confirmado',confirmado_em:new Date().toISOString(),meio,recibo:n});return n}
+  const {data,error}=await DB.rpc('rodaliq_confirmar_apoio',{p_id:x.id,p_meio:meio});if(error)throw error;return data}
+async function apoDesfazer(x){
+  if(!invProd()){await DB.doc('apoios/'+x.id).update({status:'informado',confirmado_em:null,meio:null,recibo:null});return}
+  const {error}=await DB.from('tb_apoios').update({status:'informado',confirmado_em:null,meio:null,recibo:null}).eq('id',x.id);if(error)throw error}
+function apoAlerts(){if(!invIsAdmin)return [];const nv=APO_CACHE.filter(x=>x.status==='informado');
+  return nv.length?[{n:'a',inv:1,tab:'apo',t:`${nv.length} ${nv.length===1?'contribuição informada para conferir':'contribuições informadas para conferir'}`,nota:nv.slice(0,5).map(x=>x.email).join(' · ')}]:[]}
+function apoTexto(x,nome){const d=fmtBR(String(x.confirmado_em||x.criado_em).slice(0,10));
+  return `Olá${nome?', '+nome:''}! Recebemos a sua contribuição de ${apoBRL(x.valor)} ao Rodaliq em ${d}.${x.recibo?'\nRecibo nº '+String(x.recibo).padStart(3,'0'):''}\n\nO app continua gratuito para todo mundo. A sua ajuda cobre o domínio, o servidor e as melhorias de cada mês. Muito obrigado por fortalecer o projeto.\n\nEquipe Rodaliq`}
+// tela do usuário: ⚙ Opções > 💚 Apoie o Rodaliq
+function formApoiar(){
+  const VL=AJU.valores,SG=VL.includes(AJU.sugerido)?AJU.sugerido:VL[Math.min(1,VL.length-1)];
+  const ov=document.createElement('div');ov.className='ov';let sel=SG;
+  ov.innerHTML=`<div class="modal" style="max-width:440px"><h2>💚 Ajude a manter o Rodaliq</h2>
+    <p class="small">O Rodaliq é gratuito e vai continuar. Se ele te ajuda, você pode contribuir com o que achar justo: a ajuda cobre o domínio, o servidor e as melhorias de cada mês. Nada no app depende disso.</p>
+    <div class="apoV">${VL.map(v=>`<button type="button" class="chip${v===SG?' on':''}" data-av="${v}">${apoBRL(v)}${v===SG?'<br><span class="small">sugerido</span>':''}</button>`).join('')}
+      <button type="button" class="chip" data-av="outro">Outro valor</button></div>
+    <div class="field hidden" id="apoOutroW"><label for="apoOutro">Quanto você quer contribuir?</label><input class="inp num" id="apoOutro" inputmode="decimal" placeholder="Ex.: 15,00" autocomplete="off"></div>
+    <div class="field"><label>Chave Pix</label><div class="apoPix"><code id="apoPix">${esc(AJU.pix)}</code><button type="button" class="btn sec sm" id="apoCop">Copiar</button></div></div>
+    <p class="small muted" style="margin:6px 0 0">Faça o Pix pelo seu banco e depois avise aqui. Nenhum dado de pagamento passa pelo app.</p>
+    <div class="err" id="apoErr"></div>
+    <div class="mfoot"><button class="btn sec" id="apoN">Fechar</button><button class="btn" id="apoS">Já contribuí</button></div></div>`;
+  document.body.appendChild(ov);const q=s=>ov.querySelector(s),err=t=>{q('#apoErr').textContent=t};
+  q('#apoN').onclick=()=>ov.remove();
+  ov.querySelectorAll('[data-av]').forEach(b=>b.onclick=()=>{ov.querySelectorAll('[data-av]').forEach(o=>o.classList.remove('on'));b.classList.add('on');err('');
+    const o=b.dataset.av==='outro';q('#apoOutroW').classList.toggle('hidden',!o);sel=o?null:+b.dataset.av;if(o)setTimeout(()=>q('#apoOutro').focus(),50)});
+  q('#apoOutro').addEventListener('blur',()=>{const e=q('#apoOutro'),v=r2(parseBRL(e.value));if(v>0)e.value=brl(v,1)});
+  q('#apoCop').onclick=async()=>{try{await navigator.clipboard.writeText(AJU.pix);toast('Chave Pix copiada')}catch(e){toast('Não foi possível copiar')}};
+  q('#apoS').onclick=async()=>{let v=sel;if(v==null)v=parseBRL(q('#apoOutro').value);
+    if(!v||v<=0)return err('Escolha um valor ou digite quanto você contribuiu.');
+    q('#apoS').disabled=true;
+    try{await apoCriar(r2(v),'avulso');APO_MEU=true;audit('Apoio','Configurações','Contribuição informada · '+apoBRL(v));ov.remove();atualizaSino();
+      confirma('Obrigado! Avisei o administrador. Assim que ele conferir o Pix, você recebe o recibo por e-mail ou WhatsApp.','Fechar',{titulo:'💚 Contribuição registrada',voltar:null})}
+    catch(e){q('#apoS').disabled=false;err('Não foi possível registrar agora. Tente de novo em instantes.')}};
+}
+// recibo em PDF: o WhatsApp e o e-mail abertos por link não aceitam anexo, então você baixa e anexa
+async function reciboPDF(x,nome,btn){
+  const old=btn?btn.textContent:'';if(btn){btn.disabled=true;btn.textContent='Gerando…'}
+  try{
+    await carregaLib('jspdf');
+    const d=new window.jspdf.jsPDF({unit:'pt',format:'a4'}),W=d.internal.pageSize.getWidth();
+    const n=x.recibo?String(x.recibo).padStart(3,'0'):'—';
+    d.setFontSize(18);d.setTextColor(20,33,61);d.text('Rodaliq',40,56);
+    d.setFontSize(9);d.setTextColor(91,100,120);d.text(pdfTxt('rodaliq.com.br · '+AJU.pix),40,70);
+    d.setDrawColor(227,231,239);d.line(40,84,W-40,84);
+    d.setFontSize(14);d.setTextColor(20,33,61);d.text(pdfTxt('Recibo de contribuição nº '+n),40,112);
+    const lin=[['Recebido de',pdfTxt(nome||x.email)],['E-mail',pdfTxt(x.email)],['Valor',apoBRL(x.valor)],
+      ['Forma',pdfTxt(x.meio||'Pix')],['Data da contribuição',admData(x.criado_em)],['Confirmado em',admData(x.confirmado_em)]];
+    let y=140;d.setFontSize(10);
+    lin.forEach(([a,b])=>{d.setTextColor(91,100,120);d.text(pdfTxt(a),40,y);d.setTextColor(20,33,61);d.text(pdfTxt(String(b)),200,y);y+=20});
+    y+=10;d.setDrawColor(227,231,239);d.line(40,y,W-40,y);y+=22;
+    d.setFontSize(9);d.setTextColor(91,100,120);
+    const t=pdfTxt('Contribuição voluntária ao projeto Rodaliq. O uso do aplicativo é gratuito e não depende desta contribuição: ela cobre domínio, servidor e as melhorias do app. Este é um recibo simples de quitação, emitido por pessoa física, e não é documento fiscal.');
+    d.text(d.splitTextToSize(t,W-80),40,y);
+    const dt=new Date(),fn=pad(dt.getDate())+pad(dt.getMonth()+1)+String(dt.getFullYear()).slice(2)+'_'+pad(dt.getHours())+pad(dt.getMinutes())+'_Rodaliq_Recibo_'+n+'.pdf';
+    if(DL){await DL.save({filename:fn,data:d.output('arraybuffer')});audit('Apoio','Admin','Recibo '+n+' gerado · '+x.email);toast('Recibo gerado')}
+    else toast('Download indisponível nesta visualização.');
+  }catch(e){if(!(e&&e.code==='declined'))toast(e&&String(e.message||'').startsWith('lib')?'Não consegui carregar a biblioteca de PDF.':'Não foi possível gerar o recibo.')}
+  finally{if(btn){btn.disabled=false;btn.textContent=old}}
+}
+// ⚙ Ajustes do app: só o admin principal
+function formAjustes(){if(!ehMaster())return;
+  const ov=document.createElement('div');ov.className='ov';
+  ov.innerHTML=`<div class="modal" style="max-width:460px"><h2>⚙ Ajustes do app</h2>
+    <p class="small">Valem para todo mundo, na hora. Não precisa subir versão nova.</p>
+    <label class="exChk"><input type="checkbox" id="ajA"${AJU.ativo?' checked':''}><span>Mostrar <b>💚 Ajude a manter o Rodaliq</b> no menu ⚙ Opções</span></label>
+    <label class="exChk"><input type="checkbox" id="ajV"${AJU.aviso?' checked':''}><span>Avisar no 🔔 sino, uma vez, para quem usa o app há mais de <b id="ajDt">${AJU.dias}</b> dias e ainda não contribuiu</span></label>
+    <div class="field"><label for="ajP">Chave Pix</label><input class="inp" id="ajP" value="${esc(AJU.pix)}" autocomplete="off"></div>
+    <div class="field"><label for="ajV1">Valores sugeridos (R$)</label><div style="display:flex;gap:6px">
+      ${AJU.valores.slice(0,3).map((v,i)=>`<input class="inp num" id="ajV${i+1}" inputmode="decimal" value="${brl(v,1)}">`).join('')}</div></div>
+    <div class="field"><label for="ajS">Qual deles vem marcado</label><select class="inp" id="ajS">${AJU.valores.slice(0,3).map(v=>`<option value="${v}"${v===AJU.sugerido?' selected':''}>${apoBRL(v)}</option>`).join('')}</select></div>
+    <div class="err" id="ajErr"></div>
+    <div class="mfoot"><button class="btn sec" id="ajN">Cancelar</button><button class="btn" id="ajS2">Salvar</button></div></div>`;
+  document.body.appendChild(ov);const q=s=>ov.querySelector(s);
+  const refSel=()=>{const vs=[1,2,3].map(i=>r2(parseBRL(q('#ajV'+i).value))).filter(v=>v>0);
+    q('#ajS').innerHTML=vs.map(v=>`<option value="${v}"${v===AJU.sugerido?' selected':''}>${apoBRL(v)}</option>`).join('')};
+  [1,2,3].forEach(i=>{const e=q('#ajV'+i);e.addEventListener('change',()=>{const v=r2(parseBRL(e.value));e.value=v>0?brl(v,1):'';refSel()})});
+  q('#ajN').onclick=()=>ov.remove();
+  q('#ajS2').onclick=async()=>{const pix=q('#ajP').value.trim();
+    const vs=[...new Set([1,2,3].map(i=>r2(parseBRL(q('#ajV'+i).value))).filter(v=>v>0))].sort((a,b)=>a-b);
+    if(!pix)return q('#ajErr').textContent='Informe a chave Pix.';
+    if(!vs.length)return q('#ajErr').textContent='Informe pelo menos um valor.';
+    let sg=r2(parseBRL(q('#ajS').value));if(!vs.includes(sg))sg=vs[0];
+    q('#ajS2').disabled=true;
+    try{await ajuSalvar({ativo:q('#ajA').checked,aviso:q('#ajV').checked,pix,valores:vs,sugerido:sg});
+      audit('Ajustes','Admin','Ajustes do app salvos · apoio '+(q('#ajA').checked?'ligado':'desligado'));toast('Ajustes salvos');ov.remove()}
+    catch(e){q('#ajS2').disabled=false;q('#ajErr').textContent='Não foi possível salvar. Só o admin principal pode.'}};
+}
+async function apoAdminRender(box){
+  let L;try{L=await apoListar();APO_CACHE=L}catch(e){box.innerHTML='<div class="empty">Não consegui carregar as contribuições. Tente de novo em instantes.</div>';return}
+  if(!invCache.length)try{await invRefreshBadge(true)}catch(e){}
+  const F=[['informado','Para conferir'],['confirmado','Confirmadas'],['todos','Todas']];
+  const f=UI.apoF||'informado',lst=f==='todos'?L:L.filter(x=>x.status===f),cnt=k=>k==='todos'?L.length:L.filter(x=>x.status===k).length;
+  const ym=hoje().slice(0,7),mes=L.filter(x=>x.status==='confirmado'&&String(x.confirmado_em||'').slice(0,7)===ym);
+  const card=x=>{const c=invCache.find(v=>String(v.email||'').toLowerCase()===String(x.email||'').toLowerCase()),nome=c?invPrimeiro(c):'',txt=apoTexto(x,nome);
+    ZAP_APO[x.id]={fone:c?c.whatsapp:'',txt,nome};
+    const tag=x.status==='confirmado'?'<span class="tag b">Confirmada</span>':'<span class="tag a">Para conferir</span>';
+    let bt='';
+    if(x.status==='informado')bt=`<button class="btn sm" data-ac="${esc(x.id)}">✓ Confirmar e gerar recibo</button>`;
+    else bt=`<button type="button" class="btn sm" data-ar="${esc(x.id)}">⬇ Baixar recibo (PDF)</button><a class="btn sm" href="${esc(invMailLink(x.email,'Seu recibo de contribuição ao Rodaliq',txt))}" target="_blank" rel="noopener">✉ Enviar por e-mail</a><button type="button" class="btn sm" data-za="${esc(x.id)}">💬 Enviar pelo WhatsApp</button><button class="btn sm sec" data-ad="${esc(x.id)}">↩ Desfazer</button>`;
+    return `<div class="uCard"><div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start"><div class="uMail">${esc(c?c.name:x.email)}</div>${tag}</div>
+      <div class="uLin">${esc(x.email)}${c?` · 💬 ${esc(invFmtPhone(c.whatsapp))}${invUfOf(c.whatsapp)?' · '+esc(invUfOf(c.whatsapp)):''}`:''}</div>
+      <div class="uLin"><b>${apoBRL(x.valor)}</b> · informada em ${admData(x.criado_em)}${x.confirmado_em?' · confirmada em '+admData(x.confirmado_em):''}${x.recibo?' · recibo nº '+String(x.recibo).padStart(3,'0'):''}</div>
+      <div class="ivActs" style="margin-top:8px">${bt}</div></div>`};
+  box.innerHTML=`<h3 style="margin:0">🤝 Apoiadores</h3>
+    <p class="small muted" style="margin:4px 0 8px">Contribuição é voluntária: ninguém fica sem o app por não contribuir, e o app nunca cobra. Confira o Pix no seu banco antes de confirmar; confirmar gera o número do recibo. O WhatsApp e o e-mail abrem com o texto pronto; para mandar o recibo em PDF, baixe e anexe.</p>
+    <div class="cards grid" style="margin-bottom:10px">${kpi('Confirmadas em '+mesNome(ym),apoBRL(sum(mes,x=>x.valor)),mes.length+(mes.length===1?' contribuição':' contribuições'))}${kpi('Para conferir',String(cnt('informado')),'aguardando a sua conferência')}${kpi('Apoiadores',String(new Set(L.filter(x=>x.status==='confirmado').map(x=>x.email)).size),'pessoas que já contribuíram')}</div>
+    <div class="admTabs">${F.map(([k,t])=>`<button type="button" class="chip${f===k?' on':''}" data-apf="${k}">${t} (${cnt(k)})</button>`).join('')}</div>
+    ${lst.length?lst.map(card).join(''):'<div class="empty" style="margin-top:8px">Nenhuma contribuição aqui.</div>'}`;
+  box.querySelectorAll('[data-apf]').forEach(b=>b.onclick=()=>{UI.apoF=b.dataset.apf;apoAdminRender(box)});
+  box.querySelectorAll('[data-za]').forEach(b=>b.onclick=()=>{const z=ZAP_APO[b.dataset.za];if(z)abreZap(z.fone,z.txt)});
+  box.querySelectorAll('[data-ar]').forEach(b=>b.onclick=()=>{const x=L.find(v=>v.id===b.dataset.ar);if(x)reciboPDF(x,(ZAP_APO[x.id]||{}).nome,b)});
+  box.querySelectorAll('[data-ac]').forEach(b=>b.onclick=async()=>{const x=L.find(v=>v.id===b.dataset.ac);if(!x)return;
+    if(!await confirma(`Confirmar a contribuição de <b>${apoBRL(x.valor)}</b> de <b>${esc(x.email)}</b>? Confira antes no extrato do seu banco. O app gera o número do recibo e você envia por e-mail ou WhatsApp.`,'Confirmar'))return;
+    try{const n=await apoConfirmar(x,'Pix');audit('Apoio','Admin','Contribuição confirmada · '+x.email+' · '+apoBRL(x.valor)+(n?' · recibo '+n:''));toast('Contribuição confirmada')}
+    catch(e){toast('Não foi possível confirmar agora. Tente de novo.');return}
+    UI.apoF='confirmado';await excAdminCache(true);atualizaSino();apoAdminRender(box);admContagens()});
+  box.querySelectorAll('[data-ad]').forEach(b=>b.onclick=async()=>{const x=L.find(v=>v.id===b.dataset.ad);if(!x)return;
+    if(!await confirma(`Desfazer a confirmação de <b>${esc(x.email)}</b>? Ela volta para “Para conferir” e o recibo deixa de valer.`,'Desfazer',{perigo:1}))return;
+    try{await apoDesfazer(x);audit('Apoio','Admin','Confirmação desfeita · '+x.email)}catch(e){toast('Não foi possível desfazer agora.');return}
+    await excAdminCache(true);atualizaSino();apoAdminRender(box);admContagens()});
+}
 /* ---------- V48: aba 🛡 Admin (só administradores) ---------- */
 const ADMIN_MASTER='diogogomes2110@gmail.com';
 const ehMaster=()=>invProd()?String(LOGADO||'').toLowerCase()===ADMIN_MASTER:true; // no HMO o cadastro de admin é simulado
-const ADM_T=[['convites','📨 Pedidos de convite'],['ativos','👥 Usuários ativos'],['excluidos','🚫 Usuários excluídos'],['exclusoes','🗑 Pedidos de exclusão'],['senhas','🔑 Pedidos de senha']];
+const ADM_T=[['convites','📨 Pedidos de convite'],['ativos','👥 Usuários ativos'],['excluidos','🚫 Usuários excluídos'],['exclusoes','🗑 Pedidos de exclusão'],['senhas','🔑 Pedidos de senha'],['apoios','🤝 Apoiadores']];
 // V50: Gestão Admin abre como página inteira (computador e celular)
 function abrirAdmin(sub){['#bellMenu','#optMenu','#fabMenu'].forEach(s=>{const m=$(s);if(m)m.classList.add('hidden')});if(!invIsAdmin)return;
   if(sub)UI.admSub=sub;let ov=$('#admPage');
   if(!ov){ov=document.createElement('div');ov.className='ov admPage';ov.id='admPage';document.body.appendChild(ov);ov.__fechar=()=>{ov.remove();invRefreshBadge(false);if(typeof atualizaSino==='function')atualizaSino()}}
   const sub2=UI.admSub||'convites';
-  ov.innerHTML=`<div class="admWrap"><div class="admHd"><h2>🛡 Gestão Admin</h2><div class="admHdB">${ehMaster()?'<button type="button" class="btn sec sm admMaster" id="admCad">➕ Cadastrar admin</button>':''}<button type="button" class="btn sec sm" id="admAniv">🎂 Aniversariantes</button><button type="button" class="btn sec sm" id="admFechar">Fechar</button></div></div>
+  ov.innerHTML=`<div class="admWrap"><div class="admHd"><h2>🛡 Gestão Admin</h2><div class="admHdB">${ehMaster()?'<button type="button" class="btn sec sm admMaster" id="admCad">🛡 Admins</button><button type="button" class="btn sec sm admMaster" id="admAju">⚙ Ajustes</button>':''}<button type="button" class="btn sec sm" id="admAniv">🎂 Aniversariantes</button><button type="button" class="btn sec sm" id="admFechar">Fechar</button></div></div>
     <div class="admTabs">${ADM_T.map(([k,t])=>`<button type="button" class="chip${sub2===k?' on':''}" data-adm="${k}">${t} <span data-admn="${k}"></span></button>`).join('')}</div>
     <div id="admBox"><div class="empty">Carregando…</div></div></div>`;
   ov.querySelector('#admFechar').onclick=()=>ov.__fechar();
   ov.querySelectorAll('[data-adm]').forEach(b=>b.onclick=()=>abrirAdmin(b.dataset.adm));
   ov.querySelector('#admAniv').onclick=async()=>{if((UI.admSub||'convites')!=='convites')abrirAdmin('convites');for(let i=0;i<40;i++){const m=document.querySelector('#admBox #ivMode');if(m){if(!document.querySelector('#admBox #ivCalBox:not(.hidden)'))m.click();return}await new Promise(r=>setTimeout(r,50))}};
-  const cad=ov.querySelector('#admCad');if(cad)cad.onclick=formCadAdmin;
+  const cad=ov.querySelector('#admCad');if(cad)cad.onclick=formAdmins;
+  const aju=ov.querySelector('#admAju');if(aju)aju.onclick=formAjustes;
   ov.scrollTop=0;montaAdmin();admContagens()}
 async function admContagens(){const put=(k,n)=>{const e=document.querySelector(`[data-admn="${k}"]`);if(e)e.textContent=n==null?'':'('+n+')'};
   try{if(!invCache.length)await invRefreshBadge(true)}catch(e){}
   put('convites',invCache.filter(r=>invVivo(r)&&!r.archived&&r.status==='novo').length);
   try{const us=await admUsuarios();put('ativos',us.filter(u=>!u.excluido_em).length);put('excluidos',us.filter(u=>u.excluido_em).length)}catch(e){}
   try{const L=await excListar();put('exclusoes',L.filter(x=>x.status==='novo'||x.status==='desativado').length)}catch(e){}
-  try{const L=await senListar();SEN_CACHE=L;put('senhas',L.filter(x=>x.status==='novo').length)}catch(e){}}
-// ➕ Cadastrar admin: só o admin master; no banco, só ele consegue gravar em tb_admins
-function formCadAdmin(){if(!ehMaster())return;
-  const ov=document.createElement('div');ov.className='ov';
-  ov.innerHTML=`<div class="modal" style="max-width:440px"><h2>➕ Cadastrar admin</h2><p class="small">Informe o e-mail de um usuário que já tenha conta ativa no app.</p>
-    <input class="inp" type="email" id="caMail" placeholder="e-mail do usuário" autocomplete="off">
-    <p style="margin:8px 0 0"><a class="supaLnk" href="${SUPA_TAB}" target="_blank" rel="noopener">↗ Abrir tabela tb_admins no Supabase</a></p>
-    <div class="err" id="caErr"></div><div class="mfoot"><button class="btn sec" id="caN">Cancelar</button><button class="btn" id="caS">Cadastrar</button></div></div>`;
-  document.body.appendChild(ov);const q=x=>ov.querySelector(x),err=t=>{q('#caErr').textContent=t};
-  q('#caN').onclick=()=>ov.remove();q('#caMail').addEventListener('input',()=>err(''));setTimeout(()=>q('#caMail').focus(),50);
-  q('#caS').onclick=async()=>{const em=q('#caMail').value.trim().toLowerCase();if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em))return err('Informe um e-mail válido.');
-    q('#caS').disabled=true;
-    try{
-      if(!invProd()){toast('Admin cadastrado (simulação do HMO)');audit('Cadastro de admin','Admin','Admin cadastrado (simulação) · '+em);ov.remove();return}
-      const {data:us,error:e1}=await DB.from('tb_usuarios').select('user_id,email,excluido_em').ilike('email',em);if(e1)throw e1;
-      const u=(us||[]).find(x=>!x.excluido_em);if(!u){q('#caS').disabled=false;return err('Não há usuário ativo com este e-mail.')}
-      const {error:e2}=await DB.from('tb_admins').insert({user_id:u.user_id});
-      if(e2){q('#caS').disabled=false;return err(/23505|duplicate/i.test(e2.code+e2.message)?'Este usuário já é admin.':'Não foi possível cadastrar. Só o admin master pode cadastrar admins.')}
-      audit('Cadastro de admin','Admin','Admin cadastrado · '+em);toast('Admin cadastrado');ov.remove()}
-    catch(e){q('#caS').disabled=false;err('Não foi possível cadastrar agora. Tente de novo.')}}}
+  try{const L=await senListar();SEN_CACHE=L;put('senhas',L.filter(x=>x.status==='novo').length)}catch(e){}
+  try{const L=await apoListar();APO_CACHE=L;put('apoios',L.filter(x=>x.status==='informado').length)}catch(e){}}
+// 🛡 Admins: lista, cadastro e remoção. Só o admin master; no banco, só ele grava e apaga em tb_admins
+let ADM_HMO=[]; // no HMO a lista é simulada e vive só nesta sessão
+async function admListar(){
+  if(!invProd())return [{user_id:'hmo',email:LOGADO||'usuário de teste',master:true}].concat(ADM_HMO);
+  const {data,error}=await DB.from('tb_admins').select('user_id,created_at');if(error)throw error;
+  let us=[];try{us=await admUsuarios()}catch(e){}
+  const m=new Map(us.map(u=>[u.user_id,u.email]));
+  return (data||[]).map(r=>{const em=m.get(r.user_id)||'(sem e-mail)';
+      return {user_id:r.user_id,email:em,criado_em:r.created_at,master:String(em).toLowerCase()===ADMIN_MASTER||(r.user_id===UID&&ehMaster())}})
+    .sort((a,b)=>(b.master?1:0)-(a.master?1:0)||String(a.email).localeCompare(String(b.email)));
+}
+function formAdmins(){if(!ehMaster())return;
+  const ov=document.createElement('div');ov.className='ov';ov.id='admsOv';document.body.appendChild(ov);
+  const draw=async()=>{
+    let L=[],er='';try{L=await admListar()}catch(e){er='Não consegui carregar a lista de admins. Tente de novo em instantes.'}
+    ov.innerHTML=`<div class="modal" style="max-width:460px"><h2>🛡 Admins do app</h2>
+      <p class="small">Só você, como admin principal, cadastra e descadastra admins.</p>
+      ${er?`<div class="empty">${er}</div>`:(L.map(a=>`<div class="admLin"><span class="admEm">${esc(a.email)}${a.master?' <span class="small muted">(você, admin principal)</span>':''}</span>${a.master?'':`<button type="button" class="btn sec sm" data-rm="${esc(a.user_id)}">Remover</button>`}</div>`).join('')||'<div class="empty">Nenhum admin cadastrado.</div>')}
+      <h3 style="margin:14px 0 4px">➕ Cadastrar admin</h3>
+      <p class="small muted" style="margin:0 0 6px">Informe o e-mail de um usuário que já tenha conta ativa no app.</p>
+      <input class="inp" type="email" id="caMail" placeholder="e-mail do usuário" autocomplete="off">
+      <p style="margin:8px 0 0"><a class="supaLnk" href="${SUPA_TAB}" target="_blank" rel="noopener">↗ Abrir tabela tb_admins no Supabase</a></p>
+      <div class="err" id="caErr"></div>
+      <div class="mfoot"><button class="btn sec" id="caN">Fechar</button><button class="btn" id="caS">Cadastrar</button></div></div>`;
+    const q=x=>ov.querySelector(x),err=t=>{q('#caErr').textContent=t};
+    q('#caN').onclick=()=>ov.remove();q('#caMail').addEventListener('input',()=>err(''));
+    ov.querySelectorAll('[data-rm]').forEach(b=>b.onclick=async()=>{const a=L.find(x=>String(x.user_id)===b.dataset.rm);if(!a)return;
+      if(!await confirma(`Remover o perfil de admin de <b>${esc(a.email)}</b>? A conta e os dados da pessoa continuam como estão; ela passa a ser um usuário comum assim que recarregar o app.`,'Remover admin'))return;
+      try{
+        if(invProd()){const {error}=await DB.from('tb_admins').delete().eq('user_id',a.user_id);if(error)throw error}
+        else ADM_HMO=ADM_HMO.filter(x=>x.user_id!==a.user_id);
+        audit('Remoção de admin','Admin','Admin removido · '+a.email);toast('Admin removido: '+a.email)}
+      catch(e){toast('Não foi possível remover. Só o admin principal pode.');return}
+      draw()});
+    q('#caS').onclick=async()=>{const em=q('#caMail').value.trim().toLowerCase();if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em))return err('Informe um e-mail válido.');
+      if(L.some(a=>String(a.email).toLowerCase()===em))return err('Este usuário já é admin.');
+      q('#caS').disabled=true;
+      try{
+        if(!invProd()){ADM_HMO.push({user_id:'hmo-'+Date.now(),email:em});audit('Cadastro de admin','Admin','Admin cadastrado (simulação) · '+em);toast('Admin cadastrado: '+em);draw();return}
+        const {data:us,error:e1}=await DB.from('tb_usuarios').select('user_id,email,excluido_em').ilike('email',em);if(e1)throw e1;
+        const u=(us||[]).find(x=>!x.excluido_em);if(!u){q('#caS').disabled=false;return err('Não há usuário ativo com este e-mail.')}
+        const {error:e2}=await DB.from('tb_admins').insert({user_id:u.user_id});
+        if(e2){q('#caS').disabled=false;return err(/23505|duplicate/i.test(e2.code+e2.message)?'Este usuário já é admin.':'Não foi possível cadastrar. Só o admin principal pode cadastrar admins.')}
+        audit('Cadastro de admin','Admin','Admin cadastrado · '+em);toast('Admin cadastrado: '+em);draw()}
+      catch(e){q('#caS').disabled=false;err('Não foi possível cadastrar agora. Tente de novo.')}};
+    setTimeout(()=>{const i=q('#caMail');if(i)i.focus()},50);
+  };
+  draw();
+}
 // usuários: produção lê a tabela espelho tb_usuarios (preenchida pelo Supabase); no HMO só existe o usuário de teste
 async function admUsuarios(){
   if(invProd()){const {data,error}=await DB.from('tb_usuarios').select('user_id,email,criado_em,ultimo_login,ultimo_uso,excluido_em');if(error)throw error;return data||[]}
@@ -1710,6 +1948,7 @@ async function montaAdmin(){const box=$('#admBox');if(!box)return;const sub=UI.a
   if(sub==='convites'){box.innerHTML='';openInvitesModal(box);return}
   if(sub==='exclusoes'){excAdminRender(box);return}
   if(sub==='senhas'){senAdminRender(box);return}
+  if(sub==='apoios'){apoAdminRender(box);return}
   let us;try{us=await admUsuarios()}catch(e){box.innerHTML='<div class="empty">Não consegui carregar os usuários. Tente de novo em instantes.</div>';return}
   if(!invCache.length)try{await invRefreshBadge(true)}catch(e){}
   const conv=new Map(invCache.map(x=>[String(x.email||'').toLowerCase(),x]));
@@ -1726,6 +1965,23 @@ function invSetAdmin(on){
   ['#tabAdmin','#fabAdm'].forEach(i=>{const b=$(i);if(b)b.classList.toggle('hidden',!invIsAdmin)});
   if(!invIsAdmin){const pg=$('#admPage');if(pg)pg.remove()}
   if(!invIsAdmin){invCache=[];invCacheAt=0;['#invBadge','#fabInvBadge'].forEach(i=>{const c=$(i);if(c)c.classList.add('hidden')})}
+  // V53: quem administra o app não pede exclusão pelo app (pede pelo e-mail de contato, como dizem os Termos)
+  const ex=document.querySelector('#optMenu [data-m="excluir"]');if(ex)ex.classList.toggle('hidden',invIsAdmin);
+  mostraQuem();
+}
+/* ---------- V53: nome de quem está logado (tabela public.profiles, campo display_name) ---------- */
+let NOME_USR='';
+async function carregaPerfil(){
+  NOME_USR='';
+  if(!invProd())NOME_USR=String(LOGADO||'').split('@')[0]||'Usuário de teste';
+  else{try{const {data}=await DB.from('profiles').select('display_name').eq('id',UID).maybeSingle();NOME_USR=(data&&data.display_name)||''}catch(e){NOME_USR=''}}
+  mostraQuem();
+}
+function mostraQuem(){
+  const n=$('#whoName'),m=$('#whoMail');if(!n)return;
+  const sel=invIsAdmin?' <span class="whoA">(admin)</span>':'';
+  if(NOME_USR){n.innerHTML=esc(NOME_USR)+sel;if(m)m.textContent=(LOGADO&&LOGADO!==NOME_USR)?LOGADO:''}
+  else{n.innerHTML=esc(LOGADO||'')+sel;if(m)m.textContent=''}
 }
 function invBdayOn(x,off){
   if(!x||x.status==='recusado'||!x.birth_date)return null;
@@ -2042,7 +2298,7 @@ const GUIA=[
  {t:'📅 Despesas programadas',x:`IPVA, seguro e revisão chegam de uma vez. Programe a despesa com o valor e a data de pagamento: o app divide o valor pelos meses até lá e mostra quanto separar por mês. Para não gastar sem querer, deixe esse valor numa conta separada da do dia a dia.`,
    m:'Card Despesas programadas e lucro livre, no Painel.',acts:[['＋ Programar despesa',()=>formReserva()]]},
  {t:'🪪 Sua CNH (opcional)',cfg:'cnh'},
- {t:'📊 Para acompanhar',x:`• <b>Painel:</b> meta, ganhos, custos, resultado, previsão e despesas programadas (troque o mês e o veículo no topo).<br>• <b>🔔 Sino:</b> alertas (DARF, multas, CNH, manutenção e lembrete de backup) e novidades.<br>• <b>⚡ Atalhos:</b> todos os lançamentos num toque; arraste o botão para onde preferir.<br>• <b>Relatórios:</b> filtros e download em PDF, Word, Excel e CSV.<br>• <b>⚙ Opções:</b> veículos, metas, tema, backup e este guia. Exporte um backup pelo menos a cada 30 dias e guarde o arquivo fora do aparelho: o sino avisa quando passar disso. Se um dia quiser sair, use ⚙ Opções &gt; Excluir minha conta.<br>• <b>Esqueceu a senha?</b> Use “Esqueci minha senha”, na tela de entrada.`}
+ {t:'📊 Para acompanhar',x:`• <b>Painel:</b> meta, ganhos, custos, resultado, previsão e despesas programadas (troque o mês e o veículo no topo).<br>• <b>🔔 Sino:</b> alertas (DARF, multas, CNH, manutenção e lembrete de backup) e novidades.<br>• <b>⚡ Atalhos:</b> todos os lançamentos num toque; arraste o botão para onde preferir.<br>• <b>Relatórios:</b> filtros e download em PDF, Word, Excel e CSV.<br>• <b>⚙ Opções:</b> veículos, metas, tema, backup e este guia. Exporte um backup pelo menos a cada 30 dias e guarde o arquivo fora do aparelho: o sino avisa quando passar disso. Se um dia quiser sair, use ⚙ Opções &gt; Excluir minha conta.<br>• <b>Esqueceu a senha?</b> Use “Esqueci minha senha”, na tela de entrada.<br>• <b>💚 Ajude a manter o Rodaliq:</b> o app é gratuito e vai continuar. Se ele te ajuda, você pode contribuir com o que achar justo, em ⚙ Opções. É opcional e nada aqui depende disso.`}
 ];
 function primeiroAcesso(auto){
   const c=cfg(),DS=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];let passo=0;
@@ -2258,7 +2514,7 @@ $('#optBtn').onclick=e=>{e.stopPropagation();$('#bellMenu').classList.add('hidde
 window.addEventListener('scroll',()=>{['bellMenu','optMenu'].forEach(id=>{const m=document.getElementById(id);if(m&&!m.classList.contains('hidden')&&window.innerWidth<=640)posMenu(m,document.getElementById(id==='bellMenu'?'bellBtn':'optBtn'))})},{passive:true});
 document.addEventListener('click',e=>{if(!e.target.closest('#optWrap'))$('#optMenu').classList.add('hidden');if(!e.target.closest('#bellWrap'))$('#bellMenu').classList.add('hidden')});
 $('#optMenu').onclick=e=>{const b=e.target.closest('[data-m]');if(!b)return;$('#optMenu').classList.add('hidden');
-  ({excluir:formExcluirConta,cfg:formCfg,veic:formVeic,cnh:formCnh,tema:formTema,rsv:verReservas,onb:()=>primeiroAcesso(false),termos:()=>verTermos(),aud:verAuditoria,pass:formSenha,exp:exportar,imp:()=>$('#impFile').click(),out:sair})[b.dataset.m]()};
+  ({apoio:formApoiar,excluir:formExcluirConta,cfg:formCfg,veic:formVeic,cnh:formCnh,tema:formTema,rsv:verReservas,onb:()=>primeiroAcesso(false),termos:()=>verTermos(),aud:verAuditoria,pass:formSenha,exp:exportar,imp:()=>$('#impFile').click(),out:sair})[b.dataset.m]()};
 (()=>{const h=(location.hash||'').slice(1);if(['painel','corridas','carona','custos','multas','impostos','relatorios'].includes(h))UI.tab=h})();
 iniciar();
 if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
