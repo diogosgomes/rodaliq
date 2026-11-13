@@ -165,6 +165,19 @@ h3{font-size:13px;margin:0 0 8px;color:var(--muted);text-transform:uppercase;let
 .apoV,.apoT{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0 4px}
 .apoV .chip{flex:1 1 0;min-width:84px;text-align:center;padding:8px 10px;line-height:1.2}
 .apoPix{display:flex;gap:6px;align-items:center}
+.calHd{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}
+.calW{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.calS{text-align:center;font-size:11px;color:var(--mut);padding:4px 0}
+.calD{border:1px solid transparent;background:transparent;border-radius:8px;padding:8px 0;font-size:13.5px;color:var(--ink);cursor:pointer}
+.calD:hover:not([disabled]){background:#f1f4f9}
+html[data-tema=escuro] .calD:hover:not([disabled]){background:rgba(255,255,255,.08)}
+.calD.hj{border-color:var(--line)}
+.calD.on{background:var(--blue);color:#fff;border-color:var(--blue)}
+.calD[disabled]{opacity:.28;cursor:default}
+.dtW{display:flex;gap:6px;align-items:center}
+.dtW .inp{flex:1;min-width:0}
+.dtB{border:1px solid var(--line);background:#fff;border-radius:9px;padding:8px 10px;font-size:15px;line-height:1;cursor:pointer}
+html[data-tema=escuro] .dtB{background:rgba(255,255,255,.05)}
 .apoHist{margin-top:16px;border-top:1px solid var(--line);padding-top:12px}
 .apoHd{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:14px;font-weight:700;color:var(--ink)}
 .apoSub{font-size:12px;color:var(--muted);margin-top:2px}
@@ -430,7 +443,7 @@ svg text{font-family:Inter,system-ui,sans-serif}
 
 <script>
 "use strict";
-const VERSAO='V61';
+const VERSAO='V64';
 /* ---------- utilidades ---------- */
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -830,6 +843,30 @@ function openForm({titulo,sub,campos,val={},onSave,onDel}){
   return {ov,g};
 }
 function confirma(msg,ok='Confirmar',op={}){return new Promise(res=>{const ov=document.createElement('div');ov.className='ov';ov.innerHTML=`<div class="modal" style="max-width:420px"><h2>${op.titulo||'Confirmação'}</h2><p>${msg}</p><div class="mfoot"><button class="btn sec" id="cN">${op.voltar||'Cancelar'}</button><button class="btn${op.perigo?' warn':''}" id="cS">${ok}</button></div></div>`;document.body.appendChild(ov);ov.querySelector('#cN').onclick=()=>{ov.remove();res(false)};ov.querySelector('#cS').onclick=()=>{ov.remove();res(true)}})}
+/* V63: calendário desenhado pelo próprio app — o do navegador não abre dentro do HMO */
+function abreCal(inp){
+  if(!inp)return;
+  const ov=document.createElement('div');ov.className='ov';ov.id='calOv';ov.style.zIndex='80';
+  let base=/^\d{4}-\d{2}-\d{2}$/.test(inp.value||'')?new Date(inp.value+'T12:00:00'):new Date();
+  const max=inp.getAttribute('max')||'',min=inp.getAttribute('min')||'';
+  const draw=()=>{
+    const y=base.getFullYear(),m=base.getMonth();
+    const ini=new Date(y,m,1).getDay(),dias=new Date(y,m+1,0).getDate(),cels=[];
+    for(let i=0;i<ini;i++)cels.push('<span></span>');
+    for(let d=1;d<=dias;d++){const iso=y+'-'+pad(m+1)+'-'+pad(d),off=(max&&iso>max)||(min&&iso<min);
+      cels.push(`<button type="button" class="calD${iso===inp.value?' on':''}${iso===hoje()?' hj':''}" data-cd="${iso}"${off?' disabled':''}>${d}</button>`)}
+    ov.innerHTML=`<div class="modal" style="max-width:330px"><h2 style="margin:0 0 10px">📅 Escolha a data</h2>
+      <div class="calHd"><button type="button" class="btn sec sm" data-cm="-1" aria-label="Mês anterior">‹</button><b>${MESES[m]} ${y}</b><button type="button" class="btn sec sm" data-cm="1" aria-label="Próximo mês">›</button></div>
+      <div class="calW">${['D','S','T','Q','Q','S','S'].map(d=>`<span class="calS">${d}</span>`).join('')}${cels.join('')}</div>
+      <div class="mfoot"><button class="btn sec" data-cx="1">Fechar</button><button class="btn" data-cd="${hoje()}">Hoje</button></div></div>`;
+    ov.querySelectorAll('[data-cm]').forEach(b=>b.onclick=()=>{base=new Date(y,m+(+b.dataset.cm),1);draw()});
+    ov.querySelector('[data-cx]').onclick=()=>ov.remove();
+    ov.querySelectorAll('[data-cd]').forEach(b=>b.onclick=()=>{if(b.disabled)return;
+      inp.value=b.dataset.cd;ov.remove();inp.dispatchEvent(new Event('change',{bubbles:true}))});
+  };
+  ov.onclick=e=>{if(e.target===ov)ov.remove()};
+  document.body.appendChild(ov);draw();
+}
 /* V53: WhatsApp sempre disponível. Sem telefone guardado, pergunta o número só para este envio (não fica salvo) */
 function pedeFone(){return new Promise(res=>{const ov=document.createElement('div');ov.className='ov';
   ov.innerHTML=`<div class="modal" style="max-width:400px"><h2>💬 Enviar pelo WhatsApp</h2>
@@ -1338,8 +1375,8 @@ function vRelatorios(){
   let h=`<div class="mgroup"><div class="mhead" data-rel="f1"><span class="sg">${F.f1?'−':'+'}</span><span class="t">1. Filtros e exportação</span><span class="sp"></span>${!F.f1?`<span class="tag ${at?'a':'g'}">${at?'Filtro ativo':'Filtro desativado'}</span>`:''}<span class="small muted">${lanc.rows.length} lançamentos</span></div>
   ${F.f1?`<div class="mbody" style="padding:14px">
     <div class="fgrid" style="grid-template-columns:repeat(auto-fit,minmax(160px,1fr))">
-      <div class="field"><label>De</label><input class="inp" type="date" id="rDe" value="${F.de}" max="${hoje()}"></div>
-      <div class="field"><label>Até</label><input class="inp" type="date" id="rAte" value="${F.ate}" max="${hoje()}"></div>
+      <div class="field"><label for="rDe">De</label><div class="dtW"><input class="inp" type="date" id="rDe" value="${F.de}" max="${hoje()}"><button type="button" class="dtB" data-rel="cal:rDe" aria-label="Abrir calendário">📅</button></div></div>
+      <div class="field"><label for="rAte">Até</label><div class="dtW"><input class="inp" type="date" id="rAte" value="${F.ate}" max="${hoje()}"><button type="button" class="dtB" data-rel="cal:rAte" aria-label="Abrir calendário">📅</button></div></div>
       <div class="field"><label>Veículo</label><select class="inp" id="rVe">${['Todos',...VEICS()].map(v=>`<option${v===F.veic?' selected':''}>${esc(v)}</option>`).join('')}</select></div>
       <div class="field"><label>Plataforma</label><select class="inp" id="rPl">${['Todas','Uber','99','Carona Solidária'].map(v=>`<option${v===F.plat?' selected':''}>${v}</option>`).join('')}</select></div>
     </div>
@@ -1360,6 +1397,7 @@ function vRelatorios(){
 function relAcao(t){
   const a=t.dataset.rel,F=UI.rel;
   const lerF=()=>{const de=$('#rDe'),at=$('#rAte'),ve=$('#rVe'),pl=$('#rPl');if(de){F.de=de.value||F.de;F.ate=at.value||F.ate;F.veic=ve.value;F.plat=pl.value}};
+  if(a.startsWith('cal:')){abreCal($('#'+a.slice(4)));return}
   if(a==='f1')F.f1=!F.f1;
   else if(a.startsWith('sec:')){const id=a.slice(4);F.aberto=F.aberto===id?'':id}
   else if(a==='ver')F.ver=!F.ver;
@@ -1368,7 +1406,17 @@ function relAcao(t){
   render();
 }
 document.addEventListener('change',e=>{if(UI.tab!=='relatorios'||!['rDe','rAte','rVe','rPl'].includes(e.target.id))return;const F=UI.rel;
-  F.de=$('#rDe').value||F.de;F.ate=$('#rAte').value||F.ate;if(F.de>F.ate){toast('A data inicial é depois da final.');F.ate=F.de}F.veic=$('#rVe').value;F.plat=$('#rPl').value;render()});
+  F.de=$('#rDe').value||F.de;F.ate=$('#rAte').value||F.ate;if(F.de>F.ate){toast('A data inicial é depois da final.');F.ate=F.de}F.veic=$('#rVe').value;F.plat=$('#rPl').value;
+  // V64: enquanto a pessoa estiver digitando a data, não redesenha — espera ela terminar ou sair do campo
+  if(['rDe','rAte'].includes(e.target.id)){
+    clearTimeout(window.__relT);
+    window.__relT=setTimeout(()=>{if(UI.tab!=='relatorios')return;
+      const a=document.activeElement;
+      if(a&&(a.id==='rDe'||a.id==='rAte')){
+        if(!a.__pendR){a.__pendR=true;a.addEventListener('focusout',function h(ev){ev.target.__pendR=false;ev.target.removeEventListener('focusout',h);if(UI.tab==='relatorios')render()})}
+      }else render()},500);
+    return}
+  render()});
 /* exportação */
 const LIBS={jspdf:['https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js','https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js'],
   autotable:['https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js','https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js'],
@@ -1378,8 +1426,8 @@ const libOk={};
 function carregaLib(n){if(libOk[n])return libOk[n];libOk[n]=(async()=>{for(const u of LIBS[n]){try{await new Promise((res,rej)=>{const sc=document.createElement('script');sc.src=u;sc.onload=res;sc.onerror=rej;document.head.appendChild(sc)});return}catch(e){}}libOk[n]=null;throw new Error('lib '+n)})();return libOk[n]}
 const nomeRel=ext=>{const d=new Date();return pad(d.getDate())+pad(d.getMonth()+1)+String(d.getFullYear()).slice(2)+'_'+pad(d.getHours())+pad(d.getMinutes())+'_Relatório_Rodaliq.'+ext};
 const pdfTxt=v=>String(v).replace(/→/g,'->').replace(/✓/g,'ok').replace(/−/g,'-').replace(/[^\x00-\xFF–—•‘’“”…]/g,'');
-async function exportarRel(fmt,btn){
-  const M=relModelo(),fn=nomeRel(fmt),old=btn.textContent;btn.textContent='Gerando…';btn.disabled=true;
+async function exportarRel(fmt,btn,M0,fn0){
+  const M=M0||relModelo(),fn=fn0||nomeRel(fmt),old=btn.textContent;btn.textContent='Gerando…';btn.disabled=true;
   const geradoEm='Gerado em '+dataHora(new Date().toISOString());
   try{
     let data;
@@ -1394,7 +1442,7 @@ async function exportarRel(fmt,btn){
         ws['!cols']=s.cols.map(c=>({wch:Math.max(12,c[0].length+2,c[0]==='Detalhes'||c[0]==='Motivo'?40:0)}));XLSX.utils.book_append_sheet(wb,ws,nm)});
       data=new Uint8Array(XLSX.write(wb,{bookType:'xlsx',type:'array'}))}
     else if(fmt==='pdf'){await carregaLib('jspdf');await carregaLib('autotable');const doc=new window.jspdf.jsPDF({orientation:'landscape',unit:'pt',format:'a4'});
-      doc.setFontSize(16);doc.setTextColor(20,33,61);doc.text('Relatório – Rodaliq',40,44);doc.setFontSize(9);doc.setTextColor(91,100,120);doc.text(pdfTxt(M.filtroTxt),40,60);doc.text(geradoEm+' · rodaliq.com.br · '+VERSAO,40,72);
+      doc.setFontSize(16);doc.setTextColor(20,33,61);doc.text(pdfTxt(M.titulo||'Relatório – Rodaliq'),40,44);doc.setFontSize(9);doc.setTextColor(91,100,120);doc.text(pdfTxt(M.filtroTxt),40,60);doc.text(geradoEm+' · rodaliq.com.br · '+VERSAO,40,72);
       let y=90;const blue=[31,111,235];
       M.sec.forEach((s,i)=>{if(y>500){doc.addPage();y=44}doc.setFontSize(12);doc.setTextColor(20,33,61);doc.text(pdfTxt((i+1)+'. '+s.t),40,y);y+=8;
         if(s.kpis){doc.autoTable({startY:y,body:s.kpis.map(k=>[pdfTxt(k[0]),pdfTxt(String(k[1]).replace(/<[^>]+>/g,''))]),theme:'grid',styles:{fontSize:8},columnStyles:{0:{fontStyle:'bold',cellWidth:200}},margin:{left:40,right:40},tableWidth:420});y=doc.lastAutoTable.finalY+8}
@@ -1404,7 +1452,7 @@ async function exportarRel(fmt,btn){
       const n=doc.getNumberOfPages();for(let p=1;p<=n;p++){doc.setPage(p);doc.setFontSize(8);doc.setTextColor(140);doc.text('© 2026 Rodaliq · Todos os direitos reservados. · Página '+p+' de '+n,40,doc.internal.pageSize.getHeight()-20)}
       data=doc.output('arraybuffer')}
     else if(fmt==='docx'){await carregaLib('jszip');data=await gerarDocx(M,geradoEm)}
-    if(DL){await DL.save({filename:fn,data});audit('Exportação','Relatórios',fn+' · '+M.filtroTxt);toast('Relatório gerado')}
+    if(DL){await DL.save({filename:fn,data});audit('Exportação',M.area||'Relatórios',fn+' · '+M.filtroTxt);toast('Relatório gerado')}
     else toast('Download indisponível nesta visualização.');
   }catch(e){if(!(e&&e.code==='declined'))toast(e&&e.message&&e.message.startsWith('lib')?'Não consegui carregar a biblioteca de exportação.':'Não foi possível gerar o arquivo ('+(e&&e.code||e&&e.message||'erro')+').')}
   finally{btn.textContent=old;btn.disabled=false}
@@ -1748,7 +1796,8 @@ async function carregaPerfis(f){ // admin lê o nome em public.profiles e o e-ma
   if(!f&&Object.keys(PERFIS).length&&Object.keys(EMAILS).length)return;
   try{const {data}=await DB.from('profiles').select('id,display_name');
     (data||[]).forEach(r=>{if(r.display_name)PERFIS[r.id]=String(r.display_name).trim()})}catch(e){}
-  try{(await admUsuarios()).forEach(u=>{if(u.email)EMAILS[u.user_id]=u.email})}catch(e){}}
+  try{(await admUsuarios()).forEach(u=>{if(u.email)EMAILS[u.user_id]=u.email})}catch(e){}
+  try{const {data}=await DB.from('tb_admins').select('user_id');ADM_IDS=new Set((data||[]).map(r=>r.user_id))}catch(e){}}
 function apoEmail(x){return (x.user_id&&EMAILS[x.user_id])||x.email||''}
 function apoNome(x){
   if(x.user_id&&PERFIS[x.user_id])return PERFIS[x.user_id]; // 1º: public.profiles
@@ -1923,17 +1972,134 @@ async function apoAdminRender(box){
     try{await apoDesfazer(x);audit('Apoio','Admin','Confirmação desfeita · '+apoEmail(x))}catch(e){toast('Não foi possível desfazer agora.');return}
     await excAdminCache(true);atualizaSino();apoAdminRender(box);admContagens()});
 }
+/* ---------- V62: 📑 Relatórios do painel (só o admin principal) ---------- */
+const ADM_SEC=[
+  ['apoios','🤝 Apoiadores','Apoiadores'],
+  ['convites','📨 Pedidos de convite','Pedidos de convite'],
+  ['exclusoes','🗑 Pedidos de exclusão','Pedidos de exclusão'],
+  ['senhas','🔑 Pedidos de senha','Pedidos de senha'],
+  ['ativos','👥 Usuários ativos','Usuários ativos'],
+  ['excluidos','🚫 Usuários excluídos','Usuários excluídos']];
+
+const APO_ST={informado:'Aguardando conferência',confirmado:'Confirmada',descartado:'Não localizada'};
+let ADM_US=[],ADM_IDS=new Set();
+function admRelPadrao(){const h=hoje();return {de:h.slice(0,8)+'01',ate:h,ver:false,aberto:'',sel:Object.fromEntries(ADM_SEC.map(x=>[x[0],true]))}}
+const noPer=(iso,F)=>{if(!iso)return false;const d=String(iso).slice(0,10);return d>=F.de&&d<=F.ate};
+function admRelSecoes(F){
+  const out=[];
+  const add=(id,nome,nota,cols,rows,kpis)=>{if(F.sel[id])out.push({id,t:nome,cols,rows,nota,kpis})};
+  if(F.sel.apoios){const L=APO_CACHE.filter(x=>noPer(x.criado_em,F));
+    const cf=L.filter(x=>x.status==='confirmado');
+    add('apoios','🤝 Apoiadores','Período aplicado sobre a data do aviso da contribuição.',
+      [['Nome','txt'],['E-mail','txt'],['Valor','money'],['Situação','txt'],['Informada','date'],['Confirmada','date'],['Comprov.','txt']],
+      L.map(x=>[apoNome(x),apoEmail(x),x.valor,APO_ST[x.status]||x.status,String(x.criado_em).slice(0,10),x.confirmado_em?String(x.confirmado_em).slice(0,10):null,x.recibo?String(x.recibo).padStart(3,'0'):'—']),
+      [['Confirmado no período',brl(sum(cf,x=>x.valor))],['Apoiadores',String(new Set(cf.map(x=>apoEmail(x))).size)],['Aguardando conferência',String(L.filter(x=>x.status==='informado').length)]])}
+  if(F.sel.convites){const L=invCache.filter(x=>invVivo(x)&&noPer(x.created_at,F));
+    add('convites','📨 Pedidos de convite','Período aplicado sobre a data do pedido.',
+      [['Nome','txt'],['E-mail','txt'],['WhatsApp','txt'],['UF','txt'],['Nascimento','date'],['Como soube','txt'],['Situação','txt'],['Pedido em','date']],
+      L.map(x=>[x.name,x.email,invFmtPhone(x.whatsapp),invUfOf(x.whatsapp)||'—',x.birth_date||null,x.how_known||'—',(x.archived?'Arquivado':INV_ST[x.status]||x.status),String(x.created_at).slice(0,10)]))}
+  if(F.sel.exclusoes){const L=EXC_CACHE.filter(x=>noPer(x.criado_em,F));
+    add('exclusoes','🗑 Pedidos de exclusão','Período aplicado sobre a data do pedido.',
+      [['E-mail','txt'],['Motivo','txt'],['Comentário','txt'],['Situação','txt'],['Pedido em','date']],
+      L.map(x=>[x.email,x.motivo||'—',x.comentario||'—',x.status==='novo'?'Novo':'Atendido',String(x.criado_em).slice(0,10)]))}
+  if(F.sel.senhas){const L=SEN_CACHE.filter(x=>noPer(x.criado_em,F));
+    add('senhas','🔑 Pedidos de senha','Período aplicado sobre a data do pedido.',
+      [['E-mail','txt'],['Situação','txt'],['Pedido em','date'],['Atendido em','date']],
+      L.map(x=>[x.email,x.status==='novo'?'Novo':'Atendido',String(x.criado_em).slice(0,10),x.atendido_em?String(x.atendido_em).slice(0,10):null]))}
+  if(F.sel.ativos){const L=ADM_US.filter(x=>!x.excluido_em&&noPer(x.criado_em,F));
+    add('ativos','👥 Usuários ativos','Período aplicado sobre a data de cadastro.',
+      [['Nome','txt'],['E-mail','txt'],['Cadastro','date'],['Último uso','date'],['Admin','txt']],
+      L.map(x=>[PERFIS[x.user_id]||'—',x.email,x.criado_em?String(x.criado_em).slice(0,10):null,x.ultimo_uso?String(x.ultimo_uso).slice(0,10):null,ADM_IDS.has(x.user_id)?'Sim':'Não']))}
+  if(F.sel.excluidos){const L=ADM_US.filter(x=>x.excluido_em&&noPer(x.excluido_em,F));
+    add('excluidos','🚫 Usuários excluídos','Período aplicado sobre a data da exclusão.',
+      [['Nome','txt'],['E-mail','txt'],['Cadastro','date'],['Excluído em','date']],
+      L.map(x=>[PERFIS[x.user_id]||'—',x.email,x.criado_em?String(x.criado_em).slice(0,10):null,String(x.excluido_em).slice(0,10)]))}
+  return out}
+function admRelModelo(){
+  const F=UI.admRel||(UI.admRel=admRelPadrao()),sec=admRelSecoes(F);
+  const n=sec.reduce((a,s)=>a+s.rows.length,0);
+  const filtroTxt=`${fmtBR(F.de)} a ${fmtBR(F.ate)} · ${sec.length} ${sec.length===1?'seção':'seções'} · ${n} ${n===1?'registro':'registros'}`;
+  return {titulo:'Rodaliq — Relatório do painel administrativo',area:'Admin',filtroTxt,n,
+    sec:sec.concat([{t:'Dados pessoais',nota:'Este relatório contém dados pessoais de terceiros, tratados conforme a Política de privacidade do Rodaliq e a LGPD (Lei nº 13.709/2018). Guarde o arquivo com segurança e apague-o quando não for mais necessário. Esta exportação ficou registrada no histórico de auditoria do app.'}])}}
+async function admRelRender(box){
+  if(!ehMaster()){box.innerHTML='<div class="empty">Esta aba é do admin principal.</div>';return}
+  const F=UI.admRel||(UI.admRel=admRelPadrao());
+  box.innerHTML='<div class="empty">Carregando…</div>';
+  await carregaPerfis();
+  try{ADM_US=await admUsuarios()}catch(e){ADM_US=[]}
+  try{if(!invCache.length)await invRefreshBadge(true)}catch(e){}
+  try{await excAdminCache(true)}catch(e){}
+  const M=admRelModelo(),sec=M.sec.slice(0,-1);
+  const cnt=id=>{const f=Object.assign({},F,{sel:{[id]:true}}),x=admRelSecoes(f)[0];return x?x.rows.length:0};
+  box.innerHTML=`<h3 style="margin:0">📑 Relatórios</h3>
+    <p class="small muted" style="margin:4px 0 10px">Exporta o que está nas outras abas. O arquivo leva dados pessoais de outras pessoas: guarde com cuidado e apague quando não precisar mais. Cada exportação entra no histórico de auditoria.</p>
+    <div class="grid2">
+      <div class="field"><label for="arDe">De</label><div class="dtW"><input class="inp" type="date" id="arDe" value="${F.de}" max="${hoje()}"><button type="button" class="dtB" data-arc="arDe" aria-label="Abrir calendário">📅</button></div></div>
+      <div class="field"><label for="arAte">Até</label><div class="dtW"><input class="inp" type="date" id="arAte" value="${F.ate}" max="${hoje()}"><button type="button" class="dtB" data-arc="arAte" aria-label="Abrir calendário">📅</button></div></div>
+    </div>
+    <div class="field" style="margin-top:4px"><label>O que entra no relatório</label>
+      ${ADM_SEC.map(([id,nome])=>`<label class="exChk"><input type="checkbox" data-ars="${id}"${F.sel[id]?' checked':''}><span>${nome} <span class="muted" data-arn="${id}">(${cnt(id)})</span></span></label>`).join('')}</div>
+    <div class="toolbar" style="margin:4px 0 0"><button type="button" class="btn sec sm" data-arm="1">Marcar todas</button><button type="button" class="btn sec sm" data-arm="0">Desmarcar</button></div>
+    <div class="small muted" style="margin-top:10px" id="arResumo">${esc(M.filtroTxt)}</div>
+    <div class="toolbar" style="margin:10px 0 0">
+      <button type="button" class="btn sec sm" data-arv="1" id="arVer">${F.ver?'Ocultar dados':'Ver dados'}</button>
+      <button type="button" class="btn sec sm" data-arl="1">Limpar filtro</button>
+      <span class="sp"></span><span class="small muted">Baixar:</span>
+      <button type="button" class="btn sm" data-arx="pdf">PDF</button><button type="button" class="btn sm" data-arx="docx">Word</button><button type="button" class="btn sm" data-arx="xlsx">Excel</button>
+    </div>
+    <div id="arSecs">${F.ver?(sec.length?sec.map((x,i)=>{const op=F.aberto===x.id;
+      return `<div class="mgroup"${i?'':' style="margin-top:12px"'}><div class="mhead" data-ara="${x.id}"><span class="sg">${op?'−':'+'}</span><span class="t">${i+1}. ${esc(x.t)}</span></div>${op?`<div class="mbody" style="padding:12px">${x.kpis?`<div class="grid cards" style="margin-bottom:10px">${x.kpis.map(k=>kpi(esc(k[0]),k[1])).join('')}</div>`:''}${tabelaHTML(x)}<div class="small muted" style="margin-top:6px">${esc(x.nota)}</div></div>`:''}</div>`}).join(''):'<div class="empty" style="margin-top:12px">Marque ao menos uma seção.</div>'):''}</div>`;
+  admRelLiga(box);
+}
+// repinta só o que muda, para não perder o foco de quem está digitando a data
+function admRelPinta(box){
+  const F=UI.admRel,M=admRelModelo(),sec=M.sec.slice(0,-1);
+  const cnt=id=>{const f=Object.assign({},F,{sel:{[id]:true}}),x=admRelSecoes(f)[0];return x?x.rows.length:0};
+  ADM_SEC.forEach(([id])=>{const e=box.querySelector(`[data-arn="${id}"]`);if(e)e.textContent='('+cnt(id)+')'});
+  const r=box.querySelector('#arResumo');if(r)r.textContent=M.filtroTxt;
+  const v=box.querySelector('#arVer');if(v)v.textContent=F.ver?'Ocultar dados':'Ver dados';
+  const c=box.querySelector('#arSecs');if(!c)return;
+  c.innerHTML=F.ver?(sec.length?sec.map((x,i)=>{const op=F.aberto===x.id;
+      return `<div class="mgroup"${i?'':' style="margin-top:12px"'}><div class="mhead" data-ara="${x.id}"><span class="sg">${op?'−':'+'}</span><span class="t">${i+1}. ${esc(x.t)}</span></div>${op?`<div class="mbody" style="padding:12px">${x.kpis?`<div class="grid cards" style="margin-bottom:10px">${x.kpis.map(k=>kpi(esc(k[0]),k[1])).join('')}</div>`:''}${tabelaHTML(x)}<div class="small muted" style="margin-top:6px">${esc(x.nota)}</div></div>`:''}</div>`}).join(''):'<div class="empty" style="margin-top:12px">Marque ao menos uma seção.</div>'):'';
+  c.querySelectorAll('[data-ara]').forEach(h=>h.onclick=()=>{F.aberto=F.aberto===h.dataset.ara?'':h.dataset.ara;admRelPinta(box)});
+}
+function admRelLiga(box){
+  const F=UI.admRel;
+  const red=()=>admRelPinta(box);
+  box.querySelectorAll('[data-ars]').forEach(c=>c.onchange=()=>{F.sel[c.dataset.ars]=c.checked;if(!F.sel[F.aberto])F.aberto='';red()});
+  box.querySelectorAll('[data-arm]').forEach(b=>b.onclick=()=>{const v=b.dataset.arm==='1';ADM_SEC.forEach(x=>F.sel[x[0]]=v);if(!v)F.aberto='';
+    box.querySelectorAll('[data-ars]').forEach(c=>c.checked=v);red()});
+  box.querySelector('[data-arv]').onclick=()=>{F.ver=!F.ver;if(F.ver&&!F.aberto){const p=admRelSecoes(F)[0];F.aberto=p?p.id:''}red()};
+  box.querySelector('[data-arl]').onclick=()=>{UI.admRel=admRelPadrao();admRelRender(box)};
+  box.querySelectorAll('[data-ara]').forEach(h=>h.onclick=()=>{F.aberto=F.aberto===h.dataset.ara?'':h.dataset.ara;red()});
+  // 📅 abre o calendário do aparelho
+  box.querySelectorAll('[data-arc]').forEach(b=>b.onclick=()=>abreCal(box.querySelector('#'+b.dataset.arc)));
+  // a data é lida sem redesenhar o bloco, para não cortar quem está digitando
+  ['arDe','arAte'].forEach(id=>{const e=box.querySelector('#'+id);
+    const ler=()=>{const de=box.querySelector('#arDe'),ate=box.querySelector('#arAte');
+      if(!de.value||!ate.value)return;
+      F.de=de.value;F.ate=ate.value;
+      if(F.de>F.ate){toast('A data inicial é depois da final.');F.ate=F.de;ate.value=F.ate}
+      red()};
+    e.addEventListener('change',ler);e.addEventListener('input',ler)});
+  box.querySelectorAll('[data-arx]').forEach(b=>b.onclick=()=>{const fmt=b.dataset.arx;
+    const M2=admRelModelo();if(!M2.sec.length-1<=0&&M2.sec.length<=1)return toast('Marque ao menos uma seção.');
+    const d=new Date(),fn=pad(d.getDate())+pad(d.getMonth()+1)+String(d.getFullYear()).slice(2)+'_'+pad(d.getHours())+pad(d.getMinutes())+'_Rodaliq_Relatorio_Painel_Admin.'+fmt;
+    exportarRel(fmt,b,M2,fn)});
+}
 /* ---------- V48: aba 🛡 Admin (só administradores) ---------- */
 const ADMIN_MASTER='diogogomes2110@gmail.com';
 const ehMaster=()=>invProd()?String(LOGADO||'').toLowerCase()===ADMIN_MASTER:true; // no HMO o cadastro de admin é simulado
-const ADM_T=[['convites','📨 Pedidos de convite'],['ativos','👥 Usuários ativos'],['excluidos','🚫 Usuários excluídos'],['exclusoes','🗑 Pedidos de exclusão'],['senhas','🔑 Pedidos de senha'],['apoios','🤝 Apoiadores']];
+const semAc=t=>String(t||'').replace(/[^\p{L}\p{N} ]/gu,'').trim().normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+const ADM_T=[['apoios','🤝 Apoiadores'],['convites','📨 Pedidos de convite'],['exclusoes','🗑 Pedidos de exclusão'],['senhas','🔑 Pedidos de senha'],['ativos','👥 Usuários ativos'],['excluidos','🚫 Usuários excluídos'],['relatorios','📑 Relatórios']]
+  .sort((a,b)=>a[0]==='relatorios'?1:b[0]==='relatorios'?-1:semAc(a[1]).localeCompare(semAc(b[1]),'pt-BR')); // alfabética, Relatórios por último
 // V50: Gestão Admin abre como página inteira (computador e celular)
 function abrirAdmin(sub){['#bellMenu','#optMenu','#fabMenu'].forEach(s=>{const m=$(s);if(m)m.classList.add('hidden')});if(!invIsAdmin)return;
   if(sub)UI.admSub=sub;let ov=$('#admPage');
   if(!ov){ov=document.createElement('div');ov.className='ov admPage';ov.id='admPage';document.body.appendChild(ov);ov.__fechar=()=>{ov.remove();invRefreshBadge(false);if(typeof atualizaSino==='function')atualizaSino()}}
   const sub2=UI.admSub||'convites';
   ov.innerHTML=`<div class="admWrap"><div class="admHd"><h2>🛡 Gestão Admin</h2><div class="admHdB">${ehMaster()?'<button type="button" class="btn sec sm admMaster" id="admCad">🛡 Admins</button><button type="button" class="btn sec sm admMaster" id="admAju">⚙ Ajustes</button>':''}<button type="button" class="btn sec sm" id="admAniv">🎂 Aniversariantes</button><button type="button" class="btn sec sm" id="admFechar">Fechar</button></div></div>
-    <div class="admTabs">${ADM_T.map(([k,t])=>`<button type="button" class="chip${sub2===k?' on':''}" data-adm="${k}">${t} <span data-admn="${k}"></span></button>`).join('')}</div>
+    <div class="admTabs">${ADM_T.filter(([k])=>k!=='relatorios'||ehMaster()).map(([k,t])=>`<button type="button" class="chip${sub2===k?' on':''}" data-adm="${k}">${t} <span data-admn="${k}"></span></button>`).join('')}</div>
     <div id="admBox"><div class="empty">Carregando…</div></div></div>`;
   ov.querySelector('#admFechar').onclick=()=>ov.__fechar();
   ov.querySelectorAll('[data-adm]').forEach(b=>b.onclick=()=>abrirAdmin(b.dataset.adm));
@@ -2010,6 +2176,7 @@ async function montaAdmin(){const box=$('#admBox');if(!box)return;const sub=UI.a
   if(sub==='exclusoes'){excAdminRender(box);return}
   if(sub==='senhas'){senAdminRender(box);return}
   if(sub==='apoios'){apoAdminRender(box);return}
+  if(sub==='relatorios'){admRelRender(box);return}
   let us;try{us=await admUsuarios()}catch(e){box.innerHTML='<div class="empty">Não consegui carregar os usuários. Tente de novo em instantes.</div>';return}
   if(!invCache.length)try{await invRefreshBadge(true)}catch(e){}
   const conv=new Map(invCache.map(x=>[String(x.email||'').toLowerCase(),x]));
