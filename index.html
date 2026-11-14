@@ -518,7 +518,7 @@ const UI={tab:'painel',mes:mesAtual(),veic:'Todos',sub:{corridas:'diario',custos
 const cfg=()=>S.tb_config;
 
 function setSync(t){$('#sync').textContent=t}
-const SB_URL='https://zxhgexcaswkvpotwqkqo.supabase.co',SB_KEY='sb_publishable_cHGZo50lG-YTAFx89_Lb6g_SDovxCap';
+const SB_URL='https://dazgckfmvopeqfxhemll.supabase.co',SB_KEY='sb_publishable_janSq4Ozo3-5k2GJ8Z4RYQ_gxH0EUzj';
 const LISTAS=['tb_corridas','tb_repasses','tb_carona','tb_custos','tb_multas'];
 const SNAP={};const writing={},pend={};
 function linhasDe(tb){if(LISTAS.includes(tb))return S[tb].map(r=>[String(r.id),r]);if(tb==='tb_carne')return Object.entries(S[tb]||{});return [['config',S[tb]]]}
@@ -1598,7 +1598,7 @@ async function invAutoLimpa(list){ // apaga de vez o que está na lixeira há ma
 async function invLoadCache(force){if(!invIsAdmin){invCache=[];return}if(!force&&Date.now()-invCacheAt<15000)return;invCache=await invAutoLimpa(await invList());invCacheAt=Date.now()}
 /* ---------- V49: exclusão de conta (LGPD) ---------- */
 const ZAP_EXC={},ZAP_SEN={},ZAP_PES={}; // V53: telefone e texto de cada cartão, para o botão de WhatsApp
-const EXC_DIAS=30,SUPA_USERS='https://supabase.com/dashboard/project/zxhgexcaswkvpotwqkqo/auth/users',SUPA_TAB='https://supabase.com/dashboard/project/zxhgexcaswkvpotwqkqo/editor';
+const EXC_DIAS=30,SUPA_USERS='https://supabase.com/dashboard/project/dazgckfmvopeqfxhemll/auth/users',SUPA_TAB='https://supabase.com/dashboard/project/dazgckfmvopeqfxhemll/editor';
 const EXC_MOTIVOS=['Parei de rodar por aplicativo','O app não atendeu o que eu precisava','Achei difícil de usar','Vou usar outro app ou planilha','Preocupação com meus dados','Outro motivo'];
 let EXC_MEU=null; // pedido aberto do usuário (novo ou desativado)
 async function excListar(){
@@ -1701,7 +1701,7 @@ async function excAdminRender(box){
     }catch(e){toast('Não foi possível concluir agora. Tente de novo.');return}
     await excAdminCache(true);atualizaSino();excAdminRender(box);admContagens()})}
 /* ---------- V52: senha provisória e pedidos de nova senha ---------- */
-const SUPA_SQL='https://supabase.com/dashboard/project/zxhgexcaswkvpotwqkqo/sql/new';
+const SUPA_SQL='https://supabase.com/dashboard/project/dazgckfmvopeqfxhemll/sql/new';
 const MSG_SENHA='Pedido recebido. Se o e-mail estiver cadastrado no Rodaliq, você vai receber a nova senha temporária no seu e-mail em breve.';
 function geraSenha(){const A='ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';const r=new Uint32Array(10);crypto.getRandomValues(r);return [...r].map(x=>A[x%A.length]).join('')}
 // tela de login: "Esqueci minha senha" (resposta sempre neutra)
