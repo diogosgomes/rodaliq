@@ -378,7 +378,7 @@ svg text{font-family:Inter,system-ui,sans-serif}
           <div class="small muted">💬 O número precisa ter WhatsApp: é por ele que vamos te responder.</div></div>
         <div class="field"><label for="invHow">Como soube do app?</label><input class="inp" type="text" id="invHow" maxlength="140"></div>
         <div style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden" aria-hidden="true"><label>Não preencha<input type="text" id="invWeb" tabindex="-1" autocomplete="off"></label></div>
-        <label class="ivCheck"><input type="checkbox" id="invOk"><span>Em conformidade com a Lei Geral de Proteção de Dados (LGPD, Lei nº 13.709/2018), autorizo o contato por e-mail e WhatsApp sobre o meu acesso e o uso dos meus dados somente para essa finalidade e para receber felicitações de aniversário.</span></label>
+        <label class="ivCheck"><input type="checkbox" id="invOk"><span>Em conformidade com a Lei Geral de Proteção de Dados (LGPD, Lei nº 13.709/2018), autorizo o contato por e-mail e WhatsApp sobre o meu acesso e o uso dos meus dados somente para essa finalidade. Li os <button type="button" class="lnk" data-tt="termos">Termos de uso</button> e a <button type="button" class="lnk" data-tt="priv">Política de privacidade</button>.</span></label>
         <div id="invMsg" class="err" role="alert"></div>
         <button type="submit" class="btn block" id="invBtn">Enviar pedido</button>
         <button type="button" class="btn sec block hidden" id="invClose">Fechar</button>
@@ -461,7 +461,7 @@ svg text{font-family:Inter,system-ui,sans-serif}
 
 <script>
 "use strict";
-const VERSAO='V70';
+const VERSAO='V72';
 /* ---------- utilidades ---------- */
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -1550,6 +1550,8 @@ const invProd=()=>!!(DB&&typeof DB.from==='function'); // produção (Supabase) 
 const invDigits=v=>String(v||'').replace(/\D/g,'');
 const invUfOf=w=>{const d=String(w||'');return DDD_UF[d.startsWith('55')?d.slice(2,4):d.slice(0,2)]||''};
 const invFmtPhone=d=>{d=String(d||'');if(d.startsWith('55')&&d.length>=12){const l=d.slice(2);return '('+l.slice(0,2)+') '+l.slice(2,l.length-4)+'-'+l.slice(-4)}return d};
+// V72: prova do aceite — quando e com qual texto
+const invAceite=r=>!r||r.consent===false?'Não registrada':'aceita em '+invWhen(r.created_at)+' · '+(r.consent_v?'texto '+r.consent_v:'texto anterior a '+TERMOS_DATA);
 const invWhen=v=>{const t=new Date(v);return isNaN(t)?'':t.toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'})};
 const invBirthBR=s=>{const m=/^(\d{4})-(\d{2})-(\d{2})/.exec(String(s||''));return m?`${m[3]}/${m[2]}/${m[1]}`:''};
 const invNorm=t=>String(t||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();
@@ -1561,10 +1563,10 @@ async function invSubmit(rec){
     if(all.some(x=>String(x.email).toLowerCase()===rec.email.toLowerCase()))return{dup:'email'};
     if(all.some(x=>x.whatsapp===rec.whatsapp))return{dup:'whatsapp'};
     const id='c'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
-    await DB.doc('convites/'+id).set({...rec,consent:true,status:'novo',archived:false,created_at:new Date().toISOString(),handled_at:null});
+    await DB.doc('convites/'+id).set({...rec,consent:true,consent_v:TERMOS_V,status:'novo',archived:false,created_at:new Date().toISOString(),handled_at:null});
     return{dup:null};
   }
-  const {error}=await DB.from('tb_convites').insert({name:rec.name,email:rec.email,whatsapp:rec.whatsapp,birth_date:rec.birth_date,how_known:rec.how_known,consent:true});
+  const {error}=await DB.from('tb_convites').insert({name:rec.name,email:rec.email,whatsapp:rec.whatsapp,birth_date:rec.birth_date,how_known:rec.how_known,consent:true,consent_v:TERMOS_V});
   if(error){if(error.code==='23505')return{dup:/email/i.test((error.message||'')+(error.details||''))?'email':'whatsapp'};throw error}
   return{dup:null};
 }
@@ -1843,7 +1845,7 @@ function dadosDaPessoa(u){ // monta as seções que só o admin guarda sobre alg
   const c=invCache.find(v=>String(v.email||'').toLowerCase()===em);
   if(c)sec.push({t:'Pedido de convite',cols:[['Campo','txt'],['Conteúdo','txt']],
     rows:[['Nome',c.name||'—'],['E-mail',c.email||'—'],['WhatsApp',invFmtPhone(c.whatsapp)||'—'],['UF',invUfOf(c.whatsapp)||'—'],
-      ['Data de nascimento',c.birth_date?fmtBR(String(c.birth_date).slice(0,10)):'—'],['Como soube do app',c.how_known||'—'],
+      ['Data de nascimento',c.birth_date?fmtBR(String(c.birth_date).slice(0,10)):'—'],['Como soube do app',c.how_known||'—'],['Autorização LGPD',invAceite(c)],
       ['Situação',(c.archived?'Arquivado':(INV_ST[c.status]||c.status||'—'))],['Pedido em',admData(c.created_at)]]});
   sec.push({t:'Conta',cols:[['Campo','txt'],['Conteúdo','txt']],
     rows:[['Nome no perfil',(uid&&PERFIS[uid])||'—'],['E-mail',u.email||'—'],['Cadastro',admData(u.criado_em)],
@@ -2449,6 +2451,7 @@ async function openInvitesModal(host){ // V48: com host, a tela é montada dentr
       <div class="ivTags"><span class="tag ${r.status==='novo'?'b':'g'}">${esc(INV_ST[r.status]||r.status)}</span>${r.archived?'<span class="tag g">🗄 Arquivado</span>':''}</div></div>
       <div class="small muted" style="margin-top:4px">Como soube: <b style="color:var(--ink)">${esc(r.how_known)}</b></div>
       <div class="small muted">${esc(invWhen(r.created_at))}</div>
+      <div class="small muted">🔒 Autorização LGPD: <b style="color:var(--ink)">${esc(invAceite(r))}</b></div>
       ${bd?`<div class="small ivBday">🎂 ${bd.when==='hoje'?'Hoje':'Amanhã'} é aniversário (faz ${bd.age} anos)</div>`:''}
       <div class="ivActs"><a class="btn sm" href="${esc(invMailConvite(r))}" target="_blank" rel="noopener">✉ Enviar e-mail</a><a class="btn sm" href="${esc(invWaLink(r))}" target="_blank" rel="noopener">💬 WhatsApp</a>
         ${bd?`<a class="btn sm" href="${esc(invMailBday(r))}" target="_blank" rel="noopener">✉ Parabenizar por e-mail</a><a class="btn sm" href="${esc(invBdayLink(r))}" target="_blank" rel="noopener">💬 Parabenizar pelo WhatsApp</a>`:''}
@@ -2499,6 +2502,8 @@ async function openInvitesModal(host){ // V48: com host, a tela é montada dentr
 (function(){
   const link=$('#invOpen'),form=$('#invForm'),lf=$('#fLogin'),msg=$('#invMsg');if(!link)return;
   const so0=$('#senOpen');if(so0)so0.onclick=formPedirSenha;
+  // V71: links dos Termos e da Política dentro da caixa de autorização (não marcam o checkbox)
+  document.querySelectorAll('[data-tt]').forEach(b2=>b2.addEventListener('click',ev=>{ev.preventDefault();ev.stopPropagation();verTermos(b2.dataset.tt)}));
   const ymd=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
   const info=(t,neutro)=>{msg.className=neutro?'ivInfo':'err';msg.textContent=t};
   const isMinor=b=>{const lim=new Date();lim.setFullYear(lim.getFullYear()-18);return /^\d{4}-\d{2}-\d{2}$/.test(b)&&b>ymd(lim)};
@@ -2613,7 +2618,7 @@ const TXT_TERMOS=`<h3>Termos de uso do Rodaliq</h3><p class="small muted">Versã
 const TXT_PRIV=`<h3>Política de privacidade do Rodaliq</h3><p class="small muted">Versão de ${TERMOS_DATA} · em conformidade com a LGPD (Lei nº 13.709/2018)</p>
 <p><b>1. Controlador.</b> ${TERMOS_RESP}, pessoa física, responsável pelo Rodaliq. Ele também é o encarregado pelo tratamento de dados pessoais (LGPD, art. 41). Contato: ${TERMOS_MAIL}.</p>
 <p><b>2. Dados tratados.</b><br>• <b>Pedido de convite:</b> nome, e-mail, WhatsApp (com DDD), data de nascimento e como soube do app.<br>• <b>Conta:</b> e-mail e senha (a senha fica protegida pelo provedor de login e não é vista por ninguém).<br>• <b>Uso do app:</b> lançamentos de ganhos, caronas, repasses, custos, multas (inclusive pontos e condutor informado), Carnê-Leão, veículos, metas e despesas programadas.<br>• <b>Minha CNH:</b> somente validade, categoria, EAR e data da 1ª habilitação. Não guardamos número da CNH, CPF nem foto.<br>• <b>Contribuição voluntária:</b> valor, data do aviso, forma, situação (aguardando conferência, confirmada ou não localizada) e número do comprovante. Não recebemos nem guardamos dados de pagamento.<br>• <b>No aparelho:</b> tema escolhido e posição do botão Atalhos (ficam só no seu aparelho).</p>
-<p><b>3. Para que usamos.</b> Prestar o serviço (calcular indicadores, alertas, relatórios e o Carnê-Leão estimado), liberar o acesso, falar com você por e-mail ou WhatsApp sobre o acesso e enviar felicitações de aniversário (com a sua autorização), registrar e dar comprovante das contribuições voluntárias, e manter a segurança. Não vendemos dados nem os usamos para publicidade.</p>
+<p><b>3. Para que usamos.</b> Prestar o serviço (calcular indicadores, alertas, relatórios e o Carnê-Leão estimado), liberar o acesso, confirmar que você tem 18 anos ou mais (é para isso que pedimos a data de nascimento), falar com você por e-mail ou WhatsApp sobre o seu acesso e, eventualmente, uma felicitação de aniversário, registrar e dar comprovante das contribuições voluntárias, e manter a segurança. Não vendemos dados nem os usamos para publicidade.</p>
 <p><b>4. Bases legais.</b> Execução do serviço que você contratou (art. 7º, V), consentimento para contato por e-mail e WhatsApp e para o registro da contribuição voluntária, que parte de você (art. 7º, I), e legítimo interesse para segurança e prevenção de fraudes (art. 7º, IX).</p>
 <p><b>5. Onde ficam e com quem são compartilhados.</b> Os dados ficam no Supabase (banco de dados e login, servidores em São Paulo). O site é publicado pelo GitHub Pages. Esses fornecedores só armazenam e processam os dados para o app funcionar. Não há outro compartilhamento, salvo obrigação legal.</p>
 <p><b>6. Segurança.</b> Conexão criptografada (HTTPS) e regras no banco que fazem cada usuário ver e alterar somente os próprios dados dentro de sua respectiva área logada.</p>
