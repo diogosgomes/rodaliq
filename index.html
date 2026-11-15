@@ -467,7 +467,7 @@ svg text{font-family:Inter,system-ui,sans-serif}
 
 <script>
 "use strict";
-const VERSAO='V83';
+const VERSAO='V84';
 /* ---------- utilidades ---------- */
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -2867,9 +2867,10 @@ const invBdayNear=x=>{const h=invBdayOn(x,0);if(h)return{...h,when:'hoje'};const
 // V44: lembrete semanal (sextas-feiras, só admin) para manter o projeto do Supabase ativo — o plano gratuito pausa após 7 dias seguidos sem uso
 function supaAlerta(){
   const d=new Date();if(d.getDay()!==5)return null;const k=isoOf(d);
+  const backup=ehMaster()?' Aproveite e faça o backup do Rodaliq (esquema e dados do Supabase + repositório do GitHub): no plano gratuito não há backup diário nem point-in-time recovery, então esse é hoje o único jeito de recuperar os dados em caso de perda.':'';
   return {n:'r',crit:1,tab:'supa',sup:k,lida:NOT.reads.supaLida===k,
     t:'Lembrete semanal: use o Rodaliq em produção (rodaliq.com.br) para o Supabase não pausar o projeto.',
-    nota:'No plano gratuito, o Supabase pausa o projeto após 7 dias seguidos sem atividade. Basta entrar no app e abrir o Painel ou fazer um lançamento. Se pausar, reative em supabase.com > projeto rodaliq > Restore project.'};
+    nota:'No plano gratuito, o Supabase pausa o projeto após 7 dias seguidos sem atividade. Basta entrar no app e abrir o Painel ou fazer um lançamento. Se pausar, reative em supabase.com > projeto rodaliq > Restore project.'+backup};
 }
 function invAlerts(){
   if(!invIsAdmin)return [];
