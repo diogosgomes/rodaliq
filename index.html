@@ -227,6 +227,10 @@ html[data-tema="escuro"] .ivOk{color:#4ADE80}
 .ivSearch{position:relative;margin-bottom:10px}.ivSearch span{position:absolute;left:10px;top:50%;transform:translateY(-50%)}.ivSearch .inp{padding-left:34px}
 #ivTabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}#ivTabs .chip{font-size:12px;padding:5px 10px}
 .chip.on{background:var(--blue);border-color:var(--blue);color:#fff}
+.kmRow{display:flex;gap:6px;align-items:stretch}.kmRow .inp{flex:1;min-width:0}
+.kmBtn{flex:0 0 44px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font-size:17px;cursor:pointer;line-height:1}
+.kmBtn:hover{border-color:var(--blue)}
+.avKm{color:var(--amber);font-weight:600}
 .ivCard{border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:10px}
 .ivTop{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}.ivTags{display:flex;flex-direction:column;gap:4px;align-items:flex-end;flex:0 0 auto}
 .ivNome{font-weight:700;word-break:break-word}.ivBday{color:var(--amberInk);font-weight:600;margin-top:4px}
@@ -463,7 +467,7 @@ svg text{font-family:Inter,system-ui,sans-serif}
 
 <script>
 "use strict";
-const VERSAO='V78';
+const VERSAO='V79';
 /* ---------- utilidades ---------- */
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -572,7 +576,7 @@ async function carregarNotas(){const {data,error}=await DB.from('tb_release_note
 const AUD={seq:0,mes:{}};let audChain=Promise.resolve();
 const NOME_TB={tb_corridas:'Corridas',tb_repasses:'Repasses',tb_carona:'Carona Solidária',tb_custos:'Custos',tb_multas:'Multas',tb_carne:'Carnê-Leão',tb_config:'Configurações'};
 function resumoReg(tb,r){return({tb_corridas:()=>`${r.plataforma} · ${fmtBR(r.data)} · ${brl(r.valor)}`,tb_repasses:()=>`Repasse ${r.plataforma} · ${fmtBR(r.data)} · ${brl(r.valor)}`,
-  tb_carona:()=>`${r.sentido} · ${fmtBR(r.data)} · ${r.passageiros||0} pass. · ${brl(r.valor)}`,tb_custos:()=>`${r.cat} · ${r.veiculo} · ${fmtBR(r.data)} · ${brl(r.valor)}`,
+  tb_carona:()=>`${r.sentido} · ${fmtBR(r.data)} · ${r.passageiros||0} pass. · ${brl(r.valor)}${r.km?' · '+fmtNum(r.km)+' km':''}`,tb_custos:()=>`${r.cat} · ${r.veiculo} · ${fmtBR(r.data)} · ${brl(r.valor)}`,
   tb_multas:()=>`${r.motivo} · ${r.veiculo} · ${fmtBR(r.ocorr)}`}[tb]||(()=>''))()}
 // por enquanto, só estes eventos vão para o histórico de auditoria
 const AUD_ACOES=['Exclusão','Troca de senha','Exportação','Importação'],AUD_AREAS=['Veículos','Configurações','Admin'];
@@ -793,6 +797,11 @@ function ganhosMes(ym){
   return{valor:vr,fonte:rp.length?'repasses':'—',viagens:sum(rp,r=>r.viagens),min:sum(rp,r=>r.min),km:0,dias:0,repasses:vr};
 }
 const caronaMes=ym=>doMes(S.tb_carona,ym).filter(fVeic);
+// V79 (rota 7a): um denominador só para os indicadores por km. O dinheiro da carona já entra
+// no resultado líquido; sem o km dela, Custo e Lucro por km ficavam melhores do que a realidade.
+const kmCarona=ym=>sum(caronaMes(ym),r=>r.km);
+const caronasSemKm=ym=>caronaMes(ym).filter(r=>!(+r.km>0)).length;
+const kmMes=(ym,G)=>(+(G&&G.km)||0)+kmCarona(ym);
 // multas pagas viram despesa no mês da data de pagamento (gerenciadas só na aba Multas)
 const valorMulta=r=>+(r.vPago??r.vDesc??r.vOrig)||0;
 const multasDesp=()=>S.tb_multas.filter(r=>r.pagto).map(r=>({id:'multa_'+r.id,ref:r.id,virtual:1,data:r.pagto,cat:'Multa',veiculo:r.veiculo,valor:valorMulta(r),desc:r.motivo||'Multa',fornecedor:r.orgao||''}));
@@ -845,16 +854,18 @@ function openForm({titulo,sub,campos,val={},onSave,onDel}){
     else if(c.t==='date')inp=`<input class="inp" type="date" id="${id}" value="${esc(v)}" max="${c.allowFuture?'':hoje()}"${req}>`;
     else if(c.t==='money')inp=`<input class="inp num" inputmode="decimal" id="${id}" value="${v===''||v==null?'':brl(v,1)}" placeholder="0,00"${req}>`;
     else if(c.t==='time')inp=`<input class="inp num" inputmode="numeric" id="${id}" value="${esc(v)}" placeholder="hh:mm" maxlength="6">`;
-    else if(c.t==='int'||c.t==='num')inp=`<input class="inp num" inputmode="decimal" id="${id}" value="${esc(v)}"${req}>`;
+    else if(c.t==='int'||c.t==='num'){inp=`<input class="inp num" inputmode="decimal" id="${id}" value="${v===''||v==null?'':fmtNum(v)}"${req}>`;
+      if(c.calc)inp=`<div class="kmRow">${inp}<button type="button" class="kmBtn" data-calc="${c.k}" title="Somar os km das viagens">\u{1F9EE}</button></div>`;}
     else if(c.t==='check')inp=`<label style="display:flex;gap:8px;align-items:center;font-weight:500;color:var(--ink)"><input type="checkbox" id="${id}"${v?' checked':''}> ${esc(c.txt||'')}</label>`;
     else inp=`<input class="inp" id="${id}" value="${esc(v)}"${c.ph?` placeholder="${esc(c.ph)}"`:''}${c.list?` list="dl_${c.k}"`:''}${req}>${c.list?`<datalist id="dl_${c.k}">${c.list.map(o=>`<option value="${esc(o)}">`).join('')}</datalist>`:''}`;
-    return `<div class="${cls}${c.hide?' hidden':''}" data-w="${c.k}"><label>${esc(c.l)}${c.req?' *':''}</label>${inp}${c.help?`<span class="small muted" id="h_${c.k}">${c.help}</span>`:''}</div>`;
+    return `<div class="${cls}${c.hide?' hidden':''}" data-w="${c.k}"><label>${esc(c.l)}${c.req?' *':''}</label>${inp}${c.aviso?`<span class="small avKm hidden" id="w_${c.k}"></span>`:''}${c.help?`<span class="small muted" id="h_${c.k}">${c.help}</span>`:''}</div>`;
   }).join('');
   ov.innerHTML=`<form class="modal" novalidate><h2>${esc(titulo)}</h2>${sub?`<div class="small muted">${sub}</div>`:''}<div class="fgrid">${h}</div><div class="err" id="fErr"></div><div class="mfoot">${onDel?'<button type="button" class="btn warn sm" id="fDel" style="margin-right:auto">Excluir</button>':''}<button type="button" class="btn sec" id="fCan">Cancelar</button><button class="btn" type="submit">Salvar</button></div></form>`;
   document.body.appendChild(ov);
   const g=k=>ov.querySelector('#f_'+k);
   campos.forEach(c=>{const el=g(c.k);if(!el)return;
     if(c.t==='money'){el.addEventListener('blur',()=>{if(el.value.trim()!=='')el.value=brl(parseBRL(el.value),1)})}
+    if(c.t==='num'||c.t==='int'){el.addEventListener('blur',()=>{if(el.value.trim()!=='')el.value=fmtNum(c.t==='int'?Math.round(parseBRL(el.value)):parseBRL(el.value))})}
     if(c.t==='time'){el.addEventListener('input',()=>{let d=el.value.replace(/\D/g,'').slice(0,4);el.value=d.length>2?d.slice(0,2)+':'+d.slice(2):d})}
     if(c.t==='date'){el.addEventListener('click',()=>{try{el.showPicker()}catch(e){}})}
   });
@@ -865,17 +876,56 @@ function openForm({titulo,sub,campos,val={},onSave,onDel}){
   if(onDel)ov.querySelector('#fDel').onclick=async()=>{if(await confirma('Excluir este lançamento?')){onDel();fechar()}};
   const ler=()=>{const o={};campos.forEach(c=>{const el=g(c.k);if(!el)return;
     if(c.t==='money')o[c.k]=el.value.trim()===''?null:parseBRL(el.value);
-    else if(c.t==='int')o[c.k]=el.value===''?0:parseInt(el.value,10)||0;
-    else if(c.t==='num')o[c.k]=el.value===''?null:parseFloat(String(el.value).replace(',','.'))||0;
+    else if(c.t==='int')o[c.k]=el.value.trim()===''?0:Math.round(parseBRL(el.value));
+    else if(c.t==='num')o[c.k]=el.value.trim()===''?null:parseBRL(el.value);
     else if(c.t==='time')o[c.k]=inpToMin(el.value);
     else if(c.t==='check')o[c.k]=el.checked;
     else o[c.k]=el.value.trim()});return o};
+  // V79: aviso de valor implausível (não bloqueia; só chama a atenção) e calculadora de km
+  const avisar=()=>{const o=ler();campos.forEach(c=>{if(!c.aviso)return;const sp=ov.querySelector('#w_'+c.k);if(!sp)return;
+    const t=c.aviso(o[c.k],o)||'';sp.textContent=t;sp.classList.toggle('hidden',!t)})};
+  campos.forEach(c=>{if(!c.aviso)return;const el=g(c.k);if(el)el.addEventListener('blur',avisar)});
+  avisar();
+  ov.querySelectorAll('[data-calc]').forEach(b=>b.onclick=()=>calcKm(g(b.dataset.calc),avisar));
   ov.querySelector('form').onsubmit=e=>{e.preventDefault();const o=ler();
     for(const c of campos){if(c.req&&(o[c.k]===''||o[c.k]==null)){ov.querySelector('#fErr').textContent='Preencha: '+c.l;return}
       if(c.t==='date'&&!c.allowFuture&&o[c.k]&&o[c.k]>hoje()){ov.querySelector('#fErr').textContent='Data futura não é permitida.';return}}
     const msg=onSave(o,ov);if(typeof msg==='string'){ov.querySelector('#fErr').textContent=msg;return}fechar()};
   const first=ov.querySelector('input:not([type=checkbox]),select');if(first&&window.innerWidth>700)first.focus();
   return {ov,g};
+}
+/* V79: calculadora de km — a Uber e a 99 dão o km viagem por viagem, não o total do dia.
+   Uma linha por viagem (ou separadas por espaço/;). A vírgula é decimal, como no resto do app. */
+function kmLinhas(txt){
+  return String(txt||'').split(/[\n;\t]+|\s+/).map(t=>t.replace(/km/gi,'').replace(/[^0-9.,]/g,'').trim())
+    .filter(t=>t!=='').map(t=>parseBRL(t)).filter(n=>n>0);
+}
+function calcKm(inp,depois){
+  if(!inp)return;
+  const ov=document.createElement('div');ov.className='ov';ov.style.zIndex='80';
+  ov.innerHTML=`<div class="modal" style="max-width:460px"><h2>\u{1F9EE} Somar os km das viagens</h2>
+    <div class="small muted">Um km por linha, do jeito que aparece no app da Uber ou da 99. Vale colar vários de uma vez, separados por espaço ou ponto e vírgula. A vírgula é o decimal: <b>1,30</b> é um quilômetro e trezentos metros.</div>
+    <div class="field full" style="margin-top:10px"><textarea class="inp" id="ckT" rows="7" placeholder="1,30&#10;7,4&#10;12,5" inputmode="decimal"></textarea></div>
+    <div id="ckRes" class="note small" style="margin-top:4px"></div>
+    <div class="mfoot"><button type="button" class="btn sec" id="ckF">Cancelar</button><button type="button" class="btn sec" id="ckMais">＋ Somar ao campo</button><button type="button" class="btn" id="ckUsar">Usar</button></div></div>`;
+  document.body.appendChild(ov);
+  const t=ov.querySelector('#ckT'),res=ov.querySelector('#ckRes'),bU=ov.querySelector('#ckUsar'),bM=ov.querySelector('#ckMais');
+  let L=[];
+  const atual=()=>parseBRL(inp.value||'')||0;
+  const pinta=()=>{L=kmLinhas(t.value);const tot=L.reduce((a,b)=>a+b,0);
+    res.innerHTML=L.length
+      ? `<b>${L.length} ${L.length===1?'viagem':'viagens'} \u00b7 ${fmtNum(tot)} km</b><div class="small muted" style="margin-top:4px">${L.map(n=>fmtNum(n)).join(' \u00b7 ')}</div>`
+        +(atual()?`<div class="small muted" style="margin-top:4px">No campo hoje: ${fmtNum(atual())} km \u00b7 somando dá ${fmtNum(atual()+tot)} km</div>`:'')
+      : '<span class="muted">Digite os km das viagens para somar.</span>';
+    bU.disabled=bM.disabled=!L.length};
+  t.addEventListener('input',pinta);pinta();
+  const grava=n=>{inp.value=fmtNum(n);inp.dispatchEvent(new Event('input'));ov.remove();if(depois)depois();
+    toast(`Km: ${fmtNum(n)}`)};
+  bU.onclick=()=>grava(L.reduce((a,b)=>a+b,0));
+  bM.onclick=()=>grava(atual()+L.reduce((a,b)=>a+b,0));
+  ov.querySelector('#ckF').onclick=()=>ov.remove();
+  ov.addEventListener('mousedown',e=>{if(e.target===ov)ov.remove()});
+  setTimeout(()=>t.focus(),50);
 }
 function confirma(msg,ok='Confirmar',op={}){return new Promise(res=>{const ov=document.createElement('div');ov.className='ov';ov.innerHTML=`<div class="modal" style="max-width:420px"><h2>${op.titulo||'Confirmação'}</h2><p>${msg}</p><div class="mfoot"><button class="btn sec" id="cN">${op.voltar||'Cancelar'}</button><button class="btn${op.perigo?' warn':''}" id="cS">${ok}</button></div></div>`;document.body.appendChild(ov);ov.querySelector('#cN').onclick=()=>{ov.remove();res(false)};ov.querySelector('#cS').onclick=()=>{ov.remove();res(true)}})}
 /* V63: calendário desenhado pelo próprio app — o do navegador não abre dentro do HMO */
@@ -922,14 +972,24 @@ function upsert(tb,rec){const a=S[tb];const i=a.findIndex(x=>x.id===rec.id);cons
 function remover(tb,id){const r=S[tb].find(x=>x.id===id);S[tb]=S[tb].filter(x=>x.id!==id);salvar(tb);if(r)audit('Exclusão',NOME_TB[tb],resumoReg(tb,r));render()}
 
 /* ---------- formulários por tabela ---------- */
+// V79: km em pt-BR. Sem máscara no campo (o km do dia é inteiro e redondo: 124, 230),
+// mas com o separador de milhar na saída do campo, para o motorista ver o que gravou.
+const fmtNum=n=>(+n||0).toLocaleString('pt-BR',{maximumFractionDigits:2});
+const KM_DIA_MAX=600;
+const AV_KM=(n,o)=>{if(!n)return '';
+  if(n>KM_DIA_MAX)return `\u26a0 ${fmtNum(n)} km num dia s\u00f3. Confira se n\u00e3o faltou a v\u00edrgula.`;
+  const v=+(o&&(o.valor??o.uV??o.nV))||0;
+  if(v&&n&&v/n>20)return `\u26a0 D\u00e1 ${brl(v/n)} por km. Confira o km.`;
+  return ''};
 const AJUDA_KM='📏 Usado no Painel para R$ por km, Custo por km e Lucro por km. É opcional, mas sem ele esses indicadores não aparecem.';
+const AJUDA_KM_CAR='📏 Entra na mesma conta de R$ por km, Custo por km e Lucro por km do Painel. O dinheiro da carona já soma no resultado; sem o km, os indicadores por km ficam melhores do que a realidade.';
 function formCorrida(r){
   if(!(r&&r.id)&&semVeiculo())return;
   r=r||{data:hoje(),plataforma:'Uber',veiculo:cfg().veiculoPadrao};
   const f=openForm({titulo:r.id?'Editar dia de corridas':'Novo lançamento do dia',sub:'Ganho do dia em Uber ou 99. Caronas são lançadas na aba Caronas (também somam na meta diária).'+(r.id?'':'<br>💡 Rodou nas duas no mesmo dia? Use ⚡ Atalhos &gt; Lançar o dia (Uber + 99).'),
     campos:[{k:'data',l:'Data',t:'date',req:1},{k:'plataforma',l:'Plataforma',t:'select',op:['Uber','99']},
       {k:'valor',l:'Ganho do dia (R$)',t:'money',req:1},{k:'viagens',l:'Qtd. viagens',t:'int'},
-      {k:'min',l:'Tempo online (hh:mm)',t:'time'},{k:'km',l:'Km rodados (opcional)',t:'num',help:AJUDA_KM},
+      {k:'min',l:'Tempo online (hh:mm)',t:'time'},{k:'km',l:'Km rodados (opcional)',t:'num',help:AJUDA_KM,calc:1,aviso:AV_KM},
       {k:'veiculo',l:'Veículo',t:'select',op:VEICS()},{k:'obs',l:'Observação',t:'text',full:1}],
     val:Object.assign({},r,{min:minToInp(r.min)}),
     onSave:o=>upsert('tb_corridas',Object.assign({id:r.id||uid('d')},o)),onDel:r.id?()=>remover('tb_corridas',r.id):null});
@@ -953,7 +1013,7 @@ function formCarona(r,dataPadrao){
   const f=openForm({titulo:r.id?'Editar Carona Solidária':'Nova Carona Solidária',sub:pc?`Soma na meta diária e no Resultado líquido. Valor sugerido: passageiros × ${brl(pc)} (ajuste em Opções › Metas e preferências).`:'Soma na meta diária e no Resultado líquido. Dica: informe o preço por passageiro e os trajetos em ⚙ Opções › Metas e preferências.',
     campos:[{k:'data',l:'Data',t:'date',req:1},ops.length?{k:'sentido',l:'Sentido',t:'select',op:[...new Set([...ops,'Outro',...(r.sentido&&!ops.includes(r.sentido)&&r.sentido!=='Outro'?[r.sentido]:[])])]}:{k:'sentido',l:'Trajeto',t:'text',ph:'Ex.: Centro → Aeroporto'},
       {k:'passageiros',l:'Passageiros',t:'int'},{k:'valor',l:'Valor recebido (R$)',t:'money',req:1},
-      {k:'veiculo',l:'Veículo',t:'select',op:VEICS()},{k:'obs',l:'Observação (embarque/desembarque)',t:'textarea',full:1}],
+      {k:'km',l:'Km rodados (opcional)',t:'num',help:AJUDA_KM_CAR,calc:1,aviso:AV_KM},{k:'veiculo',l:'Veículo',t:'select',op:VEICS()},{k:'obs',l:'Observação (embarque/desembarque)',t:'textarea',full:1}],
     val:r,onSave:o=>upsert('tb_carona',Object.assign({id:r.id||uid('c')},o)),onDel:r.id?()=>remover('tb_carona',r.id):null});
   f.g('passageiros').addEventListener('input',e=>{if(!pc)return;const n=parseInt(e.target.value,10)||0;f.g('valor').value=brl(n*pc,1)});
 }
@@ -1121,7 +1181,7 @@ function vPainel(){
     ${kpi('Carona Solidária',brl(vCar),car.length+(car.length===1?' viagem · ':' viagens · ')+sum(car,r=>r.passageiros)+' passageiros · soma na meta')}
     ${kpi('R$ por hora',G.min?brl(G.valor/(G.min/60)):'—',G.min?minToHM(G.min)+' online':'Informe o tempo online')}
     ${kpi('R$ por viagem',G.viagens?brl(G.valor/G.viagens):'—',G.viagens?G.viagens+' viagens':'')}
-    ${G.km?kpi('R$ por km',brl(G.valor/G.km),G.km+' km rodados'):''}`)}
+    ${(()=>{const km=kmMes(ym,G);if(!km)return '';const sk=caronasSemKm(ym);return kpi('R$ por km',brl((G.valor+vCar)/km),'Uber/99 + carona ÷ '+fmtNum(km)+' km do mês'+(kmCarona(ym)?'<br>corridas '+fmtNum(G.km)+' km · caronas '+fmtNum(kmCarona(ym))+' km':'')+(sk?'<br><span class="am">⚠ '+sk+(sk===1?' carona sem km informado':' caronas sem km informado')+'</span>':''))})()}`)}
   ${bloco('🧾 Despesas e resultado do mês',filtroTxt,`
     ${(()=>{const mu=cus.filter(r=>r.virtual);return kpi('Custos do veículo',brl(vCus),cus.length+(cus.length===1?' lançamento':' lançamentos')+(mu.length?'<br>inclui multas pagas '+brl(sum(mu,r=>r.valor)):'')+cmpMesPassado(ym,vCus))})()}
     ${kpi('Resultado líquido',`<span class="${res>=0?'pos':'neg'}">${brl(res)}</span>`,'Ganhos + carona − custos do veículo<br>'+brl(vMeta)+' (meta do mês) − '+brl(vCus)+' (custos)','hl')}
@@ -1230,8 +1290,8 @@ function vCarona(){
     ${kpiComb('Carona × combustível','a carona',sum(m,r=>r.valor),comb)}
   </div>`;
   h+=groups(L,{key:'data',chave:'car',vazio:'Nenhuma carona lançada.',
-    cab:rows=>`<span class="small muted">${rows.length} viagens · ${sum(rows,r=>r.passageiros)} pass.</span><b class="num">${brl(sum(rows,r=>r.valor))}</b>`,
-    linha:r=>{const tot=porDia(r.data.slice(0,7))[r.data]||0,meta=cfg().metaDiaria;return `<div class="row"><div class="dt">${fmtD(r.data)}<small>${wdOf(r.data)}</small></div><div class="main">${tot>=meta?'<span class="tag b">✓ meta do dia</span>':'<span class="tag a">△ dia: '+brl(tot)+' de '+brl(meta)+'</span>'}<b>${esc(r.sentido)}</b> <span class="tag g">${r.passageiros||0} pass.</span>${r.obs?`<div class="obs">${esc(r.obs)}</div>`:''}</div><div class="val num">${brl(r.valor)}</div><div class="act"><button class="ib" data-ed="tb_carona:${r.id}" aria-label="Editar">✎</button><button class="ib" data-del="tb_carona:${r.id}" aria-label="Excluir" title="Excluir">🗑</button></div></div>`}});
+    cab:rows=>`<span class="small muted">${rows.length} viagens · ${sum(rows,r=>r.passageiros)} pass.${sum(rows,r=>r.km)?' · '+fmtNum(sum(rows,r=>r.km))+' km':''}</span><b class="num">${brl(sum(rows,r=>r.valor))}</b>`,
+    linha:r=>{const tot=porDia(r.data.slice(0,7))[r.data]||0,meta=cfg().metaDiaria;return `<div class="row"><div class="dt">${fmtD(r.data)}<small>${wdOf(r.data)}</small></div><div class="main">${tot>=meta?'<span class="tag b">✓ meta do dia</span>':'<span class="tag a">△ dia: '+brl(tot)+' de '+brl(meta)+'</span>'}<b>${esc(r.sentido)}</b> <span class="tag g">${r.passageiros||0} pass.</span>${r.km?` <span class="tag">${fmtNum(r.km)} km</span>`:''}${r.obs?`<div class="obs">${esc(r.obs)}</div>`:''}</div><div class="val num">${brl(r.valor)}</div><div class="act"><button class="ib" data-ed="tb_carona:${r.id}" aria-label="Editar">✎</button><button class="ib" data-del="tb_carona:${r.id}" aria-label="Excluir" title="Excluir">🗑</button></div></div>`}});
   h+=refBloco(REF_CARONA,TXT_CARONA_IMP);
   return h;
 }
@@ -1404,8 +1464,8 @@ function relModelo(){
     cols:[['Categoria'],['Valor','money'],['% dos custos','pct'],['Lançamentos','int']],rows:Object.entries(cats).sort((a,b)=>b[1].v-a[1].v).map(([c,o])=>[c,o.v,vCus?o.v/vCus:null,o.n])});
   sec.push({id:'veic',t:'Custo-benefício por veículo',cols:[['Veículo'],['Uber + 99','money'],['Carona','money'],['Custos','money'],['Saldo','money']],
     rows:VEICS().map(v=>{const f=r=>r.veiculo===v;const a=sum(cor.filter(f),r=>r.valor),c=sum(car.filter(f),r=>r.valor),k=sum(cus.filter(f),r=>r.valor);return[v,a,c,k,a+c-k]}).filter(r=>r[1]||r[2]||r[3])});
-  const sent={};car.forEach(r=>{sent[r.sentido]=sent[r.sentido]||{n:0,p:0,v:0};sent[r.sentido].n++;sent[r.sentido].p+=+r.passageiros||0;sent[r.sentido].v+=+r.valor||0});
-  sec.push({id:'carona',t:'Carona Solidária',cols:[['Sentido'],['Viagens','int'],['Passageiros','int'],['Valor','money'],['Média por viagem','money']],rows:Object.entries(sent).map(([k,o])=>[k,o.n,o.p,o.v,o.n?o.v/o.n:null])});
+  const sent={};car.forEach(r=>{sent[r.sentido]=sent[r.sentido]||{n:0,p:0,v:0,k:0};sent[r.sentido].n++;sent[r.sentido].p+=+r.passageiros||0;sent[r.sentido].v+=+r.valor||0;sent[r.sentido].k+=+r.km||0});
+  sec.push({id:'carona',t:'Carona Solidária',cols:[['Sentido'],['Viagens','int'],['Passageiros','int'],['Km'],['Valor','money'],['Média por viagem','money']],rows:Object.entries(sent).map(([k,o])=>[k,o.n,o.p,o.k?fmtNum(o.k):'—',o.v,o.n?o.v/o.n:null])});
   sec.push({id:'conc',t:'Conciliação de repasses',cols:[['Repasse','date'],['Plataforma'],['Período'],['Repasse','money'],['Soma do diário','money'],['Diferença','money']],
     rows:rep.slice().sort((a,b)=>b.data.localeCompare(a.data)).map(r=>{const d=r.ini&&r.fim?S.tb_corridas.filter(x=>x.plataforma===r.plataforma&&x.data>=r.ini&&x.data<=r.fim):[];const sd=sum(d,x=>x.valor);return[r.data,r.plataforma,r.ini?fmtBR(r.ini)+' a '+fmtBR(r.fim):'—',r.valor,d.length?sd:null,d.length?r2(r.valor-sd):null]})});
   const anos=[...new Set(meses.map(m=>+m.slice(0,4)))];const lc=anos.flatMap(a=>linhasAno(a)).filter(l=>meses.includes(l.ym));
@@ -2979,11 +3039,11 @@ const GUIA=[
  {t:'👋 Bem-vindo ao Rodaliq™',x:`O Rodaliq organiza o seu dia a dia de motorista: ganhos, custos do carro, multas e o Carnê-Leão.<br><br><b>Regra de ouro:</b> os números do Painel vêm do que você lança. Quanto mais completo o lançamento, mais o app consegue mostrar. Este guia mostra o que lançar e onde cada informação aparece.`},
  {t:'🚗 Seu veículo',cfg:'veic'},
  {t:'🎯 Sua meta diária',x:`Defina quanto quer ganhar por dia e em quais dias da semana você roda, em <b>⚙ Opções › Metas e preferências</b>. É de lá que saem a meta do dia e a do mês.<br><br>Nessa mesma tela ficam duas escolhas que mexem no imposto: o <b>desconto simplificado</b> mensal e se a <b>Carona Solidária entra no Carnê-Leão</b>. As duas seguem as referências oficiais listadas na aba <b>🧮 Impostos</b> — e, no caso da carona, a ressalva explicada na aba <b>Caronas / BlaBlaCar</b>.`,cfg:'meta'},
- {t:'🚕 Seus ganhos (Uber e 99)',x:`Lance o ganho de cada dia em <b>Corridas &gt; ＋ Corridas</b> ou, mais rápido, em <b>⚡ Atalhos &gt; Lançar o dia (Uber + 99)</b>.<br>Preencha também viagens, tempo online e <b>km rodados</b>: sem km, os indicadores por km não aparecem.${refBloco(REF_GANHOS)}`,
+ {t:'🚕 Seus ganhos (Uber e 99)',x:`Lance o ganho de cada dia em <b>Corridas &gt; ＋ Corridas</b> ou, mais rápido, em <b>⚡ Atalhos &gt; Lançar o dia (Uber + 99)</b>.<br>Preencha também viagens, tempo online e <b>km rodados</b>: sem km, os indicadores por km não aparecem.<br><br>A Uber e a 99 mostram o km <b>viagem por viagem</b>, nunca o total do dia. Por isso o campo de km tem o botão <b>🧮</b> ao lado: digite (ou cole) um km por linha, que ele soma e devolve o total, com a opção de <b>Usar</b> ou de <b>Somar ao campo</b> se você já tinha lançado parte do dia.${refBloco(REF_GANHOS)}`,
    m:'Meta do dia e do mês, calendário, ganhos, R$/hora, R$/viagem, R$/km, previsão do mês e Carnê-Leão.',acts:[['⚡ Lançar meu primeiro dia',()=>fecharDia()],['＋ Corridas',()=>formCorrida()]]},
  {t:'🧾 Repasses semanais',x:`É o valor que a Uber ou a 99 deposita na sua conta a cada semana. Lançar o repasse permite <b>conferir</b> se bate com a soma dos dias lançados e ajuda a calcular o Carnê-Leão quando não há extrato.`,
    m:'Conciliação na aba Corridas e base do Carnê-Leão.',acts:[['＋ Repasse semanal',()=>formRepasse()]]},
- {t:'🧑‍🤝‍🧑 Carona Solidária / BlaBlaCar',x:`Se você leva passageiros fixos (casa–trabalho) ou pega viagens pela <b>BlaBlaCar</b>, lance cada uma na aba <b>Caronas / BlaBlaCar</b>. A carona tem card próprio e <b>soma na meta</b> do dia.<br><br>${'<br><br>'+TXT_CARONA_IMP}${refBloco(REF_CARONA)}`,
+ {t:'🧑‍🤝‍🧑 Carona Solidária / BlaBlaCar',x:`Se você leva passageiros fixos (casa–trabalho) ou pega viagens pela <b>BlaBlaCar</b>, lance cada uma na aba <b>Caronas / BlaBlaCar</b>. A carona tem card próprio e <b>soma na meta</b> do dia.<br><br><br><br>A carona também tem <b>km rodados</b>, com a mesma calculadora 🧮 das corridas. Vale preencher: o dinheiro da carona já entra no resultado do mês, então sem o km dela o <b>R$ por km</b>, o <b>Custo por km</b> e o <b>Lucro por km</b> ficam melhores do que a realidade. O Painel avisa quando há caronas sem km no mês.${'<br><br>'+TXT_CARONA_IMP}${refBloco(REF_CARONA)}`,
    m:'Card da Carona, meta do dia e do mês, Carnê-Leão.',acts:[['＋ Caronas',()=>formCarona()]]},
  {t:'⛽ Custos do veículo',x:`Lance tudo o que gasta com o carro em <b>Custos &gt; ＋ Custos</b>.<br>• <b>Combustível:</b> informe os litros para ver o preço médio e quanto os ganhos cobrem.<br>• <b>Manutenção:</b> informe o km da próxima troca para receber o alerta.<br>• <b>Parcela/Aluguel</b>, seguro, IPVA, lavagem e estacionamento também entram.`,
    m:'Custos do veículo e comparação com o mês passado, resultado líquido, combustível, custo e lucro por km, alertas de manutenção.',acts:[['＋ Custos',()=>formCusto()]]},
@@ -3079,8 +3139,9 @@ function verReservas(){
 function cardsExtras(ym,G,vMeta,vCus,res,cus,pd,ehMesAtual,decorridos,n){
   let h='';
   // 4. por km
-  if(G.km){h+=kpi('Custo por km',brl(vCus/G.km),G.km.toLocaleString('pt-BR')+' km nas corridas do mês')+kpi('Lucro por km',`<span class="${res>=0?'pos':'neg'}">${brl(res/G.km)}</span>`,'Resultado líquido ÷ km rodados')}
-  else h+=kpi('Custo e lucro por km','—','Lance os km rodados nas corridas para ver quanto custa e quanto sobra por km.');
+  const km=kmMes(ym,G),semKm=caronasSemKm(ym);
+  if(km){h+=kpi('Custo por km',brl(vCus/km),fmtNum(km)+' km do mês'+(kmCarona(ym)?' (corridas '+fmtNum(G.km)+' · caronas '+fmtNum(kmCarona(ym))+')':'')+(semKm?'<br><span class="am">⚠ '+semKm+(semKm===1?' carona sem km':' caronas sem km')+'</span>':''))+kpi('Lucro por km',`<span class="${res>=0?'pos':'neg'}">${brl(res/km)}</span>`,'Resultado líquido ÷ km do mês')}
+  else h+=kpi('Custo e lucro por km','—','Lance os km rodados nas corridas e nas caronas para ver quanto custa e quanto sobra por km.');
   // 5. projeção (mês em andamento, a partir do 3º dia)
   const diasTrab=Object.keys(pd).length;
   if(ehMesAtual&&decorridos>=3&&diasTrab){
@@ -3107,7 +3168,7 @@ function fecharDia(){
   if(semVeiculo())return;
   const ult=S.tb_corridas.slice().sort((a,b)=>(b.data||'').localeCompare(a.data||''))[0],vei=ult&&VEICS().includes(ult.veiculo)?ult.veiculo:cfg().veiculoPadrao;
   const P=[['u','Uber'],['n','99']],campos=[{k:'data',l:'Data',t:'date',req:1},{k:'veiculo',l:'Veículo',t:'select',op:VEICS()}];
-  P.forEach(([k,n])=>campos.push({k:k+'V',l:`${n} · Ganho do dia (R$)`,t:'money'},{k:k+'Q',l:`${n} · Qtd. viagens`,t:'int'},{k:k+'M',l:`${n} · Tempo online (hh:mm)`,t:'time'},{k:k+'K',l:`${n} · Km rodados (opcional)`,t:'num',help:AJUDA_KM}));
+  P.forEach(([k,n])=>campos.push({k:k+'V',l:`${n} · Ganho do dia (R$)`,t:'money'},{k:k+'Q',l:`${n} · Qtd. viagens`,t:'int'},{k:k+'M',l:`${n} · Tempo online (hh:mm)`,t:'time'},{k:k+'K',l:`${n} · Km rodados (opcional)`,t:'num',help:AJUDA_KM,calc:1,aviso:(x)=>x>KM_DIA_MAX?`\u26a0 ${fmtNum(x)} km num dia s\u00f3. Confira se n\u00e3o faltou a v\u00edrgula.`:''}));
   openForm({titulo:'⚡ Lançar o dia (Uber + 99)',sub:'É o mesmo <b>Novo lançamento do dia</b> da aba Corridas, só que com Uber e 99 numa tela só. Deixe em branco a plataforma em que não rodou.',campos,val:{data:hoje(),veiculo:vei},
     onSave:(o,ov)=>{const recs=P.filter(([k])=>o[k+'V']>0).map(([k,n])=>({plataforma:n,valor:o[k+'V'],viagens:o[k+'Q']||0,min:o[k+'M']||0,km:o[k+'K']||null}));
       if(!recs.length)return 'Preencha o ganho de Uber ou de 99.';
