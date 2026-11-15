@@ -467,7 +467,7 @@ svg text{font-family:Inter,system-ui,sans-serif}
 
 <script>
 "use strict";
-const VERSAO='V79';
+const VERSAO='V80';
 /* ---------- utilidades ---------- */
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -644,7 +644,13 @@ function backupAlerta(){if(!CARGA_OK||contaVazia())return null;const u=ultimoBac
 function alertas(){
   const out=[],hj=hoje(),cm=cadMes();
   const ant=addMes(mesAtual(),-1),reg=S.tb_carne[ant];
-  if(!(cm&&ant<cm)&&!(reg&&reg.bruto!=null&&reg.bruto!==''))out.push({n:'a',t:`Atualize o Carnê-Leão de ${mesNome(ant)} com o extrato da Uber.`,tab:'impostos'});
+  // V80: só cobra o Carnê-Leão de quem já rodou em app alguma vez. Quem usa o Rodaliq só
+  // para acompanhar o custo do carro não tem o que lançar, e o aviso viraria cobrança mensal
+  // por algo que ele não faz. Basta um lançamento na história da conta para o aviso voltar,
+  // então quem tirou um mês de folga continua sendo lembrado.
+  const jaRodou=()=>S.tb_corridas.some(r=>fPlat(r))||S.tb_repasses.length>0
+    ||Object.values(S.tb_carne).some(r=>r&&r.bruto!=null&&r.bruto!=='');
+  if(!(cm&&ant<cm)&&!(reg&&reg.bruto!=null&&reg.bruto!=='')&&jaRodou())out.push({n:'a',t:`Atualize o Carnê-Leão de ${mesNome(ant)} com o extrato da Uber.`,tab:'impostos'});
   const ano=+mesAtual().slice(0,4);[ano-1,ano].forEach(a=>linhasAno(a).forEach(l=>{if(l.darf>0&&!l.reg.pago)out.push({n:l.venc<hj?'r':'a',t:`DARF de ${mesNome(l.ym)}: ${brl(l.darf)} · vence ${fmtBR(l.venc)}${l.venc<hj?' (vencido)':''}.`,nota:l.venc<hj?'Valor estimado, sem multa e juros por atraso: gere a guia oficial atualizada no Sicalc da Receita.':'Valor estimado: gere a guia oficial no Carnê-Leão Web.',tab:'impostos'})}));
   S.tb_multas.filter(r=>!r.pagto).forEach(r=>{const v=r.venc;const lim=isoOf(new Date(Date.now()+10*864e5));const val=brl(r.vDesc??r.vOrig);
     if(v&&v<hj)out.push({n:'r',t:`Multa atrasada (venceu em ${fmtBR(v)}): ${val} · ${r.motivo} (${r.veiculo}).`,tab:'multas',multa:r.id});
