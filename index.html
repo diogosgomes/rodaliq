@@ -467,7 +467,7 @@ svg text{font-family:Inter,system-ui,sans-serif}
 
 <script>
 "use strict";
-const VERSAO='V87';
+const VERSAO='V88';
 /* ---------- utilidades ---------- */
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -2044,7 +2044,7 @@ const despMensal=(d,ym)=>{if(!d||!d.ativo)return 0;
   if(d.tipo==='pontual')return d.ym===ym?(+d.valor||0):0;
   return 0};
 const custoMes=(L,ym)=>sum(L,d=>despMensal(d,ym));
-const DESP_TIPOS=[['mensal','Mensal (assinatura, serviço recorrente)'],['anual','Anual (rateado em 12x automaticamente)'],['pontual','Pontual (só neste mês)']];
+const DESP_TIPOS=[['mensal','Mensal'],['anual','Anual (rateado)'],['pontual','Pontual']];
 let PERFIS={},EMAILS={};
 async function carregaPerfis(f){ // admin lê o nome em public.profiles e o e-mail em tb_usuarios
   if(!invIsAdmin||!invProd())return;
