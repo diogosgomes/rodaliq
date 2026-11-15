@@ -467,7 +467,7 @@ svg text{font-family:Inter,system-ui,sans-serif}
 
 <script>
 "use strict";
-const VERSAO='V80';
+const VERSAO='V83';
 /* ---------- utilidades ---------- */
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -1639,7 +1639,13 @@ function olhinho(i){if(!i||i.parentElement.classList.contains('pw'))return;
   b.onclick=()=>{i.type=i.type==='password'?'text':'password';b.textContent=i.type==='password'?'👁':'🙈'};
   w.appendChild(b)}
 /* ---------- Pedidos de convite (tela de login) e administração (adaptado do kit My Trade Dash V102) ---------- */
-const INV_ST={novo:'Novo',convidado:'Convidado',recusado:'Recusado'};
+const INV_ST={novo:'Novo',convidado:'Conta criada',avisado:'Avisado',recusado:'Recusado'};
+// V81: criar a conta e avisar a pessoa são passos diferentes. Criar 120 leva segundos;
+// mandar 120 mensagens, não. O status 'convidado' passa a significar "conta criada, falta avisar".
+const INV_CRIADO=r=>r.status==='convidado';
+// link do WhatsApp já com a senha provisória, para o aviso sair num toque
+const invWaSenha=(r,sen)=>'https://wa.me/'+String(r.whatsapp||'').replace(/\D/g,'')+'?text='+encodeURIComponent(
+  `Olá, ${invPrimeiro(r)}! Sua conta no Rodaliq está criada.\n\nEntre em https://rodaliq.com.br\nLogin: ${r.email}\nSenha provisória: ${sen}\n\nNo primeiro acesso o app pede para você criar a sua própria senha.`);
 const DDD_UF={};
 Object.entries({SP:'11 12 13 14 15 16 17 18 19',RJ:'21 22 24',ES:'27 28',MG:'31 32 33 34 35 37 38',PR:'41 42 43 44 45 46',SC:'47 48 49',RS:'51 53 54 55',DF:'61',GO:'62 64',TO:'63',MT:'65 66',MS:'67',AC:'68',RO:'69',BA:'71 73 74 75 77',SE:'79',PE:'81 87',AL:'82',PB:'83',RN:'84',CE:'85 88',PI:'86 89',PA:'91 93 94',AM:'92 97',RR:'95',AP:'96',MA:'98 99'}).forEach(([uf,l])=>l.split(' ').forEach(d=>{DDD_UF[d]=uf}));
 const UF_NOME={AC:'Acre',AL:'Alagoas',AP:'Amapá',AM:'Amazonas',BA:'Bahia',CE:'Ceará',DF:'Distrito Federal',ES:'Espírito Santo',GO:'Goiás',MA:'Maranhão',MT:'Mato Grosso',MS:'Mato Grosso do Sul',MG:'Minas Gerais',PA:'Pará',PB:'Paraíba',PR:'Paraná',PE:'Pernambuco',PI:'Piauí',RJ:'Rio de Janeiro',RN:'Rio Grande do Norte',RS:'Rio Grande do Sul',RO:'Rondônia',RR:'Roraima',SC:'Santa Catarina',SP:'São Paulo',SE:'Sergipe',TO:'Tocantins'};
@@ -1893,7 +1899,7 @@ let CANAIS=Object.assign({},CAN_PADRAO),SOU_COLAB=false,COLABS=[],REC_MEUS=[],RE
 const IMP_PADRAO={permitir:true,padrao:false}; // permitir = cada pessoa escolhe em ⚙ Opções; padrao = valor de quem não escolheu
 let IMP=Object.assign({},IMP_PADRAO);
 let AJU=Object.assign({},AJU_PADRAO),APO_MEU=false;
-let APO_CACHE=[];const ZAP_APO={};
+let APO_CACHE=[];const ZAP_APO={};let DESP_CACHE=[];
 async function ajuCarregar(){
   try{
     if(!invProd()){const d=await DB.doc('ajustes/manutencao').get();if(d.exists&&d.data().v)MANUT=Object.assign({},MAN_PADRAO,d.data().v)}
@@ -2013,6 +2019,29 @@ const apoBRL=v=>brl(v); // mesmo formato do resto do app: R$ 13.829,33
 async function apoListar(){
   if(!invProd())return (await DB.collection('apoios').get()).docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>String(b.criado_em).localeCompare(String(a.criado_em)));
   const {data,error}=await DB.from('tb_apoios').select('*').order('criado_em',{ascending:false}).limit(1000);if(error)throw error;return data||[]}
+/* ---------- V82: 💰 Despesas do app (custo pra manter o Rodaliq de pé, só admin principal) ---------- */
+async function despListar(){
+  if(!invProd())return (await DB.collection('despesas').get()).docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>String(b.criado_em).localeCompare(String(a.criado_em)));
+  const {data,error}=await DB.from('tb_despesas').select('*').order('criado_em',{ascending:false});if(error)throw error;return data||[]}
+async function despSalvar(obj){
+  const id=Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+  const rec={nome:String(obj.nome||'').trim(),tipo:obj.tipo,valor:r2(+obj.valor||0),venc:obj.tipo==='anual'?(obj.venc||null):null,ym:obj.tipo==='pontual'?(obj.ym||null):null,ativo:true,obs:String(obj.obs||'').trim(),criado_em:new Date().toISOString()};
+  if(!invProd()){await DB.doc('despesas/'+id).set(rec);return id}
+  const {error}=await DB.from('tb_despesas').insert({id,...rec});if(error)throw error;return id}
+async function despAtualizar(id,patch){
+  if(!invProd()){await DB.doc('despesas/'+id).update(patch);return}
+  const {error}=await DB.from('tb_despesas').update(patch).eq('id',id);if(error)throw error}
+async function despExcluir(id){
+  if(!invProd()){await DB.doc('despesas/'+id).delete();return}
+  const {error}=await DB.from('tb_despesas').delete().eq('id',id);if(error)throw error}
+// quanto desta despesa pesa no mês "ym": mensal sempre, anual dividido por 12, pontual só no mês lançado
+const despMensal=(d,ym)=>{if(!d||!d.ativo)return 0;
+  if(d.tipo==='mensal')return +d.valor||0;
+  if(d.tipo==='anual')return (+d.valor||0)/12;
+  if(d.tipo==='pontual')return d.ym===ym?(+d.valor||0):0;
+  return 0};
+const custoMes=(L,ym)=>sum(L,d=>despMensal(d,ym));
+const DESP_TIPOS=[['mensal','Mensal (assinatura, serviço recorrente)'],['anual','Anual (rateado em 12x automaticamente)'],['pontual','Pontual (só neste mês)']];
 let PERFIS={},EMAILS={};
 async function carregaPerfis(f){ // admin lê o nome em public.profiles e o e-mail em tb_usuarios
   if(!invIsAdmin||!invProd())return;
@@ -2314,9 +2343,13 @@ async function apoAdminRender(box){
   await carregaPerfis();
   let L;try{L=await apoListar();APO_CACHE=L}catch(e){box.innerHTML='<div class="empty">Não consegui carregar as contribuições. Tente de novo em instantes.</div>';return}
   if(!invCache.length)try{await invRefreshBadge(true)}catch(e){}
+  let D=[];if(ehMaster())try{D=await despListar();DESP_CACHE=D}catch(e){}
   const F=[['informado','Para conferir'],['confirmado','Confirmadas'],['descartado','Descartadas'],['todos','Todas']];
   const f=UI.apoF||'informado',lst=f==='todos'?L:L.filter(x=>x.status===f),cnt=k=>k==='todos'?L.length:L.filter(x=>x.status===k).length;
-  const ym=hoje().slice(0,7),mes=L.filter(x=>x.status==='confirmado'&&String(x.confirmado_em||'').slice(0,7)===ym);
+  UI.apoYm=UI.apoYm&&UI.apoYm<=mesAtual()?UI.apoYm:mesAtual();
+  const ym=UI.apoYm,mes=L.filter(x=>x.status==='confirmado'&&String(x.confirmado_em||'').slice(0,7)===ym);
+  const acumulado=sum(L.filter(x=>x.status==='confirmado'&&String(x.confirmado_em||'').slice(0,7)<=ym),x=>x.valor);
+  const custo=custoMes(D,ym),saldo=sum(mes,x=>x.valor)-custo;
   const card=x=>{const nome=apoNome(x),c=invCache.find(v=>String(v.email||'').toLowerCase()===String(x.email||'').toLowerCase()),txt=apoTexto(x,nome);
     ZAP_APO[x.id]={fone:c?c.whatsapp:'',txt,nome};
     const tag=x.status==='confirmado'?'<span class="tag b">Confirmada</span>':(x.status==='descartado'?'<span class="tag g">Descartada</span>':'<span class="tag a">Para conferir</span>');
@@ -2330,10 +2363,15 @@ async function apoAdminRender(box){
       <div class="ivActs" style="margin-top:8px">${bt}</div></div>`};
   box.innerHTML=`<h3 style="margin:0">🤝 Apoiadores</h3>
     <p class="small muted" style="margin:4px 0 8px">Contribuição é voluntária: ninguém fica sem o app por não contribuir, e o app nunca cobra. Confira o Pix no seu banco antes de confirmar; confirmar gera o número do recibo. O WhatsApp e o e-mail abrem com o texto pronto; para mandar o recibo em PDF, baixe e anexe.</p>
-    <div class="cards grid" style="margin-bottom:10px">${kpi('Confirmadas em '+mesNome(ym),apoBRL(sum(mes,x=>x.valor)),mes.length+(mes.length===1?' contribuição':' contribuições'))}${kpi('Para conferir',String(cnt('informado')),'aguardando a sua conferência')}${kpi('Apoiadores',String(new Set(L.filter(x=>x.status==='confirmado').map(x=>x.email)).size),'pessoas que já contribuíram')}</div>
+    <div class="mpick" style="margin-bottom:8px"><button type="button" data-apm="-1" aria-label="Mês anterior">‹</button><span style="text-transform:capitalize">${mesNome(ym)}</span><button type="button" data-apm="1" aria-label="Próximo mês"${ym>=mesAtual()?' disabled':''}>›</button></div>
+    <div class="cards grid" style="margin-bottom:10px">${kpi('Confirmadas em '+mesNome(ym),apoBRL(sum(mes,x=>x.valor)),mes.length+(mes.length===1?' contribuição':' contribuições'))}${kpi('Acumulado até '+mesNome(ym),apoBRL(acumulado),'desde o lançamento')}${kpi('Para conferir',String(cnt('informado')),'aguardando a sua conferência')}${kpi('Apoiadores',String(new Set(L.filter(x=>x.status==='confirmado').map(x=>x.email)).size),'pessoas que já contribuíram')}</div>
+    ${ehMaster()?`<div class="cards grid" style="margin-bottom:10px">${kpi('Benefício × custo em '+mesNome(ym),(saldo>=0?'✅ ':'⚠ ')+apoBRL(saldo),'Recebido '+apoBRL(sum(mes,x=>x.valor))+' · custo do app '+apoBRL(custo))}</div>
+    <p style="margin:0 0 10px"><button type="button" class="btn sec sm" id="apoDespBtn">💰 Gerenciar despesas do app (${D.filter(d=>d.ativo).length})</button></p>`:''}
     <div class="admTabs">${F.map(([k,t])=>`<button type="button" class="chip${f===k?' on':''}" data-apf="${k}">${t} (${cnt(k)})</button>`).join('')}</div>
     ${lst.length?lst.map(card).join(''):'<div class="empty" style="margin-top:8px">Nenhuma contribuição aqui.</div>'}`;
   box.querySelectorAll('[data-apf]').forEach(b=>b.onclick=()=>{UI.apoF=b.dataset.apf;apoAdminRender(box)});
+  box.querySelectorAll('[data-apm]').forEach(b=>b.onclick=()=>{let n=addMes(ym,+b.dataset.apm);if(n>mesAtual())n=mesAtual();UI.apoYm=n;apoAdminRender(box)});
+  const despBtn=box.querySelector('#apoDespBtn');if(despBtn)despBtn.onclick=()=>formDespesas(ym,()=>apoAdminRender(box));
   box.querySelectorAll('[data-za]').forEach(b=>b.onclick=()=>{const z=ZAP_APO[b.dataset.za];if(z)abreZap(z.fone,z.txt)});
   box.querySelectorAll('[data-ar]').forEach(b=>b.onclick=()=>{const x=L.find(v=>v.id===b.dataset.ar);if(x)reciboPDF(x,(ZAP_APO[x.id]||{}).nome,b)});
   box.querySelectorAll('[data-ac]').forEach(b=>b.onclick=async()=>{const x=L.find(v=>v.id===b.dataset.ac);if(!x)return;
@@ -2350,6 +2388,69 @@ async function apoAdminRender(box){
     if(!await confirma(dsc?`Trazer de volta a contribuição de <b>${esc(apoNome(x))}</b>? Ela volta para “Para conferir”.`:`Desfazer a confirmação de <b>${esc(apoNome(x))}</b>? Ela volta para “Para conferir” e o recibo deixa de valer.`,dsc?'Trazer de volta':'Desfazer',dsc?{}:{perigo:1}))return;
     try{await apoDesfazer(x);audit('Apoio','Admin','Confirmação desfeita · '+apoEmail(x))}catch(e){toast('Não foi possível desfazer agora.');return}
     await excAdminCache(true);atualizaSino();apoAdminRender(box);admContagens()});
+}
+/* ---------- V82: 💰 Gerenciar despesas do app (custo pra manter o Rodaliq de pé) ---------- */
+// V82: formatação ao vivo (milhar) do campo de valor, assim que o usuário digita a vírgula decimal
+function liveBRL(el){
+  el.addEventListener('input',()=>{
+    const v=el.value,i=v.indexOf(',');if(i<0)return; // sem vírgula ainda: não formata, deixa digitar livre
+    const intPart=v.slice(0,i).replace(/\D/g,'')||'0',decPart=v.slice(i+1).replace(/\D/g,'').slice(0,2);
+    el.value=Number(intPart).toLocaleString('pt-BR')+','+decPart;
+    el.setSelectionRange(el.value.length,el.value.length)});
+  el.addEventListener('blur',()=>{if(el.value.trim()!=='')el.value=brl(parseBRL(el.value),1)})}
+function formDespesas(ym,depois){
+  if(!ehMaster())return;
+  const ov=document.createElement('div');ov.className='ov';document.body.appendChild(ov);
+  const fecharDesp=()=>{ov.remove();if(depois)depois()};
+  ov.__fechar=()=>fechaComPerda(ov,fecharDesp);
+  const draw=async()=>{
+    let L=[],er='';try{L=await despListar();DESP_CACHE=L}catch(e){er='Não consegui carregar as despesas. Tente de novo em instantes.'}
+    const custo=custoMes(L,ym);
+    const lin=d=>{const pesa=despMensal(d,ym);
+      const sub=d.tipo==='anual'?`Anual · ${apoBRL(d.valor)} ÷ 12`:d.tipo==='pontual'?`Pontual · só em ${d.ym?mesNome(d.ym):'(mês não informado)'}`:'Mensal';
+      const emYm=d.ativo?(pesa>0?`<b>conta ${apoBRL(pesa)} em ${mesNome(ym)}</b>`:`não conta em ${mesNome(ym)}`):'inativa, não conta em nenhum mês';
+      return `<div class="uCard"><div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start"><div class="uMail">${esc(d.nome)}</div>${d.ativo?'':'<span class="tag g">Inativa</span>'}</div>
+        <div class="uLin">${sub}${d.tipo!=='anual'?' · '+apoBRL(d.valor):''}</div>
+        <div class="small muted">${emYm}</div>${d.obs?`<div class="small muted">${esc(d.obs)}</div>`:''}
+        <div class="ivActs" style="margin-top:8px"><button type="button" class="btn sm sec" data-at="${esc(d.id)}">${d.ativo?'Desativar':'Reativar'}</button><button type="button" class="btn sm sec" data-de="${esc(d.id)}">🗑 Excluir</button></div></div>`};
+    ov.innerHTML=`<div class="modal ajM" style="max-width:480px"><h2>💰 Despesas do app</h2>
+      <div class="ajBd">
+      <p class="small muted">Custos para manter o Rodaliq de pé (domínios, assinaturas, etc.). Usados só para calcular o card “Benefício × custo” em 🤝 Apoiadores — ninguém além de você vê isto.</p>
+      <div class="note small" style="margin-bottom:10px">Custo do app em <b>${mesNome(ym)}</b>: <b>${apoBRL(custo)}</b></div>
+      ${er?`<div class="empty">${er}</div>`:(L.length?L.map(lin).join(''):'<div class="empty">Nenhuma despesa cadastrada.</div>')}
+      <h3 style="margin:14px 0 4px">➕ Nova despesa</h3>
+      <div class="field"><label for="dsN">Nome</label><input class="inp" id="dsN" placeholder="Ex.: domínio rodaliq.com.br" autocomplete="off"></div>
+      <div class="field"><label for="dsT">Tipo</label><select class="inp" id="dsT">${DESP_TIPOS.map(([k,t])=>`<option value="${k}">${t}</option>`).join('')}</select></div>
+      <div class="field"><label for="dsV">Valor (R$)</label><input class="inp num" id="dsV" inputmode="decimal" placeholder="0,00" autocomplete="off"></div>
+      <div class="field hidden" id="dsYmBox"><label for="dsYm">Mês em que ela entra</label><input class="inp" type="month" id="dsYm" value="${mesAtual()}"></div>
+      <div class="field"><label for="dsO">Observação (opcional)</label><input class="inp" id="dsO" placeholder="Ex.: renova em dezembro" autocomplete="off"></div>
+      <div class="err" id="dsErr"></div>
+      </div>
+      <div class="mfoot"><button type="button" class="btn sec" id="dsN2">Fechar</button><button type="button" class="btn" id="dsS">Adicionar</button></div></div>`;
+    const q=x=>ov.querySelector(x),err=t=>{q('#dsErr').textContent=t};
+    liveBRL(q('#dsV'));
+    q('#dsN2').onclick=ov.__fechar;
+    q('#dsT').onchange=()=>{q('#dsYmBox').classList.toggle('hidden',q('#dsT').value!=='pontual')};
+    ov.querySelectorAll('[data-at]').forEach(b=>b.onclick=async()=>{const d=L.find(x=>x.id===b.dataset.at);if(!d)return;
+      try{await despAtualizar(d.id,{ativo:!d.ativo});audit('Despesa do app','Admin',(d.ativo?'Desativada':'Reativada')+' · '+d.nome)}catch(e){toast('Não foi possível salvar.');return}
+      draw()});
+    ov.querySelectorAll('[data-de]').forEach(b=>b.onclick=async()=>{const d=L.find(x=>x.id===b.dataset.de);if(!d)return;
+      if(!await confirma(`Excluir a despesa <b>${esc(d.nome)}</b>? Isso não muda nada já contabilizado em meses passados — o card usa o que está cadastrado agora.`,'Excluir',{perigo:1}))return;
+      try{await despExcluir(d.id);audit('Despesa do app','Admin','Excluída · '+d.nome)}catch(e){toast('Não foi possível excluir.');return}
+      draw()});
+    q('#dsS').onclick=async()=>{
+      const nome=q('#dsN').value.trim(),tipo=q('#dsT').value,valor=r2(parseBRL(q('#dsV').value)),ymP=q('#dsYm').value,obs=q('#dsO').value;
+      if(!nome)return err('Informe um nome para a despesa.');
+      if(!valor)return err('Informe um valor maior que zero.');
+      if(tipo==='pontual'&&!ymP)return err('Informe o mês em que esta despesa entra.');
+      q('#dsS').disabled=true;
+      try{await despSalvar({nome,tipo,valor,ym:ymP,obs});audit('Despesa do app','Admin','Cadastrada · '+nome+' · '+apoBRL(valor)+' ('+tipo+')');toast('Despesa cadastrada')}
+      catch(e){q('#dsS').disabled=false;return err('Não foi possível salvar. Só o admin principal pode.')}
+      draw()};
+    marcaPerda(ov);
+  };
+  ov.addEventListener('mousedown',e=>{if(e.target===ov)ov.__fechar()});
+  draw();
 }
 /* ---------- V62: 📑 Relatórios do painel (só o admin principal) ---------- */
 const ADM_SEC=[
@@ -2806,6 +2907,67 @@ function invMailLink(to,assunto,corpo){
 const invMailConvite=r=>invMailLink(r.email,'Seu acesso ao Rodaliq',`Olá, ${invPrimeiro(r)}!\n\nSeu pedido de convite para o Rodaliq foi recebido e o acesso será liberado.\nSeu login será o e-mail ${r.email}. A senha provisória será enviada por e-mail.\n\nPara entrar, acesse https://rodaliq.com.br\n\nEquipe Rodaliq`);
 const invMailBday=x=>invMailLink(x.email,`Feliz aniversário, ${invPrimeiro(x)}!`,`Parabéns, ${invPrimeiro(x)}! Muitas felicidades neste dia.\n\nFeliz aniversário e um abraço do Rodaliq!`);
 const invWaLink=r=>'https://wa.me/'+r.whatsapp+'?text='+encodeURIComponent(`Olá, ${invPrimeiro(r)}! Seu pedido de convite para o Rodaliq foi recebido e o acesso será liberado. Seu login será o e-mail ${r.email}. A senha provisória será enviada por aqui. Para entrar, acesse https://rodaliq.com.br`);
+// ---------- V81: criar a conta a partir do pedido de convite ----------
+// Uma senha diferente por pessoa: senha unica e mais segura do que um padrao
+// previsivel circulando no WhatsApp. Ela aparece uma vez so, no painel de resultado.
+async function invCriarContas(pedidos){
+  const itens=pedidos.map(r=>({pedido:r.id,senha:geraSenha(),_r:r}));
+  let res;
+  if(invProd()){
+    const {data,error}=await DB.rpc('rodaliq_criar_usuarios_lote',
+      {p_itens:itens.map(i=>({pedido:i.pedido,senha:i.senha}))});
+    if(error)throw error;
+    res=(data||[]).map(d=>{const i=itens.find(x=>x.pedido===d.pedido)||{};
+      return {r:i._r,senha:i.senha,ok:!!d.ok,erro:d.erro}});
+  }else{
+    // HMO: o banco de testes nao tem Auth, entao a criacao e simulada para dar
+    // para conferir a tela. O Auth de verdade so da para testar em producao.
+    res=[];
+    for(const i of itens){
+      try{await invPatch(i.pedido,{status:'convidado',handled_at:new Date().toISOString()});
+        res.push({r:i._r,senha:i.senha,ok:true,erro:null})}
+      catch(e){res.push({r:i._r,senha:i.senha,ok:false,erro:(e&&e.message)||'erro'})}
+    }
+  }
+  res.filter(x=>x.ok).forEach(x=>{if(x.r)x.r.status='convidado'});
+  audit('Criacao de contas','Admin',`${res.filter(x=>x.ok).length} criada(s) \u00b7 ${res.filter(x=>!x.ok).length} falha(s)`);
+  return res;
+}
+function invResultado(res,depois){
+  const bons=res.filter(x=>x.ok),ruins=res.filter(x=>!x.ok);
+  const ov=document.createElement('div');ov.className='ov';ov.style.zIndex='80';
+  const linha=x=>`<div class="ivCard" data-sen="${esc(x.r.id)}">
+      <div class="ivTop"><div><b class="ivNome">${esc(x.r.name)}</b><div class="small muted">${esc(x.r.email)}</div></div>
+      <span class="tag b">conta criada</span></div>
+      <div class="small" style="margin-top:6px">Senha provis\u00f3ria: <b class="num" style="font-size:16px">${esc(x.senha)}</b></div>
+      <div class="ivActs" style="margin-top:8px">
+        <button type="button" class="btn sm" data-wa="${esc(x.r.id)}">\u{1F4AC} Avisar pelo WhatsApp</button>
+        <button type="button" class="btn sec sm" data-cp="${esc(x.r.id)}">Copiar senha</button>
+        <button type="button" class="btn sec sm" data-av="${esc(x.r.id)}">\u2713 J\u00e1 avisei</button>
+      </div></div>`;
+  ov.innerHTML=`<div class="modal ajM"><h2>Contas criadas</h2>
+    <div class="ajBd">
+      <div class="note am small"><b>\u26a0 As senhas aparecem s\u00f3 agora.</b> Quando voc\u00ea fechar esta tela elas somem \u2014 nem eu nem ningu\u00e9m consegue v\u00ea-las de novo. Se perder alguma, gere outra em <b>\u{1F511} Pedidos de senha</b>.</div>
+      <div class="small muted" style="margin:10px 0 6px">${bons.length} conta(s) criada(s)${ruins.length?` \u00b7 ${ruins.length} n\u00e3o criada(s)`:''}. Avise cada pessoa e marque <b>\u2713 J\u00e1 avisei</b>.</div>
+      ${bons.map(linha).join('')||'<div class="empty">Nenhuma conta criada.</div>'}
+      ${ruins.length?`<div class="note small" style="margin-top:10px"><b>N\u00e3o foi poss\u00edvel criar</b>${ruins.map(x=>`<div style="margin-top:4px">${esc(x.r.name)} \u00b7 ${esc(x.r.email)} \u2014 ${esc(x.erro||'erro')}</div>`).join('')}</div>`:''}
+    </div>
+    <div class="mfoot"><button type="button" class="btn" id="ivRfim">Fechar</button></div></div>`;
+  document.body.appendChild(ov);
+  const SEN={};bons.forEach(x=>SEN[x.r.id]=x);
+  ov.addEventListener('click',async e=>{
+    const wa=e.target.closest('[data-wa]'),cp=e.target.closest('[data-cp]'),av=e.target.closest('[data-av]');
+    if(wa){const x=SEN[wa.dataset.wa];if(x)window.open(invWaSenha(x.r,x.senha),'_blank','noopener')}
+    else if(cp){const x=SEN[cp.dataset.cp];if(x){try{await navigator.clipboard.writeText(x.senha);toast('Senha copiada')}catch(er){toast('N\u00e3o foi poss\u00edvel copiar')}}}
+    else if(av){const x=SEN[av.dataset.av];if(!x)return;
+      try{await invSetStatus(x.r.id,'avisado');x.r.status='avisado';
+        const c=ov.querySelector('[data-sen="'+x.r.id+'"]');if(c){c.style.opacity='.45';const t=c.querySelector('.tag');if(t)t.textContent='avisado'}
+        toast('Marcado como avisado')}catch(er){toast('N\u00e3o foi poss\u00edvel marcar')}}
+  });
+  const fim=()=>{ov.remove();if(depois)depois()};
+  ov.querySelector('#ivRfim').onclick=fim;
+  ov.addEventListener('mousedown',e=>{if(e.target===ov)fim()});
+}
 async function openInvitesModal(host){ // V48: com host, a tela é montada dentro da aba 🛡 Admin
   ['#bellMenu','#optMenu','#fabMenu'].forEach(s=>{const m=$(s);if(m)m.classList.add('hidden')});
   const ov=host||document.createElement('div');if(!host)ov.className='ov';const now0=new Date();
@@ -2813,7 +2975,7 @@ async function openInvitesModal(host){ // V48: com host, a tela é montada dentr
   ov.innerHTML=`<div class="modal iv${host?' inline':''}">
     <div class="ivHd"><h2>📨 Pedidos de convite</h2><div class="ivHdB"><button type="button" class="btn sec sm" id="ivMode">🎂 Aniversariantes</button>${host?'':'<button type="button" class="btn sec sm" id="ivClose">Fechar</button>'}</div></div>
     <div id="ivListBox"><div class="ivSearch"><span aria-hidden="true">🔍</span><input class="inp" type="search" id="ivSearch" placeholder="Pesquisar por nome, telefone ou e-mail" autocomplete="off"></div>
-      <div class="chips" id="ivTabs"></div><div id="ivBody"></div></div>
+      <div class="chips" id="ivTabs"></div><div id="ivLote"></div><div id="ivBody"></div></div>
     <div id="ivCalBox" class="hidden"></div>
     <p class="small muted" style="margin-top:10px">Excluir manda o pedido para a 🗑 Lixeira, onde ele fica 15 dias antes de ser apagado de vez. Arquivar tira da lista sem apagar. Nada desta tela vai para o histórico de auditoria.</p></div>`;
   if(!host)document.body.appendChild(ov);
@@ -2824,7 +2986,13 @@ async function openInvitesModal(host){ // V48: com host, a tela é montada dentr
   const inTab=(r,k)=>k==='lixeira'?!invVivo(r):!invVivo(r)?false:k==='arquivado'?!!r.archived:!r.archived&&(k==='todos'||r.status===k);
   const draw=()=>{
     const busca=q.trim()!=='',cnt=k=>list.filter(x=>inTab(x,k)).length;
-    tabs.innerHTML=[['novo','Novos'],['convidado','Convidados'],['recusado','Recusados'],['arquivado','Arquivados'],['todos','Todos'],['lixeira','🗑 Lixeira']].map(([k,t])=>`<button type="button" data-t="${k}" class="chip${!busca&&filter===k?' on':''}">${t} (${cnt(k)})</button>`).join('');
+    // V81: criar em lote só aparece na aba Novos, e só para o admin principal
+    const novos=list.filter(x=>inTab(x,'novo'));
+    const lote=ov.querySelector('#ivLote');
+    if(lote)lote.innerHTML=(filter==='novo'&&!busca&&novos.length&&ehMaster())
+      ? `<div class="note small" style="margin-bottom:10px"><b>${novos.length} pedido(s) aguardando.</b> Criar a conta leva segundos; avisar cada pessoa, não. Por isso o app cria todas de uma vez e deixa a lista de quem falta avisar na aba 📣 A avisar.<div style="margin-top:8px"><button type="button" class="btn sm" id="ivLoteBtn">✓ Criar as contas dos ${novos.length} novos</button></div></div>`
+      : '';
+    tabs.innerHTML=[['novo','Novos'],['convidado','📣 A avisar'],['avisado','Avisados'],['recusado','Recusados'],['arquivado','Arquivados'],['todos','Todos'],['lixeira','🗑 Lixeira']].map(([k,t])=>`<button type="button" data-t="${k}" class="chip${!busca&&filter===k?' on':''}">${t} (${cnt(k)})</button>`).join('');
     const items=busca?list.filter(match):list.filter(x=>inTab(x,filter));
     if(!busca&&filter==='lixeira'){
       body.innerHTML=`<div class="ivLixHd"><span class="small muted">Os pedidos excluídos ficam aqui por ${LIX_DIAS} dias e depois são apagados de vez.</span>${items.length?`<button type="button" class="btn sec sm ivDel" data-a="esvaziar">${armed==='__all'?'⚠ Confirmar: esvaziar lixeira':'🗑 Esvaziar lixeira'}</button>`:''}</div>`+
@@ -2842,7 +3010,7 @@ async function openInvitesModal(host){ // V48: com host, a tela é montada dentr
       ${bd?`<div class="small ivBday">🎂 ${bd.when==='hoje'?'Hoje':'Amanhã'} é aniversário (faz ${bd.age} anos)</div>`:''}
       <div class="ivActs"><a class="btn sm" href="${esc(invMailConvite(r))}" target="_blank" rel="noopener">✉ Enviar e-mail</a><a class="btn sm" href="${esc(invWaLink(r))}" target="_blank" rel="noopener">💬 WhatsApp</a>
         ${bd?`<a class="btn sm" href="${esc(invMailBday(r))}" target="_blank" rel="noopener">✉ Parabenizar por e-mail</a><a class="btn sm" href="${esc(invBdayLink(r))}" target="_blank" rel="noopener">💬 Parabenizar pelo WhatsApp</a>`:''}
-        ${r.status!=='convidado'?'<button type="button" class="btn sec sm" data-a="convidado">Marcar convidado</button>':''}
+        ${r.status==='novo'?'<button type="button" class="btn sm" data-a="criar">✓ Criar conta</button>':''}${INV_CRIADO(r)?'<button type="button" class="btn sec sm" data-a="avisado">✓ Já avisei</button>':''}${!['convidado','avisado'].includes(r.status)?'<button type="button" class="btn sec sm" data-a="convidado">Marcar convidado</button>':''}
         ${r.status!=='recusado'?'<button type="button" class="btn sec sm" data-a="recusado">Recusar</button>':''}
         ${r.status!=='novo'?'<button type="button" class="btn sec sm" data-a="novo">Reabrir</button>':''}
         <button type="button" class="btn sec sm" data-a="arq">${r.archived?'♻ Desarquivar':'🗄 Arquivar'}</button>
@@ -2868,11 +3036,28 @@ async function openInvitesModal(host){ // V48: com host, a tela é montada dentr
     if(n){calM+=+n.dataset.n;if(calM<0){calM=11;calY--}if(calM>11){calM=0;calY++}calSel=null;drawCal()}
     else if(d){const v=+d.dataset.d;calSel=calSel===v?null:v;drawCal()}});
   search.addEventListener('input',()=>{q=search.value;draw()});
+  ov.addEventListener('click',async e=>{const b=e.target.closest('#ivLoteBtn');if(!b)return;
+    const novos=list.filter(x=>inTab(x,'novo'));
+    if(!novos.length)return;
+    if(!await confirma(`Criar a conta de <b>${novos.length} pessoa(s)</b>, cada uma com a sua própria senha provisória?<br><br>As senhas aparecem uma vez só, na tela seguinte. Quem já tiver conta é apenas pulado.`,'Criar '+novos.length+' conta(s)'))return;
+    b.disabled=true;b.textContent='Criando…';
+    try{const res=await invCriarContas(novos);invResultado(res,()=>{draw();atualizaSino()})}
+    catch(ex){toast('Não foi possível criar: '+((ex&&ex.message)||ex))}
+    finally{b.disabled=false}
+    invCache=list;draw()});
   tabs.addEventListener('click',e=>{const b=e.target.closest('[data-t]');if(b){filter=b.dataset.t;q='';search.value='';draw()}});
   body.addEventListener('click',async e=>{const b=e.target.closest('[data-a]');if(!b)return;
     const card=b.closest('[data-id]'),id=card?card.dataset.id:null,a=b.dataset.a,r=list.find(x=>x.id===id);
     try{
       const arma=k=>{if(armed!==k){armed=k;clearTimeout(armedT);armedT=setTimeout(()=>{armed=null;draw()},4000);draw();return true}armed=null;return false};
+      if(a==='criar'){
+        if(!ehMaster()){toast('Só o administrador principal cria contas.');return}
+        if(!await confirma(`Criar a conta de <b>${esc(r.name)}</b> (${esc(r.email)}) com uma senha provisória?<br><br>A senha aparece uma vez só, na tela seguinte.`,'Criar conta'))return;
+        b.disabled=true;b.textContent='Criando…';
+        try{const res=await invCriarContas([r]);invResultado(res,()=>{draw();atualizaSino()})}
+        catch(ex){toast('Não foi possível criar: '+((ex&&ex.message)||ex))}
+        finally{b.disabled=false}
+        invCache=list;draw();return}
       if(a==='del'){if(arma(id))return;await invTrash(id);r.deleted_at=new Date().toISOString();toast('Pedido movido para a lixeira (fica 15 dias)')}
       else if(a==='restaurar'){await invRestore(id);r.deleted_at=null;toast('Pedido restaurado')}
       else if(a==='apagar'){if(arma(id))return;await invPurge(id);list=list.filter(x=>x.id!==id);toast('Pedido apagado de vez')}
