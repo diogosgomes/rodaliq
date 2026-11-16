@@ -467,7 +467,7 @@ svg text{font-family:Inter,system-ui,sans-serif}
 
 <script>
 "use strict";
-const VERSAO='V88';
+const VERSAO='V89';
 /* ---------- utilidades ---------- */
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -1770,6 +1770,18 @@ function excTexto(x,nome){const d=fmtBR(String(x.criado_em).slice(0,10));
   const regra=`Atendemos ao seu direito de eliminação dos dados, previsto no art. 18, inciso VI, da Lei Geral de Proteção de Dados (Lei nº 13.709/2018).\n\nComo funciona: seu acesso é desativado e seus dados ficam guardados por ${EXC_DIAS} dias, caso você mude de ideia. Passado esse prazo, todos os seus lançamentos são apagados de forma definitiva. Guardamos apenas um registro mínimo do pedido (e-mail, motivo e datas), para comprovar que ele foi atendido.\n\nSe quiser levar uma cópia dos seus lançamentos antes que sejam apagados, entre no app e use ⚙ Opções > Exportar backup. Se você não conseguir entrar, responda esta mensagem que enviamos uma senha temporária.\n\nSe mudar de ideia dentro do prazo, é só responder esta mensagem.`;
   if(x.status==='desativado')return base+`Conforme a sua solicitação de ${d}, a sua conta no Rodaliq foi desativada.\n\n`+regra+assina();
   return base+`Recebemos o seu pedido de exclusão da conta no Rodaliq, feito em ${d}.\n\n`+regra+assina()}
+// V89: exclusão definitiva pelo app (só admin master). Apaga o login no Supabase; os dados saem junto e o gatilho marca "excluído".
+function excCarenciaTxt(x){
+  if(!x)return 'Esta pessoa não pediu exclusão, então não há carência.';
+  if(x.status==='desativado'){const dd=excDiasDesde(x.desativado_em),rest=EXC_DIAS-dd,lib=fmtBR(isoOf(new Date(new Date(x.desativado_em).getTime()+EXC_DIAS*864e5)));
+    return rest>0?`Faltam <b>${rest} ${rest===1?'dia':'dias'}</b> para completar os ${EXC_DIAS} dias de carência (até ${lib}).`:`A carência de ${EXC_DIAS} dias já terminou.`}
+  return `O acesso ainda não foi desativado: a carência de ${EXC_DIAS} dias nem começou (faltam ${EXC_DIAS} dias).`}
+async function usrExcluir(userId,email,pedido){
+  if(!invProd()){toast('No HMO não há usuários reais: a exclusão só roda em produção.');return false}
+  if(!await confirma(`Excluir definitivamente <b>${esc(email)}</b>? ${excCarenciaTxt(pedido)}<br><br>Isso apaga o login e todos os dados da pessoa (corridas, custos, multas, ajustes) e <b>não dá para desfazer nem reativar</b>.`,'Excluir usuário',{perigo:1}))return false;
+  try{const {error}=await DB.rpc('rodaliq_excluir_usuario',{p_user:userId});if(error)throw error}
+  catch(e){toast('Não foi possível excluir: '+String((e&&e.message)||'tente de novo').slice(0,120));return false}
+  audit('Exclusão de conta','Admin','Usuário excluído · '+email);toast('Usuário excluído');return true}
 async function excAdminRender(box){
   let L,us=[];try{L=await excListar();EXC_CACHE=L;EXC_AT=Date.now()}catch(e){box.innerHTML='<div class="empty">Não consegui carregar os pedidos. Tente de novo em instantes.</div>';return}
   try{us=await admUsuarios()}catch(e){}
@@ -1781,9 +1793,9 @@ async function excAdminRender(box){
     const tag={novo:`<span class="tag r">Novo · ${excDiasDesde(x.criado_em)} ${excDiasDesde(x.criado_em)===1?'dia':'dias'}</span>`,desativado:`<span class="tag a">Desativado · ${dd} ${dd===1?'dia':'dias'}</span>`,excluido:'<span class="tag g">Excluído</span>',desistiu:`<span class="tag b">${x.reativado_em?'Reativado':'Desistiu'}</span>`}[x.status]||'';
     ZAP_EXC[x.id]={fone:c?c.whatsapp:'',txt};
     let bt=`<a class="btn sm" href="${esc(invMailLink(x.email,'Seu pedido de exclusão no Rodaliq',txt))}" target="_blank" rel="noopener">✉ Responder por e-mail</a><button type="button" class="btn sm" data-zx="${esc(x.id)}">💬 Responder pelo WhatsApp</button>`;
-    if(x.status==='novo')bt+=`<button class="btn sm warn" data-ex="desativar" data-id="${esc(x.id)}">🔒 Desativar acesso</button>`;
-    if(x.status==='desativado'){bt+=`<button class="btn sm sec" data-ex="reativar" data-id="${esc(x.id)}">↩ Reativar</button>`;
-      bt+=dd>=EXC_DIAS?`<button class="btn sm warn" data-ex="excluir" data-id="${esc(x.id)}">↗ Apagar login (Supabase Users)</button>`:`<span class="small muted">Exclusão definitiva liberada em ${lib}</span>`}
+    if(x.status==='novo')bt+=`<button class="btn sm warn" data-ex="desativar" data-id="${esc(x.id)}">🔒 Desativar acesso</button><button class="btn sm warn" data-ex="excluir" data-id="${esc(x.id)}">🗑 Excluir usuário</button>`;
+    if(x.status==='desativado'){bt+=`<button class="btn sm sec" data-ex="reativar" data-id="${esc(x.id)}">↩ Reativar</button><button class="btn sm warn" data-ex="excluir" data-id="${esc(x.id)}">🗑 Excluir usuário</button>`;
+      bt+=dd>=EXC_DIAS?`<span class="small muted">Carência concluída</span>`:`<span class="small muted">Carência até ${lib} (faltam ${EXC_DIAS-dd} ${EXC_DIAS-dd===1?'dia':'dias'})</span>`}
     if(!['novo','desativado'].includes(x.status))bt='';
     return `<div class="uCard"><div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start"><div class="uMail">${esc(nome||x.email)}</div>${tag}</div>
       <a class="supaLnk" href="${SUPA_TAB}" target="_blank" rel="noopener">↗ Tabela tb_exclusoes no Supabase</a>
@@ -1792,7 +1804,7 @@ async function excAdminRender(box){
       <div class="note small" style="margin-top:8px"><b>Motivo:</b> ${esc(x.motivo)}${x.comentario?`<br><i>“${esc(x.comentario)}”</i>`:''}</div>
       ${bt?`<div class="ivActs" style="margin-top:8px">${bt}</div>`:''}</div>`};
   box.innerHTML=`<h3 style="margin:0">🗑 Pedidos de exclusão</h3>
-    <p class="small muted" style="margin:4px 0 8px">Desativar bloqueia o acesso na hora; os dados ficam guardados por ${EXC_DIAS} dias (dá para reativar). Depois de ${EXC_DIAS} dias, “Apagar login” abre o painel do Supabase, onde você apaga o usuário: os dados são apagados junto e fica só o registro do pedido.</p>
+    <p class="small muted" style="margin:4px 0 8px">Desativar bloqueia o acesso na hora; os dados ficam guardados por ${EXC_DIAS} dias (dá para reativar). Para encerrar de vez, use “🗑 Excluir usuário” (a qualquer momento, dentro ou fora da carência): apaga o login e os dados da pessoa e fica só o registro do pedido.</p>
     <div class="admTabs">${F.map(([k,t])=>`<button type="button" class="chip${f===k?' on':''}" data-exf="${k}">${t} (${cnt(k)})</button>`).join('')}</div>
     ${lst.length?lst.map(card).join(''):'<div class="empty" style="margin-top:8px">Nenhum pedido aqui.</div>'}`;
   box.querySelectorAll('[data-exf]').forEach(b=>b.onclick=()=>{UI.excF=b.dataset.exf;excAdminRender(box)});
@@ -1803,8 +1815,7 @@ async function excAdminRender(box){
         await excPatch(x.id,{status:'desativado',desativado_em:agora});audit('Exclusão de conta','Admin','Acesso desativado · '+x.email);toast('Acesso desativado')}
       else if(a==='reativar'){if(!await confirma(`Reativar o acesso de <b>${esc(x.email)}</b>? Tudo volta como estava.`,'Reativar'))return;
         await excPatch(x.id,{status:'desistiu',reativado_em:agora});audit('Exclusão de conta','Admin','Acesso reativado · '+x.email);toast('Acesso reativado')}
-      else if(a==='excluir'){if(!await confirma(`Vou abrir o painel do Supabase (Authentication &gt; Users). Lá, procure <b>${esc(x.email)}</b> e apague o usuário (Delete user). Os dados são apagados junto e este pedido passa para “Excluídos” sozinho.`,'Abrir Supabase'))return;
-        window.open(SUPA_USERS,'_blank','noopener');return}
+      else if(a==='excluir'){if(!await usrExcluir(x.user_id,x.email,x))return}
     }catch(e){toast('Não foi possível concluir agora. Tente de novo.');return}
     await excAdminCache(true);atualizaSino();excAdminRender(box);admContagens()})}
 /* ---------- V52: senha provisória e pedidos de nova senha ---------- */
@@ -2811,12 +2822,15 @@ async function montaAdmin(){const box=$('#admBox');if(!box)return;const sub=UI.a
     const txt=pessoaTexto(u,nm);ZAP_PES[u.user_id||u.email]={fone:c?c.whatsapp:'',txt};
     return `<div class="uCard"><div class="uMail">${esc(nm||u.email||'(sem e-mail)')}</div><div class="uLin">${esc(u.email||'(sem e-mail)')}${c?` · 💬 ${esc(invFmtPhone(c.whatsapp))}${invUfOf(c.whatsapp)?' · '+esc(invUfOf(c.whatsapp)):''}`:' · sem pedido de convite com este e-mail'}</div>
       <div class="uLin">Cadastro: ${admData(u.criado_em)}${exc?` · <b>Excluído em ${admData(u.excluido_em)}</b>`:` · Último login: ${admData(u.ultimo_login)} · Último uso: ${admData(u.ultimo_uso)}`}</div>
-      <div class="ivActs" style="margin-top:8px"><button type="button" class="btn sm" data-pdf="${esc(u.user_id||u.email)}">📄 Dados desta pessoa</button><a class="btn sm" href="${esc(invMailLink(u.email,'Seus dados pessoais no Rodaliq',txt))}" target="_blank" rel="noopener">✉ Responder o pedido</a><button type="button" class="btn sm" data-zp="${esc(u.user_id||u.email)}">💬 WhatsApp</button></div></div>`};
+      <div class="ivActs" style="margin-top:8px"><button type="button" class="btn sm" data-pdf="${esc(u.user_id||u.email)}">📄 Dados desta pessoa</button><a class="btn sm" href="${esc(invMailLink(u.email,'Seus dados pessoais no Rodaliq',txt))}" target="_blank" rel="noopener">✉ Responder o pedido</a><button type="button" class="btn sm" data-zp="${esc(u.user_id||u.email)}">💬 WhatsApp</button>${!exc&&invProd()&&ehMaster()&&u.user_id&&!ADM_IDS.has(u.user_id)?`<button type="button" class="btn sm warn" data-udel="${esc(u.user_id)}">🗑 Excluir usuário</button>`:''}</div></div>`};
   box.innerHTML=`<h3 style="margin:0">${exc?'🗑 Usuários excluídos':'👥 Usuários ativos'} (${lst.length})</h3>
-    <p class="small muted" style="margin:4px 0 0">${exc?'Usuários apagados no painel do Supabase, com a data da exclusão.':'Ordenados pelo último uso. “Último uso” muda sempre que a pessoa abre o app; “Último login”, só quando ela digita a senha.'} Só consulta: para apagar ou desativar, use o painel do Supabase (Authentication &gt; Users).${invProd()?'':' <b>No HMO aparece só o usuário de teste; os dados reais aparecem em produção.</b>'}</p>
+    <p class="small muted" style="margin:4px 0 0">${exc?'Usuários apagados (pelo app ou pelo painel do Supabase), com a data da exclusão.':'Ordenados pelo último uso. “Último uso” muda sempre que a pessoa abre o app; “Último login”, só quando ela digita a senha.'} Para apagar uma pessoa, use “🗑 Excluir usuário” (definitivo).${invProd()?'':' <b>No HMO aparece só o usuário de teste; os dados reais aparecem em produção.</b>'}</p>
     ${lst.length?lst.map(card).join(''):`<div class="empty">${exc?'Nenhum usuário excluído.':'Nenhum usuário ativo.'}</div>`}`;
   box.querySelectorAll('[data-pdf]').forEach(b=>b.onclick=()=>{const u=lst.find(v=>String(v.user_id||v.email)===b.dataset.pdf);if(u)pessoaVer(u)});
-  box.querySelectorAll('[data-zp]').forEach(b=>b.onclick=()=>{const z=ZAP_PES[b.dataset.zp];if(z)abreZap(z.fone,z.txt)});}
+  box.querySelectorAll('[data-zp]').forEach(b=>b.onclick=()=>{const z=ZAP_PES[b.dataset.zp];if(z)abreZap(z.fone,z.txt)});
+  box.querySelectorAll('[data-udel]').forEach(b=>b.onclick=async()=>{const u=lst.find(v=>v.user_id===b.dataset.udel);if(!u)return;
+    const ped=(EXC_CACHE||[]).find(x=>x.user_id===u.user_id&&['novo','desativado'].includes(x.status));
+    if(await usrExcluir(u.user_id,u.email,ped)){await excAdminCache(true);atualizaSino();montaAdmin();admContagens()}})}
 function invSetAdmin(on){
   invIsAdmin=!!on;
   ['#tabAdmin','#fabAdm'].forEach(i=>{const b=$(i);if(b)b.classList.toggle('hidden',!invIsAdmin)});
