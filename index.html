@@ -375,6 +375,7 @@ svg text{font-family:Inter,system-ui,sans-serif}
   .row .dt{min-width:58px}
 }
 .pcCard{border:1px solid var(--line);border-radius:12px;padding:11px 13px;margin-bottom:9px;background:var(--card)}.pcT1{display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap}.pcTag{font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--amberSoft);color:var(--amberInk);border:1px solid var(--amber)}.pcOf{margin-top:6px;padding:6px 9px;border-radius:9px;background:var(--blueSoft);font-weight:600;font-size:13.5px}.pcBt{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.pcBt a.btn{text-decoration:none}.pcCt{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0;align-items:center}.pcCt select{flex:0 0 150px}.pcCt input{flex:1 1 150px;min-width:0}.pcMd .ajBd{overflow-y:auto}
+body:has(#admPage) .fab{z-index:61}body:has(#admPage) .fabMenu{z-index:62}body:has(#admPage) .ov:not(.admPage) ~ .fabWrap .fab,body:has(.ov:not(.admPage)) .fabWrap .fab{visibility:hidden}
 </style>
 </head>
 <body>
@@ -447,7 +448,6 @@ svg text{font-family:Inter,system-ui,sans-serif}
       <button class="btn sec sm" id="optBtn">⚙ Opções</button>
       <div class="menu hidden" id="optMenu">
         <div class="who">Conectado como<b id="whoName">—</b><span class="whoE" id="whoMail"></span></div>
-        <button data-m="rsv">📅 Despesas programadas</button>
         <button data-m="exp">⬇ Exportar backup</button>
         <button data-m="onb">🧭 Guia do Rodaliq</button>
         <button data-m="aud">🕘 Histórico de auditoria</button>
@@ -469,13 +469,14 @@ svg text{font-family:Inter,system-ui,sans-serif}
   </div>
   <nav class="tabs" id="tabs">
     <button class="tab on" data-t="painel">📊 Painel</button>
-    <button class="tab" data-t="corridas">🚕 Corridas</button>
     <button class="tab" data-t="carona">🧑‍🤝‍🧑 Caronas / BlaBlaCar</button>
+    <button class="tab" data-t="corridas">🚕 Corridas</button>
     <button class="tab" data-t="custos">⛽ Custos</button>
-    <button class="tab" data-t="multas">🚨 Multas</button>
+    <button class="tab" data-t="reservas">📅 Despesas programadas</button>
     <button class="tab" data-t="impostos">🧾 Impostos</button>
-    <button class="tab" data-t="relatorios">📑 Relatórios</button>
+    <button class="tab" data-t="multas">🚨 Multas</button>
     <button class="tab hidden" data-t="rodacalc">🧮 RodaCalc</button>
+    <button class="tab" data-t="relatorios">📑 Relatórios</button>
   </nav>
 </header>
 <div id="excAviso" class="note am small hidden" style="margin:0 0 12px"></div>
@@ -487,6 +488,7 @@ svg text{font-family:Inter,system-ui,sans-serif}
   <button data-fab="custo">⛽ Custos</button>
   <button data-fab="dia">⚡ Lançar o dia (Uber + 99)</button>
   <button data-fab="multa">🚨 Multas</button>
+  <button data-fab="despesa">📅 Programar despesa</button>
   <button data-fab="repasse">🏦 Repasse semanal</button>
   <button data-fab="rodacalc" class="hidden">🧮 RodaCalc por KM</button>
   <div class="sep"></div>
@@ -502,7 +504,7 @@ svg text{font-family:Inter,system-ui,sans-serif}
 
 <script>
 "use strict";
-const VERSAO='V94';
+const VERSAO='V95';
 /* ---------- utilidades ---------- */
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -1131,7 +1133,7 @@ async function carnePagoRapido(ym){
 async function carneExcluir(ym){
   if(!await confirma(`Excluir os dados informados do Carnê-Leão de <b>${mesNome(ym)}</b> (valor do extrato, INSS, DARF pago e observação)?<br><span class="small muted">O app volta a calcular o mês só pelos lançamentos de Uber/99.</span>`,'Excluir',{perigo:1}))return;
   delete S.tb_carne[ym];salvar('tb_carne');audit('Exclusão','Carnê-Leão',mesNome(ym));render();toast('Dados do mês excluídos')}
-const NOVO={corrida:()=>formCorrida(),carona:()=>formCarona(),repasse:()=>formRepasse(),custo:()=>formCusto(),multa:()=>formMulta(),carne:()=>formCarne(addMes(mesAtual(),-1)),rodacalc:()=>{UI.tab='rodacalc';try{history.replaceState(history.state,'','#rodacalc')}catch(er){}render();window.scrollTo(0,0)}};
+const NOVO={corrida:()=>formCorrida(),carona:()=>formCarona(),repasse:()=>formRepasse(),custo:()=>formCusto(),multa:()=>formMulta(),despesa:()=>formReserva(),carne:()=>formCarne(addMes(mesAtual(),-1)),rodacalc:()=>{UI.tab='rodacalc';try{history.replaceState(history.state,'','#rodacalc')}catch(er){}render();window.scrollTo(0,0)}};
 const FABK='rodaliq_fab';
 // posição livre, guardada em proporção da tela (0 a 1) para servir em qualquer tamanho e ao girar o celular
 function fabPos(){let p=null;try{p=JSON.parse(localStorage.getItem(FABK)||'null')}catch(e){}
@@ -3926,10 +3928,10 @@ const GUIA=[
    m:'Pontos da CNH, alertas de vencimento e de limite de pontos, custos do mês (quando paga).',acts:[['＋ Multas',()=>formMulta()]]},
  {t:'🧮 Impostos (Carnê-Leão)',x:`Todo mês, lance o valor do <b>extrato da Uber/99</b> do mês anterior em <b>Impostos</b>. O app calcula o Carnê-Leão estimado, o DARF e avisa o vencimento.<br>⚠ Os valores são <b>estimativas</b>: confira no Carnê-Leão Web e, em caso de dúvida, consulte um <b>Contador</b>. As referências oficiais estão na aba Impostos.`,
    m:'DARF do mês, alerta de vencimento no sino e relatórios de impostos.',acts:[['🧾 Carnê-Leão do mês anterior',()=>formCarne(addMes(mesAtual(),-1))]]},
- {t:'📅 Despesas programadas',x:`IPVA, seguro e revisão chegam de uma vez. Programe a despesa com o valor e a data de pagamento: o app divide o valor pelos meses até lá e mostra quanto separar por mês. Para não gastar sem querer, deixe esse valor numa conta separada da do dia a dia.`,
-   m:'Card Despesas programadas e lucro livre, no Painel.',acts:[['＋ Programar despesa',()=>formReserva()]]},
+ {t:'📅 Despesas programadas',x:`IPVA, seguro e revisão chegam de uma vez. Na aba <b>Despesas programadas</b>, programe a despesa com o valor e a data de pagamento: o app divide o valor pelos meses até lá e mostra quanto separar por mês. Para não gastar sem querer, deixe esse valor numa conta separada da do dia a dia.`,
+   m:'Card Despesas programadas e lucro livre, no Painel.',acts:[['＋ Programar despesa',()=>formReserva()],['📅 Abrir a aba',()=>irReservas()]]},
  {t:'🪪 Sua CNH (opcional)',x:`Guarde a <b>validade</b>, a categoria, o EAR e a data da 1ª habilitação, e o app avisa quando a renovação se aproximar e quando os pontos chegarem perto do limite. Não guardamos número da CNH, CPF nem foto.<br><br>⚠ ${TXT_SEM_ORGAO}`,cfg:'cnh'},
- {t:'📊 Para acompanhar',x:`• <b>Painel:</b> meta, ganhos, custos, resultado, previsão e despesas programadas (troque o mês e o veículo no topo).<br>• <b>🔔 Sino:</b> alertas (DARF, multas, CNH, manutenção e lembrete de backup) e novidades.<br>• <b>⚡ Atalhos:</b> todos os lançamentos num toque; arraste o botão para onde preferir.<br>• <b>Relatórios:</b> filtros e download em PDF, Word, Excel e CSV.<br>• <b>⚙ Opções:</b> veículos, metas, tema, backup e este guia. Exporte um backup pelo menos a cada 30 dias e guarde o arquivo fora do aparelho: o sino avisa quando passar disso. Se um dia quiser sair, use ⚙ Opções &gt; Excluir minha conta.<br>• <b>Esqueceu a senha?</b> Use “Esqueci minha senha”, na tela de entrada.<br>• <b>💚 Ajude a manter o Rodaliq:</b> o app é gratuito e vai continuar sendo. Se ele te ajuda, você pode contribuir com o que achar justo, em ⚙ Opções: escolha um valor, copie a chave Pix, faça o Pix pelo seu banco e avise no app. Na mesma tela você acompanha as suas contribuições, mês a mês. É opcional e nada aqui depende disso.`}
+ {t:'📊 Para acompanhar',x:`• <b>Painel:</b> meta, ganhos, custos, resultado, previsão e despesas programadas (troque o mês e o veículo no topo).<br>• <b>Abas:</b> o Painel vem primeiro, as demais seguem em ordem alfabética e Relatórios fica por último. A aba <b>Despesas programadas</b> agora fica junto com as outras (antes ficava em ⚙ Opções).<br>• <b>🔔 Sino:</b> alertas (DARF, multas, CNH, manutenção e lembrete de backup) e novidades.<br>• <b>⚡ Atalhos:</b> todos os lançamentos num toque; arraste o botão para onde preferir.<br>• <b>Relatórios:</b> filtros e download em PDF, Word, Excel e CSV.<br>• <b>⚙ Opções:</b> veículos, metas, tema, backup e este guia. Exporte um backup pelo menos a cada 30 dias e guarde o arquivo fora do aparelho: o sino avisa quando passar disso. Se um dia quiser sair, use ⚙ Opções &gt; Excluir minha conta.<br>• <b>Esqueceu a senha?</b> Use “Esqueci minha senha”, na tela de entrada.<br>• <b>💚 Ajude a manter o Rodaliq:</b> o app é gratuito e vai continuar sendo. Se ele te ajuda, você pode contribuir com o que achar justo, em ⚙ Opções: escolha um valor, copie a chave Pix, faça o Pix pelo seu banco e avise no app. Na mesma tela você acompanha as suas contribuições, mês a mês. É opcional e nada aqui depende disso.`}
 ];
 function primeiroAcesso(auto){
   const c=cfg(),DS=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];let passo=0;
@@ -4000,16 +4002,12 @@ function formReserva(r){
     if(novo&&!f.g('valor').value&&s){f.g('valor').value=brl(s).replace('R$','').trim()}};
   f.g('cat').addEventListener('change',()=>{if(novo)f.g('valor').value='';ajuda()});ajuda();if(novo)setTimeout(()=>{f.ov.__snap=navSerial(f.ov)},80);
 }
-function verReservas(){
-  const ov=document.createElement('div');ov.className='ov';
-  const draw=()=>{const ym=mesAtual(),l=reservas().slice().sort((a,b)=>a.venc.localeCompare(b.venc)),dm=reservasDoMes(ym);
-    ov.innerHTML=`<div class="modal" style="max-width:520px"><h2>📅 Despesas programadas</h2><p class="small muted">Despesas grandes que vão chegar. O app sugere quanto separar por mês até a data prevista de pagamento. A lista é ordenada por essa data.</p>
-      ${l.length?l.map(r=>{const p=dm.find(x=>x.id===r.id),venc=r.venc.slice(0,7)<ym;return `<div class="ivCard" style="display:flex;justify-content:space-between;gap:8px;align-items:center"><div><b>${esc(r.nome)}</b><div class="small muted">${esc(r.cat)} · ${brl(r.valor)} · até ${fmtBR(r.venc)}</div><div class="small">${venc?'⏰ Data já passou: lance o pagamento em Custos e exclua esta despesa programada.':p?`Separar <b>${brl(p.parcela)}</b>/mês`:'Começa no próximo mês'}</div></div><button class="btn sec sm" data-rv="${esc(r.id)}">✎</button></div>`}).join(''):'<div class="empty">Nenhuma despesa programada.</div>'}
-      <div class="mfoot"><button class="btn sec" id="rvF">Fechar</button><button class="btn" id="rvN">＋ Programar despesa</button></div></div>`};
-  draw();document.body.appendChild(ov);ov.__fechar=()=>ov.remove();
-  ov.addEventListener('click',e=>{e.stopPropagation();const t=e.target;if(t.id==='rvF'||t===ov){ov.remove();return}
-    if(t.id==='rvN'){ov.remove();formReserva()}else if(t.dataset.rv){ov.remove();formReserva(JSON.parse(JSON.stringify(reservas().find(x=>x.id===t.dataset.rv))))}});
-}
+function vReservas(){
+  const ym=mesAtual(),l=reservas().slice().sort((a,b)=>a.venc.localeCompare(b.venc)),dm=reservasDoMes(ym);
+  return `<div class="card bloco"><div class="bh"><h2>📅 Despesas programadas</h2><span class="sp" style="flex:1"></span><span class="bacts"><button class="btn sm" data-acao="rvnovo">＋ Programar despesa</button></span></div>
+    <p class="small muted">Despesas grandes que vão chegar (IPVA, seguro, revisão). O app sugere quanto separar por mês até a data prevista de pagamento. A lista é ordenada por essa data. Para não gastar sem querer, deixe esse valor numa conta separada da do dia a dia.</p>
+    ${l.length?l.map(r=>{const p=dm.find(x=>x.id===r.id),venc=r.venc.slice(0,7)<ym;return `<div class="ivCard" style="display:flex;justify-content:space-between;gap:8px;align-items:center"><div><b>${esc(r.nome)}</b><div class="small muted">${esc(r.cat)} · ${brl(r.valor)} · até ${fmtBR(r.venc)}</div><div class="small">${venc?'⏰ Data já passou: lance o pagamento em Custos e exclua esta despesa programada.':p?`Separar <b>${brl(p.parcela)}</b>/mês`:'Começa no próximo mês'}</div></div><button class="btn sec sm" data-rv="${esc(r.id)}" aria-label="Editar ${esc(r.nome)}">✎</button></div>`}).join(''):'<div class="empty">Nenhuma despesa programada. Toque em “＋ Programar despesa” para começar.</div>'}</div>`}
+const irReservas=()=>{UI.tab='reservas';try{history.replaceState(history.state,'','#reservas')}catch(er){}render();window.scrollTo(0,0)};
 /* ---------- 4, 5 e 6: cards do bloco "Despesas e resultado do mês" ---------- */
 function cardsExtras(ym,G,vMeta,vCus,res,cus,pd,ehMesAtual,decorridos,n){
   let h='';
@@ -4101,7 +4099,7 @@ $('#impFile').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(
 /* ---------- render e eventos ---------- */
 function render(){
   if(UI.tab==='admin')UI.tab='painel';
-  let v={painel:vPainel,corridas:vCorridas,carona:vCarona,custos:vCustos,multas:vMultas,impostos:vImpostos,relatorios:vRelatorios,rodacalc:vRodaCalc}[UI.tab];
+  let v={painel:vPainel,corridas:vCorridas,carona:vCarona,custos:vCustos,multas:vMultas,impostos:vImpostos,relatorios:vRelatorios,rodacalc:vRodaCalc,reservas:vReservas}[UI.tab];
   if(recOff(UI.tab))v=()=>'<div class="note am" style="margin-top:12px">🔧 <b>Este recurso está temporariamente indisponível.</b> Estamos ajustando e ele volta em breve. Seus dados continuam guardados e nada foi apagado.</div>';
   navRegistraAba();
   $('#view').innerHTML=v();
@@ -4114,7 +4112,9 @@ $('#tabAdmin').onclick=()=>abrirAdmin();
 $('#donoBtn').onclick=()=>formApoiar();
 $('#tabs').onclick=e=>{const b=e.target.closest('.tab');if(!b)return;UI.tab=b.dataset.t;try{history.replaceState(history.state,'','#'+UI.tab)}catch(er){}render();window.scrollTo(0,0)};
 $('#view').addEventListener('click',e=>{
-  if(e.target.closest('[data-acao=reservas]')){verReservas();return}
+  if(e.target.closest('[data-acao=reservas]')){irReservas();return}
+  if(e.target.closest('[data-acao=rvnovo]')){formReserva();return}
+  {const rv=e.target.closest('[data-rv]');if(rv){const x=reservas().find(y=>y.id===rv.dataset.rv);if(x)formReserva(JSON.parse(JSON.stringify(x)));return}}
   const pa=e.target.closest('[data-acao]');if(pa){const a=pa.dataset.acao;
     if(a==='guia'){primeiroAcesso(false);return}
     if(a==='passos-off'){cfg().passosOk=true;salvar('tb_config');render();toast('Primeiros passos dispensado. O guia continua em ⚙ Opções.');return}
@@ -4151,8 +4151,8 @@ $('#optBtn').onclick=e=>{e.stopPropagation();$('#bellMenu').classList.add('hidde
 window.addEventListener('scroll',()=>{['bellMenu','optMenu'].forEach(id=>{const m=document.getElementById(id);if(m&&!m.classList.contains('hidden')&&window.innerWidth<=640)posMenu(m,document.getElementById(id==='bellMenu'?'bellBtn':'optBtn'))})},{passive:true});
 document.addEventListener('click',e=>{if(!e.target.closest('#optWrap'))$('#optMenu').classList.add('hidden');if(!e.target.closest('#bellWrap'))$('#bellMenu').classList.add('hidden')});
 $('#optMenu').onclick=e=>{const b=e.target.closest('[data-m]');if(!b)return;$('#optMenu').classList.add('hidden');
-  ({falar:formFalar,apoio:formApoiar,corrigir:formCorrigir,excluir:formExcluirConta,cfg:formCfg,veic:formVeic,parc:formParceiros,cnh:formCnh,tema:formTema,rsv:verReservas,onb:()=>primeiroAcesso(false),termos:()=>verTermos(),aud:verAuditoria,pass:formSenha,exp:exportar,imp:()=>$('#impFile').click(),out:sair})[b.dataset.m]()};
-(()=>{const h=(location.hash||'').slice(1);if(['painel','corridas','carona','custos','multas','impostos','relatorios','rodacalc'].includes(h))UI.tab=h})();
+  ({falar:formFalar,apoio:formApoiar,corrigir:formCorrigir,excluir:formExcluirConta,cfg:formCfg,veic:formVeic,parc:formParceiros,cnh:formCnh,tema:formTema,onb:()=>primeiroAcesso(false),termos:()=>verTermos(),aud:verAuditoria,pass:formSenha,exp:exportar,imp:()=>$('#impFile').click(),out:sair})[b.dataset.m]()};
+(()=>{const h=(location.hash||'').slice(1);if(['painel','corridas','carona','custos','multas','impostos','relatorios','rodacalc','reservas'].includes(h))UI.tab=h})();
 iniciar();
 if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
 </script>
