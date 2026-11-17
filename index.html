@@ -3424,7 +3424,7 @@ function termosAvisoAtualizado(previa){const o=document.createElement('div');o.c
   o.innerHTML=`<div class="modal" style="max-width:440px"><h2>📄 Atualizamos os Termos de uso</h2><p class="small">Incluímos o item <b>8.1</b>: contas sem nenhum lançamento por muito tempo podem ter o acesso desativado, depois de aviso. Antes de qualquer desativação, avisamos você. Você continua usando o app normalmente, e qualquer dúvida é só falar com a gente pelo e-mail <b>${MAIL_RODALIQ}</b>.</p><div class="mfoot"><button class="btn sec" id="tvL">Ler os Termos</button><button class="btn" id="tvO">Entendi</button></div></div>`;
   document.body.appendChild(o);
   o.querySelector('#tvO').onclick=()=>{if(!previa){cfg().termosVisto=TERMOS_V;salvar('tb_config');audit('Termos atualizados','Configurações','📄 Aviso de atualização visto · versão '+TERMOS_V)}o.remove()};
-  o.querySelector('#tvL').onclick=()=>{verTermos('termos')}}
+  o.querySelector('#tvL').onclick=()=>{if(!previa){cfg().termosVisto=TERMOS_V;salvar('tb_config');audit('Termos atualizados','Configurações','📄 Aviso de atualização visto (leu os Termos) · versão '+TERMOS_V)}o.remove();verTermos('termos')}}
 function checarTermos(){return new Promise(res=>{
   const a=cfg().aceite;if(a&&a.versao===TERMOS_V)return res(true);
   if(a&&a.versao){ // já aceitou antes: atualização vira aviso, sem bloquear
