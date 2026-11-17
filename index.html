@@ -374,6 +374,7 @@ svg text{font-family:Inter,system-ui,sans-serif}
   .hbars .it{grid-template-columns:90px 1fr 80px}
   .row .dt{min-width:58px}
 }
+.pcCard{border:1px solid var(--line);border-radius:12px;padding:11px 13px;margin-bottom:9px;background:var(--card)}.pcT1{display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap}.pcTag{font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--amberSoft);color:var(--amberInk);border:1px solid var(--amber)}.pcOf{margin-top:6px;padding:6px 9px;border-radius:9px;background:var(--blueSoft);font-weight:600;font-size:13.5px}.pcBt{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.pcBt a.btn{text-decoration:none}.pcCt{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0;align-items:center}.pcCt select{flex:0 0 150px}.pcCt input{flex:1 1 150px;min-width:0}.pcMd .ajBd{overflow-y:auto}
 </style>
 </head>
 <body>
@@ -395,6 +396,7 @@ svg text{font-family:Inter,system-ui,sans-serif}
     </form>
     <div class="invLink"><button type="button" class="lnk" id="senOpen">Esqueci minha senha</button></div>
     <div class="invLink"><button type="button" class="lnk" id="invOpen">Quer usar o app? Peça um convite</button></div>
+    <div class="invLink hidden" id="parcLinkW"><button type="button" class="lnk" id="parcOpen">Tem empresa ou serviço para motoristas? Quero ser parceiro</button></div>
     <form id="invForm" class="hidden" autocomplete="off" novalidate>
       <div id="invFields">
         <div class="ivWarn" role="note">🔞 <b>Somente para maiores de 18 anos.</b> A maioridade civil começa aos 18 anos completos (Código Civil, Lei nº 10.406/2002, art. 5º) e os dados de crianças e adolescentes têm regras próprias na LGPD (Lei nº 13.709/2018, art. 14). Por isso, este app não aceita pedidos de menores de 18 anos.</div>
@@ -456,6 +458,7 @@ svg text{font-family:Inter,system-ui,sans-serif}
         <button data-m="termos">📄 Termos e privacidade</button>
         <button data-m="pass">🔑 Trocar senha</button>
         <button data-m="veic">🚗 Veículos</button>
+        <button data-m="parc" class="hidden">🤝 Parceiros do Rodaliq</button>
         <div class="sep"></div>
         <button data-m="falar" class="hidden">✉️ Falar com o Rodaliq<span class="mCount hidden" id="falarN"></span></button>
         <button data-m="corrigir">✏ Corrigir meus dados</button>
@@ -499,7 +502,7 @@ svg text{font-family:Inter,system-ui,sans-serif}
 
 <script>
 "use strict";
-const VERSAO='V93';
+const VERSAO='V94';
 /* ---------- utilidades ---------- */
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -783,6 +786,7 @@ $('#bellMenu').addEventListener('click',e=>{e.stopPropagation();const t=e.target
   else{const g=t.closest('[data-ai]');if(g){const a=alertas()[+g.dataset.ai];$('#bellMenu').classList.add('hidden');if(!a)return;
       if(a.tab==='cnh'){formCnh();return}
       if(a.tab==='inv'){abrirAdmin('convites');return}
+      if(a.tab==='parc'){UI.parcF=a.pf||'ativos';abrirAdmin('parceiros');return}
       if(a.tab==='exc'){abrirAdmin('exclusoes');return}
       if(a.tab==='corr'){abrirAdmin('correcoes');return}
       if(a.tab==='sen'){abrirAdmin('senhas');return}
@@ -2107,9 +2111,9 @@ async function senAdminRender(box){
     UI.senF='atendido';await excAdminCache(true);atualizaSino();senAdminRender(box);admContagens()})}
 /* ---------- V55: 🤝 Apoiadores — contribuição voluntária. Não trava nada e não existe cobrança ---------- */
 // V56: ajustes guardados no banco (tb_ajustes), para mudar sem subir versão nova
-const AJU_PADRAO={ativo:true,nivel:'todos',pix:'rodaliq.app@gmail.com',valores:[10,25,50],sugerido:25,aviso:true,dias:30,rec:{impostos:'todos',relatorios:'todos',carona:'todos',rodacalc:'master'},msg60:null};
+const AJU_PADRAO={ativo:true,nivel:'todos',pix:'rodaliq.app@gmail.com',valores:[10,25,50],sugerido:25,aviso:true,dias:30,rec:{impostos:'todos',relatorios:'todos',carona:'todos',rodacalc:'master',parceiros:'master'},msg60:null};
 const MSG_APOIO='O Rodaliq é gratuito e vai continuar sendo. Se ele te ajuda, você pode contribuir com o que achar justo: a ajuda contribui para amenizar alguns custos como domínio, servidores e as melhorias. Seu acesso ao Rodaliq não está condicionado a sua colaboração!';
-const REC_NOMES={impostos:'🧾 Impostos (Carnê-Leão)',relatorios:'📑 Relatórios',carona:'🧑‍🤝‍🧑 Caronas',rodacalc:'🧮 RodaCalc por KM'};
+const REC_NOMES={impostos:'🧾 Impostos (Carnê-Leão)',relatorios:'📑 Relatórios',carona:'🧑‍🤝‍🧑 Caronas',rodacalc:'🧮 RodaCalc por KM',parceiros:'🤝 Parceiros do Rodaliq'};
 // V93: cada recurso tem 3 níveis — master (só o admin master), equipe (admins e colaboradores) ou todos
 const REC_NIVEIS={master:'Só o admin master',equipe:'Admins e colaboradores',todos:'Todos os usuários'};
 function recNorm(r){r=r||{};const o={};Object.keys(AJU_PADRAO.rec).forEach(k=>{const v=r[k];o[k]=v===true?'todos':v===false?'equipe':REC_NIVEIS[v]?v:AJU_PADRAO.rec[k]});return o}
@@ -2231,6 +2235,7 @@ async function ajuSalvar(v){const novo=Object.assign({},AJU_PADRAO,AJU,v);
 function aplicaAjustes(){const b=document.querySelector('#optMenu [data-m="apoio"]');if(b)b.classList.toggle('hidden',!apoVe());
   donoAtualiza();
   [['impostos','[data-t="impostos"]'],['relatorios','[data-t="relatorios"]'],['carona','[data-t="carona"],[data-fab="carona"]'],['rodacalc','[data-t="rodacalc"],[data-fab="rodacalc"]']].forEach(([k,sel])=>document.querySelectorAll(sel).forEach(e=>e.classList.toggle('hidden',recOff(k))));
+  const pb=document.querySelector('#optMenu [data-m="parc"]');if(pb)pb.classList.toggle('hidden',recOff('parceiros'));
   document.querySelectorAll('[data-fab="carne"]').forEach(e=>e.classList.toggle('hidden',recOff('impostos')));
   aplicaCanais();
   if(typeof atualizaSino==='function')atualizaSino()}
@@ -2711,6 +2716,9 @@ async function despAdminRender(box){
   UI.despYm=UI.despYm&&UI.despYm<=mesAtual()?UI.despYm:mesAtual();
   const ym=UI.despYm,mes=A.filter(x=>x.status==='confirmado'&&String(x.confirmado_em||'').slice(0,7)===ym);
   const recebido=sum(mes,x=>x.valor),custo=custoMes(L,ym),saldo=recebido-custo,ativas=L.filter(d=>d.ativo).length;
+  let PR=[],PP=[];try{PR=await pList('rec');PP=await pList('parc')}catch(e){}
+  const nomeP=Object.fromEntries(PP.map(p=>[p.id,p.nome])),recMes=PR.filter(r=>parcRecMes(r)===ym).sort((a,b)=>(nomeP[a.parceiro_id]||'').localeCompare(nomeP[b.parceiro_id]||'','pt-BR'));
+  const parcRec=sum(recMes.filter(r=>r.situacao==='recebido'),r=>r.valor),resultado=recebido+parcRec-custo;
   const tipoLbl=t=>t==='anual'?'Anual (rateado)':t==='pontual'?'Pontual':'Mensal';
   const lin=d=>{const pesa=despMensal(d,ym);
     const status=!d.ativo?'<span class="small muted">inativa</span>':(pesa>0?'':`<span class="small muted">não conta em ${mesNome(ym)}</span>`);
@@ -2720,11 +2728,14 @@ async function despAdminRender(box){
       <span class="small muted">${tipoLbl(d.tipo)} · ${apoBRL(d.valor)}${d.venc?' · renova '+fmtD(d.venc):''}</span>
       ${status}${d.obs?`<span class="small muted">· ${esc(d.obs)}</span>`:''}</span>
       <button type="button" class="btn sm sec" data-de="${esc(d.id)}">🗑 Remover</button></div>`};
-  box.innerHTML=`<h3 style="margin:0">💰 Despesas do app</h3>
-    <p class="small muted" style="margin:4px 0 8px">Custos para manter o Rodaliq de pé (domínios, assinaturas, etc.). Usados só para calcular o “Benefício × custo” — ninguém além de você vê isto.</p>
+  box.innerHTML=`<h3 style="margin:0">💰 Receitas e despesas do app</h3>
+    <p class="small muted" style="margin:4px 0 8px">Receitas (contribuições e parcerias) e custos para manter o Rodaliq de pé (domínios, assinaturas, etc.). Ninguém além de você vê isto.</p>
     <div class="mpick" style="margin-bottom:8px"><button type="button" data-dem="-1" aria-label="Mês anterior">‹</button><span style="text-transform:capitalize">${mesNome(ym)}</span><button type="button" data-dem="1" aria-label="Próximo mês"${ym>=mesAtual()?' disabled':''}>›</button></div>
-    <div class="cards grid" style="margin-bottom:4px">${kpi('Custo mensal de manter o app',apoBRL(custo),ativas+(ativas===1?' despesa ativa':' despesas ativas'))}${kpi('Benefício × custo',apoBRL(saldo),'Contribuições confirmadas em '+mesNome(ym))}</div>
-    <div class="note${saldo>=0?'':' am'} small">${saldo>=0?'✅ As contribuições confirmadas no mês cobrem o custo estimado.':'⚠ As contribuições confirmadas no mês não cobrem o custo estimado.'}</div>
+    <div class="cards grid" style="margin-bottom:4px">${kpi('🧾 Despesas do mês',apoBRL(custo),ativas+(ativas===1?' despesa ativa':' despesas ativas'))}${kpiCob('💚 Contribuições × despesas','as contribuições',recebido,custo)}${kpiCob('🤝 Parcerias × despesas','as parcerias',parcRec,custo)}${kpiCob(resultado>=0?'📈 Resultado do mês':'📉 Resultado do mês','contribuições e parcerias juntas',recebido+parcRec,custo,[['Contribuições',recebido],['Parcerias',parcRec]])}</div>
+    <div class="note${resultado>=0?'':' am'} small">${!custo?'Cadastre as despesas do app para ver a cobertura.':resultado>=0?'✅ As contribuições e as parcerias recebidas no mês cobrem as despesas.':'⚠ As contribuições e as parcerias recebidas no mês não cobrem as despesas.'}</div>
+    <h3 style="margin:12px 0 4px">🤝 Receitas de parcerias em ${mesNome(ym)}</h3>
+    ${recMes.length?recMes.map(r=>`<div class="despRow"><span class="despInfo"><b style="word-break:break-word">${esc(nomeP[r.parceiro_id]||'(parceiro removido)')}</b><b class="num">${apoBRL(r.valor)}</b>${parcRecTag(r)}${r.obs?`<span class="small muted">${esc(r.obs)}</span>`:''}</span>${r.situacao==='recebido'?'':`<button type="button" class="btn sm sec" data-prr="${esc(r.id)}">Marcar recebido</button>`}</div>`).join(''):'<div class="small muted">Nenhuma receita de parceria neste mês. Lance em Admin › Parceiros, no cartão do parceiro.</div>'}
+    <div class="note small" style="margin-top:8px">🧾 Receita de parceria é rendimento seu. O Rodaliq não é contador: veja o tratamento com o seu Contador.</div>
     <h3 style="margin:14px 0 4px">➕ Nova despesa</h3>
     <div class="despAdd">
       <div class="fld" style="flex:2 1 160px"><label for="dsN">Nome</label><input class="inp" id="dsN" placeholder="Ex.: domínio rodaliq.com.br" autocomplete="off"></div>
@@ -2738,6 +2749,7 @@ async function despAdminRender(box){
     ${er?`<div class="empty">${er}</div>`:(L.length?`<div style="margin-top:14px">${L.map(lin).join('')}</div>`:'<div class="empty" style="margin-top:10px">Nenhuma despesa cadastrada.</div>')}`;
   const q=x=>box.querySelector(x),err=t=>{q('#dsErr').textContent=t};
   liveBRL(q('#dsV'));
+  box.querySelectorAll('[data-prr]').forEach(b=>b.onclick=()=>parcMarcaRecebido(PR.find(x=>x.id===b.dataset.prr),()=>despAdminRender(box)));
   box.querySelectorAll('[data-dem]').forEach(b=>b.onclick=()=>{let n=addMes(ym,+b.dataset.dem);if(n>mesAtual())n=mesAtual();UI.despYm=n;despAdminRender(box)});
   q('#dsT').onchange=()=>{q('#dsDLbl').textContent=q('#dsT').value==='pontual'?'Data':'Renova em'};
   box.querySelectorAll('[data-at]').forEach(b=>b.onchange=async()=>{const d=L.find(x=>x.id===b.dataset.at);if(!d)return;
@@ -2757,6 +2769,302 @@ async function despAdminRender(box){
     catch(e){q('#dsS').disabled=false;return err('Não foi possível salvar. Só o admin principal pode.')}
     despAdminRender(box);admContagens()};
 }
+/* ---------- V94: 🤝 Parceiros do Rodaliq (só o admin master cadastra; o usuário vê conforme o interruptor de 3 níveis) ---------- */
+const PARC_CANAIS={whatsapp:['💬','WhatsApp'],telefone:['📞','Telefone'],email:['✉️','E-mail'],site:['🌐','Site'],instagram:['📷','Instagram'],tiktok:['🎵','TikTok'],facebook:['👥','Facebook'],youtube:['▶️','YouTube'],linkedin:['💼','LinkedIn'],outro:['🔗','Outro link']};
+const PARC_DICA={whatsapp:'(61) 9xxxx-xxxx',telefone:'(61) xxxx-xxxx',email:'contato@empresa.com.br',site:'https://www.empresa.com.br',instagram:'@perfil ou link',tiktok:'@perfil ou link',facebook:'nome da página ou link',youtube:'nome do canal ou link',linkedin:'perfil ou link',outro:'https://...'};
+const PARC_REDE={instagram:'https://www.instagram.com/',tiktok:'https://www.tiktok.com/@',facebook:'https://www.facebook.com/',youtube:'https://www.youtube.com/@',linkedin:'https://www.linkedin.com/in/'};
+const PARC_PT={cats:['parc_cats','tb_parc_categorias'],parc:['parceiros','tb_parceiros'],cand:['parc_cand','tb_parc_candidaturas'],rec:['parc_receb','tb_parc_receb'],cli:['parc_cliques','tb_parc_cliques']};
+let PARC_CACHE=[],PARC_CATS=[],PARC_CAND=[],PARC_REC=[],PARC_CLI=[];
+const parcId=()=>'p'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+const parcHoje=()=>isoOf(new Date());
+const parcAtivo=p=>p.status==='ativo'&&(!p.inicio||p.inicio<=parcHoje())&&(!p.fim||p.fim>=parcHoje());
+const parcDias=iso=>Math.round((new Date(iso+'T12:00:00')-new Date(parcHoje()+'T12:00:00'))/864e5);
+// link seguro de cada contato (só http/https, tel, mailto e wa.me; qualquer outra coisa vira vazio e o botão não aparece)
+function parcLink(c){
+  const v=String((c&&c.valor)||'').trim();if(!v)return '';
+  const d=v.replace(/\D/g,'');
+  switch(c.tipo){
+    case 'whatsapp':return d.length>=10&&d.length<=13?'https://wa.me/'+(d.startsWith('55')&&d.length>=12?d:'55'+d):'';
+    case 'telefone':return d.length>=10&&d.length<=13?'tel:+'+(d.startsWith('55')&&d.length>=12?d:'55'+d):'';
+    case 'email':return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)?'mailto:'+v:'';
+    case 'site':case 'outro':return /^https?:\/\/[^\s]+$/i.test(v)?v:'';
+    default:{if(/^https?:\/\/[^\s]+$/i.test(v))return v;const h=v.replace(/^@/,'');return PARC_REDE[c.tipo]&&/^[a-z0-9._-]{1,60}$/i.test(h)?PARC_REDE[c.tipo]+h:''}}
+}
+async function pList(k){const [c,t]=PARC_PT[k];
+  if(!invProd())return (await DB.collection(c).get()).docs.map(d=>({id:d.id,...d.data()}));
+  const {data,error}=await DB.from(t).select('*').limit(2000);if(error)throw error;return data||[]}
+async function pSet(k,id,rec){const [c,t]=PARC_PT[k];
+  if(!invProd()){await DB.doc(c+'/'+id).set(rec);return}
+  const {error}=await DB.from(t).upsert({id,...rec});if(error)throw error}
+async function pUpd(k,id,patch){const [c,t]=PARC_PT[k];
+  if(!invProd()){await DB.doc(c+'/'+id).update(patch);return}
+  const {error}=await DB.from(t).update(patch).eq('id',id);if(error)throw error}
+async function pDel(k,id){const [c,t]=PARC_PT[k];
+  if(!invProd()){await DB.doc(c+'/'+id).delete();return}
+  const {error}=await DB.from(t).delete().eq('id',id);if(error)throw error}
+async function parcCarrega(){const g=async k=>{try{return await pList(k)}catch(e){return []}};
+  [PARC_CACHE,PARC_CATS,PARC_CAND,PARC_REC,PARC_CLI]=await Promise.all(['parc','cats','cand','rec','cli'].map(g))}
+// ----- lado do usuário -----
+async function parcUsuario(){
+  if(!invProd()){const [P,C]=await Promise.all([pList('parc'),pList('cats')]),cn=Object.fromEntries(C.map(c=>[c.id,c.nome]));
+    return P.filter(parcAtivo).map(p=>({id:p.id,nome:p.nome,categoria:cn[p.categoria_id]||'',descricao:p.descricao,oferta:p.oferta,cidade:p.cidade,contatos:p.contatos||[]}))}
+  const {data,error}=await DB.rpc('rodaliq_parc_listar');if(error)throw error;return Array.isArray(data)?data:[]}
+function parcClique(id,canal){try{
+  if(invProd()){Promise.resolve(DB.rpc('rodaliq_parc_clique',{p_parceiro:id,p_canal:canal})).catch(()=>{});return}
+  const dia=hoje(),k='parc_cliques/'+id+'_'+canal+'_'+dia;
+  DB.doc(k).get().then(d=>DB.doc(k).set({parceiro_id:id,canal,dia,n:((d.exists&&d.data().n)||0)+1})).catch(()=>{})}catch(e){}}
+function parcModal(html,{id='',larg=560}={}){const ov=document.createElement('div');ov.className='ov';if(id)ov.id=id;
+  ov.innerHTML=`<div class="modal pcMd" role="dialog" aria-modal="true" style="max-width:${larg}px">${html}</div>`;document.body.appendChild(ov);
+  ov.__fechar=()=>ov.remove();ov.addEventListener('mousedown',e=>{if(e.target===ov)ov.remove()});return ov}
+const parcBotoes=(cs)=>(cs||[]).map(c=>{const h=parcLink(c);if(!h)return '';const [ic,nm]=PARC_CANAIS[c.tipo]||PARC_CANAIS.outro;
+  return `<a class="btn sec sm" href="${esc(h)}" target="_blank" rel="noopener noreferrer" data-pc="${esc(c.tipo)}">${ic} ${esc(c.tipo==='outro'&&c.rotulo?c.rotulo:nm)}</a>`}).join('');
+async function formParceiros(){
+  if(!recVe('parceiros'))return;
+  const ov=parcModal(`<div class="ivHd"><h2>🤝 Parceiros do Rodaliq</h2></div>
+    <p class="small muted" style="margin:4px 0 10px">Empresas e profissionais que oferecem condições para motoristas. São <b>parcerias</b>: o Rodaliq pode receber pela divulgação. A lista segue a ordem alfabética, sem destaque pago.</p>
+    <div id="pcCh" class="admTabs" style="margin-bottom:8px"></div><div id="pcLs"><div class="empty">Carregando…</div></div><div id="pcMore" style="text-align:center;margin-top:8px"></div>
+    <div class="note small" style="margin-top:12px">🔒 Seus dados não são enviados aos parceiros. O Rodaliq só conta quantos toques cada parceiro recebe, sem saber quem tocou. O Rodaliq não se responsabiliza pelos serviços dos parceiros: combine tudo diretamente com eles.</div>
+    <div class="mfoot"><button class="btn" id="pcX" type="button">Fechar</button></div>`,{id:'parcUsr',larg:640});
+  ov.querySelector('#pcX').onclick=()=>ov.remove();
+  ov.addEventListener('click',e=>{const a=e.target.closest('[data-pc]');if(a)parcClique(a.closest('.pcCard').dataset.id,a.dataset.pc)});
+  let L=[];try{L=await parcUsuario()}catch(e){ov.querySelector('#pcLs').innerHTML='<div class="empty">Não consegui carregar os parceiros. Tente de novo em instantes.</div>';return}
+  L.sort((a,b)=>semAc(a.nome).localeCompare(semAc(b.nome),'pt-BR'));
+  let fil='',pg=1;const cats=[...new Set(L.map(p=>p.categoria).filter(Boolean))].sort((a,b)=>semAc(a).localeCompare(semAc(b),'pt-BR'));
+  const cartao=p=>`<div class="pcCard" data-id="${esc(p.id)}"><div class="pcT1"><b>${esc(p.nome)}</b><span class="pcTag">🤝 Parceiro</span></div><div class="small muted">${esc(p.categoria||'')}${p.cidade?' · 📍 '+esc(p.cidade):''}</div>${p.oferta?`<div class="pcOf">🎁 ${esc(p.oferta)}</div>`:''}${p.descricao?`<div class="small" style="margin-top:4px">${esc(p.descricao)}</div>`:''}<div class="pcBt">${parcBotoes(p.contatos)}</div></div>`;
+  const draw=()=>{const F=L.filter(p=>!fil||p.categoria===fil),lim=pg*10;
+    ov.querySelector('#pcCh').innerHTML=cats.length>1?`<button type="button" class="chip${fil===''?' on':''}" data-f="">Todos (${L.length})</button>`+cats.map(c=>`<button type="button" class="chip${fil===c?' on':''}" data-f="${esc(c)}">${esc(c)} (${L.filter(p=>p.categoria===c).length})</button>`).join(''):'';
+    ov.querySelector('#pcLs').innerHTML=F.length?F.slice(0,lim).map(cartao).join(''):'<div class="empty">Ainda não há parceiros por aqui. Volte em breve!</div>';
+    ov.querySelector('#pcMore').innerHTML=F.length>lim?`<button type="button" class="btn sec" id="pcMoreB">Mostrar mais ${Math.min(10,F.length-lim)} (restam ${F.length-lim})</button>`:'';
+    const mb=ov.querySelector('#pcMoreB');if(mb)mb.onclick=()=>{pg++;draw()};
+    ov.querySelectorAll('#pcCh [data-f]').forEach(b=>b.onclick=()=>{fil=b.dataset.f;pg=1;draw()})};
+  draw()}
+// ----- editor de contatos (WhatsApp, e-mail, site e redes) -----
+function parcContatosEd(host,ini,max){
+  let L=(ini||[]).map(c=>({...c}));
+  const draw=()=>{host.innerHTML=L.map((c,i)=>`<div class="pcCt" data-i="${i}"><select class="inp" data-k="tipo" aria-label="Tipo de contato">${Object.entries(PARC_CANAIS).map(([k,[ic,nm]])=>`<option value="${k}"${c.tipo===k?' selected':''}>${ic} ${nm}</option>`).join('')}</select><input class="inp" data-k="valor" maxlength="200" value="${esc(c.valor||'')}" placeholder="${esc(PARC_DICA[c.tipo]||'')}" aria-label="Contato" autocomplete="off">${c.tipo==='outro'?`<input class="inp" data-k="rotulo" maxlength="30" value="${esc(c.rotulo||'')}" placeholder="Nome do link (ex.: Cardápio)" aria-label="Nome do link" autocomplete="off">`:''}<button type="button" class="btn sec sm" data-rm="${i}" aria-label="Remover contato">✕</button></div>`).join('')+(L.length<max?'<button type="button" class="btn sec sm" data-add="1">＋ Adicionar contato</button>':'');
+    host.querySelectorAll('[data-k]').forEach(el=>{const h=()=>{const i=+el.closest('.pcCt').dataset.i;L[i][el.dataset.k]=el.value;if(el.dataset.k==='tipo')draw()};el.onchange=h;if(el.tagName==='INPUT')el.oninput=h});
+    host.querySelectorAll('[data-rm]').forEach(b=>b.onclick=()=>{L.splice(+b.dataset.rm,1);draw()});
+    const a=host.querySelector('[data-add]');if(a)a.onclick=()=>{L.push({tipo:L.length?'site':'whatsapp',valor:''});draw()}};
+  draw();
+  return{get:()=>L.map(c=>({tipo:c.tipo,valor:String(c.valor||'').trim(),...(c.tipo==='outro'&&c.rotulo?{rotulo:String(c.rotulo).trim().slice(0,30)}:{})})).filter(c=>c.valor),
+    erro:()=>{const bad=L.map(c=>({...c,valor:String(c.valor||'').trim()})).filter(c=>c.valor).find(c=>!parcLink(c));return bad?`Confira o contato de ${(PARC_CANAIS[bad.tipo]||PARC_CANAIS.outro)[1]}: "${bad.valor}" não parece válido.`:''}}}
+// ----- formulário de candidatura (tela de login e prévia do Admin) -----
+async function parcFormInfo(){
+  if(!invProd()){const C=await pList('cats');return{aberto:true,categorias:C.filter(c=>c.ativo!==false).sort((a,b)=>(a.ordem||0)-(b.ordem||0)||semAc(a.nome).localeCompare(semAc(b.nome),'pt-BR')).map(c=>({id:c.id,nome:c.nome}))}}
+  const {data,error}=await DB.rpc('rodaliq_parc_form');if(error)throw error;return data||{aberto:false,categorias:[]}}
+function parcFormCand(info,{previa=false}={}){
+  const ov=parcModal(`<div class="ivHd"><h2>🤝 Quero ser parceiro do Rodaliq</h2></div>${previa?'<div class="note am small" style="margin-bottom:8px">👁 Prévia para o admin: nada do que você preencher aqui é enviado.</div>':''}
+    <p class="small muted" style="margin:4px 0 10px">Tem uma empresa ou presta um serviço para motoristas? Conte para a gente. Isto é só uma candidatura: ela não cria conta no app e não garante a parceria.</p>
+    <form id="pfF" autocomplete="off" novalidate>
+      <div class="field"><label for="pfP">Eu sou</label><select class="inp" id="pfP"><option value="pj">Empresa (CNPJ)</option><option value="pf">Autônomo (CPF)</option></select></div>
+      <div class="field"><label for="pfN">Nome da empresa ou do profissional</label><input class="inp" id="pfN" maxlength="120" placeholder="Ex.: Auto Center Silva ou João da Silva"></div>
+      <div class="field"><label for="pfR">Pessoa responsável pelo contato</label><input class="inp" id="pfR" maxlength="100" placeholder="Ex.: Maria Souza"></div>
+      <div class="field"><label for="pfE">E-mail</label><input class="inp" type="email" id="pfE" maxlength="120" autocapitalize="none"></div>
+      <div class="field"><label for="pfW">💬 WhatsApp (com DDD)</label><input class="inp" type="tel" id="pfW" inputmode="numeric" maxlength="16" placeholder="(61) 9xxxx-xxxx"></div>
+      <div class="field"><label for="pfC">Categoria</label><select class="inp" id="pfC">${info.categorias.map(c=>`<option value="${esc(c.id)}">${esc(c.nome)}</option>`).join('')}<option value="__outra">Outra (descrever)</option></select></div>
+      <div class="field hidden" id="pfOW"><label for="pfO">Qual categoria?</label><input class="inp" id="pfO" maxlength="60" placeholder="Ex.: Lavagem a seco"></div>
+      <div class="field"><label for="pfCi">Cidade</label><input class="inp" id="pfCi" maxlength="80" placeholder="Ex.: Brasília"></div>
+      <div class="field"><label for="pfOf">O que você oferece aos motoristas?</label><textarea class="inp" id="pfOf" maxlength="600" rows="3" placeholder="Ex.: 10% de desconto em revisão para quem mostrar o Rodaliq"></textarea></div>
+      <div class="field"><label>Contatos que aparecerão para os motoristas (opcional)</label><div class="small muted">WhatsApp, e-mail, site e redes sociais. Se divulgarmos a parceria, só estes contatos serão mostrados.</div><div id="pfCt"></div></div>
+      <div style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden" aria-hidden="true"><label>Não preencha<input type="text" id="pfWeb" tabindex="-1" autocomplete="off"></label></div>
+      <label class="ivCheck"><input type="checkbox" id="pfOk"><span>Em conformidade com a LGPD (Lei nº 13.709/2018), autorizo o Rodaliq a entrar em contato por e-mail e WhatsApp e a usar os dados informados somente para analisar esta candidatura. Li os <button type="button" class="lnk" data-tt="termos">Termos de uso</button> e a <button type="button" class="lnk" data-tt="priv">Política de privacidade</button>.</span></label>
+      <div id="pfMsg" class="err" role="alert"></div>
+      <div class="mfoot"><button type="button" class="btn sec" id="pfX">Voltar</button><button type="submit" class="btn" id="pfS">${previa?'Testar envio (não envia)':'Enviar candidatura'}</button></div>
+    </form>
+    <div id="pfDone" class="ivDone hidden"><div class="big">✅</div><p style="font-weight:700;margin:6px 0">Recebemos sua candidatura!</p><p class="small muted">Se houver interesse, entraremos em contato pelo e-mail ou WhatsApp informado.</p><button type="button" class="btn block" id="pfD" style="margin-top:12px">Fechar</button></div>`,{id:'parcCand',larg:560});
+  const q=s=>ov.querySelector(s),msg=t=>{q('#pfMsg').textContent=t};
+  const ed=parcContatosEd(q('#pfCt'),[],5);
+  ov.querySelectorAll('[data-tt]').forEach(b=>b.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();verTermos(b.dataset.tt)}));
+  q('#pfC').onchange=()=>q('#pfOW').classList.toggle('hidden',q('#pfC').value!=='__outra');
+  if(!info.categorias.length){q('#pfC').value='__outra';q('#pfOW').classList.remove('hidden')}
+  q('#pfW').addEventListener('input',()=>{q('#pfW').value=invDigits(q('#pfW').value).slice(0,11)});
+  const sujo=()=>['#pfN','#pfR','#pfE','#pfW','#pfCi','#pfOf'].some(k=>q(k).value.trim()!=='')||q('#pfOk').checked;
+  const fecha=async()=>{if(sujo()&&!await confirma('Você começou a preencher. Se voltar agora, <b>o que digitou será perdido</b>.','Voltar e perder',{titulo:'Voltar?',voltar:'Continuar preenchendo',perigo:1}))return;ov.remove()};
+  ov.__fechar=fecha;q('#pfX').onclick=fecha;q('#pfD').onclick=()=>ov.remove();
+  q('#pfF').addEventListener('submit',async e=>{e.preventDefault();
+    if(q('#pfWeb').value){q('#pfF').classList.add('hidden');q('#pfDone').classList.remove('hidden');return} // campo-isca: finge sucesso
+    const dig=invDigits(q('#pfW').value),ddd=dig.slice(0,2),num=dig.slice(2),outra=q('#pfC').value==='__outra';
+    const rec={nome:q('#pfN').value.trim().replace(/\s+/g,' '),pessoa:q('#pfP').value,responsavel:q('#pfR').value.trim().replace(/\s+/g,' '),email:q('#pfE').value.trim().toLowerCase(),whatsapp:'55'+dig,
+      categoria_id:outra?null:q('#pfC').value,categoria_outra:outra?q('#pfO').value.trim().replace(/\s+/g,' '):null,cidade:q('#pfCi').value.trim(),oferta:q('#pfOf').value.trim(),contatos:ed.get(),consent:true,consent_v:TERMOS_V};
+    if(rec.nome.length<2)return msg('Informe o nome da empresa ou do profissional.');
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(rec.email))return msg('Informe um e-mail válido.');
+    if(!DDD_UF[ddd])return msg('Informe o WhatsApp com DDD válido.');
+    if(!/^9?\d{8}$/.test(num)||num.length<8)return msg('Informe o número do WhatsApp com DDD, por exemplo (61) 9xxxx-xxxx.');
+    if(outra&&rec.categoria_outra.length<2)return msg('Conte qual é a categoria.');
+    if(rec.oferta.length<5)return msg('Conte o que você oferece aos motoristas.');
+    const er=ed.erro();if(er)return msg(er);
+    if(!q('#pfOk').checked)return msg('Marque a autorização para continuar.');
+    if(previa){q('#pfF').classList.add('hidden');q('#pfDone').classList.remove('hidden');return}
+    let last=0;try{last=+localStorage.getItem('rodaliq_parc_last')||0}catch(x){}
+    if(Date.now()-last<60000)return msg('Sua candidatura já foi enviada. Se houver interesse, entraremos em contato.');
+    const b=q('#pfS');b.disabled=true;b.textContent='Enviando…';msg('');
+    try{const r=await parcCandidatar(rec);
+      if(r&&r.ok){try{localStorage.setItem('rodaliq_parc_last',String(Date.now()))}catch(x){}q('#pfF').classList.add('hidden');q('#pfDone').classList.remove('hidden')}
+      else msg(r&&r.erro==='dup'?'Já recebemos uma candidatura com este e-mail. Entraremos em contato.':r&&r.erro==='fechado'?'As candidaturas não estão abertas no momento.':r&&r.erro==='limite'?'Muitas candidaturas agora. Tente de novo mais tarde.':'Confira os dados e tente de novo.')
+    }catch(ex){msg('Não foi possível enviar agora. Tente de novo em instantes.')}
+    b.disabled=false;b.textContent='Enviar candidatura'});
+  setTimeout(()=>q('#pfN').focus(),50)}
+async function parcCandidatar(rec){
+  if(!invProd()){const all=await pList('cand');if(all.some(c=>c.status==='nova'&&String(c.email).toLowerCase()===String(rec.email).toLowerCase()))return{erro:'dup'};
+    await DB.doc('parc_cand/'+parcId()).set({...rec,status:'nova',criado_em:new Date().toISOString()});return{ok:true}}
+  const {data,error}=await DB.rpc('rodaliq_parc_candidatar',{p:rec});if(error)throw error;return data}
+// o link do formulário só aparece na tela de login quando o interruptor está em "Todos" (o banco também confere)
+function parcLoginInit(t){t=t||0;
+  if(invProd()&&typeof DB.rpc==='function'){parcFormInfo().then(inf=>{const w=$('#parcLinkW');if(w&&inf&&inf.aberto){w.classList.remove('hidden');$('#parcOpen').onclick=async()=>{let i=inf;try{i=await parcFormInfo()}catch(e){}if(!i||!i.aberto){toast('As candidaturas não estão abertas.');return}parcFormCand(i)}}}).catch(()=>{});return}
+  if(t<40)setTimeout(()=>parcLoginInit(t+1),500)}
+// ----- Admin › Parceiros -----
+const PARC_COBR=['Mensal','Trimestral','Semestral','Anual','Por indicação','Outra'];
+const parcIni=n=>String(n||'?').trim().split(/\s+/).slice(0,2).map(x=>x[0]||'').join('').toUpperCase()||'?';
+const parcCatNome=id=>(PARC_CATS.find(c=>c.id===id)||{}).nome||'';
+function parcSituacao(p){const h=parcHoje();
+  if(p.status==='rascunho')return['Rascunho','não aparece para os usuários (falta completar e ativar)'];
+  if(p.status==='encerrado')return['Encerrada',p.fim?'encerrada em '+fmtBR(p.fim):'encerrada'];
+  if(p.inicio&&p.inicio>h)return['Agendada','começa em '+fmtBR(p.inicio)];
+  if(p.fim&&p.fim<h)return['Vencida','venceu em '+fmtBR(p.fim)];
+  return['Ativa',p.fim?'até '+fmtBR(p.fim):'sem data fim']}
+async function parcAdminRender(box){
+  if(!ehMaster())return;
+  await parcCarrega();
+  const F=UI.parcF||'ativos',h=parcHoje(),limite=isoOf(new Date(Date.now()-30*864e5));
+  const ativos=PARC_CACHE.filter(parcAtivo),inativos=PARC_CACHE.filter(p=>!parcAtivo(p)),novas=PARC_CAND.filter(c=>c.status==='nova');
+  const usoCat=id=>PARC_CACHE.filter(p=>p.categoria_id===id).length+PARC_CAND.filter(c=>c.categoria_id===id).length;
+  const tabs=[['ativos','Ativos ('+ativos.length+')'],['inativos','Inativos ('+inativos.length+')'],['cand','Candidaturas ('+novas.length+(PARC_CAND.length>novas.length?' novas':'')+')'],['cats','Categorias ('+PARC_CATS.length+')']];
+  const ord=(a,b)=>semAc(a.nome).localeCompare(semAc(b.nome),'pt-BR');
+  const clk=p=>{const l=PARC_CLI.filter(c=>c.parceiro_id===p.id&&String(c.dia)>=limite),t={};l.forEach(c=>t[c.canal]=(t[c.canal]||0)+(+c.n||0));
+    const tot=Object.values(t).reduce((s,x)=>s+x,0);return{tot,txt:Object.entries(t).map(([k,n])=>((PARC_CANAIS[k]||PARC_CANAIS.outro)[0])+' '+(PARC_CANAIS[k]||PARC_CANAIS.outro)[1]+' '+n).join(' · ')}};
+  const cardP=p=>{const [sit,sd]=parcSituacao(p),ok=sit==='Ativa',k=clk(p),rs=PARC_REC.filter(r=>r.parceiro_id===p.id).sort((a,b)=>String(b.competencia).localeCompare(String(a.competencia))).slice(0,6);
+    const ct=/^https:\/\/[^\s]+$/i.test(p.contrato_url||'')?`<a href="${esc(p.contrato_url)}" target="_blank" rel="noopener noreferrer">📎 Abrir contrato</a>`:(p.contrato_url?esc(p.contrato_url):'<span class="muted">sem link do contrato</span>');
+    return `<div class="uCard uCp" data-pid="${esc(p.id)}"><button type="button" class="uHd" aria-expanded="false"><span class="uAv" aria-hidden="true">${esc(parcIni(p.nome))}</span><span class="uNm"><b>${esc(p.nome)}</b><small>${esc(parcCatNome(p.categoria_id)||'sem categoria')}${p.cidade?' · '+esc(p.cidade):''} · ${esc(sd)}</small></span><span class="uTg"><span class="rcTag ${ok?'ts':'ad'}">${ok?'✔ Ativa':'⏸ '+sit}</span></span><span class="uCv" aria-hidden="true">▾</span></button>
+      <div class="uDt"><div class="uLin">${p.pessoa==='pf'?'Autônomo':'Empresa'}${p.documento?' · '+esc(p.documento):''}${p.responsavel?' · 👤 '+esc(p.responsavel):''}${p.whatsapp?' · 💬 '+esc(invFmtPhone(p.whatsapp)):''}${p.email?' · ✉️ '+esc(p.email):''}</div>
+      <div class="uLin">Início ${p.inicio?fmtBR(p.inicio):'—'} · Fim ${p.fim?fmtBR(p.fim):'sem data fim'} · ${p.valor?apoBRL(p.valor)+(p.cobranca?' ('+esc(p.cobranca.toLowerCase())+')':''):'sem valor combinado'}</div>
+      <div class="uLin">${ct}</div>
+      ${p.oferta?`<div class="uLin">🎁 ${esc(p.oferta)}</div>`:''}${p.descricao?`<div class="uLin">${esc(p.descricao)}</div>`:''}
+      <div class="pcBt">${parcBotoes(p.contatos)||'<span class="small muted">Nenhum contato público cadastrado.</span>'}</div>
+      <div class="uLin" style="margin-top:6px">👆 Toques nos últimos 30 dias: <b>${k.tot}</b>${k.tot?' · '+k.txt:''}</div>
+      <div style="margin-top:8px"><b class="small">Recebimentos</b>${rs.length?rs.map(r=>`<div class="despRow"><span class="despInfo"><span>${esc(mesNome(r.competencia))}</span><b class="num">${apoBRL(r.valor)}</b>${parcRecTag(r)}${r.obs?`<span class="small muted">${esc(r.obs)}</span>`:''}</span><span>${r.situacao==='recebido'?'':`<button type="button" class="btn sm sec" data-rr="${esc(r.id)}">Marcar recebido</button> `}<button type="button" class="btn sm sec" data-rd="${esc(r.id)}" aria-label="Remover recebimento">🗑</button></span></div>`).join(''):'<div class="small muted">Nenhum recebimento lançado.</div>'}</div>
+      <div class="uAc" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px"><button type="button" class="btn sm" data-rn="${esc(p.id)}">＋ Registrar recebimento</button><button type="button" class="btn sm sec" data-pe="${esc(p.id)}">✏ Editar</button>${p.status==='ativo'&&!(p.fim&&p.fim<h)?`<button type="button" class="btn sm sec" data-px="${esc(p.id)}">⏹ Encerrar parceria</button>`:`<button type="button" class="btn sm sec" data-pa="${esc(p.id)}">↻ Reativar</button>`}<button type="button" class="btn sm sec" data-pd="${esc(p.id)}">🗑 Excluir</button></div></div></div>`};
+  const cardC=c=>{const nome=c.categoria_id?parcCatNome(c.categoria_id):(c.categoria_outra?c.categoria_outra+' (sugerida)':'—'),st=c.status==='nova'?'🆕 Nova':c.status==='aprovada'?'✔ Aprovada':'✖ Recusada';
+    return `<div class="uCard uCp" data-cid="${esc(c.id)}"><button type="button" class="uHd" aria-expanded="false"><span class="uAv" aria-hidden="true">${esc(parcIni(c.nome))}</span><span class="uNm"><b>${esc(c.nome)}</b><small>${esc(nome)}${c.cidade?' · '+esc(c.cidade):''} · ${esc(c.criado_em?dataHora(c.criado_em):'')}</small></span><span class="uTg"><span class="rcTag ${c.status==='nova'?'ad':'ts'}">${st}</span></span><span class="uCv" aria-hidden="true">▾</span></button>
+      <div class="uDt"><div class="uLin">${c.pessoa==='pf'?'Autônomo':'Empresa'}${c.responsavel?' · 👤 '+esc(c.responsavel):''} · ✉️ ${esc(c.email)} · 💬 ${esc(invFmtPhone(c.whatsapp))}</div>${c.oferta?`<div class="uLin">🎁 ${esc(c.oferta)}</div>`:''}
+      <div class="pcBt">${parcBotoes(c.contatos)||'<span class="small muted">Sem contatos públicos informados.</span>'}</div>
+      <div class="uAc" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px"><a class="btn sm sec" href="https://wa.me/${esc(String(c.whatsapp||'').replace(/\D/g,''))}" target="_blank" rel="noopener noreferrer">💬 Falar no WhatsApp</a>${c.status==='nova'?`<button type="button" class="btn sm" data-ca="${esc(c.id)}">✔ Aprovar (criar rascunho)</button><button type="button" class="btn sm sec" data-cr="${esc(c.id)}">✖ Recusar</button>`:''}<button type="button" class="btn sm sec" data-cd="${esc(c.id)}">🗑 Excluir</button></div></div></div>`};
+  const cardK=c=>{const u=usoCat(c.id);return `<div class="uCard uCp"><div class="despRow"><span class="despInfo"><b>${esc(c.nome)}</b><span class="small muted">${u} em uso</span>${c.ativo===false?'<span class="rcTag ad">⏸ Desativada</span>':''}</span><span style="display:flex;gap:4px;flex-wrap:wrap"><button type="button" class="btn sm sec" data-ku="${esc(c.id)}" aria-label="Subir ${esc(c.nome)}">▲</button><button type="button" class="btn sm sec" data-kd="${esc(c.id)}" aria-label="Descer ${esc(c.nome)}">▼</button><button type="button" class="btn sm sec" data-kr="${esc(c.id)}">✏ Renomear</button><button type="button" class="btn sm sec" data-kt="${esc(c.id)}">${c.ativo===false?'↻ Ativar':'⏸ Desativar'}</button>${u?'':`<button type="button" class="btn sm sec" data-kx="${esc(c.id)}">🗑</button>`}</span></div></div>`};
+  const lista=F==='ativos'?ativos.sort(ord).map(cardP).join('')||'<div class="empty">Nenhum parceiro ativo.</div>'
+    :F==='inativos'?inativos.sort(ord).map(cardP).join('')||'<div class="empty">Nenhum parceiro inativo.</div>'
+    :F==='cand'?[...PARC_CAND].sort((a,b)=>(a.status==='nova'?0:1)-(b.status==='nova'?0:1)||String(b.criado_em).localeCompare(String(a.criado_em))).map(cardC).join('')||'<div class="empty">Nenhuma candidatura recebida.</div>'
+    :`<div class="despAdd"><div class="fld" style="flex:2 1 200px"><label for="kN">Nova categoria</label><input class="inp" id="kN" maxlength="60" placeholder="Ex.: Mecânica" autocomplete="off"></div><div class="fld" style="flex:0 0 auto"><button type="button" class="btn" id="kS">Adicionar</button></div>${PARC_CATS.length?'':'<div class="fld" style="flex:0 0 auto"><button type="button" class="btn sec" id="kSeed">Criar categorias sugeridas</button></div>'}</div><div class="err" id="kErr"></div>${[...PARC_CATS].sort((a,b)=>(a.ordem||0)-(b.ordem||0)||ord(a,b)).map(cardK).join('')||'<div class="empty">Nenhuma categoria ainda.</div>'}`;
+  box.innerHTML=`<h3 style="margin:0">🤝 Parceiros do Rodaliq</h3>
+    <p class="small muted" style="margin:4px 0 8px">Parceiros não têm conta nem acesso ao app: você cadastra e mantém tudo aqui. Quem aparece para os usuários é só quem está <b>ativo</b> (sem data fim, ou com data fim ainda no futuro). O nível de quem vê está em ⚙ Ajustes do app › Recursos.</p>
+    <div class="admTabs" id="pcTabs">${tabs.map(([k,t])=>`<button type="button" class="chip${F===k?' on':''}" data-pf="${k}">${t}</button>`).join('')}</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0"><button type="button" class="btn sm" id="pcNovo">＋ Novo parceiro</button><button type="button" class="btn sm sec" id="pcPrev">👁 Prévia do formulário de candidatura</button></div>${lista}`;
+  const again=()=>{parcAdminRender(box);admContagens()};
+  box.querySelectorAll('[data-pf]').forEach(b=>b.onclick=()=>{UI.parcF=b.dataset.pf;UI.admPag=1;parcAdminRender(box)});
+  box.querySelectorAll('.uHd').forEach(b=>b.onclick=()=>{const c=b.parentNode;c.classList.toggle('op');b.setAttribute('aria-expanded',c.classList.contains('op'))});
+  box.querySelector('#pcNovo').onclick=()=>parcFormP(null,again);
+  box.querySelector('#pcPrev').onclick=async()=>{let i;try{i=await parcFormInfo()}catch(e){toast('Não consegui abrir a prévia.');return}parcFormCand(i,{previa:true})};
+  const P=id=>PARC_CACHE.find(x=>x.id===id),Cd=id=>PARC_CAND.find(x=>x.id===id);
+  box.querySelectorAll('[data-pe]').forEach(b=>b.onclick=()=>parcFormP(P(b.dataset.pe),again));
+  box.querySelectorAll('[data-px]').forEach(b=>b.onclick=async()=>{const p=P(b.dataset.px);if(!p||!await confirma(`Encerrar a parceria com <b>${esc(p.nome)}</b>? Ele some da tela dos usuários agora. Você pode reativar depois.`,'Encerrar',{perigo:1}))return;
+    try{await pUpd('parc',p.id,{status:'encerrado',fim:parcHoje()});audit('Parceiros','Admin','Parceria encerrada · '+p.nome)}catch(e){toast('Não foi possível salvar.');return}again()});
+  box.querySelectorAll('[data-pa]').forEach(b=>b.onclick=async()=>{const p=P(b.dataset.pa);if(!p)return;
+    try{await pUpd('parc',p.id,{status:'ativo',fim:null});audit('Parceiros','Admin','Parceria reativada · '+p.nome)}catch(e){toast('Não foi possível salvar.');return}toast('Parceria reativada. Ajuste a data fim, se houver.');again()});
+  box.querySelectorAll('[data-pd]').forEach(b=>b.onclick=async()=>{const p=P(b.dataset.pd);if(!p||!await confirma(`Excluir <b>${esc(p.nome)}</b> e todos os recebimentos e toques dele? Isso não pode ser desfeito. Para só tirar da tela dos usuários, use “Encerrar parceria”.`,'Excluir',{perigo:1}))return;
+    try{await pDel('parc',p.id);audit('Parceiros','Admin','Parceiro excluído · '+p.nome)}catch(e){toast('Não foi possível excluir.');return}again()});
+  box.querySelectorAll('[data-rn]').forEach(b=>b.onclick=()=>parcFormRec(P(b.dataset.rn),again));
+  box.querySelectorAll('[data-rr]').forEach(b=>b.onclick=()=>parcMarcaRecebido(PARC_REC.find(x=>x.id===b.dataset.rr),again));
+  box.querySelectorAll('[data-rd]').forEach(b=>b.onclick=async()=>{if(!await confirma('Remover este recebimento?','Remover',{perigo:1}))return;try{await pDel('rec',b.dataset.rd);audit('Parceiros','Admin','Recebimento removido')}catch(e){toast('Não foi possível remover.');return}again()});
+  // candidaturas
+  box.querySelectorAll('[data-ca]').forEach(b=>b.onclick=async()=>{const c=Cd(b.dataset.ca);if(!c)return;
+    let cid=c.categoria_id;
+    try{if(!cid&&c.categoria_outra){const ex=PARC_CATS.find(x=>semAc(x.nome)===semAc(c.categoria_outra));
+        if(ex)cid=ex.id;else{cid='k'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);await pSet('cats',cid,{nome:c.categoria_outra,ativo:true,ordem:PARC_CATS.length+1,criado_em:new Date().toISOString()});audit('Parceiros','Admin','Categoria criada a partir de candidatura · '+c.categoria_outra)}}
+      const pid=parcId();
+      await pSet('parc',pid,{nome:c.nome,pessoa:c.pessoa,documento:null,categoria_id:cid||null,responsavel:c.responsavel||null,email:c.email,whatsapp:c.whatsapp,descricao:null,oferta:c.oferta||null,cidade:c.cidade||null,contatos:c.contatos||[],inicio:null,fim:null,valor:0,cobranca:null,contrato_url:null,status:'rascunho',candidatura_id:c.id,criado_em:new Date().toISOString()});
+      await pUpd('cand',c.id,{status:'aprovada',tratado_em:new Date().toISOString(),parceiro_id:pid});
+      audit('Parceiros','Admin','Candidatura aprovada · '+c.nome+' (rascunho criado)');
+      await parcCarrega();toast('Rascunho criado. Complete o cadastro e ative.');UI.parcF='inativos';await parcAdminRender(box);admContagens();parcFormP(PARC_CACHE.find(x=>x.id===pid),again);return
+    }catch(e){toast('Não foi possível aprovar.')}});
+  box.querySelectorAll('[data-cr]').forEach(b=>b.onclick=async()=>{const c=Cd(b.dataset.cr);if(!c||!await confirma(`Recusar a candidatura de <b>${esc(c.nome)}</b>?`,'Recusar',{perigo:1}))return;
+    try{await pUpd('cand',c.id,{status:'recusada',tratado_em:new Date().toISOString()});audit('Parceiros','Admin','Candidatura recusada · '+c.nome)}catch(e){toast('Não foi possível salvar.');return}again()});
+  box.querySelectorAll('[data-cd]').forEach(b=>b.onclick=async()=>{const c=Cd(b.dataset.cd);if(!c||!await confirma(`Excluir a candidatura de <b>${esc(c.nome)}</b>? Os dados dela serão apagados.`,'Excluir',{perigo:1}))return;
+    try{await pDel('cand',c.id);audit('Parceiros','Admin','Candidatura excluída · '+c.nome)}catch(e){toast('Não foi possível excluir.');return}again()});
+  // categorias
+  const kErr=t=>{const e=box.querySelector('#kErr');if(e)e.textContent=t};
+  const kS=box.querySelector('#kS');if(kS)kS.onclick=async()=>{const nome=box.querySelector('#kN').value.trim().replace(/\s+/g,' ');
+    if(nome.length<2)return kErr('Informe o nome da categoria.');if(PARC_CATS.some(c=>semAc(c.nome)===semAc(nome)))return kErr('Essa categoria já existe.');
+    try{await pSet('cats','k'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),{nome,ativo:true,ordem:PARC_CATS.length+1,criado_em:new Date().toISOString()});audit('Parceiros','Admin','Categoria criada · '+nome)}catch(e){return kErr('Não foi possível salvar.')}again()};
+  const kSeed=box.querySelector('#kSeed');if(kSeed)kSeed.onclick=async()=>{try{let o=1;for(const nome of ['Combustível e GNV','Contador','Lavagem e estética','Mecânica e revisão','Pneus','Seguro'])await pSet('cats','k'+Date.now().toString(36)+(o)+Math.random().toString(36).slice(2,4),{nome,ativo:true,ordem:o++,criado_em:new Date().toISOString()});audit('Parceiros','Admin','Categorias sugeridas criadas')}catch(e){return kErr('Não foi possível salvar.')}again()};
+  const K=id=>PARC_CATS.find(x=>x.id===id);
+  box.querySelectorAll('[data-kt]').forEach(b=>b.onclick=async()=>{const c=K(b.dataset.kt);try{await pUpd('cats',c.id,{ativo:c.ativo===false})}catch(e){toast('Não foi possível salvar.');return}again()});
+  box.querySelectorAll('[data-kx]').forEach(b=>b.onclick=async()=>{const c=K(b.dataset.kx);if(!c||!await confirma(`Excluir a categoria <b>${esc(c.nome)}</b>?`,'Excluir',{perigo:1}))return;try{await pDel('cats',c.id);audit('Parceiros','Admin','Categoria excluída · '+c.nome)}catch(e){toast('Não foi possível excluir.');return}again()});
+  const move=async(id,d)=>{const L=[...PARC_CATS].sort((a,b)=>(a.ordem||0)-(b.ordem||0)||ord(a,b)),i=L.findIndex(x=>x.id===id),j=i+d;if(j<0||j>=L.length)return;
+    [L[i],L[j]]=[L[j],L[i]];try{for(let n=0;n<L.length;n++)if((L[n].ordem||0)!==n+1)await pUpd('cats',L[n].id,{ordem:n+1})}catch(e){toast('Não foi possível salvar.');return}again()};
+  box.querySelectorAll('[data-ku]').forEach(b=>b.onclick=()=>move(b.dataset.ku,-1));box.querySelectorAll('[data-kd]').forEach(b=>b.onclick=()=>move(b.dataset.kd,1));
+  box.querySelectorAll('[data-kr]').forEach(b=>b.onclick=()=>{const c=K(b.dataset.kr);const ov=parcModal(`<h2>Renomear categoria</h2><div class="field"><input class="inp" id="krN" maxlength="60" value="${esc(c.nome)}" aria-label="Nome da categoria"></div><div class="err" id="krE"></div><div class="mfoot"><button type="button" class="btn sec" id="krC">Cancelar</button><button type="button" class="btn" id="krS">Salvar</button></div>`,{larg:420});
+    ov.querySelector('#krC').onclick=()=>ov.remove();ov.querySelector('#krS').onclick=async()=>{const nome=ov.querySelector('#krN').value.trim().replace(/\s+/g,' ');
+      if(nome.length<2){ov.querySelector('#krE').textContent='Informe o nome.';return}if(PARC_CATS.some(x=>x.id!==c.id&&semAc(x.nome)===semAc(nome))){ov.querySelector('#krE').textContent='Já existe uma categoria com esse nome.';return}
+      try{await pUpd('cats',c.id,{nome});audit('Parceiros','Admin','Categoria renomeada · '+c.nome+' → '+nome)}catch(e){ov.querySelector('#krE').textContent='Não foi possível salvar.';return}ov.remove();again()}})}
+// cadastro/edição de parceiro (modal)
+function parcFormP(p,done){
+  const novo=!p;p=p||{pessoa:'pj',status:'rascunho',contatos:[],valor:0};
+  const cats=PARC_CATS.filter(c=>c.ativo!==false||c.id===p.categoria_id).sort((a,b)=>(a.ordem||0)-(b.ordem||0));
+  const ov=parcModal(`<div class="ivHd"><h2>${novo?'＋ Novo parceiro':'✏ Editar parceiro'}</h2></div><div class="ajBd" style="max-height:68vh">
+    <div class="field"><label for="ppP">Tipo</label><select class="inp" id="ppP"><option value="pj"${p.pessoa==='pj'?' selected':''}>Empresa (CNPJ)</option><option value="pf"${p.pessoa==='pf'?' selected':''}>Autônomo (CPF)</option></select></div>
+    <div class="field"><label for="ppN">Nome (empresa ou profissional)</label><input class="inp" id="ppN" maxlength="120" value="${esc(p.nome||'')}"></div>
+    <div class="field"><label for="ppD">CPF/CNPJ (só para você, não aparece para os usuários)</label><input class="inp" id="ppD" maxlength="20" value="${esc(p.documento||'')}" inputmode="numeric"></div>
+    <div class="field"><label for="ppC">Categoria</label><select class="inp" id="ppC"><option value="">— escolha —</option>${cats.map(c=>`<option value="${esc(c.id)}"${p.categoria_id===c.id?' selected':''}>${esc(c.nome)}</option>`).join('')}</select></div>
+    <div class="field"><label for="ppR">Responsável (só para você)</label><input class="inp" id="ppR" maxlength="100" value="${esc(p.responsavel||'')}"></div>
+    <div class="field"><label for="ppE">E-mail de contato (só para você)</label><input class="inp" type="email" id="ppE" maxlength="120" value="${esc(p.email||'')}"></div>
+    <div class="field"><label for="ppW">WhatsApp de contato (só para você)</label><input class="inp" type="tel" id="ppW" maxlength="20" inputmode="numeric" value="${esc(p.whatsapp||'')}" placeholder="5561999999999"></div>
+    <div class="field"><label for="ppCi">Cidade</label><input class="inp" id="ppCi" maxlength="80" value="${esc(p.cidade||'')}"></div>
+    <div class="field"><label for="ppOf">Oferta para os motoristas (aparece no cartão)</label><input class="inp" id="ppOf" maxlength="300" value="${esc(p.oferta||'')}" placeholder="Ex.: 10% de desconto em revisão"></div>
+    <div class="field"><label for="ppDe">Descrição (aparece no cartão)</label><textarea class="inp" id="ppDe" maxlength="600" rows="3">${esc(p.descricao||'')}</textarea></div>
+    <div class="field"><label>Contatos públicos (botões que o motorista vê)</label><div id="ppCt"></div></div>
+    <div class="field"><label for="ppI">Início da parceria</label><input class="inp" type="date" id="ppI" value="${esc(p.inicio||'')}"></div>
+    <div class="field"><label for="ppF">Fim da parceria (opcional — vazio = sem data fim)</label><input class="inp" type="date" id="ppF" value="${esc(p.fim||'')}"></div>
+    <div class="field"><label for="ppV">Valor combinado (R$)</label><input class="inp num" id="ppV" inputmode="decimal" value="${p.valor?brl(p.valor,1):''}" placeholder="0,00"></div>
+    <div class="field"><label for="ppB">Forma de cobrança</label><select class="inp" id="ppB"><option value="">—</option>${PARC_COBR.map(x=>`<option${p.cobranca===x?' selected':''}>${x}</option>`).join('')}</select></div>
+    <div class="field"><label for="ppK">Link do contrato (https://…, por exemplo do seu Drive)</label><input class="inp" id="ppK" maxlength="400" value="${esc(p.contrato_url||'')}" placeholder="https://…"></div>
+    <div class="field"><label for="ppS">Situação</label><select class="inp" id="ppS"><option value="rascunho"${p.status==='rascunho'?' selected':''}>Rascunho (não aparece para os usuários)</option><option value="ativo"${p.status==='ativo'?' selected':''}>Ativo (aparece enquanto estiver dentro das datas)</option><option value="encerrado"${p.status==='encerrado'?' selected':''}>Encerrado</option></select></div>
+    <div class="err" id="ppEr"></div></div><div class="mfoot"><button type="button" class="btn sec" id="ppX">Cancelar</button><button type="button" class="btn" id="ppSv">Salvar</button></div>`,{id:'parcEd',larg:600});
+  const q=s=>ov.querySelector(s),err=t=>{q('#ppEr').textContent=t};
+  const ed=parcContatosEd(q('#ppCt'),p.contatos||[],10);liveBRL(q('#ppV'));
+  ov.__fechar=()=>ov.remove();q('#ppX').onclick=()=>ov.remove();
+  q('#ppSv').onclick=async()=>{
+    const nome=q('#ppN').value.trim().replace(/\s+/g,' '),ini=q('#ppI').value,fim=q('#ppF').value,url=q('#ppK').value.trim(),st=q('#ppS').value,email=q('#ppE').value.trim();
+    if(nome.length<2)return err('Informe o nome.');if(email&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))return err('E-mail inválido.');
+    if(ini&&fim&&fim<ini)return err('A data fim não pode ser antes do início.');if(url&&!/^https:\/\/[^\s]+$/i.test(url))return err('O link do contrato precisa começar com https://');
+    const er=ed.erro();if(er)return err(er);
+    if(st==='ativo'&&!q('#ppC').value)return err('Escolha uma categoria para ativar.');if(st==='ativo'&&!ed.get().length)return err('Cadastre ao menos um contato público para ativar.');
+    const rec={nome,pessoa:q('#ppP').value,documento:q('#ppD').value.trim()||null,categoria_id:q('#ppC').value||null,responsavel:q('#ppR').value.trim()||null,email:email||null,whatsapp:invDigits(q('#ppW').value)||null,descricao:q('#ppDe').value.trim()||null,oferta:q('#ppOf').value.trim()||null,cidade:q('#ppCi').value.trim()||null,contatos:ed.get(),inicio:ini||null,fim:fim||null,valor:r2(parseBRL(q('#ppV').value)),cobranca:q('#ppB').value||null,contrato_url:url||null,status:st};
+    q('#ppSv').disabled=true;
+    try{if(novo)await pSet('parc',parcId(),{...rec,candidatura_id:null,criado_em:new Date().toISOString()});else await pUpd('parc',p.id,rec);
+      audit('Parceiros','Admin',(novo?'Parceiro cadastrado · ':'Parceiro editado · ')+nome+' ('+st+')')}
+    catch(e){q('#ppSv').disabled=false;return err('Não foi possível salvar. Só o admin principal pode.')}
+    ov.remove();toast('Parceiro salvo');if(done)done()}}
+const PARC_FORMAS=['Pix','Transferência','Boleto','Dinheiro','Outra'];
+// recebido conta no mês da data do pagamento (como as contribuições); previsto conta no mês da competência
+const parcRecMes=r=>r.situacao==='recebido'&&r.data_pagamento?String(r.data_pagamento).slice(0,7):r.competencia;
+const parcRecTag=r=>r.situacao==='recebido'?`<span class="rcTag ts">✔ Recebido${r.data_pagamento?' em '+fmtBR(r.data_pagamento):''}${r.forma_pagamento?' · '+esc(r.forma_pagamento):''}</span>`:`<span class="rcTag ad">⏳ Previsto</span>`;
+// cobertura das despesas do mês por uma fonte de receita (mesmo estilo de "Corridas × combustível")
+function kpiCob(titulo,quem,valor,custo,partes){
+  if(!custo)return kpi(titulo,'—','Cadastre as despesas do app para ver quanto do custo do mês '+quem+' cobrem.');
+  const sobra=r2(valor-custo),det=(partes||[]).map(p=>p[0]+' '+pctTxt(p[1],custo)).join(' · ');
+  return kpi(titulo,`<span class="${valor>=custo?'pos':'neg'}">${pctTxt(valor,custo)}</span>`,`${apoBRL(valor)} de ${apoBRL(custo)} de despesas · ${sobra>=0?'sobram '+apoBRL(sobra):'faltam '+apoBRL(-sobra)}`+(det?'<br>'+det:'')+`<br>ⓘ quanto ${quem} cobrem${partes?'':' sozinhas'}`,'wide')}
+function parcMarcaRecebido(r,done){if(!r)return;
+  const ov=parcModal(`<h2>✔ Marcar como recebido</h2><div class="field"><label for="mrD">Data do pagamento</label><input class="inp" type="date" id="mrD" value="${parcHoje()}" max="${parcHoje()}"></div><div class="field"><label for="mrF">Forma de pagamento</label><select class="inp" id="mrF">${PARC_FORMAS.map(f=>`<option>${f}</option>`).join('')}</select></div><div class="err" id="mrE"></div><div class="mfoot"><button type="button" class="btn sec" id="mrC">Cancelar</button><button type="button" class="btn" id="mrS">Salvar</button></div>`,{larg:420});
+  ov.querySelector('#mrC').onclick=()=>ov.remove();
+  ov.querySelector('#mrS').onclick=async()=>{const d=ov.querySelector('#mrD').value;if(!/^\d{4}-\d{2}-\d{2}$/.test(d))return ov.querySelector('#mrE').textContent='Informe a data do pagamento.';
+    try{await pUpd('rec',r.id,{situacao:'recebido',data_pagamento:d,forma_pagamento:ov.querySelector('#mrF').value});audit('Parceiros','Admin','Recebimento marcado como recebido · '+fmtBR(d)+' · '+ov.querySelector('#mrF').value)}catch(e){return ov.querySelector('#mrE').textContent='Não foi possível salvar.'}
+    ov.remove();if(done)done()}}
+function parcFormRec(p,done){if(!p)return;
+  const ym0=mesAtual();
+  const ov=parcModal(`<h2>＋ Recebimento de ${esc(p.nome)}</h2><div class="field"><label for="rcM">Competência (mês)</label><input class="inp" type="month" id="rcM" value="${ym0}"></div><div class="field"><label for="rcV">Valor (R$)</label><input class="inp num" id="rcV" inputmode="decimal" value="${p.valor?brl(p.valor,1):''}" placeholder="0,00"></div><div class="field"><label for="rcS">Situação</label><select class="inp" id="rcS"><option value="previsto">⏳ Previsto</option><option value="recebido">✔ Recebido</option></select></div><div id="rcPg" class="hidden"><div class="field"><label for="rcDt">Data do pagamento</label><input class="inp" type="date" id="rcDt" value="${parcHoje()}" max="${parcHoje()}"></div><div class="field"><label for="rcF">Forma de pagamento</label><select class="inp" id="rcF">${PARC_FORMAS.map(f=>`<option>${f}</option>`).join('')}</select></div></div><div class="field"><label for="rcO">Observação (opcional)</label><input class="inp" id="rcO" maxlength="200"></div><div class="err" id="rcE"></div><div class="mfoot"><button type="button" class="btn sec" id="rcC">Cancelar</button><button type="button" class="btn" id="rcSv">Salvar</button></div>`,{larg:440});
+  const q=s=>ov.querySelector(s);liveBRL(q('#rcV'));q('#rcC').onclick=()=>ov.remove();q('#rcS').onchange=()=>q('#rcPg').classList.toggle('hidden',q('#rcS').value!=='recebido');
+  q('#rcSv').onclick=async()=>{const m=q('#rcM').value,v=r2(parseBRL(q('#rcV').value));if(!/^\d{4}-\d{2}$/.test(m))return q('#rcE').textContent='Escolha o mês.';if(!(v>0))return q('#rcE').textContent='Informe um valor maior que zero.';
+    const rb=q('#rcS').value==='recebido',dt=q('#rcDt').value;if(rb&&!/^\d{4}-\d{2}-\d{2}$/.test(dt))return q('#rcE').textContent='Informe a data do pagamento.';
+    try{await pSet('rec',parcId(),{parceiro_id:p.id,competencia:m,valor:v,situacao:q('#rcS').value,data_pagamento:rb?dt:null,forma_pagamento:rb?q('#rcF').value:null,obs:q('#rcO').value.trim()||null,criado_em:new Date().toISOString()});audit('Parceiros','Admin','Recebimento lançado · '+p.nome+' · '+mesNome(m)+' · '+apoBRL(v)+' ('+q('#rcS').value+')')}catch(e){return q('#rcE').textContent='Não foi possível salvar.'}
+    ov.remove();toast('Recebimento lançado');if(done)done()}}
 /* ---------- V62: 📑 Relatórios do painel (só o admin principal) ---------- */
 const ADM_SEC=[
   ['apoios','🤝 Apoiadores','Apoiadores'],
@@ -2916,7 +3224,7 @@ function admRelLiga(box){
 const ADMIN_MASTER='diogogomes2110@gmail.com';
 const ehMaster=()=>invProd()?String(LOGADO||'').toLowerCase()===ADMIN_MASTER:true; // no HMO o cadastro de admin é simulado
 const semAc=t=>String(t||'').replace(/[^\p{L}\p{N} ]/gu,'').trim().normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
-const ADM_T=[['apoios','🤝 Apoiadores'],['despesas','💰 Despesas'],['colab','🛠 Colaboradores'],['convites','📨 Pedidos de convite'],['exclusoes','🗑 Pedidos de exclusão'],['correcoes','✏ Correções de dados'],['senhas','🔑 Pedidos de senha'],['recados','💬 Recados'],['ativos','👥 Usuários ativos'],['excluidos','🚫 Usuários excluídos'],['relatorios','📑 Relatórios']]
+const ADM_T=[['apoios','🤝 Apoiadores'],['despesas','💰 Receitas e despesas'],['parceiros','🤝 Parceiros'],['colab','🛠 Colaboradores'],['convites','📨 Pedidos de convite'],['exclusoes','🗑 Pedidos de exclusão'],['correcoes','✏ Correções de dados'],['senhas','🔑 Pedidos de senha'],['recados','💬 Recados'],['ativos','👥 Usuários ativos'],['excluidos','🚫 Usuários excluídos'],['relatorios','📑 Relatórios']]
   .sort((a,b)=>a[0]==='relatorios'?1:b[0]==='relatorios'?-1:semAc(a[1]).localeCompare(semAc(b[1]),'pt-BR')); // alfabética, Relatórios por último
 // V50: Gestão Admin abre como página inteira (computador e celular)
 function abrirAdmin(sub){['#bellMenu','#optMenu','#fabMenu'].forEach(s=>{const m=$(s);if(m)m.classList.add('hidden')});if(!invIsAdmin)return;
@@ -2924,7 +3232,7 @@ function abrirAdmin(sub){['#bellMenu','#optMenu','#fabMenu'].forEach(s=>{const m
   if(!ov){ov=document.createElement('div');ov.className='ov admPage';ov.id='admPage';document.body.appendChild(ov);ov.__fechar=()=>{ov.remove();invRefreshBadge(false);if(typeof atualizaSino==='function')atualizaSino()}}
   const sub2=UI.admSub||'convites';
   ov.innerHTML=`<div class="admWrap"><div class="admStick"><div class="admHd"><h2>🛡 Gestão Admin</h2><div class="admHdB">${ehMaster()?'<button type="button" class="btn sec sm admMaster" id="admCad">🛡 Admins</button><button type="button" class="btn sec sm admMaster" id="admAju">⚙ Ajustes</button>':''}<button type="button" class="btn sec sm" id="admAniv">🎂 Aniversariantes</button></div><button type="button" class="btn sec sm admFch" id="admFechar">Fechar</button></div>
-    <div class="admTabs">${ADM_T.filter(([k])=>!['relatorios','colab','recados','despesas'].includes(k)||ehMaster()).map(([k,t])=>`<button type="button" class="chip${sub2===k?' on':''}" data-adm="${k}">${t} <span data-admn="${k}"></span></button>`).join('')}</div><div id="admQslot"></div></div>
+    <div class="admTabs">${ADM_T.filter(([k])=>!['relatorios','colab','recados','despesas','parceiros'].includes(k)||ehMaster()).map(([k,t])=>`<button type="button" class="chip${sub2===k?' on':''}" data-adm="${k}">${t} <span data-admn="${k}"></span></button>`).join('')}</div><div id="admQslot"></div></div>
     <div id="admBox"><div class="empty">Carregando…</div></div><div id="admMore" style="text-align:center;margin:12px 0"></div></div>`;
   ov.querySelector('#admFechar').onclick=()=>ov.__fechar();
   ov.querySelectorAll('[data-adm]').forEach(b=>b.onclick=()=>abrirAdmin(b.dataset.adm));
@@ -2942,7 +3250,8 @@ async function admContagens(){const put=(k,n)=>{const e=document.querySelector(`
   try{const L=await apoListar();APO_CACHE=L;put('apoios',L.filter(x=>x.status==='informado').length)}catch(e){}
   if(ehMaster()){try{REC_TODOS=await recTodos();put('recados',recConversas().length)}catch(e){}
     try{COLABS=await colabListar();put('colab',COLABS.length)}catch(e){}
-    try{const D=await despListar();DESP_CACHE=D;put('despesas',D.filter(d=>d.ativo).length)}catch(e){}}
+    try{const D=await despListar();DESP_CACHE=D;put('despesas',D.filter(d=>d.ativo).length)}catch(e){}
+    try{await parcCarrega();put('parceiros',PARC_CACHE.filter(parcAtivo).length)}catch(e){}}
   await carregaPerfis()}
 // ---- V73: 🛠 Colaboradores ----
 function colabRender(box){
@@ -3101,7 +3410,7 @@ async function admUsuarios(){
   return [{user_id:'hmo',email:(LOGADO||'usuário de teste')+' (HMO)',criado_em:cri||null,ultimo_login:null,ultimo_uso:new Date().toISOString(),excluido_em:null}]}
 function registrarUso(){if(!invProd()||!DB||typeof DB.rpc!=='function')return;try{Promise.resolve(DB.rpc('rodaliq_registrar_uso')).catch(()=>{})}catch(e){}} // grava o "último uso" (produção); falha nunca atrapalha o login
 const admData=iso=>iso?dataHora(iso):'—';
-const ADM_BUSCA=['apoios','exclusoes','senhas','ativos','excluidos','correcoes'];
+const ADM_BUSCA=['parceiros','apoios','exclusoes','senhas','ativos','excluidos','correcoes'];
 const ADM_PAG=10;
 function admBuscaAplica(){const box=$('#admBox'),qi=$('#admQ');if(!box||!qi)return;
   const norm=t=>String(t||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,''),q=norm(qi.value).trim(),qd=q.replace(/\D/g,'');
@@ -3126,6 +3435,7 @@ async function montaAdmin(){const box=$('#admBox');if(!box)return;const sub=UI.a
   if(sub==='senhas'){senAdminRender(box);return}
   if(sub==='apoios'){apoAdminRender(box);return}
   if(sub==='despesas'){despAdminRender(box);return}
+  if(sub==='parceiros'){parcAdminRender(box);return}
   if(sub==='colab'){colabRender(box);return}
   if(sub==='recados'){recAdminRender(box);return}
   if(sub==='relatorios'){admRelRender(box);return}
@@ -3229,11 +3539,15 @@ function invAlerts(){
   const nw=invCache.filter(x=>invVivo(x)&&x.status==='novo'&&!x.archived);
   if(nw.length)out.push({n:'a',inv:1,tab:'inv',t:nw.length===1?'1 pedido de convite novo':nw.length+' pedidos de convite novos',
     nota:nw.slice(0,5).map(x=>`${x.name}${invUfOf(x.whatsapp)?' ('+invUfOf(x.whatsapp)+')':''}`).join(' · ')+(nw.length>5?' · … e mais '+(nw.length-5):'')+'. Responda por e-mail ou WhatsApp e marque como convidado ou recusado.'});
+  if(ehMaster()){const nc=PARC_CAND.filter(c=>c.status==='nova').length;
+    if(nc)out.push({n:'a',tab:'parc',pf:'cand',t:nc===1?'1 candidatura de parceiro nova':nc+' candidaturas de parceiros novas',nota:'Veja em Admin › Parceiros › Candidaturas e responda por e-mail ou WhatsApp.'});
+    PARC_CACHE.filter(p=>p.status==='ativo'&&p.fim&&p.fim>=parcHoje()).forEach(p=>{const d=parcDias(p.fim);if(d<=30)out.push({n:'a',tab:'parc',t:'Parceria com '+p.nome+' termina '+(d===0?'hoje':'em '+d+(d===1?' dia':' dias')),nota:'Fim em '+fmtBR(p.fim)+'. Renove o contrato ou deixe encerrar.'})})}
   invCache.filter(invVivo).forEach(x=>{const a=invBdayAlerta(x);if(a)out.push(a)});
   return out;
 }
 async function invRefreshBadge(avisa){
   if(!invIsAdmin)return;
+  if(ehMaster())try{await parcCarrega()}catch(e){}
   try{await invLoadCache(true);const n=invCache.filter(x=>invVivo(x)&&x.status==='novo'&&!x.archived).length;
     ['#invBadge','#fabInvBadge'].forEach(i=>{const c=$(i);if(c){c.textContent=n;c.classList.toggle('hidden',n===0)}});
     if(avisa&&n>0)toast(n===1?'1 pedido de convite novo':n+' pedidos de convite novos');
@@ -3476,6 +3790,8 @@ async function openInvitesModal(host){ // V48: com host, a tela é montada dentr
     btn.disabled=false;btn.textContent='Enviar pedido';
   });
 })();
+
+parcLoginInit();
 
 /* ---------- Gesto/botão de voltar do celular: fecha janelas, refaz o caminho das abas e, no Painel, pergunta antes de sair ---------- */
 const NAVT=[];let navUlt=null,navRev=false,NAV_ON=false,navIgnora=false,invGuarda=false;
@@ -3835,7 +4151,7 @@ $('#optBtn').onclick=e=>{e.stopPropagation();$('#bellMenu').classList.add('hidde
 window.addEventListener('scroll',()=>{['bellMenu','optMenu'].forEach(id=>{const m=document.getElementById(id);if(m&&!m.classList.contains('hidden')&&window.innerWidth<=640)posMenu(m,document.getElementById(id==='bellMenu'?'bellBtn':'optBtn'))})},{passive:true});
 document.addEventListener('click',e=>{if(!e.target.closest('#optWrap'))$('#optMenu').classList.add('hidden');if(!e.target.closest('#bellWrap'))$('#bellMenu').classList.add('hidden')});
 $('#optMenu').onclick=e=>{const b=e.target.closest('[data-m]');if(!b)return;$('#optMenu').classList.add('hidden');
-  ({falar:formFalar,apoio:formApoiar,corrigir:formCorrigir,excluir:formExcluirConta,cfg:formCfg,veic:formVeic,cnh:formCnh,tema:formTema,rsv:verReservas,onb:()=>primeiroAcesso(false),termos:()=>verTermos(),aud:verAuditoria,pass:formSenha,exp:exportar,imp:()=>$('#impFile').click(),out:sair})[b.dataset.m]()};
+  ({falar:formFalar,apoio:formApoiar,corrigir:formCorrigir,excluir:formExcluirConta,cfg:formCfg,veic:formVeic,parc:formParceiros,cnh:formCnh,tema:formTema,rsv:verReservas,onb:()=>primeiroAcesso(false),termos:()=>verTermos(),aud:verAuditoria,pass:formSenha,exp:exportar,imp:()=>$('#impFile').click(),out:sair})[b.dataset.m]()};
 (()=>{const h=(location.hash||'').slice(1);if(['painel','corridas','carona','custos','multas','impostos','relatorios','rodacalc'].includes(h))UI.tab=h})();
 iniciar();
 if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
