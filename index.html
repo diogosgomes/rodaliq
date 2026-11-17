@@ -36,6 +36,7 @@ a{color:var(--blue)}
 #login{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px}
 .loginCard{background:var(--card);border-radius:16px;box-shadow:var(--sh);padding:28px;width:100%;max-width:380px}
 .brand{display:flex;align-items:center;gap:10px}
+.donoBtn{background:none;border:0;padding:4px;color:var(--muted);cursor:pointer;border-radius:10px;line-height:0}.donoBtn{display:inline-flex;align-items:center;gap:6px}.donoTx{font-size:12px;font-weight:600;line-height:1.1;text-align:left;max-width:92px}.donoBtn:hover{color:var(--ink);background:var(--card)}.donoW{animation:donoOnda 3.2s linear infinite}@keyframes donoOnda{from{transform:translateX(0)}to{transform:translateX(20px)}}@media (prefers-reduced-motion:reduce){.donoW{animation:none}}
 .brand .t1{font-weight:700;font-size:18px;letter-spacing:-.2px}
 .brand .t1 b{color:var(--blue)}
 .brand .t1.wm{font-family:'Space Grotesk',Inter,sans-serif;font-size:24px;letter-spacing:-.02em;line-height:1.05}
@@ -61,6 +62,7 @@ a{color:var(--blue)}
 footer{text-align:center;color:var(--muted);font-size:12px;padding:22px 10px 30px}
 /* app */
 header{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.96);backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
+.ftIg{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;max-width:1200px;margin:0 auto}.igLink{display:inline-flex;align-items:center;gap:6px;color:var(--muted);text-decoration:none;font-size:13px}.igLink:hover{color:var(--blue)}
 .hbar{max-width:1200px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .hbar .sp{flex:1}
 .sync{font-size:12px;color:var(--muted)}
@@ -227,7 +229,7 @@ html[data-tema="escuro"] .ivOk{color:#4ADE80}
 .ivSearch{position:relative;margin-bottom:10px}.ivSearch span{position:absolute;left:10px;top:50%;transform:translateY(-50%)}.ivSearch .inp{padding-left:34px}
 #ivTabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}#ivTabs .chip{font-size:12px;padding:5px 10px}
 .chip.on{background:var(--blue);border-color:var(--blue);color:#fff}
-.kmRow{display:flex;gap:6px;align-items:stretch}.kmRow .inp{flex:1;min-width:0}
+.kmRow input[type=date]::-webkit-calendar-picker-indicator{display:none;-webkit-appearance:none}.kmRow{display:flex;gap:6px;align-items:stretch}.kmRow .inp{flex:1;min-width:0}
 .kmBtn{flex:0 0 44px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font-size:17px;cursor:pointer;line-height:1}
 .kmBtn:hover{border-color:var(--blue)}
 .avKm{color:var(--amber);font-weight:600}
@@ -374,18 +376,20 @@ svg text{font-family:Inter,system-ui,sans-serif}
         <div class="ivWarn" role="note">🔞 <b>Somente para maiores de 18 anos.</b> A maioridade civil começa aos 18 anos completos (Código Civil, Lei nº 10.406/2002, art. 5º) e os dados de crianças e adolescentes têm regras próprias na LGPD (Lei nº 13.709/2018, art. 14). Por isso, este app não aceita pedidos de menores de 18 anos.</div>
         <div class="field"><label for="invName">Nome e sobrenome</label><input class="inp" type="text" id="invName" maxlength="80" autocomplete="name" placeholder="Ex.: Maria Souza"></div>
         <div class="field"><label for="invEmail">E-mail</label><input class="inp" type="email" id="invEmail" maxlength="120" autocomplete="email" autocapitalize="none"></div>
+        <div class="field"><label for="invEmail2">Confirmar e-mail</label><input class="inp" type="email" id="invEmail2" maxlength="120" autocomplete="off" autocapitalize="none"></div>
         <div class="field"><label for="invBirth">Data de nascimento</label><input class="inp" type="date" id="invBirth" min="1900-01-01" autocomplete="bday"></div>
         <div id="invMinor" class="ivMinor hidden" role="alert">⛔ Menores de 18 anos não podem pedir convite nem usar o app (Código Civil, art. 5º; LGPD, art. 14). Seu pedido não será enviado.</div>
         <div class="field"><label for="invDdd">💬 WhatsApp</label>
           <div class="ivTel"><span class="muted">(</span><input class="inp" type="tel" id="invDdd" inputmode="numeric" maxlength="2" placeholder="DDD" aria-label="DDD" autocomplete="tel-area-code"><span class="muted">)</span><input class="inp" type="tel" id="invPhone" inputmode="numeric" maxlength="10" placeholder="9xxxx-xxxx" aria-label="Número com 9 dígitos" autocomplete="tel-local"></div>
           <div id="invUf" class="small" aria-live="polite" style="min-height:16px;margin-top:4px"></div>
-          <div class="small muted">💬 O número precisa ter WhatsApp: é por ele que vamos te responder.</div></div>
+          <div class="small muted">💬 O número precisa ter WhatsApp: ele e o e-mail informado serão os nossos canais de contato com você, quando necessário.</div></div>
+        <div class="field" role="radiogroup" aria-labelledby="invDrvL"><label id="invDrvL">Você é motorista de aplicativo?</label>
+          <div class="exMot" style="display:flex;gap:18px;margin-top:2px"><label style="display:inline-flex;gap:6px;align-items:center;font-weight:500"><input type="radio" name="invDrv" value="sim"> Sim</label><label style="display:inline-flex;gap:6px;align-items:center;font-weight:500"><input type="radio" name="invDrv" value="nao"> Não</label></div></div>
         <div class="field"><label for="invHow">Como soube do app?</label><input class="inp" type="text" id="invHow" maxlength="140"></div>
         <div style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden" aria-hidden="true"><label>Não preencha<input type="text" id="invWeb" tabindex="-1" autocomplete="off"></label></div>
         <label class="ivCheck"><input type="checkbox" id="invOk"><span>Em conformidade com a Lei Geral de Proteção de Dados (LGPD, Lei nº 13.709/2018), autorizo o contato por e-mail e WhatsApp sobre o meu acesso e o uso dos meus dados somente para essa finalidade. Li os <button type="button" class="lnk" data-tt="termos">Termos de uso</button> e a <button type="button" class="lnk" data-tt="priv">Política de privacidade</button>.</span></label>
         <div id="invMsg" class="err" role="alert"></div>
-        <button type="submit" class="btn block" id="invBtn">Enviar pedido</button>
-        <button type="button" class="btn sec block hidden" id="invClose">Fechar</button>
+        <div style="display:flex;gap:10px"><button type="button" class="btn sec" id="invClose" style="flex:1">Voltar</button><button type="submit" class="btn" id="invBtn" style="flex:1">Enviar pedido</button></div>
       </div>
       <div id="invDone" class="ivDone hidden">
         <div class="big">✅</div>
@@ -404,9 +408,11 @@ svg text{font-family:Inter,system-ui,sans-serif}
 <header>
   <div class="hbar">
     <div class="brand"><span id="logoH"></span><div><div class="t1 wm">roda<b>l<span class="idot">ı</span>q</b></div><div class="t2">Gestão do motorista de app</div></div></div>
+    <button class="donoBtn hidden" id="donoBtn" type="button"><svg viewBox="0 0 40 52" width="26" height="34" aria-hidden="true"><defs><clipPath id="donoCp"><path d="M7 4h26l-3 40a4 4 0 0 1-4 4H14a4 4 0 0 1-4-4z"/></clipPath></defs><g clip-path="url(#donoCp)"><g id="donoAgua" transform="translate(0 48)"><path class="donoW" d="M-40 0q10-6 20 0t20 0 20 0 20 0 20 0 20 0V60H-40z" fill="#3B82F6"/></g></g><path d="M7 4h26l-3 40a4 4 0 0 1-4 4H14a4 4 0 0 1-4-4z" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/></svg><span class="donoTx">Ajude a manter o Rodaliq</span></button>
     
     <div class="sp"></div>
     <span class="sync" id="sync">—</span>
+    <button class="btn sec sm hidden" type="button" id="tabAdmin">🛡 Admin<span id="invBadge" class="mBadge hidden"></span></button>
     <div class="menuWrap" id="bellWrap">
       <button class="btn sec sm" id="bellBtn" aria-label="Notificações">🔔<span class="badge" id="bellN"></span></button>
       <div class="menu bell hidden" id="bellMenu"></div>
@@ -415,7 +421,6 @@ svg text{font-family:Inter,system-ui,sans-serif}
       <button class="btn sec sm" id="optBtn">⚙ Opções</button>
       <div class="menu hidden" id="optMenu">
         <div class="who">Conectado como<b id="whoName">—</b><span class="whoE" id="whoMail"></span></div>
-        <button data-m="apoio">💚 Ajude a manter o Rodaliq</button>
         <button data-m="rsv">📅 Despesas programadas</button>
         <button data-m="exp">⬇ Exportar backup</button>
         <button data-m="onb">🧭 Guia do Rodaliq</button>
@@ -429,6 +434,7 @@ svg text{font-family:Inter,system-ui,sans-serif}
         <button data-m="veic">🚗 Veículos</button>
         <div class="sep"></div>
         <button data-m="falar" class="hidden">✉️ Falar com o Rodaliq<span class="mCount hidden" id="falarN"></span></button>
+        <button data-m="corrigir">✏ Corrigir meus dados</button>
         <button data-m="excluir">🗑 Excluir minha conta</button>
         <button data-m="out">↩ Sair</button>
       </div>
@@ -442,7 +448,6 @@ svg text{font-family:Inter,system-ui,sans-serif}
     <button class="tab" data-t="multas">🚨 Multas</button>
     <button class="tab" data-t="impostos">🧾 Impostos</button>
     <button class="tab" data-t="relatorios">📑 Relatórios</button>
-    <button class="tab hidden" type="button" id="tabAdmin">🛡 Admin<span id="invBadge" class="mBadge hidden"></span></button>
   </nav>
 </header>
 <div id="excAviso" class="note am small hidden" style="margin:0 0 12px"></div>
@@ -461,13 +466,13 @@ svg text{font-family:Inter,system-ui,sans-serif}
   <button data-fab="sair">↩ Sair</button>
   <div class="dica">Dica: segure e arraste o botão ⚡ Atalhos para qualquer ponto da tela.</div>
 </div><button class="btn fab" id="fab" aria-haspopup="true">⚡ Atalhos</button></div>
-<footer>© 2026 Rodaliq™ · Todos os direitos reservados.</footer>
+<footer class="ftIg"><a class="igLink" href="https://www.instagram.com/rodaliq.app/" target="_blank" rel="noopener" aria-label="Instagram do Rodaliq (abre em nova aba)" title="Siga o Rodaliq no Instagram"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5.5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.3" cy="6.7" r="1" fill="currentColor" stroke="none"/></svg><span>@rodaliq.app</span></a><span>© 2026 Rodaliq™ · Todos os direitos reservados.</span></footer>
 <input type="file" id="impFile" accept=".json,application/json" class="hidden">
 </div>
 
 <script>
 "use strict";
-const VERSAO='V89';
+const VERSAO='V92';
 /* ---------- utilidades ---------- */
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -664,7 +669,7 @@ function alertas(){
   cfg().veiculos.filter(v=>v.pendente).forEach(v=>out.push({n:'a',tab:'veic',t:`Complete o cadastro do veículo ${v.nome}`,nota:'Ele foi criado a partir dos seus lançamentos. Abra ⚙ Opções > Veículos e informe a descrição (ex.: modelo e ano).'}));
   const bk=backupAlerta();if(bk)out.push(bk);
   const av=apoAviso();if(av)out.push(av);
-  out.unshift(...invAlerts(),...excAlerts(),...senAlerts(),...apoAlerts(),...recAlerts());
+  out.unshift(...invAlerts(),...excAlerts(),...corrAlerts(),...senAlerts(),...apoAlerts(),...recAlerts());
   proximasManut().filter(x=>x.prox-x.ult<=1500).forEach(x=>out.push({n:x.prox<=x.ult?'r':'a',t:`Manutenção ${x.prox<=x.ult?'vencida':'próxima'}: ${x.desc} (${x.veiculo}) em ${x.prox.toLocaleString('pt-BR')} km.`,tab:'custos'}));
   return out;
 }
@@ -710,7 +715,7 @@ function renderSino(){
   const item=n=>{const lida=r.lidas.includes(n.id),imp=impValida(n);return `<div class="it${imp?' imp':''}${lida?'':' nova'}">${imp?'<div class="tagImp">⚠ IMPORTANTE</div>':''}<div class="ttl">${lida?'':'● '}${esc(n.titulo)}</div>${corpo(n)}<div class="acts"><button data-nl="${esc(n.id)}">${lida?'Marcar como não lida':'Marcar como lida'}</button><button data-nx="${esc(n.id)}">🗑 Excluir</button></div></div>`};
   const nl=naoLidas().length;
   let h=`<div class="hd"><button class="chip${tab==='alertas'?' on':''}" data-bt="alertas">Alertas (${al.filter(a=>!a.lida).length})</button><button class="chip${tab==='novidades'?' on':''}" data-bt="novidades">Novidades (${nl})</button></div>`;
-  if(tab==='alertas')h+=al.length?al.map((a,i)=>`<div class="it al${a.lida?' lida':''}${a.crit?' crit':''}${a.inv?' inv':''}" data-ai="${i}"><span class="tag ${a.n}">${a.n==='r'?'✕':'⚠'}</span><div><div>${esc(a.t)}</div>${a.nota?`<div class="nota">${esc(a.nota)}</div>`:''}${a.cnh?`<div class="acts"><button data-cl="${esc(a.cnh)}">${a.lida?'Marcar como não lida':'Marcar como lida'}</button></div>`:''}${a.bd?`<div class="acts"><a class="lnk" href="${esc(a.em)}" target="_blank" rel="noopener">✉ Parabenizar por e-mail</a><a class="lnk" href="${esc(a.wa)}" target="_blank" rel="noopener">💬 Parabenizar pelo WhatsApp</a><button data-bl="${esc(a.bd)}">Marcar como lido</button></div>`:''}${a.bk?`<div class="acts"><button class="bkBtn" data-bk="1">📥 Exportar backup</button></div>`:''}${a.apoC?`<div class="acts"><button data-apc="1">Para conferir</button></div>`:''}${a.recA?`<div class="acts"><button data-rca="1">Abrir os recados</button></div>`:''}${a.recU?`<div class="acts"><button data-rcu="1">Ler a resposta</button></div>`:''}${a.apo?`<div class="acts"><button data-ap="1">💚 Quero contribuir</button><button data-apn="1">Agora não</button><button data-apx="1">Não mostrar de novo</button></div>`:''}${a.sup?`<div class="acts"><button data-sl="${esc(a.sup)}">${a.lida?'Marcar como não lida':'Marcar como lida'}</button></div>`:''}</div></div>`).join(''):'<div class="empty">Nenhum alerta agora. ✓</div>';
+  if(tab==='alertas')h+=al.length?al.map((a,i)=>`<div class="it al${a.lida?' lida':''}${a.crit?' crit':''}${a.inv?' inv':''}" data-ai="${i}"><span class="tag ${a.n}">${a.n==='r'?'✕':'⚠'}</span><div><div>${esc(a.t)}</div>${a.nota?`<div class="nota">${esc(a.nota)}</div>`:''}${a.cnh?`<div class="acts"><button data-cl="${esc(a.cnh)}">${a.lida?'Marcar como não lida':'Marcar como lida'}</button></div>`:''}${a.bd?`<div class="acts"><a class="lnk" href="${esc(a.em)}" target="_blank" rel="noopener">✉ Parabenizar por e-mail</a><a class="lnk" href="${esc(a.wa)}" target="_blank" rel="noopener">💬 Parabenizar pelo WhatsApp</a><button data-bl="${esc(a.bd)}">Marcar como lido</button></div>`:''}${a.bk?`<div class="acts"><button class="bkBtn" data-bk="1">📥 Exportar backup</button></div>`:''}${a.apoC?`<div class="acts"><button data-apc="1">Para conferir</button></div>`:''}${a.recA?`<div class="acts"><button data-rca="1">Abrir os recados</button></div>`:''}${a.recU?`<div class="acts"><button data-rcu="1">Ler a resposta</button></div>`:''}${a.apo?`<div class="acts"><button data-ap="1">💚 Quero contribuir</button><button data-apn="1">Agora não</button></div>`:''}${a.sup?`<div class="acts"><button data-sl="${esc(a.sup)}">${a.lida?'Marcar como não lida':'Marcar como lida'}</button></div>`:''}</div></div>`).join(''):'<div class="empty">Nenhum alerta agora. ✓</div>';
   else if(UI.bellExc){h+=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><b class="small">🗑 Excluídas (últimos ${DIAS_EXCL} dias)</b><span style="display:flex;gap:12px">${excl.length?'<button class="lnk ivDelTxt" data-besv="1">🗑 Esvaziar</button>':''}<button class="lnk" data-bexc="0">Voltar</button></span></div><div class="small muted" style="margin:-2px 0 8px">As novidades ficam aqui por 30 dias. <b>Esvaziar</b> apaga de vez.</div>`+(excl.length?excl.map(n=>`<div class="it"><div class="ttl">${esc(n.titulo)}</div>${corpo(n)}<div class="acts"><button data-nr="${esc(n.id)}">↩ Restaurar</button></div></div>`).join(''):'<div class="empty">Nenhuma novidade excluída nos últimos 30 dias.</div>')}
   else{h+=nl?`<div style="text-align:right;margin-bottom:4px"><button class="lnk" data-nall="1">Marcar todas como lidas (${nl})</button></div>`:'';
     h+=`<div class="novInfo"><button class="lnk" data-binfo="1">ℹ Como funcionam as novidades ${UI.bellInfo?'▴':'▾'}</button>${UI.bellInfo?`<ul>
@@ -740,7 +745,7 @@ $('#bellMenu').addEventListener('click',e=>{e.stopPropagation();const t=e.target
   else if(t.closest('[data-rca]')){$('#bellMenu').classList.add('hidden');UI.recF='pend';REC_ABERTA=null;abrirAdmin('recados');return}
   else if(t.closest('[data-rcu]')){$('#bellMenu').classList.add('hidden');formFalar();return}
   else if(t.closest('[data-ap]')){$('#bellMenu').classList.add('hidden');formApoiar();return}
-  else if(t.closest('[data-apn]')){NOT.reads.apoio=Object.assign({},NOT.reads.apoio,{em:new Date().toISOString()});salvarReads();renderSino();atualizaSino();return}
+  else if(t.closest('[data-apn]')){NOT.reads.apoio=Object.assign({},NOT.reads.apoio,{em:new Date().toISOString(),em60:new Date().toISOString(),mes:hoje().slice(0,7)});salvarReads();renderSino();atualizaSino();return}
   else if(t.closest('[data-apx]')){NOT.reads.apoio=Object.assign({},NOT.reads.apoio,{nunca:true});salvarReads();renderSino();atualizaSino();toast('Não falo mais nisso.');return}
   else if(t.dataset.sl){r.supaLida=r.supaLida===t.dataset.sl?null:t.dataset.sl;salvarReads()}
   else if(t.dataset.cl){r.cnhLida=r.cnhLida===t.dataset.cl?null:t.dataset.cl;salvarReads()}
@@ -752,6 +757,7 @@ $('#bellMenu').addEventListener('click',e=>{e.stopPropagation();const t=e.target
       if(a.tab==='cnh'){formCnh();return}
       if(a.tab==='inv'){abrirAdmin('convites');return}
       if(a.tab==='exc'){abrirAdmin('exclusoes');return}
+      if(a.tab==='corr'){abrirAdmin('correcoes');return}
       if(a.tab==='sen'){abrirAdmin('senhas');return}
       if(a.tab==='apo'){abrirAdmin('apoios');return}
       if(a.tab==='veic'){formVeic();return}
@@ -857,7 +863,7 @@ function openForm({titulo,sub,campos,val={},onSave,onDel}){
     let inp;
     if(c.t==='select')inp=`<select class="inp" id="${id}"${req}>${c.op.map(o=>o===SEP_OP?'<hr>':`<option${String(o)===String(v)?' selected':''}>${esc(o)}</option>`).join('')}</select>`;
     else if(c.t==='textarea')inp=`<textarea class="inp" id="${id}" rows="3">${esc(v)}</textarea>`;
-    else if(c.t==='date')inp=`<input class="inp" type="date" id="${id}" value="${esc(v)}" max="${c.allowFuture?'':hoje()}"${req}>`;
+    else if(c.t==='date')inp=`<div class="kmRow"><input class="inp" type="date" id="${id}" value="${esc(v)}" max="${c.allowFuture?'':hoje()}"${req}><button type="button" class="kmBtn" data-cal="${id}" title="Abrir o calendário" aria-label="Abrir o calendário">\u{1F4C5}</button></div>`;
     else if(c.t==='money')inp=`<input class="inp num" inputmode="decimal" id="${id}" value="${v===''||v==null?'':brl(v,1)}" placeholder="0,00"${req}>`;
     else if(c.t==='time')inp=`<input class="inp num" inputmode="numeric" id="${id}" value="${esc(v)}" placeholder="hh:mm" maxlength="6">`;
     else if(c.t==='int'||c.t==='num'){inp=`<input class="inp num" inputmode="decimal" id="${id}" value="${v===''||v==null?'':fmtNum(v)}"${req}>`;
@@ -873,7 +879,6 @@ function openForm({titulo,sub,campos,val={},onSave,onDel}){
     if(c.t==='money'){el.addEventListener('blur',()=>{if(el.value.trim()!=='')el.value=brl(parseBRL(el.value),1)})}
     if(c.t==='num'||c.t==='int'){el.addEventListener('blur',()=>{if(el.value.trim()!=='')el.value=fmtNum(c.t==='int'?Math.round(parseBRL(el.value)):parseBRL(el.value))})}
     if(c.t==='time'){el.addEventListener('input',()=>{let d=el.value.replace(/\D/g,'').slice(0,4);el.value=d.length>2?d.slice(0,2)+':'+d.slice(2):d})}
-    if(c.t==='date'){el.addEventListener('click',()=>{try{el.showPicker()}catch(e){}})}
   });
   const fechar=()=>ov.remove();
   ov.__fechar=()=>fechaComPerda(ov,fechar);marcaPerda(ov);
@@ -893,6 +898,7 @@ function openForm({titulo,sub,campos,val={},onSave,onDel}){
   campos.forEach(c=>{if(!c.aviso)return;const el=g(c.k);if(el)el.addEventListener('blur',avisar)});
   avisar();
   ov.querySelectorAll('[data-calc]').forEach(b=>b.onclick=()=>calcKm(g(b.dataset.calc),avisar));
+  ov.querySelectorAll('[data-cal]').forEach(b=>b.onclick=()=>{const el=ov.querySelector('#'+b.dataset.cal);if(!el)return;el.focus();try{el.showPicker();return}catch(e){}abreCal(el)});
   ov.querySelector('form').onsubmit=e=>{e.preventDefault();const o=ler();
     for(const c of campos){if(c.req&&(o[c.k]===''||o[c.k]==null)){ov.querySelector('#fErr').textContent='Preencha: '+c.l;return}
       if(c.t==='date'&&!c.allowFuture&&o[c.k]&&o[c.k]>hoje()){ov.querySelector('#fErr').textContent='Data futura não é permitida.';return}}
@@ -925,8 +931,9 @@ function calcKm(inp,depois){
       : '<span class="muted">Digite os km das viagens para somar.</span>';
     bU.disabled=bM.disabled=!L.length};
   t.addEventListener('input',pinta);pinta();
+  const proximo=()=>{try{const m=inp.closest('.modal')||document;const L=[...m.querySelectorAll('input:not([type=hidden]):not([disabled]),select:not([disabled]),textarea:not([disabled]),button:not([disabled])')].filter(e=>e.offsetParent!==null&&!e.classList.contains('kmBtn')&&e.tabIndex>=0);const i=L.indexOf(inp);const n=i>=0?L[i+1]:null;if(n)n.focus();else inp.focus()}catch(er){}};
   const grava=n=>{inp.value=fmtNum(n);inp.dispatchEvent(new Event('input'));ov.remove();if(depois)depois();
-    toast(`Km: ${fmtNum(n)}`)};
+    toast(`Km: ${fmtNum(n)}`);proximo()};
   bU.onclick=()=>grava(L.reduce((a,b)=>a+b,0));
   bM.onclick=()=>grava(atual()+L.reduce((a,b)=>a+b,0));
   ov.querySelector('#ckF').onclick=()=>ov.remove();
@@ -1055,14 +1062,14 @@ function formMulta(r){
       {k:'orgao',l:'Órgão autuador',t:'text',list:['Detran DF','DER DF','PRF','ANTT','DNIT']},{k:'auto',l:'Nº do auto de infração',t:'text'},
       {k:'motivo',l:'Motivo',t:'text',full:1,req:1},{k:'veiculo',l:'Veículo',t:'select',op:VEICS()},
       {k:'infrator',l:'Real infrator (condutor)',t:'text',list:cfg().condutores},{k:'pontos',l:'Pontos',t:'int',help:' '},
-      {k:'vOrig',l:'Valor original (R$)',t:'money'},{k:'vDesc',l:'Valor com desconto (R$)',t:'money'},
-      {k:'venc',l:'Vencimento do boleto',t:'date',allowFuture:1},{k:'pagto',l:'Data do pagamento',t:'date'},{k:'vPago',l:'Valor pago (R$)',t:'money',help:'Preenchido com o valor com desconto; altere se pagou outro valor.'}],
-    val:r,onSave:o=>{if(o.vPago==null)o.vPago=o.vDesc??null;if(o.infrator&&!cfg().condutores.includes(o.infrator)){cfg().condutores.push(o.infrator);salvar('tb_config')}upsert('tb_multas',Object.assign({id:r.id||uid('m')},o))},
+      {k:'vOrig',l:'Valor original (R$)',t:'money'},{k:'vDescAmt',l:'Valor do desconto (R$)',t:'money'},
+      {k:'venc',l:'Vencimento do boleto',t:'date',allowFuture:1},{k:'pagto',l:'Data do pagamento',t:'date'},{k:'vPago',l:'Valor pago (R$)',t:'money',help:'Calculado: valor original menos o valor do desconto. Altere se pagou outro valor.'}],
+    val:Object.assign({},r,{vDescAmt:(r.vOrig!=null&&r.vDesc!=null)?Math.round((r.vOrig-r.vDesc)*100)/100:null}),onSave:o=>{if(o.vOrig!=null&&o.vDescAmt!=null)o.vDesc=Math.max(0,Math.round((o.vOrig-o.vDescAmt)*100)/100);else o.vDesc=null;delete o.vDescAmt;if(o.vPago==null)o.vPago=o.vDesc??o.vOrig??null;if(o.infrator&&!cfg().condutores.includes(o.infrator)){cfg().condutores.push(o.infrator);salvar('tb_config')}upsert('tb_multas',Object.assign({id:r.id||uid('m')},o))},
     onDel:r.id?()=>remover('tb_multas',r.id):null});
-  const vd=f.g('vDesc'),vp=f.g('vPago');let vpManual=!!(r.vPago!=null&&r.vDesc!=null&&r.vPago!==r.vDesc);
+  const vd=f.g('vDescAmt'),vo=f.g('vOrig'),vp=f.g('vPago');let vpManual=!!(r.vPago!=null&&r.vDesc!=null&&r.vPago!==r.vDesc);
   vp.addEventListener('input',()=>{vpManual=vp.value.trim()!==''});
-  const copia=()=>{if(!vpManual)vp.value=vd.value.trim()===''?'':brl(parseBRL(vd.value),1)};
-  vd.addEventListener('input',copia);vd.addEventListener('blur',copia);if(!r.id||r.vPago==null)copia();
+  const copia=()=>{if(!vpManual)vp.value=vo.value.trim()===''?'':brl(Math.max(0,parseBRL(vo.value)-(parseBRL(vd.value)||0)),1)};
+  [vd,vo].forEach(x=>{x.addEventListener('input',copia);x.addEventListener('blur',copia)});if(!r.id||r.vPago==null)copia();
   const ex=()=>{const v=f.g('ocorr').value,h=f.ov.querySelector('#h_ocorr');if(h)h.textContent=v?'Pontos expiram em '+fmtBR(statusMulta({ocorr:v}).exp):''};
   f.g('ocorr').addEventListener('input',ex);f.g('ocorr').addEventListener('change',ex);ex();
   const NIV={3:'leve',4:'média',5:'grave',7:'gravíssima'};
@@ -1077,13 +1084,22 @@ function formMulta(r){
 }
 function formCarne(ym){
   const L=linhaCarne(ym);const reg=L.reg;
-  openForm({titulo:'Carnê-Leão – '+mesNome(ym),sub:`Soma de Uber/99 lançada no mês (${L.fonteSug==='repasses'?'repasses recebidos':'diário de corridas'}): <b>${brl(L.sug)}</b>. Deixe o valor do extrato em branco para usar essa soma. ${L.car?(L.carOn?`A Carona Solidária do mês (<b>${brl(L.car)}</b>) é somada automaticamente.`:`A Carona Solidária do mês (<b>${brl(L.car)}</b>) <b>não</b> entra nesta base${IMP.permitir?' — mude em ⚙ Opções › Metas e preferências':''}.`):''}`,
+  openForm({titulo:'Carnê-Leão – '+mesNome(ym),sub:`Soma de Uber/99 lançada no mês (${L.fonteSug==='repasses'?'repasses recebidos':'diário de corridas'}): <b>${brl(L.sug)}</b>. Deixe o valor do extrato em branco para usar essa soma. <br>💡 <b>Depois de pagar o DARF</b> (no app do seu banco ou no site da Receita), volte aqui e marque <b>Paguei DARF deste mês</b> com a data e o valor; ou use o ✔️ na lista. O app não consulta a Receita: a confirmação do pagamento é sempre sua. ${L.car?(L.carOn?`A Carona Solidária do mês (<b>${brl(L.car)}</b>) é somada automaticamente.`:`A Carona Solidária do mês (<b>${brl(L.car)}</b>) <b>não</b> entra nesta base${IMP.permitir?' — mude em ⚙ Opções › Metas e preferências':''}.`):''}`,
     campos:[{k:'bruto',l:'Recebido de Uber/99 no mês, conforme extrato (R$)',t:'money',full:1},
       {k:'inss',l:'INSS pago como autônomo no mês (R$) – opcional',t:'money',full:1,help:'Só substitui o desconto simplificado (R$ 607,20) se for maior.'},
       {k:'pago',l:'DARF',t:'check',txt:'Paguei DARF deste mês'},{k:'dataPago',l:'Data do pagamento',t:'date'},{k:'valorPago',l:'Valor pago (R$)',t:'money'},
       {k:'obs',l:'Observação',t:'text',full:1,help:'Ex.: inclui corridas do veículo anterior.'}],
-    val:reg,onSave:o=>{S.tb_carne[ym]=o;salvar('tb_carne');audit('Edição','Carnê-Leão',`${mesNome(ym)} · recebido ${o.bruto==null?'(soma dos repasses)':brl(o.bruto)}${o.pago?' · DARF pago'+(o.valorPago?' '+brl(o.valorPago):''):''}`);render()}});
+    val:reg,onDel:Object.keys(reg||{}).length?()=>{delete S.tb_carne[ym];salvar('tb_carne');audit('Exclusão','Carnê-Leão',mesNome(ym));render()}:null,onSave:o=>{if(o.pago&&(o.bruto==null||o.bruto===''))return 'Para marcar o DARF como pago, informe o valor recebido de Uber/99 conforme o extrato.';S.tb_carne[ym]=o;salvar('tb_carne');audit('Edição','Carnê-Leão',`${mesNome(ym)} · recebido ${o.bruto==null?'(soma dos repasses)':brl(o.bruto)}${o.pago?' · DARF pago'+(o.valorPago?' '+brl(o.valorPago):''):''}`);render()}});
 }
+async function carnePagoRapido(ym){
+  const L=linhaCarne(ym),reg=S.tb_carne[ym]||{},h=hoje();
+  if(reg.bruto==null||reg.bruto===''){toast('Informe primeiro o valor recebido, conforme o extrato.');formCarne(ym);return}
+  if(!await confirma(`Marcar o DARF de <b>${mesNome(ym)}</b> como pago?<br><span class="small muted">Data do pagamento: ${fmtBR(reg.dataPago&&reg.dataPago<h?reg.dataPago:h)} · Valor: ${brl(reg.valorPago||L.darf)}. Você pode ajustar depois em ✎ Editar.</span>`,'Marcar como pago'))return;
+  S.tb_carne[ym]=Object.assign({},reg,{pago:true,dataPago:(reg.dataPago&&reg.dataPago<h)?reg.dataPago:h,valorPago:reg.valorPago||L.darf||null});
+  salvar('tb_carne');audit('Edição','Carnê-Leão',`${mesNome(ym)} · DARF marcado como pago`);render();toast('DARF marcado como pago')}
+async function carneExcluir(ym){
+  if(!await confirma(`Excluir os dados informados do Carnê-Leão de <b>${mesNome(ym)}</b> (valor do extrato, INSS, DARF pago e observação)?<br><span class="small muted">O app volta a calcular o mês só pelos lançamentos de Uber/99.</span>`,'Excluir',{perigo:1}))return;
+  delete S.tb_carne[ym];salvar('tb_carne');audit('Exclusão','Carnê-Leão',mesNome(ym));render();toast('Dados do mês excluídos')}
 const NOVO={corrida:()=>formCorrida(),carona:()=>formCarona(),repasse:()=>formRepasse(),custo:()=>formCusto(),multa:()=>formMulta(),carne:()=>formCarne(addMes(mesAtual(),-1))};
 const FABK='rodaliq_fab';
 // posição livre, guardada em proporção da tela (0 a 1) para servir em qualquer tamanho e ao girar o celular
@@ -1259,6 +1275,7 @@ function vCorridas(){
       ${kpiComb('Corridas × combustível','as corridas (Uber + 99)',vm,combMes(ym),[['Uber',sum(ub,r=>r.valor)],['99',sum(nn,r=>r.valor)]])}
     </div>`;
     h+=`<div class="note" style="margin-bottom:12px"><b>Diário</b>: o ganho de cada dia em Uber e 99. É ele que conta na meta (junto com a Carona Solidária), no calendário, no gráfico e nos cards de R$/hora e R$/viagem. Os <b>repasses semanais</b> não somam na meta, para não contar o mesmo dinheiro duas vezes: servem para conferir com o diário e para o Carnê-Leão.</div>`;
+    h+=`<div class="note small" style="margin-bottom:12px"><b>Legenda</b><br><span class="tag b">✓ meta</span> o dia bateu a meta diária (Uber + 99 + carona).<br><span class="tag a">△ R$ X p/ meta</span> quanto faltou, em reais, para o dia chegar na meta.</div>`;
     h+=groups(L,{key:'data',chave:'cor',vazio:'Nenhum dia lançado ainda. Use “＋ Corridas” ao fim de cada dia rodado para acompanhar a meta de '+brl(meta)+'.',
       cab:(rows,m)=>{const v=sum(rows,r=>r.valor),bat=Object.values(porDia(m)).filter(x=>x>=meta).length;return `<span class="small muted">${new Set(rows.map(r=>r.data)).size} dias · ✓ ${bat}</span><b class="num">${brl(v)}</b>`},
       linha:r=>{const ym=r.data.slice(0,7),tot=(porDia(ym)[r.data]||0),car=(porDiaCar(ym)[r.data]||0);return `<div class="row"><div class="dt">${fmtD(r.data)}<small>${wdOf(r.data)}</small></div><div class="main">${tot>=meta?'<span class="tag b">✓ meta</span>':'<span class="tag a">△ '+brl(meta-tot)+' p/ meta</span>'}<span class="tag g">${esc(r.plataforma)}</span><span class="tag g">${esc(r.veiculo)}</span><div class="small muted">${r.viagens||0} viagens · ${minToHM(r.min)}${r.min?' · '+brl(r.valor/(r.min/60))+'/h':''}${r.km?' · '+r.km+' km':''}${car?' · dia com '+brl(car)+' de carona (total '+brl(tot)+')':''}</div>${r.obs?`<div class="obs">${esc(r.obs)}</div>`:''}</div><div class="val num">${brl(r.valor)}</div><div class="act"><button class="ib" data-ed="tb_corridas:${r.id}" aria-label="Editar">✎</button><button class="ib" data-del="tb_corridas:${r.id}" aria-label="Excluir" title="Excluir">🗑</button></div></div>`}});
@@ -1273,10 +1290,11 @@ function vCorridas(){
     </div>`;
     h+=`<div class="note" style="margin-bottom:12px"><b>Repasses</b>: o que a Uber ou a 99 depositou na conta. Não somam na meta (a meta usa o diário). Servem para conferir com o diário, como base do Carnê-Leão quando não há extrato (regime de caixa) e como ganho do mês só quando o mês não tem diário lançado.</div>`;
     h+=`<div class="note" style="margin-bottom:12px">A conciliação compara o repasse com a soma dos dias lançados no período (mesma plataforma). Diferença costuma vir de ajustes, promoções ou dias não lançados.</div>`;
+    h+=`<div class="note small" style="margin-bottom:12px"><b>Legenda</b><br><span class="tag b">✓ confere</span> o repasse é igual à soma dos dias lançados no período.<br><span class="tag a">⚠ dif. R$ X</span> diferença = repasse − soma do diário. <b>Negativo</b>: a plataforma depositou menos do que você lançou (dia lançado a mais, valor digitado errado ou desconto/taxa). <b>Positivo</b>: depositou mais (dia sem lançamento, promoção ou ajuste). Confira os dias do período e corrija o que estiver errado.<br><span class="tag g">sem dias lançados no período</span> não há lançamentos do diário nessas datas para comparar.</div>`;
     h+=groups(L,{key:'data',chave:'rep',vazio:'Nenhum repasse lançado.',
       cab:rows=>`<span class="small muted">${rows.length} repasses</span><b class="num">${brl(sum(rows,r=>r.valor))}</b>`,
       linha:r=>{const dias=r.ini&&r.fim?S.tb_corridas.filter(x=>x.plataforma===r.plataforma&&x.data>=r.ini&&x.data<=r.fim):[];const sd=sum(dias,x=>x.valor),dif=r2(r.valor-sd);
-        const conc=!dias.length?'<span class="tag g">sem dias lançados no período</span>':Math.abs(dif)<0.01?'<span class="tag b">✓ confere</span>':`<span class="tag a">⚠ dif. ${brl(dif)}</span>`;
+        const conc=!dias.length?'<span class="tag g">sem dias lançados no período</span>':Math.abs(dif)<0.01?'<span class="tag b">✓ confere</span>':`<span class="tag a" title="Repasse menos a soma do diário no período">⚠ dif. ${brl(dif)} (${dif<0?'repasse menor que o diário':'repasse maior que o diário'})</span>`;
         return `<div class="row"><div class="dt">${fmtD(r.data)}<small>${wdOf(r.data)}</small></div><div class="main"><span class="tag g">${esc(r.plataforma)}</span><span class="tag g">${esc(r.veiculo)}</span>${conc}<div class="small muted">Período ${r.ini?fmtD(r.ini)+' a '+fmtD(r.fim):'—'} · ${r.viagens||0} viagens · ${minToHM(r.min)}${r.min?' · '+brl(r.valor/(r.min/60))+'/h':''}</div></div><div class="val num">${brl(r.valor)}</div><div class="act"><button class="ib" data-ed="tb_repasses:${r.id}" aria-label="Editar">✎</button><button class="ib" data-del="tb_repasses:${r.id}" aria-label="Excluir" title="Excluir">🗑</button></div></div>`}});
   }
   h+=refBloco(REF_GANHOS);
@@ -1396,7 +1414,7 @@ function vImpostos(){
   ${pagoSemDevido.length?`<div class="note am" style="margin-bottom:12px">⚠ <b>${pagoSemDevido.map(l=>mesCurto(l.ym)).join(', ')}</b>: há DARF marcado como pago em mês sem imposto devido pela regra atual. O valor pago não se perde: entra como imposto já pago na declaração anual (ou pode ser pedido de volta pela Receita). Vale conferir com um contador.</div>`:''}
   <div class="card" style="margin-bottom:12px"><h2>Carnê-Leão ${ano}</h2><div class="tblwrap"><table class="tbl num">
     <tr><th>Mês</th><th class="r">Recebido</th><th class="r">Tributável 60%</th><th class="r">Dedução</th><th class="r">Base</th><th class="r">IR tabela</th><th class="r">Redução</th><th class="r">DARF</th><th>Situação</th><th>Vencimento</th><th>Pago</th><th></th></tr>
-    ${L.map(l=>`<tr><td><b>${mesCurto(l.ym)}</b></td><td class="r">${brl(l.bruto,1)}${l.bruto?`<div class="small muted">apps ${brl(l.apps,1)}${l.temExtrato?'':(l.sug?' ('+l.fonteSug+')':'')}${l.carBase?' · carona '+brl(l.carBase,1):(l.car?' · carona fora da base':'')}</div>`:''}${l.reg.obs?`<div class="small muted" title="${esc(l.reg.obs)}">ℹ ${esc(l.reg.obs.length>28?l.reg.obs.slice(0,28)+'…':l.reg.obs)}</div>`:''}</td><td class="r">${brl(l.trib,1)}</td><td class="r">${brl(l.ded,1)}</td><td class="r">${brl(l.base,1)}</td><td class="r">${brl(l.irT,1)}</td><td class="r">${l.red?'−'+brl(l.red,1):'—'}</td><td class="r"><b>${brl(l.darf,1)}</b></td><td>${l.st}</td><td>${fmtD(l.venc)}</td><td>${l.reg.pago?`<span class="tag b">✓ ${l.reg.valorPago?brl(l.reg.valorPago):'sim'}</span>`:'—'}</td><td><button class="ib" data-carne="${l.ym}" aria-label="Editar mês">✎</button></td></tr>`).join('')}
+    ${L.map(l=>`<tr><td><b>${mesCurto(l.ym)}</b></td><td class="r">${brl(l.bruto,1)}${l.bruto?`<div class="small muted">apps ${brl(l.apps,1)}${l.temExtrato?'':(l.sug?' ('+l.fonteSug+')':'')}${l.carBase?' · carona '+brl(l.carBase,1):(l.car?' · carona fora da base':'')}</div>`:''}${l.reg.obs?`<div class="small muted" title="${esc(l.reg.obs)}">ℹ ${esc(l.reg.obs.length>28?l.reg.obs.slice(0,28)+'…':l.reg.obs)}</div>`:''}</td><td class="r">${brl(l.trib,1)}</td><td class="r">${brl(l.ded,1)}</td><td class="r">${brl(l.base,1)}</td><td class="r">${brl(l.irT,1)}</td><td class="r">${l.red?'−'+brl(l.red,1):'—'}</td><td class="r"><b>${brl(l.darf,1)}</b></td><td>${l.st}</td><td>${fmtD(l.venc)}</td><td>${l.reg.pago?`<span class="tag b">✓ ${l.reg.valorPago?brl(l.reg.valorPago):'sim'}</span>`:'—'}</td><td><button class="ib" data-carne="${l.ym}" aria-label="Editar mês" title="Editar">✎</button>${l.reg.pago?'':`<button class="ib" data-cpg="${l.ym}" aria-label="Marcar DARF como pago" title="Paguei o DARF deste mês">✔️</button>`}${Object.keys(l.reg||{}).length?`<button class="ib" data-cex="${l.ym}" aria-label="Excluir dados do mês" title="Excluir">🗑</button>`:''}</td></tr>`).join('')}
     <tr class="tot"><td>Total</td><td class="r">${brl(tot('bruto'),1)}</td><td class="r">${brl(tot('trib'),1)}</td><td></td><td></td><td class="r">${brl(tot('irT'),1)}</td><td class="r">${tot('red')?'−'+brl(tot('red'),1):'—'}</td><td class="r">${brl(tot('darf'),1)}</td><td colspan="4"></td></tr>
   </table></div></div>
   <div class="grid two">
@@ -1673,7 +1691,7 @@ async function invSubmit(rec){
     await DB.doc('convites/'+id).set({...rec,consent:true,consent_v:TERMOS_V,status:'novo',archived:false,created_at:new Date().toISOString(),handled_at:null});
     return{dup:null};
   }
-  const {error}=await DB.from('tb_convites').insert({name:rec.name,email:rec.email,whatsapp:rec.whatsapp,birth_date:rec.birth_date,how_known:rec.how_known,consent:true,consent_v:TERMOS_V});
+  const {error}=await DB.from('tb_convites').insert({name:rec.name,email:rec.email,whatsapp:rec.whatsapp,birth_date:rec.birth_date,how_known:rec.how_known,motorista:rec.motorista,consent:true,consent_v:TERMOS_V});
   if(error){if(error.code==='23505')return{dup:/email/i.test((error.message||'')+(error.details||''))?'email':'whatsapp'};throw error}
   return{dup:null};
 }
@@ -1726,7 +1744,7 @@ async function checarExclusao(){try{EXC_MEU=await excMeu()}catch(e){EXC_MEU=null
   if(EXC_MEU&&EXC_MEU.status==='desativado'){telaDesativada();return true}return false}
 function telaDesativada(){document.querySelectorAll('.ov').forEach(o=>o.remove());
   const ov=document.createElement('div');ov.className='ov';ov.id='excBloq';
-  ov.innerHTML=`<div class="modal" style="max-width:440px"><h2>🔒 Conta desativada</h2><p>Sua conta está desativada conforme sua solicitação. Fale com <a href="mailto:${MAIL_RODALIQ}">${MAIL_RODALIQ}</a>.</p><p class="small muted">Pedido feito em ${dataHora(EXC_MEU.criado_em)}. Os dados ficam guardados por ${EXC_DIAS} dias após a desativação e depois são apagados de vez.</p><div class="mfoot"><button class="btn" id="excSair">↩ Sair</button></div></div>`;
+  ov.innerHTML=`<div class="modal" style="max-width:440px"><h2>🔒 Conta desativada</h2><p>${EXC_MEU.motivo==='Inatividade'?'Sua conta foi desativada por falta de lançamentos (item 8.1 dos Termos de uso).':'Sua conta está desativada conforme sua solicitação.'} Fale com <a href="mailto:${MAIL_RODALIQ}">${MAIL_RODALIQ}</a>${EXC_MEU.motivo==='Inatividade'?' para voltar'  :''}.</p><p class="small muted">${EXC_MEU.motivo==='Inatividade'?'Desativada':'Pedido feito'} em ${dataHora(EXC_MEU.desativado_em||EXC_MEU.criado_em)}. Os dados ficam guardados por ${EXC_DIAS} dias após a desativação e depois são apagados de vez.</p><div class="mfoot"><button class="btn" id="excSair">↩ Sair</button></div></div>`;
   document.body.appendChild(ov);ov.querySelector('#excSair').onclick=()=>{try{sessionStorage.removeItem('mdd_s')}catch(e){}sairSemAudit()}}
 function sairSemAudit(){if(invProd()&&DB&&DB.auth)DB.auth.signOut().finally(()=>location.reload());else location.reload()}
 function avisoExclusao(){const el=$('#excAviso');if(!el)return;const p=EXC_MEU&&EXC_MEU.status==='novo'?EXC_MEU:null;el.classList.toggle('hidden',!p);
@@ -1757,12 +1775,12 @@ function formExcluirConta(){
     catch(e){q('#exC').disabled=false;err(/duplicate|23505/i.test((e&&(e.code+e.message))||'')?'Você já tem um pedido de exclusão em andamento.':'Não foi possível enviar agora. Tente de novo em instantes.')}}}
 // ---- Admin > Pedidos de exclusão ----
 let EXC_CACHE=[],EXC_AT=0;
-async function excAdminCache(force){if(!invIsAdmin){EXC_CACHE=[];SEN_CACHE=[];APO_CACHE=[];return}if(!force&&Date.now()-EXC_AT<15000)return;try{EXC_CACHE=await excListar();EXC_AT=Date.now()}catch(e){}try{SEN_CACHE=await senListar()}catch(e){}try{APO_CACHE=await apoListar()}catch(e){}await carregaPerfis()}
+async function excAdminCache(force){if(!invIsAdmin){EXC_CACHE=[];SEN_CACHE=[];APO_CACHE=[];return}if(!force&&Date.now()-EXC_AT<15000)return;try{EXC_CACHE=await excListar();EXC_AT=Date.now()}catch(e){}try{CORR_CACHE=await corrListar()}catch(e){}try{SEN_CACHE=await senListar()}catch(e){}try{APO_CACHE=await apoListar()}catch(e){}await carregaPerfis()}
 const excDiasDesde=iso=>iso?Math.floor((Date.now()-new Date(iso).getTime())/864e5):0;
 function excAlerts(){if(!invIsAdmin)return [];const out=[],nv=EXC_CACHE.filter(x=>x.status==='novo');
   if(nv.length)out.push({n:'r',inv:1,tab:'exc',t:`${nv.length} ${nv.length===1?'pedido de exclusão aguardando':'pedidos de exclusão aguardando'}`,nota:nv.slice(0,5).map(x=>x.email).join(' · ')+'. Responda em até 15 dias (prazo da LGPD para pedidos do titular).'});
   EXC_CACHE.filter(x=>x.status==='desativado'&&excDiasDesde(x.desativado_em)>=EXC_DIAS).forEach(x=>{const c=invCache.find(v=>String(v.email||'').toLowerCase()===String(x.email||'').toLowerCase());
-    out.push({n:'a',inv:1,tab:'exc',t:`Excluir dados de ${c?c.name:x.email}: prazo de ${EXC_DIAS} dias concluído`,nota:'Abra Admin > Pedidos de exclusão e apague o login no painel do Supabase. Os dados são apagados junto.'})});
+    out.push({n:'a',inv:1,tab:'exc',t:`Excluir dados de ${c?c.name:x.email}: prazo de ${EXC_DIAS} dias concluído`,nota:'Abra Admin > Pedidos de exclusão e use “🗑 Excluir usuário”. O login e os dados são apagados juntos.'})});
   return out}
 const assina=()=>`\n\nAtenciosamente,\n${TERMOS_RESP}\nEquipe Rodaliq`;
 function excTexto(x,nome){const d=fmtBR(String(x.criado_em).slice(0,10));
@@ -1818,6 +1836,97 @@ async function excAdminRender(box){
       else if(a==='excluir'){if(!await usrExcluir(x.user_id,x.email,x))return}
     }catch(e){toast('Não foi possível concluir agora. Tente de novo.');return}
     await excAdminCache(true);atualizaSino();excAdminRender(box);admContagens()})}
+/* ---------- V90: ✏ Corrigir meus dados (LGPD, art. 18, III) ---------- */
+const CORR_CAMPOS={nome:'Nome',celular:'Celular (WhatsApp)',email:'E-mail'};
+let CORR_CACHE=[];const ZAP_CORR={};
+async function corrListar(){
+  if(!invProd())return (await DB.collection('correcoes').get()).docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>String(b.criado_em).localeCompare(String(a.criado_em)));
+  const {data,error}=await DB.from('tb_correcoes').select('*').order('criado_em',{ascending:false}).limit(1000);if(error)throw error;return data||[]}
+async function corrCriar(o){
+  if(!invProd()){const id='c'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);await DB.doc('correcoes/'+id).set({user_id:UID,email:LOGADO,...o,status:'novo',criado_em:new Date().toISOString()});return}
+  const {error}=await DB.from('tb_correcoes').insert({email:LOGADO,...o});if(error)throw error}
+async function corrPatch(id,patch){
+  if(!invProd()){await DB.doc('correcoes/'+id).update(patch);return}
+  const {error}=await DB.from('tb_correcoes').update(patch).eq('id',id);if(error)throw error}
+async function corrAplicar(x){
+  if(!invProd()){const old=x.valor_atual||'';await DB.doc('correcoes/'+x.id).update({status:'atendido',valor_antigo:old,resolvido_em:new Date().toISOString()});return old}
+  const {data,error}=await DB.rpc('rodaliq_aplicar_correcao',{p_id:x.id});if(error)throw error;return data||''}
+function corrAlerts(){if(!invIsAdmin)return [];const nv=CORR_CACHE.filter(x=>x.status==='novo');
+  return nv.length?[{n:'r',inv:1,tab:'corr',t:`${nv.length} ${nv.length===1?'pedido de correção de dados aguardando':'pedidos de correção de dados aguardando'}`,nota:nv.slice(0,5).map(x=>x.email).join(' · ')+'. Responda em até 15 dias (prazo da LGPD para pedidos do titular).'}]:[]}
+const corrDig=v=>String(v||'').replace(/\D/g,'');
+function formCorrigir(){
+  const ov=document.createElement('div');ov.className='ov';
+  const atual={nome:NOME_USR||'',email:LOGADO||'',celular:''};
+  ov.innerHTML=`<div class="modal ajM" style="max-width:460px"><h2>✏ Corrigir meus dados</h2>
+    <div class="ajBd">
+    <p class="small">Informou algo errado ou mudou de nome, celular ou e-mail? Envie o pedido e a equipe do Rodaliq faz a correção e avisa você (direito previsto no art. 18, III, da LGPD).</p>
+    <div class="field"><label for="coC">O que corrigir</label><select class="inp" id="coC">${Object.entries(CORR_CAMPOS).map(([k,t])=>`<option value="${k}">${t}</option>`).join('')}</select></div>
+    <div class="small muted" id="coAt" style="margin:-2px 0 8px"></div>
+    <div class="field"><label for="coN" id="coNL">Novo nome e sobrenome</label><input class="inp" id="coN" maxlength="120" autocomplete="off"></div>
+    <div class="field"><label for="coM">Motivo *</label><input class="inp" id="coM" maxlength="300" placeholder="Ex.: errei a digitação" autocomplete="off"></div>
+    <div class="note am small hidden" id="coEm">Para trocar o e-mail, vamos te escrever no <b>novo e-mail</b> para confirmar que ele é seu. A troca só vale depois dessa confirmação; até lá você continua entrando com o e-mail atual.</div>
+    <div class="err" id="coErr"></div></div>
+    <div class="mfoot"><button class="btn sec" id="coV">Voltar</button><button class="btn" id="coS">Enviar pedido</button></div></div>`;
+  document.body.appendChild(ov);const q=x=>ov.querySelector(x),err=t=>{q('#coErr').textContent=t};
+  const troca=()=>{const c=q('#coC').value,i=q('#coN');err('');
+    q('#coNL').textContent={nome:'Novo nome e sobrenome',celular:'Novo celular (com DDD)',email:'Novo e-mail'}[c];
+    q('#coAt').textContent=c==='celular'?'':'Atual: '+(atual[c]||'—');
+    i.value='';i.type=c==='email'?'email':'text';i.inputMode=c==='celular'?'tel':(c==='email'?'email':'text');i.placeholder=c==='celular'?'(61) 99999-9999':'';
+    q('#coEm').classList.toggle('hidden',c!=='email')};
+  q('#coC').onchange=troca;troca();q('#coV').onclick=()=>ov.remove();
+  q('#coS').onclick=async()=>{const c=q('#coC').value;let v=q('#coN').value.trim();const motivo=q('#coM').value.trim();
+    if(c==='nome'){if(v.length<2)return err('Informe o nome completo.');if(v.toLowerCase()===String(atual.nome).toLowerCase())return err('O nome informado é igual ao atual.')}
+    if(c==='celular'){v=corrDig(v);if(v.startsWith('55')&&v.length>=12)v=v.slice(2);if(v.length<10||v.length>11)return err('Informe o celular com DDD (10 ou 11 números).')}
+    if(c==='email'){v=v.toLowerCase();if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v))return err('Informe um e-mail válido.');if(v===String(atual.email).toLowerCase())return err('O e-mail informado é igual ao atual.')}
+    if(motivo.length<3)return err('Informe o motivo do pedido.');
+    q('#coS').disabled=true;
+    try{const ja=(await corrListar()).some(x=>(invProd()||x.user_id===UID)&&x.status==='novo'&&x.campo===c);
+      if(ja){q('#coS').disabled=false;return err('Você já tem um pedido de correção de '+CORR_CAMPOS[c].toLowerCase()+' em andamento.')}
+      await corrCriar({campo:c,valor_atual:atual[c]||null,valor_novo:v,motivo:motivo||null});
+      audit('Correção de dados','Configurações','Pedido de correção · '+CORR_CAMPOS[c]);ov.remove();toast('Pedido enviado. Você será avisado.')}
+    catch(e){q('#coS').disabled=false;err('Não foi possível enviar agora. Tente de novo em instantes.')}}}
+function corrTexto(x,nome,feito){const d=fmtBR(String(x.criado_em).slice(0,10)),cp=CORR_CAMPOS[x.campo].toLowerCase(),em=x.campo==='email';
+  const base=`Olá${nome?', '+nome:''}!\nEsperamos que você esteja bem!\n\n`;
+  const lgpd=`Atendemos ao seu direito de correção de dados incompletos, inexatos ou desatualizados, previsto no art. 18, inciso III, da Lei Geral de Proteção de Dados (Lei nº 13.709/2018).`;
+  if(x.status==='recusado')return base+`Recebemos o seu pedido de correção de ${cp} no Rodaliq, feito em ${d}, mas não conseguimos fazer a alteração. Se quiser, responda esta mensagem com mais detalhes.`+assina();
+  if(feito)return base+`A correção de ${cp} que você pediu em ${d} foi feita.`+(em?`\n\nSeu e-mail de acesso ao Rodaliq agora é ${x.valor_novo}. Use-o para entrar (a senha continua a mesma).`:'')+`\n\n`+lgpd+assina();
+  return base+`Recebemos o seu pedido de correção de ${cp} no Rodaliq, feito em ${d}.\n\n`+lgpd+(em?`\n\nPara trocar o seu e-mail de acesso para ${x.valor_novo}, precisamos confirmar que ele é seu: responda esta mensagem com a palavra “confirmo”. Assim que recebermos, fazemos a troca e avisamos você.`:`\n\nVamos conferir e fazer a correção em breve.`)+assina()}
+async function corrAdminRender(box){
+  let L;try{L=await corrListar();CORR_CACHE=L}catch(e){box.innerHTML='<div class="empty">Não consegui carregar os pedidos. Tente de novo em instantes.</div>';return}
+  if(!invCache.length)try{await invRefreshBadge(true)}catch(e){}
+  await carregaPerfis();
+  const F=[['novo','Novos'],['atendido','Atendidos'],['recusado','Recusados']],f=UI.corF||'novo',cnt=k=>L.filter(x=>x.status===k).length,lst=L.filter(x=>x.status===f);
+  const card=x=>{const c=invCache.find(v=>String(v.email||'').toLowerCase()===String(x.email||'').toLowerCase()),nome=(x.user_id&&PERFIS[x.user_id])||(c&&c.name)||'',em=x.campo==='email';
+    const dest=em&&x.status==='novo'?x.valor_novo:(em&&x.status==='atendido'?x.valor_novo:x.email);
+    const pn=String(nome||String(x.email||'').split('@')[0]||'').trim().split(/\s+/)[0],txt=corrTexto(x,pn?pn.charAt(0).toUpperCase()+pn.slice(1):'',x.status==='atendido');ZAP_CORR[x.id]={fone:c?c.whatsapp:'',txt};
+    const tag={novo:`<span class="tag r">Novo · ${excDiasDesde(x.criado_em)} ${excDiasDesde(x.criado_em)===1?'dia':'dias'}</span>`,atendido:'<span class="tag g">Atendido</span>',recusado:'<span class="tag a">Recusado</span>'}[x.status]||'';
+    const ant=x.status==='atendido'?` · valor anterior: <b>${esc(x.valor_antigo||'—')}</b>`:'';
+    let bt=`<a class="btn sm" href="${esc(invMailLink(dest,em&&x.status==='novo'?'Confirme o seu novo e-mail no Rodaliq':'Sua correção de dados no Rodaliq',txt))}" target="_blank" rel="noopener">${em&&x.status==='novo'?'✉ Pedir confirmação no novo e-mail':'✉ '+(x.status==='atendido'?'Avisar por e-mail':'Responder por e-mail')}</a><button type="button" class="btn sm" data-zc="${esc(x.id)}">💬 WhatsApp</button>`;
+    if(x.status==='novo'){bt+=(em&&!ehMaster())?'<span class="small muted">Só o admin principal troca e-mail.</span>':`<button type="button" class="btn sm warn" data-cx="aplicar" data-id="${esc(x.id)}">✔ Aplicar correção</button>`;
+      bt+=`<button type="button" class="btn sm sec" data-cx="recusar" data-id="${esc(x.id)}">✖ Recusar</button>`}
+    return `<div class="uCard"><div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start"><div class="uMail">${esc(nome||x.email||'(sem nome)')}</div>${tag}</div>
+      <div class="uLin">${esc(x.email||'')}${c?` · 💬 ${esc(invFmtPhone(c.whatsapp))}`:''}</div>
+      <div class="uLin"><b>${esc(CORR_CAMPOS[x.campo]||x.campo)}</b>: ${esc(x.valor_atual||'—')} → <b>${esc(x.campo==='celular'?invFmtPhone('55'+corrDig(x.valor_novo)):x.valor_novo)}</b>${ant}</div>
+      ${x.motivo?`<div class="small muted">Motivo: ${esc(x.motivo)}</div>`:''}
+      <div class="small muted">Pedido em ${admData(x.criado_em)}${x.resolvido_em?' · tratado em '+admData(x.resolvido_em):''}</div>
+      <div class="ivActs" style="margin-top:8px">${bt}</div></div>`};
+  box.innerHTML=`<h3 style="margin:0">✏ Correções de dados</h3>
+    <p class="small muted" style="margin:4px 0 8px">Pedidos de quem quer corrigir nome, celular ou e-mail. Ao aplicar, o app atualiza o cadastro e guarda o valor anterior na auditoria. No e-mail, peça a confirmação pelo <b>novo</b> endereço e aplique só depois da resposta. Prazo da LGPD para responder: 15 dias.</p>
+    <div class="admTabs">${F.map(([k,t])=>`<button type="button" class="chip${f===k?' on':''}" data-cf="${k}">${t} (${cnt(k)})</button>`).join('')}</div>
+    ${lst.length?lst.map(card).join(''):'<div class="empty" style="margin-top:8px">Nenhum pedido aqui.</div>'}`;
+  box.querySelectorAll('[data-cf]').forEach(b=>b.onclick=()=>{UI.corF=b.dataset.cf;corrAdminRender(box)});
+  box.querySelectorAll('[data-zc]').forEach(b=>b.onclick=()=>{const z=ZAP_CORR[b.dataset.zc];if(z)abreZap(z.fone,z.txt)});
+  box.querySelectorAll('[data-cx]').forEach(b=>b.onclick=async()=>{const x=L.find(v=>v.id===b.dataset.id);if(!x)return;
+    const c=invCache.find(v=>String(v.email||'').toLowerCase()===String(x.email||'').toLowerCase()),nome=(x.user_id&&PERFIS[x.user_id])||(c&&c.name)||x.email,novo=x.campo==='celular'?invFmtPhone('55'+corrDig(x.valor_novo)):x.valor_novo;
+    try{
+      if(b.dataset.cx==='aplicar'){
+        const msg=x.campo==='email'?`Trocar o e-mail de acesso de <b>${esc(x.email)}</b> para <b>${esc(novo)}</b>?<br><br>Aplique só depois de a pessoa confirmar pelo novo e-mail. Depois disso ela entra com o novo e-mail (a senha continua a mesma). O valor anterior fica na auditoria.`:`Corrigir ${esc(CORR_CAMPOS[x.campo].toLowerCase())} de <b>${esc(nome)}</b>: ${esc(x.valor_atual||'—')} → <b>${esc(novo)}</b>?<br><br>O valor anterior fica na auditoria.`;
+        if(!await confirma(msg,'Aplicar correção'))return;
+        const old=await corrAplicar(x);audit('Correção de dados','Admin',`${CORR_CAMPOS[x.campo]} de “${old||x.valor_atual||'—'}” para “${novo}” · ${x.email}`);toast('Correção aplicada')}
+      else{if(!await confirma(`Recusar o pedido de correção de ${esc(CORR_CAMPOS[x.campo].toLowerCase())} de <b>${esc(nome)}</b>? Responda a pessoa explicando o motivo.`,'Recusar',{perigo:1}))return;
+        await corrPatch(x.id,{status:'recusado',resolvido_em:new Date().toISOString()});audit('Correção de dados','Admin','Pedido recusado · '+CORR_CAMPOS[x.campo]+' · '+x.email);toast('Pedido recusado')}
+    }catch(e){toast('Não foi possível concluir: '+String((e&&e.message)||'tente de novo').slice(0,120));return}
+    await excAdminCache(true);atualizaSino();corrAdminRender(box);admContagens()})}
 /* ---------- V52: senha provisória e pedidos de nova senha ---------- */
 const SUPA_SQL='https://supabase.com/dashboard/project/dazgckfmvopeqfxhemll/sql/new';
 const MSG_SENHA='Pedido recebido. Se o e-mail estiver cadastrado no Rodaliq, você vai receber a nova senha temporária no seu e-mail em breve.';
@@ -1902,7 +2011,10 @@ async function senAdminRender(box){
     UI.senF='atendido';await excAdminCache(true);atualizaSino();senAdminRender(box);admContagens()})}
 /* ---------- V55: 🤝 Apoiadores — contribuição voluntária. Não trava nada e não existe cobrança ---------- */
 // V56: ajustes guardados no banco (tb_ajustes), para mudar sem subir versão nova
-const AJU_PADRAO={ativo:true,pix:'rodaliq.app@gmail.com',valores:[10,25,50],sugerido:25,aviso:true,dias:30};
+const AJU_PADRAO={ativo:true,pix:'rodaliq.app@gmail.com',valores:[10,25,50],sugerido:25,aviso:true,dias:30,rec:{impostos:true,relatorios:true,carona:true},msg60:null};
+const MSG_APOIO='O Rodaliq é gratuito e vai continuar sendo. Se ele te ajuda, você pode contribuir com o que achar justo: a ajuda contribui para amenizar alguns custos como domínio, servidores e as melhorias. Seu acesso ao Rodaliq não está condicionado a sua colaboração!';
+const REC_NOMES={impostos:'🧾 Impostos (Carnê-Leão)',relatorios:'📑 Relatórios',carona:'🧑‍🤝‍🧑 Caronas'};
+const recOff=k=>!!(AJU.rec&&AJU.rec[k]===false)&&!ehMaster()&&!SOU_COLAB;
 // V73: canais de recado (colaboradores e, no futuro, usuários)
 const CAN_PADRAO={colaborador:true,usuario:false};
 // V74: placa de manutenção. O admin master NUNCA é bloqueado.
@@ -1912,7 +2024,7 @@ let CANAIS=Object.assign({},CAN_PADRAO),SOU_COLAB=false,COLABS=[],REC_MEUS=[],RE
 // V70: regra do imposto sobre a Carona Solidária, definida pelo admin principal para todo o app
 const IMP_PADRAO={permitir:true,padrao:false}; // permitir = cada pessoa escolhe em ⚙ Opções; padrao = valor de quem não escolheu
 let IMP=Object.assign({},IMP_PADRAO);
-let AJU=Object.assign({},AJU_PADRAO),APO_MEU=false;
+let AJU=Object.assign({},AJU_PADRAO),APO_MEU=false,APO_ULT=null;
 let APO_CACHE=[];const ZAP_APO={};let DESP_CACHE=[];
 async function ajuCarregar(){
   try{
@@ -1926,6 +2038,7 @@ async function ajuCarregar(){
     else{const {data}=await DB.from('tb_ajustes').select('valor').eq('chave','apoio').maybeSingle();if(data&&data.valor)AJU=Object.assign({},AJU_PADRAO,data.valor)}
   }catch(e){AJU=Object.assign({},AJU_PADRAO)}
   if(!Array.isArray(AJU.valores)||!AJU.valores.length)AJU.valores=AJU_PADRAO.valores.slice();
+  AJU.rec=Object.assign({},AJU_PADRAO.rec,AJU.rec||{});
   try{
     if(!invProd()){const d=await DB.doc('ajustes/imposto').get();if(d.exists&&d.data().v)IMP=Object.assign({},IMP_PADRAO,d.data().v)}
     else{const {data}=await DB.from('tb_ajustes').select('valor').eq('chave','imposto').maybeSingle();if(data&&data.valor)IMP=Object.assign({},IMP_PADRAO,data.valor)}
@@ -1939,7 +2052,7 @@ async function ajuCarregar(){
     else{const {data}=await DB.rpc('rodaliq_sou_colaborador');SOU_COLAB=!!data}
   }catch(e){SOU_COLAB=false}
   try{REC_MEUS=await recMeus()}catch(e){REC_MEUS=[]}
-  try{APO_MEU=(await apoMeus()).length>0}catch(e){APO_MEU=false}
+  try{const am=await apoMeus();APO_MEU=am.length>0;APO_ULT=am.filter(x=>x.status==='confirmado'&&x.confirmado_em).map(x=>x.confirmado_em).sort().pop()||null}catch(e){APO_MEU=false;APO_ULT=null}
   aplicaAjustes();
   checarManutencao();
 }
@@ -2013,6 +2126,9 @@ async function ajuSalvar(v){const novo=Object.assign({},AJU_PADRAO,AJU,v);
   else{const {error}=await DB.from('tb_ajustes').upsert({chave:'apoio',valor:novo,atualizado_em:new Date().toISOString()},{onConflict:'chave'});if(error)throw error}
   AJU=novo;aplicaAjustes()}
 function aplicaAjustes(){const b=document.querySelector('#optMenu [data-m="apoio"]');if(b)b.classList.toggle('hidden',!AJU.ativo);
+  donoAtualiza();
+  [['impostos','[data-t="impostos"]'],['relatorios','[data-t="relatorios"]'],['carona','[data-t="carona"],[data-fab="carona"]']].forEach(([k,sel])=>document.querySelectorAll(sel).forEach(e=>e.classList.toggle('hidden',recOff(k))));
+  document.querySelectorAll('[data-fab="carne"]').forEach(e=>e.classList.toggle('hidden',recOff('impostos')));
   aplicaCanais();
   if(typeof atualizaSino==='function')atualizaSino()}
 // V73: o item ✉️ só existe para quem pode usar, e o contador mostra respostas não lidas
@@ -2022,13 +2138,30 @@ function aplicaCanais(){
   const n=recPend(),sp=b.querySelector('#falarN');
   if(sp){sp.textContent=n;sp.classList.toggle('hidden',!n)}}
 // aviso no sino: uma vez só, depois de usar o app por um tempo; some de vez se a pessoa pedir
+// feriados nacionais (fixos + móveis) para achar o 5º dia útil do mês
+function feriadosBR(y){const a=y%19,b=Math.floor(y/100),c=y%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),mes=Math.floor((h+l-7*m+114)/31),dia=((h+l-7*m+114)%31)+1;
+  const pas=new Date(y,mes-1,dia),mv=n=>isoOf(new Date(y,mes-1,dia+n));
+  const fx=['01-01','04-21','05-01','09-07','10-12','11-02','11-15','11-20','12-25'].map(x=>y+'-'+x);
+  return new Set([...fx,mv(-48),mv(-47),mv(-2),mv(60)])}
+function quintoDiaUtil(y,m){const fer=feriadosBR(y);let n=0;for(let d=1;d<=31;d++){const dt=new Date(y,m,d);if(dt.getMonth()!==m)break;const w=dt.getDay();if(w===0||w===6||fer.has(isoOf(dt)))continue;if(++n===5)return isoOf(dt)}return isoOf(new Date(y,m,7))}
+const apoNaoDoou60=()=>!APO_ULT||excDiasDesde(APO_ULT)>=60;
 function apoAviso(){
-  if(!AJU.ativo||!AJU.aviso||APO_MEU||!CAD)return null;
-  const r=(NOT.reads&&NOT.reads.apoio)||{};if(r.nunca)return null;
+  if(!AJU.ativo||!AJU.aviso||!CAD)return null;
+  const r=(NOT.reads&&NOT.reads.apoio)||{};
+  if(!apoNaoDoou60())return null;
+  const m=AJU.msg60;
+  if(m&&m.em&&(!r.em60||r.em60<m.em))return {n:'a',apo:1,t:'O Rodaliq é gratuito e vai continuar assim.',nota:m.texto||MSG_APOIO};
   if(Math.floor((Date.now()-new Date(CAD).getTime())/864e5)<(AJU.dias||30))return null;
-  if(r.em&&Date.now()-new Date(r.em).getTime()<180*864e5)return null;
-  return {n:'a',apo:1,t:'O Rodaliq é gratuito e vai continuar assim.',nota:'Se ele te ajuda, você pode contribuir com o que achar justo. É opcional: nada no app depende disso.'};
+  const d=new Date(),h=isoOf(d);if(h<quintoDiaUtil(d.getFullYear(),d.getMonth()))return null;
+  if(r.mes===h.slice(0,7))return null;
+  return {n:'a',apo:1,t:'O Rodaliq é gratuito e vai continuar assim.',nota:MSG_APOIO};
 }
+// copo d'água no cabeçalho: enche com a última contribuição confirmada e esvazia em 60 dias
+function donoNivel(){if(!APO_ULT)return 0;const d=excDiasDesde(APO_ULT);return d>=60?0:Math.max(0.04,0.85*(1-d/60))}
+function donoAtualiza(){const b=document.getElementById('donoBtn');if(!b)return;b.classList.toggle('hidden',!AJU.ativo||!CAD&&false);
+  const n=donoNivel(),ag=document.getElementById('donoAgua');if(ag)ag.setAttribute('transform','translate(0 '+(48-44*n).toFixed(1)+')');
+  const st=APO_ULT?(n>0?'Seu copo está com '+Math.round(n/0.85*100)+'% da última contribuição confirmada.':'Seu copo esvaziou: faz mais de 60 dias da última contribuição.'):'Seu copo está vazio: nenhuma contribuição confirmada ainda.';
+  b.title=MSG_APOIO+'\n\n'+st;b.setAttribute('aria-label','Ajude a manter o Rodaliq. '+st)}
 const apoBRL=v=>brl(v); // mesmo formato do resto do app: R$ 13.829,33
 async function apoListar(){
   if(!invProd())return (await DB.collection('apoios').get()).docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>String(b.criado_em).localeCompare(String(a.criado_em)));
@@ -2074,7 +2207,7 @@ function dadosDaPessoa(u){ // monta as seções que só o admin guarda sobre alg
   const c=invCache.find(v=>String(v.email||'').toLowerCase()===em);
   if(c)sec.push({t:'Pedido de convite',cols:[['Campo','txt'],['Conteúdo','txt']],
     rows:[['Nome',c.name||'—'],['E-mail',c.email||'—'],['WhatsApp',invFmtPhone(c.whatsapp)||'—'],['UF',invUfOf(c.whatsapp)||'—'],
-      ['Data de nascimento',c.birth_date?fmtBR(String(c.birth_date).slice(0,10)):'—'],['Como soube do app',c.how_known||'—'],['Autorização LGPD',invAceite(c)],
+      ['Data de nascimento',c.birth_date?fmtBR(String(c.birth_date).slice(0,10)):'—'],['Como soube do app',c.how_known||'—'],['É motorista de app',c.motorista===true?'Sim':c.motorista===false?'Não':'Não informado'],['Autorização LGPD',invAceite(c)],
       ['Situação',(c.archived?'Arquivado':(INV_ST[c.status]||c.status||'—'))],['Pedido em',admData(c.created_at)]]});
   sec.push({t:'Conta',cols:[['Campo','txt'],['Conteúdo','txt']],
     rows:[['Nome no perfil',(uid&&PERFIS[uid])||'—'],['E-mail',u.email||'—'],['Cadastro',admData(u.criado_em)],
@@ -2122,6 +2255,14 @@ async function pessoaPDF(u,btn){
   const M={titulo:'Rodaliq — Dados pessoais de '+nome,area:'Admin',
     filtroTxt:'Titular: '+nome+' · '+(u.email||''),sec:dadosDaPessoa(u)};
   await exportarRel('pdf',btn,M,fn)}
+// V92: inatividade (sem lançamentos). Aviso 15 dias antes; desativa aos 90.
+const INAT_DIAS=90,INAT_AVISO=15;
+async function inatUltimos(){if(!invProd())return {};const {data,error}=await DB.rpc('rodaliq_ultimos_lancamentos');if(error)throw error;const m={};(data||[]).forEach(r=>{m[r.user_id]=r.ultimo});return m}
+const inatDias=(u,INAT)=>excDiasDesde((INAT&&INAT[u.user_id])||u.criado_em);
+function inatTexto(nome,dias,desativa){const quando=INAT_DIAS-dias;
+  const base=`Olá${nome?', '+nome:''}!\nEsperamos que você esteja bem!\n\n`;
+  if(desativa)return base+`Como a sua conta no Rodaliq está há mais de ${INAT_DIAS} dias sem nenhum lançamento, o acesso foi desativado, conforme o item 8.1 dos Termos de uso.\n\nSeus dados ficam guardados por ${EXC_DIAS} dias. Se quiser voltar, é só responder esta mensagem nesse prazo e reativamos o seu acesso.\n\nO Rodaliq continua gratuito para todo mundo!`+assina();
+  return base+`Sentimos a sua falta por aqui! Faz ${dias} dias que a sua conta no Rodaliq não recebe nenhum lançamento.\n\nPara manter o serviço enxuto e os seus dados protegidos, contas sem lançamentos por ${INAT_DIAS} dias têm o acesso desativado (item 8.1 dos Termos de uso)${quando>0?', o que aconteceria em cerca de '+quando+' dias':''}. Para evitar isso, basta lançar o seu dia de corridas ou um custo no app.\n\nSe preferir pausar, tudo bem: seus dados ficam guardados por ${EXC_DIAS} dias depois da desativação.`+assina()}
 function pessoaTexto(u,nome){
   return `Olá${nome?', '+nome:''}!\nEsperamos que você esteja bem!\n\nRecebemos o seu pedido e estamos atendendo ao direito de acesso aos dados, previsto no art. 18 da Lei Geral de Proteção de Dados (Lei nº 13.709/2018).\n\nEm anexo vai o documento com os dados pessoais que guardamos sobre você na área administrativa do Rodaliq: o pedido de convite, os dados da conta e, se houver, contribuições e pedidos que você tenha feito.\n\nOs seus lançamentos do dia a dia (corridas, caronas, repasses, custos, multas e Carnê-Leão) não ficam visíveis para nós: eles são só seus. Para ter uma cópia deles, entre no app e use ⚙ Opções > Exportar backup. Se não conseguir entrar, responda esta mensagem que enviamos uma senha temporária.\n\nQualquer dúvida, é só responder.${assina()}`}
 function apoNome(x){
@@ -2131,7 +2272,7 @@ function apoNome(x){
   return (c&&String(c.name||'').trim())||apoEmail(x)||'';}
 async function apoMeus(){
   if(!invProd())return (await DB.collection('apoios').get()).docs.map(d=>({id:d.id,...d.data()})).filter(x=>x.user_id===UID);
-  const {data,error}=await DB.from('tb_apoios').select('id,valor,status,criado_em').eq('user_id',UID);if(error)throw error;return data||[]}
+  const {data,error}=await DB.from('tb_apoios').select('id,valor,status,criado_em,confirmado_em').eq('user_id',UID);if(error)throw error;return data||[]}
 async function apoCriar(valor,tipo){
   if(!invProd()){const id='a'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
     await DB.doc('apoios/'+id).set({user_id:UID,email:LOGADO,valor,tipo,status:'informado',criado_em:new Date().toISOString(),confirmado_em:null,recibo:null});return}
@@ -2302,8 +2443,8 @@ function formAjustes(){if(!ehMaster())return;
   ov.innerHTML=`<div class="modal ajM" style="max-width:460px"><h2>⚙ Ajustes do app</h2>
     <div class="ajBd">
     <p class="small">Valem para todo mundo, na hora. Não precisa subir versão nova.</p>
-    <label class="exChk"><input type="checkbox" id="ajA"${AJU.ativo?' checked':''}><span>Mostrar <b>💚 Ajude a manter o Rodaliq</b> no menu ⚙ Opções</span></label>
-    <label class="exChk"><input type="checkbox" id="ajV"${AJU.aviso?' checked':''}><span>Avisar no 🔔 sino, uma vez, para quem usa o app há mais de <b id="ajDt">${AJU.dias}</b> dias e ainda não contribuiu</span></label>
+    <label class="exChk"><input type="checkbox" id="ajA"${AJU.ativo?' checked':''}><span>Mostrar o <b>copo 💚 Ajude a manter o Rodaliq</b> no cabeçalho</span></label>
+    <label class="exChk"><input type="checkbox" id="ajV"${AJU.aviso?' checked':''}><span>Avisar no 🔔 sino, no <b>5º dia útil de cada mês</b>, quem usa o app há mais de <b id="ajDt">${AJU.dias}</b> dias e não contribuiu nos últimos 60 dias</span></label>
     <div class="field"><label for="ajP">Chave Pix</label><input class="inp" id="ajP" value="${esc(AJU.pix)}" autocomplete="off"></div>
     <div class="field"><label for="ajV1">Valores sugeridos (R$)</label><div style="display:flex;gap:6px">
       ${AJU.valores.slice(0,3).map((v,i)=>`<input class="inp num" id="ajV${i+1}" inputmode="decimal" value="${brl(v,1)}">`).join('')}</div></div>
@@ -2316,6 +2457,12 @@ function formAjustes(){if(!ehMaster())return;
     <p class="small muted" style="margin:0 0 8px">Desligar esconde o canal, mas não apaga nada do que já foi escrito.</p>
     <label class="exChk"><input type="checkbox" id="ajCC"${CANAIS.colaborador?' checked':''}><span>🛠 <b>Colaboradores</b> — admins e colaboradores cadastrados falam com você pelo app</span></label>
     <label class="exChk"><input type="checkbox" id="ajCU"${CANAIS.usuario?' checked':''}><span>💬 <b>Usuários</b> — qualquer pessoa com conta fala com você pelo app</span></label>
+    <h3 class="ajTit">📄 Termos de uso</h3>
+    <p class="small muted" style="margin:0 0 8px">Veja como o aviso de atualização aparece para quem já aceitou os Termos antes (nada é salvo).</p>
+    <button type="button" class="btn sec sm" id="ajTv">👁 Ver o aviso de atualização dos Termos</button>
+    <h3 class="ajTit">🎛 Recursos do app</h3>
+    <p class="small muted" style="margin:0 0 8px">Desligar esconde o recurso para os usuários (os dados ficam guardados). <b>Você e os colaboradores continuam vendo.</b> Vale na hora, sem subir versão.</p>
+    ${Object.entries(REC_NOMES).map(([k,t])=>`<label class="exChk"><input type="checkbox" id="ajR_${k}"${AJU.rec[k]!==false?' checked':''}><span><b>${t}</b> ligado</span></label>`).join('')}
     <h3 class="ajTit">🚧 Manutenção</h3>
     <p class="small muted" style="margin:0 0 8px">Com a placa ligada, quem abrir o app vê o seu recado no lugar das telas. <b>Você nunca é bloqueado.</b> Nada é apagado.</p>
     <label class="exChk"><input type="checkbox" id="ajMA"${MANUT.ativo?' checked':''}><span>🚧 <b>Colocar o app em manutenção</b></span></label>
@@ -2330,6 +2477,7 @@ function formAjustes(){if(!ehMaster())return;
   const refSel=()=>{const vs=[1,2,3].map(i=>r2(parseBRL(q('#ajV'+i).value))).filter(v=>v>0);
     q('#ajS').innerHTML=vs.map(v=>`<option value="${v}"${v===AJU.sugerido?' selected':''}>${apoBRL(v)}</option>`).join('')};
   [1,2,3].forEach(i=>{const e=q('#ajV'+i);e.addEventListener('change',()=>{const v=r2(parseBRL(e.value));e.value=v>0?brl(v,1):'';refSel()})});
+  q('#ajTv').onclick=()=>termosAvisoAtualizado(true);
   q('#ajMA').addEventListener('change',()=>{const o=q('#ajMTob');if(o)o.classList.toggle('hidden',!q('#ajMA').checked)});
   const refImp=()=>{q('#ajIDt').textContent=q('#ajIP').checked?'para quem ainda não escolheu':'para todo o app'};
   q('#ajIP').addEventListener('change',refImp);
@@ -2345,7 +2493,7 @@ function formAjustes(){if(!ehMaster())return;
     if(!vs.length)return q('#ajErr').textContent='Informe pelo menos um valor.';
     let sg=r2(parseBRL(q('#ajS').value));if(!vs.includes(sg))sg=vs[0];
     q('#ajS2').disabled=true;
-    try{await ajuSalvar({ativo:q('#ajA').checked,aviso:q('#ajV').checked,pix,valores:vs,sugerido:sg});
+    try{await ajuSalvar({ativo:q('#ajA').checked,aviso:q('#ajV').checked,pix,valores:vs,sugerido:sg,rec:Object.fromEntries(Object.keys(REC_NOMES).map(k=>[k,q('#ajR_'+k).checked]))});
       await impSalvar({permitir:q('#ajIP').checked,padrao:q('#ajID').checked});
       await canaisSalvar({colaborador:q('#ajCC').checked,usuario:q('#ajCU').checked});
       await manutSalvar({ativo:q('#ajMA').checked,colabs:q('#ajMC').checked,mensagem:recadoManut});
@@ -2353,6 +2501,30 @@ function formAjustes(){if(!ehMaster())return;
       toast('Ajustes salvos');ov.remove();render()}
     catch(e){q('#ajS2').disabled=false;q('#ajErr').textContent='Não foi possível salvar. Só o admin principal pode.'}};
 }
+// V92: contadores e lembrete para quem não contribuiu nos últimos 60 dias
+async function apoNaoDoaram(box,L){
+  const us=(await admUsuarios()).filter(u=>!u.excluido_em&&!(u.user_id&&ADM_IDS.has(u.user_id)));
+  const conf=L.filter(x=>x.status==='confirmado'&&x.confirmado_em);
+  const ult=u=>conf.filter(x=>(x.user_id&&x.user_id===u.user_id)||String(apoEmail(x)).toLowerCase()===String(u.email||'').toLowerCase()).map(x=>x.confirmado_em).sort().pop()||null;
+  const info=us.map(u=>({u,ult:ult(u)})),doadores=info.filter(i=>i.ult),nao=info.filter(i=>!i.ult||excDiasDesde(i.ult)>=60);
+  const txt=(AJU.msg60&&AJU.msg60.texto)||MSG_APOIO;
+  const rows=nao.map(({u,ult:ul})=>{const c=invCache.find(v=>String(v.email||'').toLowerCase()===String(u.email||'').toLowerCase()),nm=(u.user_id&&PERFIS[u.user_id])||(c&&c.name)||'',pn=String(nm).split(' ')[0];
+    const t=`Olá${pn?', '+pn:''}!\nEsperamos que você esteja bem!\n\n${txt}`+assina();ZAP_APO['n:'+(u.user_id||u.email)]={fone:c?c.whatsapp:'',txt:t};
+    return `<div class="uCard"><div class="uMail">${esc(nm||u.email)}</div><div class="uLin">${esc(u.email||'')}${c?' · 💬 '+esc(invFmtPhone(c.whatsapp)):''} · ${ul?'última contribuição há '+excDiasDesde(ul)+' dias':'nunca contribuiu'}</div>
+      <div class="ivActs" style="margin-top:8px"><a class="btn sm" href="${esc(invMailLink(u.email,'O Rodaliq continua gratuito',t))}" target="_blank" rel="noopener">✉ E-mail</a><button type="button" class="btn sm" data-zn="${esc(u.user_id||u.email)}">💬 WhatsApp</button></div></div>`}).join('');
+  const html=`<div class="cards grid" style="margin:10px 0">${kpi('Usuários ativos',String(us.length),'sem contar admins')}${kpi('Doadores',String(doadores.length),'com contribuição confirmada')}${kpi('Sem doar há +60 dias',String(nao.length),'inclui quem nunca contribuiu')}</div>
+    <h3 style="margin:14px 0 4px">Usuários que não doaram +60 dias (${nao.length})</h3>
+    <p class="small muted" style="margin:0 0 6px">Texto do lembrete (o “Olá, Nome!” é colocado na frente em cada mensagem). “Enviar a MSG” mostra o texto no 🔔 sino de todos esses usuários, uma vez. Cada pessoa pode escolher “não falar mais nisso”, e isso é respeitado. Por e-mail ou WhatsApp, use os botões de cada pessoa, só para quem informou esse canal no cadastro.</p>
+    <textarea class="inp" id="ap60T" rows="5" maxlength="700">${esc(txt)}</textarea>
+    <div class="ivActs" style="margin:8px 0"><button type="button" class="btn sm" id="ap60E"${nao.length?'':' disabled'}>📣 Enviar a MSG</button><button type="button" class="btn sm sec" id="ap60R">Restaurar texto padrão</button></div>
+    ${AJU.msg60&&AJU.msg60.em?`<div class="small muted" style="margin-bottom:6px">Última MSG enviada em ${admData(AJU.msg60.em)}.</div>`:''}
+    <details style="margin:6px 0 12px"><summary class="small" style="cursor:pointer">Ver a lista (${nao.length})</summary>${rows||'<div class="empty">Ninguém nessa situação.</div>'}</details>`;
+  const tabs=box.querySelector('.admTabs');if(!tabs)return;tabs.insertAdjacentHTML('beforebegin',html);
+  box.querySelectorAll('[data-zn]').forEach(b=>b.onclick=()=>{const z=ZAP_APO['n:'+b.dataset.zn];if(z)abreZap(z.fone,z.txt)});
+  box.querySelector('#ap60R').onclick=()=>{box.querySelector('#ap60T').value=MSG_APOIO};
+  box.querySelector('#ap60E').onclick=async()=>{const t=box.querySelector('#ap60T').value.trim();if(t.length<20)return toast('Escreva o texto da mensagem.');
+    if(!await confirma(`Mostrar esta mensagem no 🔔 sino de <b>${nao.length}</b> usuário(s) que não contribuíram nos últimos 60 dias?`,'Enviar a MSG'))return;
+    try{await ajuSalvar({msg60:{texto:t,em:new Date().toISOString()}});audit('Apoio','Admin','MSG de apoio enviada · '+nao.length+' usuário(s)');toast('MSG enviada');apoAdminRender(box)}catch(e){toast('Não foi possível enviar agora.')}}}
 async function apoAdminRender(box){
   await carregaPerfis();
   let L;try{L=await apoListar();APO_CACHE=L}catch(e){box.innerHTML='<div class="empty">Não consegui carregar as contribuições. Tente de novo em instantes.</div>';return}
@@ -2379,6 +2551,7 @@ async function apoAdminRender(box){
     <div class="cards grid" style="margin-bottom:10px">${kpi('Confirmadas em '+mesNome(ym),apoBRL(sum(mes,x=>x.valor)),mes.length+(mes.length===1?' contribuição':' contribuições'))}${kpi('Acumulado até '+mesNome(ym),apoBRL(acumulado),'desde o lançamento')}${kpi('Para conferir',String(cnt('informado')),'aguardando a sua conferência')}${kpi('Apoiadores',String(new Set(L.filter(x=>x.status==='confirmado').map(x=>x.email)).size),'pessoas que já contribuíram')}</div>
     <div class="admTabs">${F.map(([k,t])=>`<button type="button" class="chip${f===k?' on':''}" data-apf="${k}">${t} (${cnt(k)})</button>`).join('')}</div>
     ${lst.length?lst.map(card).join(''):'<div class="empty" style="margin-top:8px">Nenhuma contribuição aqui.</div>'}`;
+  try{await apoNaoDoaram(box,L)}catch(e){}
   box.querySelectorAll('[data-apf]').forEach(b=>b.onclick=()=>{UI.apoF=b.dataset.apf;apoAdminRender(box)});
   box.querySelectorAll('[data-apm]').forEach(b=>b.onclick=()=>{let n=addMes(ym,+b.dataset.apm);if(n>mesAtual())n=mesAtual();UI.apoYm=n;apoAdminRender(box)});
   box.querySelectorAll('[data-za]').forEach(b=>b.onclick=()=>{const z=ZAP_APO[b.dataset.za];if(z)abreZap(z.fone,z.txt)});
@@ -2619,7 +2792,7 @@ function admRelLiga(box){
 const ADMIN_MASTER='diogogomes2110@gmail.com';
 const ehMaster=()=>invProd()?String(LOGADO||'').toLowerCase()===ADMIN_MASTER:true; // no HMO o cadastro de admin é simulado
 const semAc=t=>String(t||'').replace(/[^\p{L}\p{N} ]/gu,'').trim().normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
-const ADM_T=[['apoios','🤝 Apoiadores'],['despesas','💰 Despesas'],['colab','🛠 Colaboradores'],['convites','📨 Pedidos de convite'],['exclusoes','🗑 Pedidos de exclusão'],['senhas','🔑 Pedidos de senha'],['recados','💬 Recados'],['ativos','👥 Usuários ativos'],['excluidos','🚫 Usuários excluídos'],['relatorios','📑 Relatórios']]
+const ADM_T=[['apoios','🤝 Apoiadores'],['despesas','💰 Despesas'],['colab','🛠 Colaboradores'],['convites','📨 Pedidos de convite'],['exclusoes','🗑 Pedidos de exclusão'],['correcoes','✏ Correções de dados'],['senhas','🔑 Pedidos de senha'],['recados','💬 Recados'],['ativos','👥 Usuários ativos'],['excluidos','🚫 Usuários excluídos'],['relatorios','📑 Relatórios']]
   .sort((a,b)=>a[0]==='relatorios'?1:b[0]==='relatorios'?-1:semAc(a[1]).localeCompare(semAc(b[1]),'pt-BR')); // alfabética, Relatórios por último
 // V50: Gestão Admin abre como página inteira (computador e celular)
 function abrirAdmin(sub){['#bellMenu','#optMenu','#fabMenu'].forEach(s=>{const m=$(s);if(m)m.classList.add('hidden')});if(!invIsAdmin)return;
@@ -2640,6 +2813,7 @@ async function admContagens(){const put=(k,n)=>{const e=document.querySelector(`
   put('convites',invCache.filter(r=>invVivo(r)&&!r.archived&&r.status==='novo').length);
   try{const us=await admUsuarios();put('ativos',us.filter(u=>!u.excluido_em).length);put('excluidos',us.filter(u=>u.excluido_em).length)}catch(e){}
   try{const L=await excListar();put('exclusoes',L.filter(x=>x.status==='novo'||x.status==='desativado').length)}catch(e){}
+  try{const L=await corrListar();CORR_CACHE=L;put('correcoes',L.filter(x=>x.status==='novo').length)}catch(e){}
   try{const L=await senListar();SEN_CACHE=L;put('senhas',L.filter(x=>x.status==='novo').length)}catch(e){}
   try{const L=await apoListar();APO_CACHE=L;put('apoios',L.filter(x=>x.status==='informado').length)}catch(e){}
   if(ehMaster()){try{REC_TODOS=await recTodos();put('recados',recConversas().length)}catch(e){}
@@ -2803,9 +2977,21 @@ async function admUsuarios(){
   return [{user_id:'hmo',email:(LOGADO||'usuário de teste')+' (HMO)',criado_em:cri||null,ultimo_login:null,ultimo_uso:new Date().toISOString(),excluido_em:null}]}
 function registrarUso(){if(!invProd()||!DB||typeof DB.rpc!=='function')return;try{Promise.resolve(DB.rpc('rodaliq_registrar_uso')).catch(()=>{})}catch(e){}} // grava o "último uso" (produção); falha nunca atrapalha o login
 const admData=iso=>iso?dataHora(iso):'—';
-async function montaAdmin(){const box=$('#admBox');if(!box)return;const sub=UI.admSub||'convites';
+const ADM_BUSCA=['apoios','exclusoes','senhas','ativos','excluidos','correcoes'];
+function admBuscaAplica(){const box=$('#admBox'),qi=$('#admQ');if(!box||!qi)return;
+  const norm=t=>String(t||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,''),q=norm(qi.value).trim(),qd=q.replace(/\D/g,'');
+  let n=0,tot=0;box.querySelectorAll('.uCard,.ivCard').forEach(c=>{tot++;const t=norm(c.textContent),td=t.replace(/\D/g,'');const ok=!q||t.includes(q)||(qd.length>=3&&td.includes(qd));c.style.display=ok?'':'none';if(ok)n++});
+  const cnt=$('#admQn');if(cnt)cnt.textContent=q?(n+' de '+tot+' encontrado(s)'):''}
+function admBuscaMonta(sub){const box=$('#admBox');if(!box)return;let w=$('#admQw');
+  if(!ADM_BUSCA.includes(sub)){if(w)w.remove();return}
+  if(!w){w=document.createElement('div');w.id='admQw';w.style.cssText='margin:0 0 10px';w.innerHTML='<input class="inp" id="admQ" type="search" placeholder="🔎 Pesquisar por nome, telefone ou e-mail" autocomplete="off" aria-label="Pesquisar por nome, telefone ou e-mail"><div class="small muted" id="admQn" style="min-height:16px;margin-top:4px"></div>';box.parentNode.insertBefore(w,box);
+    $('#admQ').addEventListener('input',admBuscaAplica);
+    new MutationObserver(()=>{if(!box.__bq){box.__bq=1;setTimeout(()=>{box.__bq=0;admBuscaAplica()},0)}}).observe(box,{childList:true,subtree:true})}
+  else{$('#admQ').value='';$('#admQn').textContent=''}}
+async function montaAdmin(){const box=$('#admBox');if(!box)return;const sub=UI.admSub||'convites';admBuscaMonta(sub);
   if(sub==='convites'){box.innerHTML='';openInvitesModal(box);return}
   if(sub==='exclusoes'){excAdminRender(box);return}
+  if(sub==='correcoes'){corrAdminRender(box);return}
   if(sub==='senhas'){senAdminRender(box);return}
   if(sub==='apoios'){apoAdminRender(box);return}
   if(sub==='despesas'){despAdminRender(box);return}
@@ -2815,17 +3001,25 @@ async function montaAdmin(){const box=$('#admBox');if(!box)return;const sub=UI.a
   let us;try{us=await admUsuarios()}catch(e){box.innerHTML='<div class="empty">Não consegui carregar os usuários. Tente de novo em instantes.</div>';return}
   await carregaPerfis();try{await excAdminCache()}catch(e){}
   if(!invCache.length)try{await invRefreshBadge(true)}catch(e){}
+  let INAT={};if(sub==='ativos')try{INAT=await inatUltimos()}catch(e){}
   const conv=new Map(invCache.map(x=>[String(x.email||'').toLowerCase(),x]));
-  const exc=sub==='excluidos',lst=us.filter(u=>exc?!!u.excluido_em:!u.excluido_em)
+  const exc=sub==='excluidos',lstAll=us.filter(u=>exc?!!u.excluido_em:!u.excluido_em),ativF=UI.ativF||'todos',ehAdm=u=>u.user_id&&ADM_IDS.has(u.user_id),emAviso=u=>!exc&&!ehAdm(u)&&inatDias(u,INAT)>=INAT_DIAS-INAT_AVISO,lst=lstAll.filter(u=>exc||ativF==='todos'||(ativF==='aviso'&&emAviso(u)))
     .sort((a,b)=>String(exc?b.excluido_em:(b.ultimo_uso||b.ultimo_login||'')).localeCompare(String(exc?a.excluido_em:(a.ultimo_uso||a.ultimo_login||'')))) ;
   const card=u=>{const c=conv.get(String(u.email||'').toLowerCase()),nm=(u.user_id&&PERFIS[u.user_id])||(c&&c.name)||'';
-    const txt=pessoaTexto(u,nm);ZAP_PES[u.user_id||u.email]={fone:c?c.whatsapp:'',txt};
+    const txt=pessoaTexto(u,nm);ZAP_PES[u.user_id||u.email]={fone:c?c.whatsapp:'',txt};if(u.user_id)ZAP_PES['i:'+u.user_id]={fone:c?c.whatsapp:'',txt:inatTexto(String(nm).split(' ')[0],inatDias(u,INAT),false)};
     return `<div class="uCard"><div class="uMail">${esc(nm||u.email||'(sem e-mail)')}</div><div class="uLin">${esc(u.email||'(sem e-mail)')}${c?` · 💬 ${esc(invFmtPhone(c.whatsapp))}${invUfOf(c.whatsapp)?' · '+esc(invUfOf(c.whatsapp)):''}`:' · sem pedido de convite com este e-mail'}</div>
+      ${!exc&&invProd()&&!ehAdm(u)?(()=>{const d=inatDias(u,INAT),t=INAT[u.user_id];return `<div class="uLin">Último lançamento: <b>${t?admData(t):'nenhum'}</b> · ${d} ${d===1?'dia':'dias'} sem lançar${d>=INAT_DIAS?' <span class="tag r">inativo</span>':d>=INAT_DIAS-INAT_AVISO?' <span class="tag a">avisar</span>':''}</div>`})():''}
       <div class="uLin">Cadastro: ${admData(u.criado_em)}${exc?` · <b>Excluído em ${admData(u.excluido_em)}</b>`:` · Último login: ${admData(u.ultimo_login)} · Último uso: ${admData(u.ultimo_uso)}`}</div>
-      <div class="ivActs" style="margin-top:8px"><button type="button" class="btn sm" data-pdf="${esc(u.user_id||u.email)}">📄 Dados desta pessoa</button><a class="btn sm" href="${esc(invMailLink(u.email,'Seus dados pessoais no Rodaliq',txt))}" target="_blank" rel="noopener">✉ Responder o pedido</a><button type="button" class="btn sm" data-zp="${esc(u.user_id||u.email)}">💬 WhatsApp</button>${!exc&&invProd()&&ehMaster()&&u.user_id&&!ADM_IDS.has(u.user_id)?`<button type="button" class="btn sm warn" data-udel="${esc(u.user_id)}">🗑 Excluir usuário</button>`:''}</div></div>`};
+      <div class="ivActs" style="margin-top:8px"><button type="button" class="btn sm" data-pdf="${esc(u.user_id||u.email)}">📄 Dados desta pessoa</button><a class="btn sm" href="${esc(invMailLink(u.email,'Seus dados pessoais no Rodaliq',txt))}" target="_blank" rel="noopener">✉ Responder o pedido</a><button type="button" class="btn sm" data-zp="${esc(u.user_id||u.email)}">💬 WhatsApp</button>${!exc&&invProd()&&ehMaster()&&u.user_id&&!ADM_IDS.has(u.user_id)?`${emAviso(u)?`<a class="btn sm" href="${esc(invMailLink(u.email,'Sua conta no Rodaliq',inatTexto(nm.split(' ')[0],inatDias(u,INAT),false)))}" target="_blank" rel="noopener">✉ Avisar da inatividade</a><button type="button" class="btn sm" data-zi="${esc(u.user_id)}">💬 Avisar no WhatsApp</button>`:''}${emAviso(u)&&inatDias(u,INAT)>=INAT_DIAS&&invProd()&&ehMaster()&&!(EXC_CACHE||[]).some(x=>x.user_id===u.user_id&&['novo','desativado'].includes(x.status))?`<button type="button" class="btn sm warn" data-uina="${esc(u.user_id)}">🔒 Desativar por inatividade</button>`:''}<button type="button" class="btn sm warn" data-udel="${esc(u.user_id)}">🗑 Excluir usuário</button>`:''}</div></div>`};
   box.innerHTML=`<h3 style="margin:0">${exc?'🗑 Usuários excluídos':'👥 Usuários ativos'} (${lst.length})</h3>
     <p class="small muted" style="margin:4px 0 0">${exc?'Usuários apagados (pelo app ou pelo painel do Supabase), com a data da exclusão.':'Ordenados pelo último uso. “Último uso” muda sempre que a pessoa abre o app; “Último login”, só quando ela digita a senha.'} Para apagar uma pessoa, use “🗑 Excluir usuário” (definitivo).${invProd()?'':' <b>No HMO aparece só o usuário de teste; os dados reais aparecem em produção.</b>'}</p>
-    ${lst.length?lst.map(card).join(''):`<div class="empty">${exc?'Nenhum usuário excluído.':'Nenhum usuário ativo.'}</div>`}`;
+    ${sub==='ativos'&&invProd()?`<div class="admTabs" style="margin:8px 0"><button type="button" class="chip${ativF==='todos'?' on':''}" data-ativf="todos">Todos (${lstAll.length})</button><button type="button" class="chip${ativF==='aviso'?' on':''}" data-ativf="aviso">Sem lançar há ${INAT_DIAS-INAT_AVISO}+ dias (${lstAll.filter(emAviso).length})</button></div><p class="small muted" style="margin:0 0 8px">Só entrar no app não conta: vale o último lançamento. Aos ${INAT_DIAS-INAT_AVISO} dias você pode avisar a pessoa; aos ${INAT_DIAS} dias aparece “🔒 Desativar por inatividade” (mesma carência de ${EXC_DIAS} dias e mesma reativação dos pedidos de exclusão).</p>`:''}
+    ${lst.length?lst.map(card).join(''):`<div class="empty">${exc?'Nenhum usuário excluído.':ativF==='aviso'?'Ninguém nessa situação.':'Nenhum usuário ativo.'}</div>`}`;
+  box.querySelectorAll('[data-ativf]').forEach(b=>b.onclick=()=>{UI.ativF=b.dataset.ativf;montaAdmin()});
+  box.querySelectorAll('[data-zi]').forEach(b=>b.onclick=()=>{const z=ZAP_PES['i:'+b.dataset.zi];if(z)abreZap(z.fone,z.txt)});
+  box.querySelectorAll('[data-uina]').forEach(b=>b.onclick=async()=>{const u=lst.find(v=>v.user_id===b.dataset.uina);if(!u)return;const d=inatDias(u,INAT);
+    if(!await confirma(`Desativar o acesso de <b>${esc(u.email)}</b> por inatividade (${d} dias sem lançamentos)? A pessoa não consegue mais ver nem lançar dados. Os dados ficam guardados por ${EXC_DIAS} dias e você pode reativar nesse prazo em <b>Pedidos de exclusão</b>.`,'Desativar acesso',{perigo:1}))return;
+    try{const {error}=await DB.rpc('rodaliq_desativar_inatividade',{p_user:u.user_id});if(error)throw error;audit('Inatividade','Admin','Acesso desativado por inatividade · '+u.email+' · '+d+' dias');toast('Acesso desativado. Avise a pessoa.');await excAdminCache(true);atualizaSino();montaAdmin();admContagens()}catch(e){toast('Não foi possível desativar agora.')}});
   box.querySelectorAll('[data-pdf]').forEach(b=>b.onclick=()=>{const u=lst.find(v=>String(v.user_id||v.email)===b.dataset.pdf);if(u)pessoaVer(u)});
   box.querySelectorAll('[data-zp]').forEach(b=>b.onclick=()=>{const z=ZAP_PES[b.dataset.zp];if(z)abreZap(z.fone,z.txt)});
   box.querySelectorAll('[data-udel]').forEach(b=>b.onclick=async()=>{const u=lst.find(v=>v.user_id===b.dataset.udel);if(!u)return;
@@ -2977,9 +3171,10 @@ function invResultado(res,depois){
     else if(av){const x=SEN[av.dataset.av];if(!x)return;
       try{await invSetStatus(x.r.id,'avisado');x.r.status='avisado';
         const c=ov.querySelector('[data-sen="'+x.r.id+'"]');if(c){c.style.opacity='.45';const t=c.querySelector('.tag');if(t)t.textContent='avisado'}
-        toast('Marcado como avisado')}catch(er){toast('N\u00e3o foi poss\u00edvel marcar')}}
+        toast('Marcado como avisado');
+        if(bons.every(y=>y.r.status==='avisado'))setTimeout(()=>fim(),250)}catch(er){toast('N\u00e3o foi poss\u00edvel marcar')}}
   });
-  const fim=()=>{ov.remove();if(depois)depois()};
+  function fim(){ov.remove();if(depois)depois()}
   ov.querySelector('#ivRfim').onclick=fim;
   ov.addEventListener('mousedown',e=>{if(e.target===ov)fim()});
 }
@@ -3019,7 +3214,7 @@ async function openInvitesModal(host){ // V48: com host, a tela é montada dentr
     body.innerHTML=(busca?`<p class="small muted">Resultado da pesquisa em todos os pedidos, inclusive arquivados: ${items.length}.</p>`:'')+(items.length?items.map(r=>{const uf=invUfOf(r.whatsapp),bd=invBdayNear(r);return `<div class="ivCard" data-id="${esc(r.id)}">
       <div class="ivTop"><div style="min-width:0"><div class="ivNome">${esc(r.name)}</div><div class="small muted" style="word-break:break-all">${esc(r.email)}</div><a class="supaLnk" href="${SUPA_USERS}" target="_blank" rel="noopener">↗ Abrir Supabase (Users)</a><div class="small">💬 ${esc(invFmtPhone(r.whatsapp))}${uf?' · '+esc(uf):''}</div>${r.birth_date?`<div class="small">🎂 ${esc(invBirthBR(r.birth_date))}</div>`:''}</div>
       <div class="ivTags"><span class="tag ${r.status==='novo'?'b':'g'}">${esc(INV_ST[r.status]||r.status)}</span>${r.archived?'<span class="tag g">🗄 Arquivado</span>':''}</div></div>
-      <div class="small muted" style="margin-top:4px">Como soube: <b style="color:var(--ink)">${esc(r.how_known)}</b></div>
+      <div class="small muted" style="margin-top:4px">Como soube: <b style="color:var(--ink)">${esc(r.how_known)}</b> · 🚗 Motorista de app: <b style="color:var(--ink)">${r.motorista===true?'Sim':r.motorista===false?'Não':'—'}</b></div>
       <div class="small muted">${esc(invWhen(r.created_at))}</div>
       <div class="small muted">🔒 Autorização LGPD: <b style="color:var(--ink)">${esc(invAceite(r))}</b></div>
       ${bd?`<div class="small ivBday">🎂 ${bd.when==='hoje'?'Hoje':'Amanhã'} é aniversário (faz ${bd.age} anos)</div>`:''}
@@ -3094,11 +3289,11 @@ async function openInvitesModal(host){ // V48: com host, a tela é montada dentr
   const ymd=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
   const info=(t,neutro)=>{msg.className=neutro?'ivInfo':'err';msg.textContent=t};
   const isMinor=b=>{const lim=new Date();lim.setFullYear(lim.getFullYear()-18);return /^\d{4}-\d{2}-\d{2}$/.test(b)&&b>ymd(lim)};
-  const checkMinor=()=>{const m=isMinor($('#invBirth').value);if(m)msg.textContent='';$('#invMinor').classList.toggle('hidden',!m);$('#invBtn').classList.toggle('hidden',m);$('#invClose').classList.toggle('hidden',!m);return m};
+  const checkMinor=()=>{const m=isMinor($('#invBirth').value);if(m)msg.textContent='';$('#invMinor').classList.toggle('hidden',!m);$('#invBtn').classList.toggle('hidden',m);return m};
   const view=(on,doGesto)=>{form.classList.toggle('hidden',!on);if(on&&!NAV_ON&&!invGuarda){try{history.pushState({rq:'inv'},'');invGuarda=true}catch(e){}}if(!on&&invGuarda&&!doGesto){invGuarda=false;navIgnora=true;try{history.back()}catch(e){navIgnora=false}}if(!on&&doGesto)invGuarda=false;lf.classList.toggle('hidden',on);link.parentElement.classList.toggle('hidden',on);if(so0)so0.parentElement.classList.toggle('hidden',on);
     info('');if(!on){form.reset();$('#invUf').textContent=''}
     if(on){$('#invDone').classList.add('hidden');$('#invFields').classList.remove('hidden');checkMinor();setTimeout(()=>$('#invName').focus(),50)}};
-  form.__fechar=g=>view(false,g);form.__sujo=()=>['#invName','#invEmail','#invBirth','#invDdd','#invPhone','#invHow'].some(k=>$(k).value.trim()!=='')||$('#invOk').checked;
+  form.__fechar=g=>view(false,g);form.__sujo=()=>['#invName','#invEmail','#invEmail2','#invBirth','#invDdd','#invPhone','#invHow'].some(k=>$(k).value.trim()!=='')||$('#invOk').checked||!!form.querySelector('input[name=invDrv]:checked');
   $('#invBirth').max=ymd(new Date());
   const showUf=()=>{const d=invDigits($('#invDdd').value),el=$('#invUf');if(d.length<2){el.textContent='';return}
     const uf=DDD_UF[d.slice(0,2)];el.textContent=uf?`📍 ${UF_NOME[uf]} (${uf})`:'✕ DDD não encontrado';el.className='small '+(uf?'ivOk':'ivBad')};
@@ -3106,7 +3301,7 @@ async function openInvitesModal(host){ // V48: com host, a tela é montada dentr
   $('#invPhone').addEventListener('input',()=>{const i=$('#invPhone');const d=invDigits(i.value).slice(0,9);i.value=d.length>5?d.slice(0,5)+'-'+d.slice(5):d});
   ['input','change'].forEach(ev=>$('#invBirth').addEventListener(ev,checkMinor));
   link.addEventListener('click',()=>view(true));
-  $('#invClose').addEventListener('click',()=>view(false));
+  $('#invClose').addEventListener('click',async()=>{if(form.__sujo()&&!await confirma('Você começou a preencher o pedido. Se voltar agora, <b>o que você digitou será perdido</b>.','Voltar e perder',{titulo:'Voltar para o login?',voltar:'Continuar preenchendo',perigo:1}))return;view(false)});
   $('#invDoneBack').addEventListener('click',()=>view(false));
   const DUP={email:'Já recebemos um pedido com este e-mail. Em breve entraremos em contato pelo e-mail ou WhatsApp informado.',whatsapp:'Já recebemos um pedido com este WhatsApp. Em breve entraremos em contato.',again:'Seu pedido já foi enviado. Em breve entraremos em contato pelo e-mail ou WhatsApp informado.'};
   form.addEventListener('submit',async e=>{
@@ -3114,13 +3309,16 @@ async function openInvitesModal(host){ // V48: com host, a tela é montada dentr
     if($('#invWeb').value){$('#invFields').classList.add('hidden');$('#invDone').classList.remove('hidden');return} // campo-isca: finge sucesso
     const ddd=invDigits($('#invDdd').value),num=invDigits($('#invPhone').value),birth=$('#invBirth').value;
     const rec={name:$('#invName').value.trim().replace(/\s+/g,' '),email:$('#invEmail').value.trim(),whatsapp:'55'+ddd+num,birth_date:birth,how_known:$('#invHow').value.trim().replace(/\s+/g,' ')};
+    const drv=form.querySelector('input[name=invDrv]:checked');rec.motorista=drv?drv.value==='sim':null;
     const parts=rec.name.split(' ');
     if(checkMinor())return info('Menores de 18 anos não podem pedir convite.');
     if(parts.length<2||parts[0].length<2||parts[1].length<1)return info('Informe nome e sobrenome.');
     if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(rec.email)||rec.email.length>120)return info('Informe um e-mail válido.');
+    if($('#invEmail2').value.trim().toLowerCase()!==rec.email.toLowerCase())return info('Os e-mails informados não são iguais. Confira o campo “Confirmar e-mail”.');
     if(!/^\d{4}-\d{2}-\d{2}$/.test(birth)||birth<'1900-01-01')return info('Informe a data de nascimento.');
     if(!DDD_UF[ddd])return info('Informe um DDD válido.');
     if(!/^9\d{8}$/.test(num))return info('Informe o número do WhatsApp com 9 dígitos (começa com 9).');
+    if(rec.motorista===null)return info('Informe se você é motorista de aplicativo.');
     if(rec.how_known.length<2)return info('Conte como soube do app.');
     if(!$('#invOk').checked)return info('Marque a autorização para continuar.');
     let last=0;try{last=+localStorage.getItem('rodaliq_inv_last')||0}catch(x){}
@@ -3189,7 +3387,7 @@ window.addEventListener('popstate',async()=>{
 
 /* ===================== V36: termos, primeiro acesso, por km, projeção, reservas e fechar o dia ===================== */
 /* ---------- 1. Termos de uso e Política de privacidade ---------- */
-const TERMOS_V='T5-2026-11-14',TERMOS_DATA='14/11/2026',TERMOS_RESP='Diogo Gomes',TERMOS_MAIL='rodaliq.app@gmail.com';
+const TERMOS_V='T6-2026-11-17',TERMOS_DATA='17/11/2026',TERMOS_RESP='Diogo Gomes',TERMOS_MAIL='rodaliq.app@gmail.com';
 const TXT_TERMOS=`<h3>Termos de uso do Rodaliq</h3><p class="small muted">Versão de ${TERMOS_DATA}</p>
 <p><b>1. O que é o Rodaliq.</b> Um aplicativo de gestão para motoristas de aplicativo: registra ganhos (Uber, 99 e Carona Solidária), custos do veículo, multas e o Carnê-Leão, e mostra indicadores, alertas e relatórios. Ele nasceu de uma necessidade do próprio criador, que controlava essas mesmas informações à mão, espalhadas por mais de uma planilha. Ao perceber que outros motoristas provavelmente passavam pela mesma dificuldade, decidiu transformar esse controle em um aplicativo e compartilhá-lo.</p>\n<p><b>1.1. Onde o Rodaliq se aplica.</b> O Rodaliq é destinado ao uso no Brasil. Os cálculos, prazos e referências legais do aplicativo seguem a legislação brasileira — inclusive o Carnê-Leão, o DARF, a CNH e as multas de trânsito — e os valores são em reais. Nada impede o acesso de fora do país, mas o aplicativo não foi feito para outras moedas, outros fusos horários nem a legislação de outros países.</p>
 <p><b>2. Quem pode usar.</b> Somente maiores de 18 anos (Código Civil, art. 5º), com acesso liberado por convite. A conta é pessoal: login e senha não devem ser compartilhados.</p>
@@ -3199,6 +3397,7 @@ const TXT_TERMOS=`<h3>Termos de uso do Rodaliq</h3><p class="small muted">Versã
 <p><b>6. Segurança dos dados.</b> O Rodaliq adota medidas técnicas para proteger seus dados contra acessos não autorizados, como conexão criptografada e acesso restrito a cada conta, conforme a LGPD (Lei nº 13.709/2018, art. 46).</p>
 <p><b>7. Propriedade.</b> A marca, o nome, a identidade visual e o código do Rodaliq pertencem ao seu responsável. Os dados que você lança são seus.</p>
 <p><b>8. Encerramento da sua conta.</b> Você pode pedir a exclusão da conta e dos dados a qualquer momento em ⚙ Opções &gt; Excluir minha conta. O acesso é desativado e, após ${EXC_DIAS} dias, os dados são apagados de vez (veja o item “Como excluir sua conta” da Política de privacidade). O pedido de exclusão só pode ser feito pelo app.</p>
+<p><b>8.1. Inatividade.</b> Se a conta ficar muito tempo sem nenhum lançamento no app (só entrar não conta como uso), o acesso pode ser desativado e o cadastro, apagado, para manter o serviço enxuto e os seus dados protegidos. Antes disso, avisamos você pelo e-mail ou WhatsApp informado no cadastro, com antecedência. Desativado o acesso, valem os mesmos ${EXC_DIAS} dias de carência do item 8, e você pode pedir para voltar nesse prazo.</p>
 <p><b>9. Encerramento do aplicativo.</b> Assim como você pode encerrar a sua conta quando quiser, o Rodaliq também pode ser descontinuado a qualquer momento. Se isso acontecer, todos os usuários serão avisados pelo app com, no mínimo, 30 dias de antecedência, contados a partir do aviso, para que haja tempo de exportar os dados em ⚙ Opções &gt; Exportar backup. Encerrado esse prazo, o acesso é desativado e os dados são apagados. Por se tratar de contribuição voluntária, e não de pagamento por um serviço contratado, não há devolução de valores já contribuídos.</p>
 <p><b>10. Mudanças.</b> Estes termos podem ser atualizados. Quando isso acontecer, o app pedirá um novo aceite.</p>
 <p><b>11. Lei aplicável.</b> Legislação brasileira. Contato: ${TERMOS_MAIL}.</p>`;
@@ -3221,8 +3420,16 @@ function verTermos(aba){
   draw();document.body.appendChild(ov);ov.__fechar=()=>ov.remove();
   ov.addEventListener('click',e=>{e.stopPropagation();if(e.target.dataset.ta){at=e.target.dataset.ta;draw()}else if(e.target.id==='tmF'||e.target===ov)ov.remove()});
 }
+function termosAvisoAtualizado(previa){const o=document.createElement('div');o.className='ov';o.style.zIndex='75';
+  o.innerHTML=`<div class="modal" style="max-width:440px"><h2>📄 Atualizamos os Termos de uso</h2><p class="small">Incluímos o item <b>8.1</b>: contas sem nenhum lançamento por muito tempo podem ter o acesso desativado, depois de aviso. Antes de qualquer desativação, avisamos você. Você continua usando o app normalmente, e qualquer dúvida é só falar com a gente pelo e-mail <b>${MAIL_RODALIQ}</b>.</p><div class="mfoot"><button class="btn sec" id="tvL">Ler os Termos</button><button class="btn" id="tvO">Entendi</button></div></div>`;
+  document.body.appendChild(o);
+  o.querySelector('#tvO').onclick=()=>{if(!previa){cfg().termosVisto=TERMOS_V;salvar('tb_config');audit('Termos atualizados','Configurações','📄 Aviso de atualização visto · versão '+TERMOS_V)}o.remove()};
+  o.querySelector('#tvL').onclick=()=>{verTermos('termos')}}
 function checarTermos(){return new Promise(res=>{
   const a=cfg().aceite;if(a&&a.versao===TERMOS_V)return res(true);
+  if(a&&a.versao){ // já aceitou antes: atualização vira aviso, sem bloquear
+    if(cfg().termosVisto!==TERMOS_V)termosAvisoAtualizado(false);
+    return res(true)}
   const ov=document.createElement('div');ov.className='ov';ov.id='termosDlg';ov.style.zIndex='75';let at='termos';
   const draw=()=>{const ok=ov.querySelector('#tmOk')?.checked;ov.innerHTML=`<div class="modal termos"><h2>Antes de continuar</h2>
     <p class="small muted">${a?'Os Termos de uso e a Política de privacidade foram atualizados.':'Para usar o Rodaliq, leia e aceite os Termos de uso e a Política de privacidade.'}</p>
@@ -3243,6 +3450,8 @@ function checarPrimeiroAcesso(){if(!cfg().onboardingOk&&contaVazia())primeiroAce
 /* ---------- 3. Guia do Rodaliq (passo a passo) e card "Primeiros passos" ---------- */
 const GUIA=[
  {t:'👋 Bem-vindo ao Rodaliq™',x:`O Rodaliq organiza o seu dia a dia de motorista: ganhos, custos do carro, multas e o Carnê-Leão.<br><br><b>Regra de ouro:</b> os números do Painel vêm do que você lança. Quanto mais completo o lançamento, mais o app consegue mostrar. Este guia mostra o que lançar e onde cada informação aparece.`},
+ {t:'📲 Instale o Rodaliq no seu aparelho',x:`O Rodaliq é um app que roda no navegador, mas você pode ter o ícone na tela, como qualquer aplicativo (sem loja de apps e sem ocupar quase espaço).<br><br><b>📱 Android (Chrome):</b> abra rodaliq.com.br &gt; toque nos <b>3 pontinhos ⋮</b> &gt; <b>Instalar app</b> (ou <b>Adicionar à tela inicial</b>) &gt; confirme.<br><b>🍎 iPhone/iPad (Safari):</b> abra rodaliq.com.br no <b>Safari</b> &gt; toque em <b>Compartilhar</b> (quadrado com seta para cima) &gt; role e toque em <b>Adicionar à Tela de Início</b> &gt; <b>Adicionar</b>.<br><b>💻 Computador (Chrome ou Edge):</b> abra rodaliq.com.br &gt; clique no ícone de <b>instalar</b> (monitor com seta) no fim da barra de endereço, ou em <b>⋮ &gt; Salvar e compartilhar &gt; Instalar página como app</b>.<br><br>Depois é só abrir pelo ícone. Seus dados continuam os mesmos, na sua conta.`,m:'Ícone na tela inicial do celular ou do computador.'},
+ {t:'💚 O copo no topo da tela',x:`O Rodaliq é gratuito e vai continuar sendo. O <b>copo</b> ao lado do logo é o jeito discreto de ajudar a manter o app no ar: toque nele se quiser contribuir com o que achar justo (Pix, sem cobrança e sem obrigação). O copo enche quando uma contribuição sua é confirmada e vai esvaziando em até 60 dias. Seu acesso nunca depende disso.`,m:'Contribuição voluntária e opcional.'},
  {t:'🚗 Seu veículo',cfg:'veic'},
  {t:'🎯 Sua meta diária',x:`Defina quanto quer ganhar por dia e em quais dias da semana você roda, em <b>⚙ Opções › Metas e preferências</b>. É de lá que saem a meta do dia e a do mês.<br><br>Nessa mesma tela ficam duas escolhas que mexem no imposto: o <b>desconto simplificado</b> mensal e se a <b>Carona Solidária entra no Carnê-Leão</b>. As duas seguem as referências oficiais listadas na aba <b>🧮 Impostos</b> — e, no caso da carona, a ressalva explicada na aba <b>Caronas / BlaBlaCar</b>.`,cfg:'meta'},
  {t:'🚕 Seus ganhos (Uber e 99)',x:`Lance o ganho de cada dia em <b>Corridas &gt; ＋ Corridas</b> ou, mais rápido, em <b>⚡ Atalhos &gt; Lançar o dia (Uber + 99)</b>.<br>Preencha também viagens, tempo online e <b>km rodados</b>: sem km, os indicadores por km não aparecem.<br><br>A Uber e a 99 mostram o km <b>viagem por viagem</b>, nunca o total do dia. Por isso o campo de km tem o botão <b>🧮</b> ao lado: digite (ou cole) um km por linha, que ele soma e devolve o total, com a opção de <b>Usar</b> ou de <b>Somar ao campo</b> se você já tinha lançado parte do dia.${refBloco(REF_GANHOS)}`,
@@ -3317,12 +3526,12 @@ function cardPassos(){
 /* ---------- 6. Reservas para despesas grandes ---------- */
 const mesesEntre=(a,b)=>(+b.slice(0,4)-+a.slice(0,4))*12+(+b.slice(5,7)-+a.slice(5,7))+1; // inclusivo
 const reservas=()=>cfg().reservas||[];
-function reservasDoMes(ym){return reservas().filter(r=>r.criado<=ym&&ym<=r.venc.slice(0,7)).map(r=>({...r,parcela:Math.round(r.valor/Math.max(1,mesesEntre(r.criado,r.venc.slice(0,7)))*100)/100}))}
+function reservasDoMes(ym){return reservas().filter(r=>r.criado<=ym&&ym<=r.venc.slice(0,7)).sort((a,b)=>String(a.venc).localeCompare(String(b.venc))).map(r=>({...r,parcela:Math.round(r.valor/Math.max(1,mesesEntre(r.criado,r.venc.slice(0,7)))*100)/100}))}
 function sugestaoReserva(cat){const lim=isoOf(new Date(new Date().setFullYear(new Date().getFullYear()-1)));return sum(todasDespesas().filter(r=>r.cat===cat&&r.data>lim),r=>r.valor)}
 function formReserva(r){
   r=r||{cat:'IPVA/Licenciamento',venc:''};const novo=!r.id;
   const f=openForm({titulo:novo?'Nova despesa programada':'Editar despesa programada',sub:'<div class="prevComo" style="margin:0"><b>Como funciona:</b> cadastre uma despesa grande que vai chegar e a data em que vai pagar. O app divide o valor pelos meses até lá e mostra, no Painel, quanto separar por mês. Exemplo: IPVA de R$ 2.160 em 31/01, cadastrado em novembro, dá R$ 720 por mês (novembro, dezembro e janeiro).</div>',
-    campos:[{k:'nome',l:'O que é a despesa?',t:'text',req:1,full:1,ph:'Ex.: IPVA 2027, Seguro anual, Revisão dos 60 mil km, Pneus'},{k:'cat',l:'Categoria',t:'select',op:comSep(CATS_FORM)},{k:'valor',l:'Valor previsto (R$)',t:'money',req:1,help:' '},{k:'venc',l:'Data de pagamento',t:'date',req:1,allowFuture:1}],
+    campos:[{k:'nome',l:'O que é a despesa?',t:'text',req:1,full:1,ph:'Ex.: IPVA 2027, Seguro anual, Revisão dos 60 mil km, Pneus'},{k:'cat',l:'Categoria',t:'select',op:comSep(CATS_FORM)},{k:'valor',l:'Valor previsto (R$)',t:'money',req:1,help:' '},{k:'venc',l:'Data prevista p/ pagamento',t:'date',req:1,allowFuture:1}],
     val:Object.assign({nome:r.nome||''},r),
     onSave:o=>{if(!(o.valor>0))return 'Informe o valor previsto.';const criado=r.criado||mesAtual();if(o.venc.slice(0,7)<criado)return 'A data precisa ser deste mês em diante.';
       const lista=reservas().filter(x=>x.id!==r.id);lista.push({id:r.id||uid('rv'),nome:o.nome,cat:o.cat,valor:o.valor,venc:o.venc,criado});cfg().reservas=lista;salvar('tb_config');render();toast('Despesa programada salva')},
@@ -3334,7 +3543,7 @@ function formReserva(r){
 function verReservas(){
   const ov=document.createElement('div');ov.className='ov';
   const draw=()=>{const ym=mesAtual(),l=reservas().slice().sort((a,b)=>a.venc.localeCompare(b.venc)),dm=reservasDoMes(ym);
-    ov.innerHTML=`<div class="modal" style="max-width:520px"><h2>📅 Despesas programadas</h2><p class="small muted">Despesas grandes que vão chegar. O app sugere quanto separar por mês até a data de pagamento.</p>
+    ov.innerHTML=`<div class="modal" style="max-width:520px"><h2>📅 Despesas programadas</h2><p class="small muted">Despesas grandes que vão chegar. O app sugere quanto separar por mês até a data prevista de pagamento. A lista é ordenada por essa data.</p>
       ${l.length?l.map(r=>{const p=dm.find(x=>x.id===r.id),venc=r.venc.slice(0,7)<ym;return `<div class="ivCard" style="display:flex;justify-content:space-between;gap:8px;align-items:center"><div><b>${esc(r.nome)}</b><div class="small muted">${esc(r.cat)} · ${brl(r.valor)} · até ${fmtBR(r.venc)}</div><div class="small">${venc?'⏰ Data já passou: lance o pagamento em Custos e exclua esta despesa programada.':p?`Separar <b>${brl(p.parcela)}</b>/mês`:'Começa no próximo mês'}</div></div><button class="btn sec sm" data-rv="${esc(r.id)}">✎</button></div>`}).join(''):'<div class="empty">Nenhuma despesa programada.</div>'}
       <div class="mfoot"><button class="btn sec" id="rvF">Fechar</button><button class="btn" id="rvN">＋ Programar despesa</button></div></div>`};
   draw();document.body.appendChild(ov);ov.__fechar=()=>ov.remove();
@@ -3432,7 +3641,8 @@ $('#impFile').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(
 /* ---------- render e eventos ---------- */
 function render(){
   if(UI.tab==='admin')UI.tab='painel';
-  const v={painel:vPainel,corridas:vCorridas,carona:vCarona,custos:vCustos,multas:vMultas,impostos:vImpostos,relatorios:vRelatorios}[UI.tab];
+  let v={painel:vPainel,corridas:vCorridas,carona:vCarona,custos:vCustos,multas:vMultas,impostos:vImpostos,relatorios:vRelatorios}[UI.tab];
+  if(recOff(UI.tab))v=()=>'<div class="note am" style="margin-top:12px">🔧 <b>Este recurso está temporariamente indisponível.</b> Estamos ajustando e ele volta em breve. Seus dados continuam guardados e nada foi apagado.</div>';
   navRegistraAba();
   $('#view').innerHTML=v();
   document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.dataset.t===UI.tab));
@@ -3440,14 +3650,18 @@ function render(){
   ['simV','simD','simN'].forEach(i=>{const el=document.getElementById(i);if(el)el.oninput=simular});simular();
   atualizaSino();if(!$('#bellMenu').classList.contains('hidden'))renderSino();
 }
-$('#tabs').onclick=e=>{const b=e.target.closest('.tab');if(!b)return;if(b.id==='tabAdmin'){abrirAdmin();return}UI.tab=b.dataset.t;try{history.replaceState(history.state,'','#'+UI.tab)}catch(er){}render();window.scrollTo(0,0)};
+$('#tabAdmin').onclick=()=>abrirAdmin();
+$('#donoBtn').onclick=()=>formApoiar();
+$('#tabs').onclick=e=>{const b=e.target.closest('.tab');if(!b)return;UI.tab=b.dataset.t;try{history.replaceState(history.state,'','#'+UI.tab)}catch(er){}render();window.scrollTo(0,0)};
 $('#view').addEventListener('click',e=>{
   if(e.target.closest('[data-acao=reservas]')){verReservas();return}
   const pa=e.target.closest('[data-acao]');if(pa){const a=pa.dataset.acao;
     if(a==='guia'){primeiroAcesso(false);return}
     if(a==='passos-off'){cfg().passosOk=true;salvar('tb_config');render();toast('Primeiros passos dispensado. O guia continua em ⚙ Opções.');return}
     if(a.startsWith('passo:')){const p=PASSOS.find(x=>x.k===a.slice(6));if(p)p.go();return}}
-  const t=e.target.closest('[data-mp],[data-grp],[data-sub],[data-new],[data-ed],[data-del],[data-carne],[data-ano],[data-rel]');if(!t)return;
+  const t=e.target.closest('[data-mp],[data-grp],[data-sub],[data-new],[data-ed],[data-del],[data-carne],[data-cpg],[data-cex],[data-ano],[data-rel]');if(!t)return;
+  if(t.dataset.cpg){carnePagoRapido(t.dataset.cpg);return}
+  if(t.dataset.cex){carneExcluir(t.dataset.cex);return}
   if(t.dataset.rel){relAcao(t);return}
   if(t.dataset.del){const [tb,id]=t.dataset.del.split(':');const r=S[tb].find(x=>x.id===id);if(!r)return;confirma('Excluir este lançamento?<br><b>'+esc(resumoReg(tb,r))+'</b>','Excluir').then(ok=>{if(ok){remover(tb,id);toast('Lançamento excluído')}});return}
   if(t.dataset.mp){const n=addMes(UI.mes,+t.dataset.mp);if(n>mesAtual()){toast('Mês futuro');return}UI.mes=n;render()}
@@ -3477,7 +3691,7 @@ $('#optBtn').onclick=e=>{e.stopPropagation();$('#bellMenu').classList.add('hidde
 window.addEventListener('scroll',()=>{['bellMenu','optMenu'].forEach(id=>{const m=document.getElementById(id);if(m&&!m.classList.contains('hidden')&&window.innerWidth<=640)posMenu(m,document.getElementById(id==='bellMenu'?'bellBtn':'optBtn'))})},{passive:true});
 document.addEventListener('click',e=>{if(!e.target.closest('#optWrap'))$('#optMenu').classList.add('hidden');if(!e.target.closest('#bellWrap'))$('#bellMenu').classList.add('hidden')});
 $('#optMenu').onclick=e=>{const b=e.target.closest('[data-m]');if(!b)return;$('#optMenu').classList.add('hidden');
-  ({falar:formFalar,apoio:formApoiar,excluir:formExcluirConta,cfg:formCfg,veic:formVeic,cnh:formCnh,tema:formTema,rsv:verReservas,onb:()=>primeiroAcesso(false),termos:()=>verTermos(),aud:verAuditoria,pass:formSenha,exp:exportar,imp:()=>$('#impFile').click(),out:sair})[b.dataset.m]()};
+  ({falar:formFalar,apoio:formApoiar,corrigir:formCorrigir,excluir:formExcluirConta,cfg:formCfg,veic:formVeic,cnh:formCnh,tema:formTema,rsv:verReservas,onb:()=>primeiroAcesso(false),termos:()=>verTermos(),aud:verAuditoria,pass:formSenha,exp:exportar,imp:()=>$('#impFile').click(),out:sair})[b.dataset.m]()};
 (()=>{const h=(location.hash||'').slice(1);if(['painel','corridas','carona','custos','multas','impostos','relatorios'].includes(h))UI.tab=h})();
 iniciar();
 if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
