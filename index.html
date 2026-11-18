@@ -89,6 +89,8 @@ h3{font-size:13px;margin:0 0 8px;color:var(--muted);text-transform:uppercase;let
 .kpi .s{font-size:12px;color:var(--muted);margin-top:2px}
 .kpi.hl{border:2px solid var(--blue)}
 .kpi.wide{grid-column:span 2}
+.vhSc{max-height:262px;overflow-y:auto;border:1px solid var(--line);border-radius:10px}.vhRw{display:block;width:100%;text-align:left;background:#fff;border:0;border-bottom:1px solid var(--line);padding:9px 12px;cursor:pointer;font:inherit;color:inherit}.vhRw:last-child{border-bottom:0}.vhRw.on{background:var(--blueSoft)}.vhT{display:block}.vhR{display:block;font-size:12.5px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.vhRw.on .vhR{display:none}.vhD{display:flex;flex-direction:column;gap:5px;margin-top:8px;font-size:13px}
+html[data-tema="escuro"] .vhRw{background:transparent}html[data-tema="escuro"] .vhRw.on{background:#16233f}
 .kpi.pdw{grid-column:span 2}
 .pdTop{grid-column:1/-1}
 @media(min-width:861px){.kpi.pdw{grid-column:1/span 2}}
@@ -540,7 +542,7 @@ body:has(#admPage) .fab{z-index:61}body:has(#admPage) .fabMenu{z-index:62}body:h
 
 <script>
 "use strict";
-const VERSAO='V96';
+const VERSAO='V97';
 /* ---------- utilidades ---------- */
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -2940,7 +2942,7 @@ async function parcCarrega(){const g=async k=>{try{return await pList(k)}catch(e
 // ----- lado do usuário -----
 async function parcUsuario(){
   if(!invProd()){const [P,C]=await Promise.all([pList('parc'),pList('cats')]),cn=Object.fromEntries(C.map(c=>[c.id,c.nome]));
-    return P.filter(parcAtivo).map(p=>({id:p.id,nome:p.nome,categoria:cn[p.categoria_id]||'',descricao:p.descricao,oferta:p.oferta,cidade:p.cidade,contatos:p.contatos||[],endereco:p.endereco||null,exclusivo_texto:(p.exclusivo&&(PREV_AP||SOU_APOIADOR||invIsAdmin||SOU_COLAB))?(p.exclusivo_texto||''):''}))}
+    return P.filter(parcAtivo).map(p=>({id:p.id,nome:p.nome,categoria:cn[p.categoria_id]||'',descricao:p.descricao,oferta:p.oferta,cidade:p.cidade,contatos:p.contatos||[],endereco:p.endereco||null,exclusivo:!!p.exclusivo,exclusivo_texto:(p.exclusivo&&(PREV_AP||SOU_APOIADOR||invIsAdmin||SOU_COLAB))?(p.exclusivo_texto||''):''}))}
   const {data,error}=await DB.rpc('rodaliq_parc_listar');if(error)throw error;return Array.isArray(data)?data:[]}
 function parcClique(id,canal){try{
   if(invProd()){Promise.resolve(DB.rpc('rodaliq_parc_clique',{p_parceiro:id,p_canal:canal})).catch(()=>{});return}
@@ -2963,7 +2965,7 @@ async function formParceiros(){
   let L=[];try{L=await parcUsuario()}catch(e){ov.querySelector('#pcLs').innerHTML='<div class="empty">Não consegui carregar os parceiros. Tente de novo em instantes.</div>';return}
   L.sort((a,b)=>semAc(a.nome).localeCompare(semAc(b.nome),'pt-BR'));
   let fil='',pg=1;const cats=[...new Set(L.map(p=>p.categoria).filter(Boolean))].sort((a,b)=>semAc(a).localeCompare(semAc(b),'pt-BR'));
-  const cartao=p=>`<div class="pcCard" data-id="${esc(p.id)}"><div class="pcT1"><b>${esc(p.nome)}</b><span class="pcTag">🤝 Parceiro</span></div><div class="small muted">${esc(p.categoria||'')}${p.cidade?' · 📍 '+esc(p.cidade):''}</div>${p.oferta?`<div class="pcOf">🎁 ${esc(p.oferta)}</div>`:''}${p.exclusivo_texto?`<div class="pcOf pcEx">💚 Oferta exclusiva para apoiadores: ${esc(p.exclusivo_texto)}</div>`:''}${p.descricao?`<div class="small" style="margin-top:4px">${esc(p.descricao)}</div>`:''}${parcEndTxt(p.endereco)?`<div class="small muted" style="margin-top:4px">📍 ${esc(parcEndTxt(p.endereco))}</div>`:''}<div class="pcBt">${parcBotoes(p.contatos)}${parcEndMapa(p.endereco)?`<a class="btn sec sm" href="${esc(parcEndMapa(p.endereco))}" target="_blank" rel="noopener noreferrer" data-pc="mapas">🧭 Como chegar</a>`:''}</div></div>`;
+  const cartao=p=>`<div class="pcCard" data-id="${esc(p.id)}"><div class="pcT1"><b>${esc(p.nome)}</b><span class="pcTag">🤝 Parceiro</span></div><div class="small muted">${esc(p.categoria||'')}${p.cidade?' · 📍 '+esc(p.cidade):''}</div>${p.oferta?`<div class="pcOf">🎁 ${esc(p.oferta)}</div>`:''}${p.exclusivo_texto?`<div class="pcOf pcEx">💚 Oferta exclusiva para apoiadores: ${esc(p.exclusivo_texto)}</div>`:p.exclusivo?`<div class="pcOf pcEx small">💚 Este parceiro tem uma oferta exclusiva para apoiadores do Rodaliq.</div>`:''}${p.descricao?`<div class="small" style="margin-top:4px">${esc(p.descricao)}</div>`:''}${parcEndTxt(p.endereco)?`<div class="small muted" style="margin-top:4px">📍 ${esc(parcEndTxt(p.endereco))}</div>`:''}<div class="pcBt">${parcBotoes(p.contatos)}${parcEndMapa(p.endereco)?`<a class="btn sec sm" href="${esc(parcEndMapa(p.endereco))}" target="_blank" rel="noopener noreferrer" data-pc="mapas">🧭 Como chegar</a>`:''}</div></div>`;
   const draw=()=>{const F=L.filter(p=>!fil||p.categoria===fil),lim=pg*10;
     ov.querySelector('#pcCh').innerHTML=cats.length>1?`<button type="button" class="chip${fil===''?' on':''}" data-f="">Todos (${L.length})</button>`+cats.map(c=>`<button type="button" class="chip${fil===c?' on':''}" data-f="${esc(c)}">${esc(c)} (${L.filter(p=>p.categoria===c).length})</button>`).join(''):'';
     ov.querySelector('#pcLs').innerHTML=F.length?F.slice(0,lim).map(cartao).join(''):'<div class="empty">Ainda não há parceiros por aqui. Volte em breve!</div>';
@@ -3035,7 +3037,7 @@ function parcFormCand(info,{previa=false}={}){
     const b=q('#pfS');b.disabled=true;b.textContent='Enviando…';msg('');
     try{const r=await parcCandidatar(rec);
       if(r&&r.ok){try{localStorage.setItem('rodaliq_parc_last',String(Date.now()))}catch(x){}q('#pfF').classList.add('hidden');q('#pfDone').classList.remove('hidden')}
-      else msg(r&&r.erro==='dup'?'Já recebemos uma candidatura com este e-mail. Entraremos em contato.':r&&r.erro==='fechado'?'As candidaturas não estão abertas no momento.':r&&r.erro==='limite'?'Muitas candidaturas agora. Tente de novo mais tarde.':'Confira os dados e tente de novo.')
+      else msg(r&&r.erro==='dup'?'Já recebemos uma candidatura com este e-mail ou WhatsApp. Entraremos em contato.':r&&r.erro==='fechado'?'As candidaturas não estão abertas no momento.':r&&r.erro==='limite'?'Muitas candidaturas agora. Tente de novo mais tarde.':'Confira os dados e tente de novo.')
     }catch(ex){msg('Não foi possível enviar agora. Tente de novo em instantes.')}
     b.disabled=false;b.textContent='Enviar candidatura'});
   setTimeout(()=>q('#pfN').focus(),50)}
@@ -3383,21 +3385,22 @@ function admRelLiga(box){
 const ADMIN_MASTER='diogogomes2110@gmail.com';
 const ehMaster=()=>invProd()?String(LOGADO||'').toLowerCase()===ADMIN_MASTER:true; // no HMO o cadastro de admin é simulado
 const semAc=t=>String(t||'').replace(/[^\p{L}\p{N} ]/gu,'').trim().normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
-const ADM_T=[['apoios','🤝 Apoiadores'],['despesas','💰 Receitas e despesas'],['parceiros','🤝 Parceiros'],['colab','🛠 Colaboradores'],['convites','📨 Pedidos de convite'],['exclusoes','🗑 Pedidos de exclusão'],['correcoes','✏ Correções de dados'],['senhas','🔑 Pedidos de senha'],['recados','💬 Recados'],['ativos','👥 Usuários ativos'],['excluidos','🚫 Usuários excluídos'],['relatorios','📑 Relatórios']]
+const ADM_T=[['apoios','🤝 Apoiadores'],['despesas','💰 Receitas e despesas'],['parceiros','🤝 Parceiros'],['colab','🛠 Colaboradores'],['convites','📨 Pedidos de convite'],['exclusoes','🗑 Pedidos de exclusão'],['correcoes','✏ Correções de dados'],['senhas','🔑 Pedidos de senha'],['recados','💬 Recados'],['ativos','👥 Usuários ativos'],['excluidos','🚫 Usuários excluídos'],['relatorios','📑 Relatórios'],['versoes','📜 Versões em PROD']]
   .sort((a,b)=>a[0]==='relatorios'?1:b[0]==='relatorios'?-1:semAc(a[1]).localeCompare(semAc(b[1]),'pt-BR')); // alfabética, Relatórios por último
 // V50: Gestão Admin abre como página inteira (computador e celular)
 function abrirAdmin(sub){['#bellMenu','#optMenu','#fabMenu'].forEach(s=>{const m=$(s);if(m)m.classList.add('hidden')});if(!invIsAdmin)return;
   if(sub)UI.admSub=sub;let ov=$('#admPage');
   if(!ov){ov=document.createElement('div');ov.className='ov admPage';ov.id='admPage';document.body.appendChild(ov);ov.__fechar=()=>{ov.remove();invRefreshBadge(false);if(typeof atualizaSino==='function')atualizaSino()}}
   const sub2=UI.admSub||'convites';
-  ov.innerHTML=`<div class="admWrap"><div class="admStick"><div class="admHd"><h2>🛡 Gestão Admin</h2><div class="admHdB">${ehMaster()?'<button type="button" class="btn sec sm admMaster" id="admCad">🛡 Admins</button><button type="button" class="btn sec sm admMaster" id="admAju">⚙ Ajustes</button>':''}<button type="button" class="btn sec sm" id="admAniv">🎂 Aniversariantes</button></div><button type="button" class="btn sec sm admFch" id="admFechar">Fechar</button></div>
-    <div class="admTabs">${ADM_T.filter(([k])=>!['relatorios','colab','recados','despesas','parceiros'].includes(k)||ehMaster()).map(([k,t])=>`<button type="button" class="chip${sub2===k?' on':''}" data-adm="${k}">${t} <span data-admn="${k}"></span></button>`).join('')}</div><div id="admQslot"></div></div>
+  ov.innerHTML=`<div class="admWrap"><div class="admStick"><div class="admHd"><h2>🛡 Gestão Admin</h2><div class="admHdB">${ehMaster()?'<button type="button" class="btn sec sm admMaster" id="admCad">🛡 Admins</button><button type="button" class="btn sec sm admMaster" id="admAju">⚙ Ajustes</button><button type="button" class="btn sec sm admMaster" id="admExp">💾 Exportar dados do app</button>':''}<button type="button" class="btn sec sm" id="admAniv">🎂 Aniversariantes</button></div><button type="button" class="btn sec sm admFch" id="admFechar">Fechar</button></div>
+    <div class="admTabs">${ADM_T.filter(([k])=>!['relatorios','colab','recados','despesas','parceiros','versoes'].includes(k)||ehMaster()).map(([k,t])=>`<button type="button" class="chip${sub2===k?' on':''}" data-adm="${k}">${t} <span data-admn="${k}"></span></button>`).join('')}</div><div id="admQslot"></div></div>
     <div id="admBox"><div class="empty">Carregando…</div></div><div id="admMore" style="text-align:center;margin:12px 0"></div></div>`;
   ov.querySelector('#admFechar').onclick=()=>ov.__fechar();
   ov.querySelectorAll('[data-adm]').forEach(b=>b.onclick=()=>abrirAdmin(b.dataset.adm));
   ov.querySelector('#admAniv').onclick=async()=>{if((UI.admSub||'convites')!=='convites')abrirAdmin('convites');for(let i=0;i<40;i++){const m=document.querySelector('#admBox #ivMode');if(m){if(!document.querySelector('#admBox #ivCalBox:not(.hidden)'))m.click();return}await new Promise(r=>setTimeout(r,50))}};
   const cad=ov.querySelector('#admCad');if(cad)cad.onclick=formAdmins;
   const aju=ov.querySelector('#admAju');if(aju)aju.onclick=formAjustes;
+  const exp=ov.querySelector('#admExp');if(exp)exp.onclick=exportaDadosApp;
   ov.scrollTop=0;montaAdmin();admContagens()}
 async function admContagens(){const put=(k,n)=>{const e=document.querySelector(`[data-admn="${k}"]`);if(e)e.textContent=n==null?'':'('+n+')'};
   try{if(!invCache.length)await invRefreshBadge(true)}catch(e){}
@@ -3413,6 +3416,25 @@ async function admContagens(){const put=(k,n)=>{const e=document.querySelector(`
     try{await parcCarrega();put('parceiros',PARC_CACHE.filter(parcAtivo).length)}catch(e){}}
   await carregaPerfis()}
 // ---- V73: 🛠 Colaboradores ----
+const HIST_SEED=[{"n": 97, "versao": "V97", "data": "2026-11-18", "commit": "pendente", "resumo": "Despesas programadas: pagamento sempre lançado em Custos, seção “Pagas em [mês]”, aviso de parcelas pagas em outro mês, editar parcela e excluir parcela com opção de puxar as datas; etiqueta de oferta exclusiva para apoiadores; histórico de versões em PROD; botão “Exportar dados do app” (master); limites extras na candidatura de parceiros; funções internas do banco fechadas a quem não entrou no app.", "testar": "Marcar uma parcela como paga e ver o lançamento em Custos; desfazer e ver o lançamento sair; editar parcela (com e sem ratear); excluir parcela do meio e escolher puxar ou manter datas; ver a etiqueta de oferta exclusiva como usuário comum; abrir Gestão Admin › Versões em PROD; clicar em 💾 Exportar dados do app e conferir o arquivo baixado (em produção ele inclui também a estrutura do banco); entrar com a conta master e com uma conta comum, e abrir a candidatura de parceiros na tela de login.", "git": "Ainda não enviado ao GitHub · arquivo index.html", "supa": "Sim · arquivo v97.sql (inclui o fechamento de funções internas a quem não entrou no app) · tb_versoes (nova, só admin master) · função rodaliq_exportar_admin (nova, só master; também devolve a estrutura do banco: colunas, regras de acesso, funções e migrações) · funções rodaliq_parc_listar (informa se há oferta exclusiva) e rodaliq_parc_candidatar (limite de 3 por e-mail em 24 h e uma candidatura nova por WhatsApp)."}, {"n": 96, "versao": "V96", "data": "2026-11-18", "commit": "6939bc9", "resumo": "Apoiadores (cadastro, validade de 30 dias, selo 💚), Despesas programadas por parcela e por mês, Agenda do Motorista, Parceiros (endereço, oferta exclusiva, busca), RodaCalc (contraproposta), cards de Receitas e despesas e Painel reorganizado.", "testar": "Selo e Apoiadores no Admin; Despesas programadas por mês e por despesa; Agenda (só master); RodaCalc; Parceiros (endereço, oferta exclusiva); cards de Receitas e despesas; barra de rolagem nas abas.", "git": "Commit 6939bc9 · arquivo index.html", "supa": "Sim · migração v96_apoiadores_parceiros · tb_apoiadores (nova) · tb_parceiros (+ endereco, exclusivo, exclusivo_texto) · funções rodaliq_sou_apoiador, rodaliq_parc_nivel_ok e rodaliq_parc_listar."}, {"n": 95, "versao": "V95", "data": "2026-11-17", "commit": "f5c6d8b", "resumo": "Aba Despesas programadas, atalho Programar despesa, Atalhos acessível no Admin e Guia.", "testar": "", "git": "Commit f5c6d8b · arquivo index.html", "supa": "Sem alteração no banco neste deploy."}, {"n": 94, "versao": "V94", "data": "2026-11-17", "commit": "6b9ed81", "resumo": "Parceiros do Rodaliq: cadastro no Admin, tela do usuário em 3 níveis, candidatura no login, recebimentos e cobertura de despesas.", "testar": "", "git": "Commit 6b9ed81 · arquivo index.html", "supa": "Sim · migração v94_parceiros · tb_parceiros, tb_parc_categorias, tb_parc_candidaturas, tb_parc_cliques, tb_parc_receb (novas) · funções rodaliq_parc_form, rodaliq_parc_candidatar, rodaliq_parc_clique, rodaliq_parc_listar."}, {"n": 93, "versao": "V93", "data": "2026-11-17", "commit": "91623aa", "resumo": "RodaCalc por KM, recursos em 3 níveis, Ajustes do app em lista, Admin com topo fixo, ordem e paginação.", "testar": "", "git": "Commit 91623aa · arquivo index.html", "supa": "Sem alteração no banco neste deploy."}, {"n": 92, "versao": "V92 (inclui V90 e V91)", "data": "2026-11-17", "commit": "2c96c96", "resumo": "Ajustes de convite/admin/Carnê-Leão, inatividade, copo “Ajude a manter o Rodaliq” e recursos ligáveis; correção: “Ler os Termos” fecha o aviso de atualização antes (9dc1529).", "testar": "", "git": "Commit 2c96c96 · arquivo index.html", "supa": "Sim · migrações v90_correcoes_de_dados, v90b_correcoes_celular_55, v91_convites_motorista e v92_inatividade · tb_correcoes (nova) · funções rodaliq_aplicar_correcao e rodaliq_desativar_inatividade."}, {"n": 89, "versao": "V89", "data": "2026-11-16", "commit": "bd8e07a", "resumo": "Excluir usuário pelo app (admin master), com aviso dos dias que faltam da carência de 30 dias.", "testar": "", "git": "Commit bd8e07a · arquivo index.html", "supa": "Sim · migrações v89_excluir_usuario_pelo_app, v89_fix_criar_usuario_identities_email e v89b_fix_criar_usuario_identities_values · função rodaliq_excluir_usuario (nova) e correção de rodaliq_criar_usuario."}, {"n": 88, "versao": "V88", "data": "2026-11-15", "commit": "ab97304", "resumo": "Rótulos do Tipo em Despesas renomeados (Mensal / Anual (rateado) / Pontual).", "testar": "", "git": "Commit ab97304 · arquivo index.html", "supa": "Sem alteração no banco neste deploy."}, {"n": 87, "versao": "V87", "data": "2026-11-15", "commit": "f66f6f3", "resumo": "Aviso por e-mail na criação de contas e Despesas do app como aba própria na Gestão Admin (cards de custo e Benefício × custo).", "testar": "", "git": "Commit f66f6f3 · arquivo index.html", "supa": "Sem alteração no banco neste deploy."}, {"n": 84, "versao": "V84 (inclui V81 a V86)", "data": "2026-11-15", "commit": "c812383", "resumo": "Lembrete de backup do Rodaliq junto do alerta semanal de sexta-feira (só admin master).", "testar": "", "git": "Commit c812383 · arquivo index.html", "supa": "Sem alteração no banco neste deploy (as migrações v81 e v82 de 15/11 estão listadas na V83)."}, {"n": 83, "versao": "V83", "data": "2026-11-15", "commit": "da6373c", "resumo": "Criação de contas a partir dos pedidos de convite, Apoiadores (navegador de mês, acumulado, despesas do app) e correções de rolagem e máscara.", "testar": "", "git": "Commit da6373c · arquivo index.html", "supa": "Sim (ligação aproximada, mesmo dia) · migrações v81_criar_usuario_lote, v81_status_avisado e v82_tb_despesas · função rodaliq_criar_usuarios_lote · tb_despesas (nova)."}, {"n": 80, "versao": "V80", "data": "2026-11-15", "commit": "a79e82b", "resumo": "Aviso do Carnê-Leão só para quem já lançou corrida, repasse ou extrato.", "testar": "", "git": "Commit a79e82b · arquivo index.html", "supa": "Sem alteração no banco neste deploy."}, {"n": 79, "versao": "V79", "data": "2026-11-15", "commit": "51d2104", "resumo": "Calculadora de km nas 3 telas, km na Carona Solidária, denominador único nos indicadores por km e correção do parser pt-BR.", "testar": "", "git": "Commit 51d2104 · arquivo index.html", "supa": "Sem alteração no banco neste deploy."}, {"n": 78, "versao": "V78", "data": "2026-11-14", "commit": "16f35f4", "resumo": "Referências oficiais nas abas, aviso de que o Rodaliq não integra com sistemas oficiais, padronização para Contador e rolagem em Ajustes.", "testar": "", "git": "Commit 16f35f4 · arquivo index.html", "supa": "Sem alteração no banco neste deploy."}, {"n": 77, "versao": "V77", "data": "2026-11-14", "commit": "3129039", "resumo": "Canal de recados com colaboradores, placa de manutenção e ajustes de LGPD.", "testar": "", "git": "Commit 3129039 · arquivo index.html", "supa": "Sim (ligação aproximada) · migração rodaliq_v73_colaboradores_recados · tb_colaboradores e tb_recados (novas) · função rodaliq_sou_colaborador."}];
+async function verListar(){
+  if(!invProd())return HIST_SEED.slice();
+  const {data,error}=await DB.from('tb_versoes').select('*').order('n',{ascending:false});if(error)throw error;return data||[]}
+// V97: Gestão Admin › Versões em PROD (só master). 5 linhas visíveis, o resto rola; toque abre o detalhe.
+function versoesRender(box){
+  box.innerHTML='<div class="empty">Carregando…</div>';
+  verListar().then(L=>{
+    L.sort((a,b)=>b.n-a.n);const atual=L.find(x=>x.commit&&x.commit!=='pendente'),aberta={k:null};let q='';
+    box.innerHTML=`<div class="card bloco"><div class="bh"><h2>📜 Versões em PROD</h2><span class="small muted">Versão atual em produção: <b>${atual?esc(atual.versao):'—'}</b> · ${L.length} ${L.length===1?'registro':'registros'}</span></div>
+      <p class="small muted">Cada implantação acrescenta uma linha. Toque numa versão para ver o código do commit, o que foi implementado e o que testar.</p>
+      <input class="inp" id="vhQ" type="search" placeholder="Buscar por palavra (ex.: parceiros)" autocomplete="off" style="margin:6px 0 8px"><div class="vhSc" id="vhL"></div></div>`;
+    const draw=()=>{const t=q.trim().toLowerCase(),F=L.filter(x=>!t||(x.versao+' '+x.resumo+' '+(x.testar||'')).toLowerCase().includes(t));
+      box.querySelector('#vhL').innerHTML=F.length?F.map(x=>{const op=aberta.k===x.n,pend=x.commit==='pendente';
+        return `<button type="button" class="vhRw${op?' on':''}" data-vh="${x.n}" aria-expanded="${op}"><span class="vhT"><b>${esc(x.versao)}</b> · ${esc(fmtBR(x.data))}${atual&&atual.n===x.n?' <span class="pdTg h">atual</span>':''}${pend?' <span class="pdTg a">ainda não implantada</span>':''}</span><span class="vhR">${esc(x.resumo)}</span>${op?`<span class="vhD"><span><b>GitHub:</b> ${esc(x.git||('Commit '+(x.commit||'—')))}</span><span><b>Supabase:</b> ${esc(x.supa||'sem registro para esta versão.')}</span><span><b>O que foi implementado:</b> ${esc(x.resumo)}</span>${x.testar?`<span><b>O que testar:</b> ${esc(x.testar)}</span>`:''}</span>`:''}</button>`}).join(''):'<div class="empty" style="margin:10px">Nenhuma versão encontrada.</div>'};
+    draw();
+    box.querySelector('#vhQ').addEventListener('input',e=>{q=e.target.value;draw()});
+    box.querySelector('#vhL').addEventListener('click',e=>{const b=e.target.closest('[data-vh]');if(!b)return;const n=+b.dataset.vh;aberta.k=aberta.k===n?null:n;draw()});
+  }).catch(()=>{box.innerHTML='<div class="empty">Não foi possível carregar o histórico agora.</div>'})}
 function colabRender(box){
   const draw=async()=>{
     let L=[],A=[],er='';
@@ -3610,6 +3632,7 @@ async function montaAdmin(){const box=$('#admBox');if(!box)return;const sub=UI.a
   if(sub==='apoios'){apoAdminRender(box);return}
   if(sub==='despesas'){despAdminRender(box);return}
   if(sub==='parceiros'){parcAdminRender(box);return}
+  if(sub==='versoes'){versoesRender(box);return}
   if(sub==='colab'){colabRender(box);return}
   if(sub==='recados'){recAdminRender(box);return}
   if(sub==='relatorios'){admRelRender(box);return}
@@ -3700,9 +3723,22 @@ function invBdayAlerta(x){
 const invBdayNear=x=>{const h=invBdayOn(x,0);if(h)return{...h,when:'hoje'};const a=invBdayOn(x,1);return a?{...a,when:'amanhã'}:null};
 // Alertas do sino (só administrador): entram no topo da aba Alertas
 // V44: lembrete semanal (sextas-feiras, só admin) para manter o projeto do Supabase ativo — o plano gratuito pausa após 7 dias seguidos sem uso
+// V97: cópia dos dados do app (tabelas de administração) em JSON, só master. Não inclui lançamentos dos usuários nem senhas provisórias.
+async function exportaDadosApp(){
+  if(!ehMaster())return;
+  try{let T;
+    if(invProd()){const {data,error}=await DB.rpc('rodaliq_exportar_admin');if(error)throw error;T=data||{}}
+    else{T={};for(const k of Object.keys(PARC_PT)){try{T[PARC_PT[k][1]]=await pList(k)}catch(e){}}T.tb_versoes=HIST_SEED.slice()}
+    const d=new Date(),nome=pad(d.getDate())+pad(d.getMonth()+1)+String(d.getFullYear()).slice(2)+'_'+pad(d.getHours())+pad(d.getMinutes())+'_backup_dados_do_app_Rodaliq.json';
+    const n=Object.values(T).reduce((a,x)=>a+(Array.isArray(x)?x.length:0),0);
+    const blob=new Blob([JSON.stringify({gerado_em:d.toISOString(),versao:VERSAO,ambiente:invProd()?'produção':'HMO',tabelas:T},null,1)],{type:'application/json'});
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=nome;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500);
+    audit('Exportação','Admin','Dados do app · '+Object.keys(T).length+' tabelas · '+n+' registros');
+    toast('Dados exportados: '+Object.keys(T).filter(k=>k!=='estrutura').length+' tabelas, '+n+' registros'+(T.estrutura?' e a estrutura do banco':''))
+  }catch(e){toast('Não foi possível exportar agora.')}}
 function supaAlerta(){
   const d=new Date();if(d.getDay()!==5)return null;const k=isoOf(d);
-  const backup=ehMaster()?' Aproveite e faça o backup do Rodaliq (esquema e dados do Supabase + repositório do GitHub): no plano gratuito não há backup diário nem point-in-time recovery, então esse é hoje o único jeito de recuperar os dados em caso de perda.':'';
+  const backup=ehMaster()?' Aproveite e faça o backup do Rodaliq: use 💾 Exportar dados do app (Gestão Admin) e guarde o arquivo fora do computador, além do repositório do GitHub. No plano gratuito não há backup diário nem point-in-time recovery, então esse é hoje o único jeito de recuperar os dados em caso de perda.':'';
   return {n:'r',crit:1,tab:'supa',sup:k,lida:NOT.reads.supaLida===k,
     t:'Lembrete semanal: use o Rodaliq em produção (rodaliq.com.br) para o Supabase não pausar o projeto.',
     nota:'No plano gratuito, o Supabase pausa o projeto após 7 dias seguidos sem atividade. Basta entrar no app e abrir o Painel ou fazer um lançamento. Se pausar, reative em supabase.com > projeto rodaliq > Restore project.'+backup};
@@ -4100,7 +4136,7 @@ const GUIA=[
    m:'Pontos da CNH, alertas de vencimento e de limite de pontos, custos do mês (quando paga).',acts:[['＋ Multas',()=>formMulta()]]},
  {t:'🧮 Impostos (Carnê-Leão)',x:`Todo mês, lance o valor do <b>extrato da Uber/99</b> do mês anterior em <b>Impostos</b>. O app calcula o Carnê-Leão estimado, o DARF e avisa o vencimento.<br>⚠ Os valores são <b>estimativas</b>: confira no Carnê-Leão Web e, em caso de dúvida, consulte um <b>Contador</b>. As referências oficiais estão na aba Impostos.`,
    m:'DARF do mês, alerta de vencimento no sino e relatórios de impostos.',acts:[['🧾 Carnê-Leão do mês anterior',()=>formCarne(addMes(mesAtual(),-1))]]},
- {t:'📅 Despesas programadas',x:`IPVA, seguro e revisão chegam de uma vez. Na aba <b>Despesas programadas</b>, programe a despesa com o valor e a data de pagamento: o app divide o valor pelos meses até lá e mostra quanto separar por mês. Pode ser à vista ou parcelada, e quando você pagar toca em <b>Marcar como paga</b> (e, se quiser, já lança em Custos). Parcela atrasada fica destacada e avisa no sino. Para não gastar sem querer, deixe esse valor numa conta separada da do dia a dia.`,
+ {t:'📅 Despesas programadas',x:`IPVA, seguro e revisão chegam de uma vez. Na aba <b>Despesas programadas</b>, programe a despesa com o valor e a data de pagamento: o app divide o valor pelos meses até lá e mostra quanto separar por mês. Pode ser à vista ou parcelada, e quando você pagar toca em <b>Marcar como paga</b>: o pagamento é lançado em Custos e entra nos indicadores. Nas despesas parceladas, cada parcela pode ser editada ou excluída, e ao excluir você escolhe se as seguintes avançam para o mês da excluída. Parcela atrasada fica destacada e avisa no sino. Para não gastar sem querer, deixe esse valor numa conta separada da do dia a dia.`,
    m:'Card Despesas programadas e lucro livre, no Painel.',acts:[['＋ Programar despesa',()=>formReserva()],['📅 Abrir a aba',()=>irReservas()]]},
  {t:'🪪 Sua CNH (opcional)',x:`Guarde a <b>validade</b>, a categoria, o EAR e a data da 1ª habilitação, e o app avisa quando a renovação se aproximar e quando os pontos chegarem perto do limite. Não guardamos número da CNH, CPF nem foto.<br><br>⚠ ${TXT_SEM_ORGAO}`,cfg:'cnh'},
  {t:'📊 Para acompanhar',x:`• <b>Painel:</b> meta, ganhos, custos, resultado, previsão e despesas programadas (troque o mês e o veículo no topo).<br>• <b>Abas:</b> o Painel vem primeiro, as demais seguem em ordem alfabética e Relatórios fica por último. A aba <b>Despesas programadas</b> agora fica junto com as outras (antes ficava em ⚙ Opções).<br>• <b>🔔 Sino:</b> alertas (DARF, multas, CNH, manutenção e lembrete de backup) e novidades.<br>• <b>⚡ Atalhos:</b> todos os lançamentos num toque; arraste o botão para onde preferir.<br>• <b>Relatórios:</b> filtros e download em PDF, Word, Excel e CSV.<br>• <b>⚙ Opções:</b> veículos, metas, tema, backup e este guia. Exporte um backup pelo menos a cada 30 dias e guarde o arquivo fora do aparelho: o sino avisa quando passar disso. Se um dia quiser sair, use ⚙ Opções &gt; Excluir minha conta.<br>• <b>Esqueceu a senha?</b> Use “Esqueci minha senha”, na tela de entrada.<br>• <b>💚 Ajude a manter o Rodaliq:</b> o app é gratuito e vai continuar sendo. Se ele te ajuda, você pode contribuir com o que achar justo, em ⚙ Opções: escolha um valor, copie a chave Pix, faça o Pix pelo seu banco e avise no app. Na mesma tela você acompanha as suas contribuições, mês a mês. É opcional e nada aqui depende disso.`}
@@ -4200,23 +4236,43 @@ function formReserva(r){
 // V96: marcar uma parcela como paga (e, se quiser, já lançar em Custos)
 function formPagaReserva(r,k){
   const p=rvParc(r)[k];if(!p)return;const tot=rvParc(r).length;
-  const f=openForm({titulo:'Marcar como paga',sub:`<b>${esc(r.nome)}</b>${tot>1?` · parcela ${k+1} de ${tot}`:''} · previsto ${brl(p.valor)} em ${fmtBR(p.venc)}`,
-    campos:[{k:'data',l:'Data do pagamento',t:'date',req:1},{k:'valor',l:'Valor pago (R$)',t:'money',req:1},{k:'lanca',l:'Lançar em Custos?',t:'select',op:['Sim, lançar em Custos','Não, só marcar como paga'],full:1,help:'Lançar em Custos faz o valor entrar nos custos do mês do pagamento. Escolha “Não” se você já lançou.'}],
-    val:{data:hoje(),valor:p.valor,lanca:'Sim, lançar em Custos'},
+  const f=openForm({titulo:'Marcar como paga',sub:`<b>${esc(r.nome)}</b>${tot>1?` · parcela ${k+1} de ${tot}`:''} · previsto ${brl(p.valor)} em ${fmtBR(p.venc)}<div class="prevComo" style="margin:8px 0 0">💡 O pagamento será lançado em <b>Custos</b> e entra normalmente nos indicadores do mês do pagamento.</div>`,
+    campos:[{k:'data',l:'Data do pagamento',t:'date',req:1},{k:'valor',l:'Valor pago (R$)',t:'money',req:1}],
+    val:{data:hoje(),valor:p.valor},
     onSave:o=>{if(!(o.valor>0))return 'Informe o valor pago.';
-      if(/^Sim/.test(o.lanca)&&semVeiculo())return 'Cadastre um veículo antes de lançar em Custos.';
-      const lista=reservas().map(x=>{if(x.id!==r.id)return x;const parc=rvParc(x).map(y=>({...y}));parc[k].pago={data:o.data,valor:o.valor};return {...x,parc,np:parc.length}});
+      if(semVeiculo())return 'Cadastre um veículo antes de marcar como paga: o pagamento é lançado em Custos.';
+      const cid=uid('k');
+      const lista=reservas().map(x=>{if(x.id!==r.id)return x;const parc=rvParc(x).map(y=>({...y}));parc[k].pago={data:o.data,valor:o.valor,custoId:cid};return {...x,parc,np:parc.length}});
       cfg().reservas=lista;
-      if(/^Sim/.test(o.lanca))upsert('tb_custos',{id:uid('k'),data:o.data,cat:r.cat,veiculo:cfg().veiculoPadrao,valor:o.valor,desc:r.nome+(tot>1?` (parcela ${k+1}/${tot})`:''),obs:'Despesa programada'});
-      salvar('tb_config');render();toast(/^Sim/.test(o.lanca)?'Marcada como paga e lançada em Custos':'Marcada como paga')}});
+      upsert('tb_custos',{id:cid,data:o.data,cat:r.cat,veiculo:cfg().veiculoPadrao,valor:o.valor,desc:r.nome+(tot>1?` (parcela ${k+1}/${tot})`:''),obs:'Despesa programada'});
+      salvar('tb_config');render();toast('Marcada como paga e lançada em Custos')}});
   return f}
+// V97: editar uma parcela em aberto (vencimento e valor)
+function formEditaParc(r,k){
+  const ps=rvParc(r),p=ps[k];if(!p||p.pago)return;
+  const outras=ps.filter((q,i)=>i!==k&&!q.pago).length;
+  const campos=[{k:'venc',l:'Vencimento',t:'date',req:1,allowFuture:1},{k:'valor',l:'Valor da parcela (R$)',t:'money',req:1}];
+  if(outras)campos.push({k:'dif',l:'Se o valor mudar, as demais parcelas em aberto',t:'select',op:['Ficam como estão','Ratear a diferença entre elas'],full:1,help:'“Ratear” mantém o valor total da despesa: a diferença é dividida entre as outras parcelas em aberto.'});
+  return openForm({titulo:'Editar parcela',sub:`<b>${esc(r.nome)}</b> · parcela ${k+1} de ${ps.length}`,campos,val:{venc:p.venc,valor:p.valor,dif:'Ficam como estão'},
+    onSave:o=>{if(!(o.valor>0))return 'Informe o valor da parcela.';if(!o.venc)return 'Informe o vencimento.';
+      const parc=ps.map(y=>({...y}));const dif=r2(p.valor-o.valor);parc[k].valor=o.valor;parc[k].venc=o.venc;
+      if(outras&&/^Ratear/.test(o.dif)&&dif!==0){const idx=parc.map((q,i)=>i!==k&&!q.pago?i:-1).filter(i=>i>=0),base=Math.floor((dif/idx.length)*100)/100;
+        let resto=dif;idx.forEach((i,n)=>{const add=n===idx.length-1?r2(resto):base;resto=r2(resto-add);parc[i].valor=r2(parc[i].valor+add)});
+        if(idx.some(i=>!(parc[i].valor>0)))return 'O rateio deixaria uma parcela sem valor. Escolha “Ficam como estão”.'}
+      parc.sort((a,b)=>String(a.venc).localeCompare(String(b.venc)));
+      cfg().reservas=reservas().map(y=>y.id!==r.id?y:{...y,parc,np:parc.length,valor:r2(sum(parc,q=>q.valor)),venc:parc[0].venc});
+      salvar('tb_config');render();toast('Parcela atualizada')}})}
+// V97: excluir parcela — pergunta se as seguintes avançam para o mês da excluída
+function escolhaPuxa(msg){return new Promise(res=>{const d=document.createElement('div');d.className='ov';d.style.zIndex='80';
+  d.innerHTML=`<div class="modal" style="max-width:460px"><h2>Como ficam as datas?</h2><p>${msg}</p><div class="mfoot" style="flex-wrap:wrap"><button class="btn sec" data-e="cancelar">Cancelar</button><button class="btn sec" data-e="manter">Manter as datas</button><button class="btn" data-e="puxar">Puxar as próximas para trás</button></div></div>`;
+  document.body.appendChild(d);d.__fechar=()=>{d.remove();res('cancelar')};d.addEventListener('click',e=>{e.stopPropagation();const v=e.target.dataset.e;if(v){d.remove();res(v)}})})}
 function vReservasDesp(){
   const ym=mesAtual(),hj=hoje(),dm=reservasDoMes(ym);
   const abertas=reservas().filter(r=>!rvQuitada(r)).sort((a,b)=>String(rvProx(a).venc).localeCompare(String(rvProx(b).venc)));
   const pagas=reservas().filter(rvQuitada).sort((a,b)=>String(rvParc(b).map(p=>p.pago.data).sort().pop()).localeCompare(String(rvParc(a).map(p=>p.pago.data).sort().pop())));
   const parcLin=(r,k,tot)=>{const p=rvParc(r)[k],atras=!p.pago&&p.venc<hj;
     const st=p.pago?`✔ Paga em ${fmtBR(p.pago.data)} (${brl(p.pago.valor)})`:atras?'⏰ Atrasada':p.venc===hj?'⚠ Vence hoje':'A vencer';
-    return `<div class="rvParc${atras?' atr':''}"><span>${tot>1?`<b>${k+1}/${tot}</b> · `:''}${fmtBR(p.venc)} · ${brl(p.valor)}</span><span class="small">${st}</span>${p.pago?`<button class="btn sec sm" data-rvu="${esc(r.id)}|${k}" aria-label="Desfazer pagamento">↩ Desfazer</button>`:`<span style="display:flex;gap:6px"><button class="btn sm" data-rvp="${esc(r.id)}|${k}">✔ Marcar como paga</button><button class="btn sec sm" data-rvx="${esc(r.id)}|${k}" aria-label="Excluir parcela">🗑 ${rvParc(r).length===1?'Excluir despesa':'Excluir'}</button></span>`}</div>`};
+    return `<div class="rvParc${atras?' atr':''}"><span>${tot>1?`<b>${k+1}/${tot}</b> · `:''}${fmtBR(p.venc)} · ${brl(p.valor)}</span><span class="small">${st}</span>${p.pago?`<button class="btn sec sm" data-rvu="${esc(r.id)}|${k}" aria-label="Desfazer pagamento">↩ Desfazer</button>`:`<span style="display:flex;gap:6px"><button class="btn sm" data-rvp="${esc(r.id)}|${k}">✔ Marcar como paga</button>${rvParc(r).length>1?`<button class="btn sec sm" data-rve="${esc(r.id)}|${k}" aria-label="Editar parcela">✎ Editar</button>`:''}<button class="btn sec sm" data-rvx="${esc(r.id)}|${k}" aria-label="Excluir parcela">🗑 ${rvParc(r).length===1?'Excluir despesa':'Excluir'}</button></span>`}</div>`};
   const card=r=>{const tot=rvParc(r).length,px=rvProx(r),p=dm.find(x=>x.id===r.id),atras=px&&px.venc<hj;
     const msg=atras?'⏰ Há parcela atrasada: pague e marque como paga abaixo.':p?`Separar <b>${brl(p.parcela)}</b>/mês`:'Começa no próximo mês';
     return `<div class="ivCard"><div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start"><div><b>${esc(r.nome)}</b><div class="small muted">${esc(r.cat)} · ${brl(r.valor)}${tot>1?` em ${tot} parcelas`:''} · ${tot>1?'próxima':'até'} ${fmtBR(px.venc)}</div><div class="small">${msg}</div></div><button class="btn sec sm" data-rv="${esc(r.id)}" aria-label="Editar ${esc(r.nome)}">✎</button></div>
@@ -4322,8 +4378,10 @@ function vReservas(){
   const doMes=todas.filter(x=>x.p.venc.slice(0,7)===ym).sort((a,b)=>a.p.venc.localeCompare(b.p.venc)||a.r.nome.localeCompare(b.r.nome));
   const atr=ym===hm?todas.filter(x=>!x.p.pago&&x.p.venc.slice(0,7)<hm).sort((a,b)=>a.p.venc.localeCompare(b.p.venc)):[];
   const aPagar=sum(doMes.filter(x=>!x.p.pago),x=>x.p.valor),nPag=doMes.filter(x=>!x.p.pago).length,jaPago=sum(doMes.filter(x=>x.p.pago),x=>x.p.pago.valor);
+  const pagaOutro=doMes.filter(x=>x.p.pago&&String(x.p.pago.data).slice(0,7)!==ym);
+  const pagasMes=todas.filter(x=>x.p.pago&&String(x.p.pago.data).slice(0,7)===ym).sort((a,b)=>String(a.p.pago.data).localeCompare(String(b.p.pago.data)));
   const lin=x=>{const {r,p,k,tot}=x,atras=!p.pago&&p.venc<hj,st=p.pago?`✔ Paga em ${fmtBR(p.pago.data)} (${brl(p.pago.valor)})`:atras?'⏰ Atrasada':p.venc===hj?'⚠ Vence hoje':'A vencer';
-    return `<div class="rvParc${atras?' atr':''}"><span><b>${esc(r.nome)}</b>${tot>1?` · ${k+1}/${tot}`:''} · ${fmtBR(p.venc)} · ${brl(p.valor)}<br><span class="small muted">${esc(r.cat)}</span></span><span class="small">${st}</span>${p.pago?`<button class="btn sec sm" data-rvu="${esc(r.id)}|${k}" aria-label="Desfazer pagamento">↩ Desfazer</button>`:`<span style="display:flex;gap:6px"><button class="btn sm" data-rvp="${esc(r.id)}|${k}">✔ Marcar como paga</button><button class="btn sec sm" data-rvx="${esc(r.id)}|${k}" aria-label="Excluir parcela">🗑 ${tot===1?'Excluir despesa':'Excluir'}</button></span>`}</div>`};
+    return `<div class="rvParc${atras?' atr':''}"><span><b>${esc(r.nome)}</b>${tot>1?` · ${k+1}/${tot}`:''} · ${fmtBR(p.venc)} · ${brl(p.valor)}<br><span class="small muted">${esc(r.cat)}</span></span><span class="small">${st}</span>${p.pago?`<button class="btn sec sm" data-rvu="${esc(r.id)}|${k}" aria-label="Desfazer pagamento">↩ Desfazer</button>`:`<span style="display:flex;gap:6px"><button class="btn sm" data-rvp="${esc(r.id)}|${k}">✔ Marcar como paga</button>${tot>1?`<button class="btn sec sm" data-rve="${esc(r.id)}|${k}" aria-label="Editar parcela">✎ Editar</button>`:''}<button class="btn sec sm" data-rvx="${esc(r.id)}|${k}" aria-label="Excluir parcela">🗑 ${tot===1?'Excluir despesa':'Excluir'}</button></span>`}</div>`};
   const mesNome2=m=>MESES[+m.slice(5,7)-1]+'/'+m.slice(0,4),mn=MESES[+ym.slice(5,7)-1].toLowerCase();
   const pend=doMes.filter(x=>!x.p.pago),atrT=pend.filter(x=>x.p.venc<hj).length+atr.length,aPagarT=aPagar+sum(atr,x=>x.p.valor),prox=pend.filter(x=>x.p.venc>=hj)[0],nPago=doMes.length-pend.length;
   const cardsM=`<div class="grid cards" style="margin:10px 0;grid-template-columns:repeat(2,minmax(0,1fr))">${kp('Vencem em '+mn,doMes.length+(doMes.length===1?' parcela':' parcelas'),`${brl(sum(doMes,x=>x.p.valor))} no total<br>${nPago} ${nPago===1?'paga':'pagas'}${nPago?' ('+brl(jaPago)+')':''} · ${pend.length} a pagar`)}${kp('A pagar em '+mn,brl(aPagarT),`${atrT?atrT+(atrT===1?' atrasada':' atrasadas')+' ('+brl(sum(pend.filter(x=>x.p.venc<hj),x=>x.p.valor)+sum(atr,x=>x.p.valor))+')':'nenhuma atrasada'}<br>${prox?'próxima: '+fmtBR(prox.p.venc).slice(0,5)+' · '+esc(prox.r.nome):'nenhuma a vencer'}`)}</div>`;
@@ -4331,7 +4389,9 @@ function vReservas(){
     <p class="small muted">Despesas grandes que vão chegar (IPVA, seguro, revisão), à vista ou parceladas. Navegue pelos meses para ver o que vence em cada um. Quando pagar, toque em “Marcar como paga”. Para não gastar sem querer, deixe esse valor numa conta separada da do dia a dia.</p>
     ${cardsM}<div class="agNav"><button class="btn sec sm" data-rvm="-1" aria-label="Mês anterior"${ym<=min?' disabled':''}>‹</button><b>${mesNome2(ym)}</b><button class="btn sec sm" data-rvm="1" aria-label="Próximo mês"${ym>=max?' disabled':''}>›</button></div>
     ${atr.length?`<div class="ivCard" style="border-color:var(--red)"><b>⏰ Atrasadas (${atr.length})</b><div class="rvParcs">${atr.map(lin).join('')}</div></div>`:''}
-    ${doMes.length?`<div class="small" style="margin:8px 0"><b>${nPag?`Para pagar em ${MESES[+ym.slice(5,7)-1].toLowerCase()}: ${brl(aPagar)} · ${nPag} ${nPag===1?'parcela':'parcelas'}`:'Tudo pago neste mês'}</b>${jaPago?` · já pago: ${brl(jaPago)}`:''}</div><div class="rvParcs">${doMes.map(lin).join('')}</div>`:'<div class="empty">Nada vence neste mês.</div>'}
+    ${doMes.length?`<div class="small" style="margin:8px 0"><b>${nPag?`Para pagar em ${MESES[+ym.slice(5,7)-1].toLowerCase()}: ${brl(aPagar)} · ${nPag} ${nPag===1?'parcela':'parcelas'}`:'Tudo pago neste mês'}</b></div>${pend.length?`<div class="rvParcs">${pend.map(lin).join('')}</div>`:''}`:'<div class="empty">Nada vence neste mês.</div>'}
+    ${pagaOutro.length?`<div class="ivCard" style="margin-top:10px"><b>✔ Vencem em ${mn} e foram pagas em outro mês (${pagaOutro.length})</b><div class="rvParcs">${pagaOutro.map(lin).join('')}</div></div>`:''}
+    ${pagasMes.length?`<div class="ivCard" style="margin-top:10px"><b>✔ Pagas em ${mn} (${pagasMes.length}) · ${brl(sum(pagasMes,x=>x.p.pago.valor))}</b><div class="rvParcs">${pagasMes.map(lin).join('')}</div></div>`:''}
     ${!todas.length?'<div class="empty">Nenhuma despesa programada. Toque em “＋ Programar despesa” para começar.</div>':''}</div>`}
 const irReservas=()=>{UI.tab='reservas';try{history.replaceState(history.state,'','#reservas')}catch(er){}render();window.scrollTo(0,0)};
 /* ---------- 4, 5 e 6: cards do bloco "Despesas e resultado do mês" ---------- */
@@ -4455,18 +4515,27 @@ $('#view').addEventListener('click',e=>{
   {const pg=e.target.closest('[data-rvp]');if(pg){const [id,k]=pg.dataset.rvp.split('|'),x=reservas().find(y=>y.id===id);if(x)formPagaReserva(JSON.parse(JSON.stringify(x)),+k);return}}
   {const dx=e.target.closest('[data-rvx]');if(dx){const [id,k]=dx.dataset.rvx.split('|'),x=reservas().find(y=>y.id===id);if(!x)return;const ps=rvParc(x),tot=ps.length,unica=ps.length===1||ps.every((p,i)=>i===+k||p.pago)&&!ps.some((p,i)=>i!==+k&&!p.pago)&&ps.filter(p=>p.pago).length===0&&ps.length===1;
     const so=ps.length===1;
-    confirma(so?`Excluir a despesa programada <b>${esc(x.nome)}</b> inteira? Isso não pode ser desfeito.`:`Excluir a parcela ${(+k)+1} de ${tot} (${fmtBR(ps[+k].venc)} · ${brl(ps[+k].valor)}) de <b>${esc(x.nome)}</b>? O valor total e a contagem de parcelas serão ajustados.`,so?'Excluir despesa':'Excluir parcela').then(ok=>{if(!ok)return;
+    confirma(so?`Excluir a despesa programada <b>${esc(x.nome)}</b> inteira? Isso não pode ser desfeito.`:`Excluir a parcela ${(+k)+1} de ${tot} (${fmtBR(ps[+k].venc)} · ${brl(ps[+k].valor)}) de <b>${esc(x.nome)}</b>? As demais parcelas mantêm o valor; o total da despesa cai de ${brl(x.valor)} para ${brl(r2(x.valor-ps[+k].valor))}.`,so?'Excluir despesa':'Excluir parcela').then(async ok=>{if(!ok)return;
+      let modo='manter';
+      if(!so){const pos=ps.map((p,i)=>i>+k&&!p.pago?i:-1).filter(i=>i>=0);
+        if(pos.length){const ex=pos.slice(0,3).map(i=>`parcela ${i+1}: ${fmtBR(ps[i].venc).slice(3)} → ${fmtBR(ps[i-1].venc).slice(3)}`).join('; ')+(pos.length>3?'…':'');
+          modo=await escolhaPuxa(`A parcela ${(+k)+1} vencia em <b>${fmtBR(ps[+k].venc).slice(3)}</b>. Quer trazer as próximas para o mês dela, ou manter as datas (esse mês fica sem parcela)?<div class="small muted" style="margin-top:8px"><b>Puxar:</b> ${ex}. A série termina um mês antes.<br><b>Manter:</b> as demais continuam nas datas atuais.</div>`);
+          if(modo==='cancelar')return}}
       if(so)cfg().reservas=reservas().filter(y=>y.id!==id);
-      else cfg().reservas=reservas().map(y=>{if(y.id!==id)return y;const parc=rvParc(y).filter((_,i)=>i!==+k).map(p=>({...p}));return {...y,parc,np:parc.length,valor:r2(sum(parc,p=>p.valor)),venc:parc[0].venc}});
+      else cfg().reservas=reservas().map(y=>{if(y.id!==id)return y;const ant=rvParc(y).map(p=>p.venc);let parc=rvParc(y).map((p,i)=>(modo==='puxar'&&i>+k&&!p.pago)?{...p,venc:ant[i-1]}:{...p}).filter((_,i)=>i!==+k);parc.sort((a,b)=>String(a.venc).localeCompare(String(b.venc)));return {...y,parc,np:parc.length,valor:r2(sum(parc,p=>p.valor)),venc:parc[0].venc}});
       salvar('tb_config');render();toast(so?'Despesa excluída':'Parcela excluída')});return}}
+  {const ed=e.target.closest('[data-rve]');if(ed){const [id,k]=ed.dataset.rve.split('|'),x=reservas().find(y=>y.id===id);if(x)formEditaParc(JSON.parse(JSON.stringify(x)),+k);return}}
   {const ad=e.target.closest('[data-rvadd]');if(ad){const x=reservas().find(y=>y.id===ad.dataset.rvadd);if(!x)return;const ps=rvParc(x),ult=ps[ps.length-1];
     if(ps.length>=60){toast('Limite de 60 parcelas');return}
     confirma(`Adicionar mais uma parcela de ${brl(ult.valor)} em ${fmtBR(rvAddMes(ult.venc,1))} a <b>${esc(x.nome)}</b>? O valor total passa a ${brl(r2(x.valor+ult.valor))}.`,'Adicionar parcela').then(ok=>{if(!ok)return;
       cfg().reservas=reservas().map(y=>{if(y.id!==x.id)return y;const parc=rvParc(y).map(p=>({...p}));parc.push({venc:rvAddMes(ult.venc,1),valor:ult.valor,pago:null});return {...y,parc,np:parc.length,valor:r2(sum(parc,p=>p.valor))}});
       salvar('tb_config');render();toast('Parcela adicionada')});return}}
   {const un=e.target.closest('[data-rvu]');if(un){const [id,k]=un.dataset.rvu.split('|');
-    confirma('Desfazer o pagamento desta parcela? Se você a lançou em Custos, esse lançamento continua lá: apague-o em Custos se quiser.','Desfazer pagamento').then(ok=>{if(!ok)return;
-      cfg().reservas=reservas().map(x=>{if(x.id!==id)return x;const parc=rvParc(x).map(y=>({...y}));parc[+k].pago=null;return {...x,parc,np:parc.length}});salvar('tb_config');render();toast('Pagamento desfeito')});return}}
+    const xr=reservas().find(y=>y.id===id),pgo=xr&&rvParc(xr)[+k]&&rvParc(xr)[+k].pago,cid=pgo&&pgo.custoId,temC=!!(cid&&S.tb_custos.some(c=>c.id===cid));
+    confirma(temC?'Desfazer o pagamento desta parcela? O lançamento dela em Custos também será removido.':'Desfazer o pagamento desta parcela? Este pagamento foi lançado antes sem vínculo: se ele entrou em Custos, o lançamento continua lá e você pode apagá-lo em Custos.','Desfazer pagamento').then(ok=>{if(!ok)return;
+      cfg().reservas=reservas().map(x=>{if(x.id!==id)return x;const parc=rvParc(x).map(y=>({...y}));parc[+k].pago=null;return {...x,parc,np:parc.length}});
+      if(temC){S.tb_custos=S.tb_custos.filter(c=>c.id!==cid);salvar('tb_custos')}
+      salvar('tb_config');render();toast(temC?'Pagamento desfeito e lançamento removido de Custos':'Pagamento desfeito')});return}}
   {const rv=e.target.closest('[data-rv]');if(rv){const x=reservas().find(y=>y.id===rv.dataset.rv);if(x)formReserva(JSON.parse(JSON.stringify(x)));return}}
   const pa=e.target.closest('[data-acao]');if(pa){const a=pa.dataset.acao;
     if(a==='guia'){primeiroAcesso(false);return}
