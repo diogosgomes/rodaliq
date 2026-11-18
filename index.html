@@ -66,8 +66,8 @@ header{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.96);backdro
 .hbar{max-width:1200px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .hbar .sp{flex:1}
 .sync{font-size:12px;color:var(--muted)}
-.tabs{max-width:1200px;margin:0 auto;padding:0 10px;display:flex;gap:2px;overflow-x:auto;scrollbar-width:none}
-.tabs::-webkit-scrollbar{display:none}
+.tabs{max-width:1200px;margin:0 auto;padding:0 10px 4px;display:flex;gap:2px;overflow-x:auto;scrollbar-width:thin;scrollbar-color:var(--muted) transparent}
+.tabs::-webkit-scrollbar{height:8px}.tabs::-webkit-scrollbar-thumb{background:var(--muted);border-radius:6px}.tabs .tab{flex:0 0 auto;white-space:nowrap}
 .tab{border:0;background:none;padding:10px 12px;font-weight:600;color:var(--muted);border-bottom:3px solid transparent;cursor:pointer;white-space:nowrap}
 .tab.on{color:var(--blue);border-bottom-color:var(--blue)}
 main{max-width:1200px;margin:0 auto;padding:16px}
@@ -89,6 +89,9 @@ h3{font-size:13px;margin:0 0 8px;color:var(--muted);text-transform:uppercase;let
 .kpi .s{font-size:12px;color:var(--muted);margin-top:2px}
 .kpi.hl{border:2px solid var(--blue)}
 .kpi.wide{grid-column:span 2}
+.kpi.pdw{grid-column:span 2}
+.pdTop{grid-column:1/-1}
+@media(min-width:861px){.kpi.pdw{grid-column:1/span 2}}
 .bacts{display:flex;gap:6px;flex-wrap:wrap}
 .bloco{margin-bottom:14px;border:1px solid var(--line);background:#fbfcfe}
 .bh{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:10px}
@@ -376,6 +379,35 @@ svg text{font-family:Inter,system-ui,sans-serif}
 }
 .pcCard{border:1px solid var(--line);border-radius:12px;padding:11px 13px;margin-bottom:9px;background:var(--card)}.pcT1{display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap}.pcTag{font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--amberSoft);color:var(--amberInk);border:1px solid var(--amber)}.pcOf{margin-top:6px;padding:6px 9px;border-radius:9px;background:var(--blueSoft);font-weight:600;font-size:13.5px}.pcBt{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.pcBt a.btn{text-decoration:none}.pcCt{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0;align-items:center}.pcCt select{flex:0 0 150px}.pcCt input{flex:1 1 150px;min-width:0}.pcMd .ajBd{overflow-y:auto}
 body:has(#admPage) .fab{z-index:61}body:has(#admPage) .fabMenu{z-index:62}body:has(#admPage) .ov:not(.admPage) ~ .fabWrap .fab,body:has(.ov:not(.admPage)) .fabWrap .fab{visibility:hidden}
+.selo{display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;background:rgba(40,200,120,.15);border:1px solid rgba(40,200,120,.5);font-size:11px;font-weight:700;vertical-align:middle}
+.admCols,.admRow{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1.4fr) auto;gap:8px;align-items:center}
+.admCols{margin-top:8px;padding:0 10px;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+.admRow{border:1px solid var(--line);border-radius:9px;padding:8px 10px;margin-top:6px;background:var(--bg)}
+.admRow .admEm{word-break:break-all;font-size:13px}
+.admRow .admNm{word-break:break-word}
+@media(max-width:560px){.admCols{display:none}.admRow{grid-template-columns:1fr auto}.admRow .admEm{grid-column:1;grid-row:2}}
+.pcEx{border-color:rgba(40,200,120,.6)}
+.rvParcs{margin-top:8px;display:grid;gap:6px}
+.rvParc{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px 10px;border:1px solid var(--line);border-radius:9px;padding:6px 10px;background:var(--bg)}
+.rvParc.atr{border-color:var(--red)}
+.rvPagas{margin-top:14px}.rvPagas summary{cursor:pointer;padding:6px 0}
+.rcTop{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.rcOfRow{display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:460px}
+.agLin{display:flex;gap:10px;align-items:center;border:1px solid var(--line);border-radius:9px;padding:7px 10px;margin-top:6px;background:var(--bg)}
+.agLin.hj{border-color:var(--blue)}.agD{min-width:48px;text-align:center;font-size:13px}.agT{flex:1;min-width:0;word-break:break-word}
+.agNav{display:flex;justify-content:space-between;align-items:center;margin:4px 0 8px}
+.agG{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center;font-size:12px;color:var(--muted)}
+.agC{position:relative;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);padding:9px 0;font:inherit;font-size:14px;cursor:pointer}
+.agC.vz{border:0;background:none;cursor:default}.agC.hj{border:2px solid var(--blue);font-weight:700}.agC.sel{background:var(--blue);color:#fff}
+.agN{position:absolute;top:1px;right:3px;font-size:10px;font-style:normal;font-weight:700}
+.rcScroll{max-height:calc(100vh - 150px);overflow-y:scroll;direction:rtl;scrollbar-width:auto;scrollbar-color:var(--muted) var(--line)}
+.rcScroll>*{direction:ltr}
+.rcScroll::-webkit-scrollbar{width:14px}.rcScroll::-webkit-scrollbar-track{background:var(--line);border-radius:7px}.rcScroll::-webkit-scrollbar-thumb{background:var(--muted);border-radius:7px;border:2px solid var(--line)}
+#prevBar{position:fixed;left:0;right:0;bottom:0;z-index:90;background:#1f6f43;color:#fff;padding:8px 12px;display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap;font-size:14px}
+.pdSc{margin-top:6px;max-height:172px;overflow-y:auto;border-top:1px solid var(--line)}
+.pdRw{display:flex;justify-content:space-between;gap:8px;padding:6px 0;border-bottom:1px solid var(--line);font-size:13px;min-height:33px;align-items:center}
+.pdTg{display:inline-block;font-size:11px;padding:1px 7px;border-radius:999px;border:1px solid var(--line);margin-right:5px;white-space:nowrap}
+.pdTg.a{border-color:var(--red)}.pdTg.h{border-color:var(--amber,#b58900)}
 </style>
 </head>
 <body>
@@ -445,6 +477,7 @@ body:has(#admPage) .fab{z-index:61}body:has(#admPage) .fabMenu{z-index:62}body:h
       <div class="menu bell hidden" id="bellMenu"></div>
     </div>
     <div class="menuWrap" id="optWrap">
+      <span class="selo hidden" id="hdrSelo" title="Você é apoiador do Rodaliq">💚 Apoiador</span>
       <button class="btn sec sm" id="optBtn">⚙ Opções</button>
       <div class="menu hidden" id="optMenu">
         <div class="who">Conectado como<b id="whoName">—</b><span class="whoE" id="whoMail"></span></div>
@@ -454,6 +487,7 @@ body:has(#admPage) .fab{z-index:61}body:has(#admPage) .fabMenu{z-index:62}body:h
         <button data-m="imp">⬆ Importar backup</button>
         <button data-m="cfg">🎯 Metas e preferências</button>
         <button data-m="cnh">🪪 Minha CNH</button>
+        <button data-m="prevap" class="hidden">👁 Ver como apoiador</button>
         <button data-m="tema">🌓 Tema</button>
         <button data-m="termos">📄 Termos e privacidade</button>
         <button data-m="pass">🔑 Trocar senha</button>
@@ -469,6 +503,7 @@ body:has(#admPage) .fab{z-index:61}body:has(#admPage) .fabMenu{z-index:62}body:h
   </div>
   <nav class="tabs" id="tabs">
     <button class="tab on" data-t="painel">📊 Painel</button>
+    <button class="tab hidden" data-t="agenda">🗓 Agenda do Motorista</button>
     <button class="tab" data-t="carona">🧑‍🤝‍🧑 Caronas / BlaBlaCar</button>
     <button class="tab" data-t="corridas">🚕 Corridas</button>
     <button class="tab" data-t="custos">⛽ Custos</button>
@@ -482,6 +517,7 @@ body:has(#admPage) .fab{z-index:61}body:has(#admPage) .fabMenu{z-index:62}body:h
 <div id="excAviso" class="note am small hidden" style="margin:0 0 12px"></div>
 <main id="view"></main>
 <div class="fabWrap" id="fabWrap"><div class="fabMenu hidden" id="fabMenu">
+  <button data-fab="agenda">🗓 Agenda (novo evento)</button>
   <button data-fab="carne">🧾 Carnê-Leão do mês anterior</button>
   <button data-fab="carona">🧑‍🤝‍🧑 Caronas</button>
   <button data-fab="corrida">🚕 Corridas (Uber / 99)</button>
@@ -504,7 +540,7 @@ body:has(#admPage) .fab{z-index:61}body:has(#admPage) .fabMenu{z-index:62}body:h
 
 <script>
 "use strict";
-const VERSAO='V95';
+const VERSAO='V96';
 /* ---------- utilidades ---------- */
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -699,6 +735,13 @@ function alertas(){
     if(c.vencida){const dv=-c.d,lim=isoOf(new Date(new Date(cfg().cnh.validade+'T12:00:00').getTime()+30*864e5));out.unshift(dv<=30?{n:'r',crit:1,t:`CNH vencida há ${dv} ${dv===1?'dia':'dias'}: você tem até ${fmtBR(lim)} para renovar sem multa.`,nota:'Depois de atualizar a validade em ⚙ Opções > Minha CNH, o alerta some.',tab:'cnh'}:{n:'r',crit:1,t:'CNH vencida há mais de 30 dias: dirigir agora é infração gravíssima.',nota:`Venceu em ${fmtBR(cfg().cnh.validade)}. Renove e atualize a validade em ⚙ Opções > Minha CNH.`,tab:'cnh'})}
     else out.push({n:'a',t:c.d===0?`CNH vence hoje (${fmtBR(cfg().cnh.validade)}). Agende a renovação.`:`CNH vence em ${c.d} ${c.d===1?'dia':'dias'} (${fmtBR(cfg().cnh.validade)}). Agende a renovação.`,tab:'cnh',cnh:c.chave,lida:NOT.reads.cnhLida===c.chave})}
   cfg().veiculos.filter(v=>v.pendente).forEach(v=>out.push({n:'a',tab:'veic',t:`Complete o cadastro do veículo ${v.nome}`,nota:'Ele foi criado a partir dos seus lançamentos. Abra ⚙ Opções > Veículos e informe a descrição (ex.: modelo e ano).'}));
+  if(!recOff('reservas'))reservas().forEach(r=>rvParc(r).forEach((p,k,A)=>{if(p.pago)return;const d=diasEntre(hj,p.venc),nm=r.nome+(A.length>1?` (parcela ${k+1}/${A.length})`:''),val=brl(p.valor);
+    if(d<0)out.push({n:'r',t:`Despesa programada atrasada (venceu em ${fmtBR(p.venc)}): ${nm} · ${val}.`,nota:'Pague e toque em “Marcar como paga” em Despesas programadas.',tab:'reservas'});
+    else if(d===0)out.push({n:'r',t:`Despesa programada vence hoje: ${nm} · ${val}.`,tab:'reservas'});
+    else if(d<=7)out.push({n:'a',t:`Despesa programada vence em ${d} ${d===1?'dia':'dias'} (${fmtBR(p.venc)}): ${nm} · ${val}.`,tab:'reservas'})}));
+  if(!recOff('agenda')){const am=isoOf(new Date(Date.now()+864e5));agEventos(am,am).forEach(e=>out.push({n:'a',t:'Amanhã: '+e.titulo+(e.hora?' às '+e.hora:'')+(e.tipo==='aniversario'?' 🎂':'')+'.',tab:'agenda'}))}
+  if(APO_FIM_MSG)out.push({n:'a',t:APO_FIM_MSG,tab:'painel'});
+  apoVenceAlerts().forEach(a=>out.push(a));
   const bk=backupAlerta();if(bk)out.push(bk);
   const av=apoAviso();if(av)out.push(av);
   out.unshift(...invAlerts(),...excAlerts(),...corrAlerts(),...senAlerts(),...apoAlerts(),...recAlerts());
@@ -1133,7 +1176,7 @@ async function carnePagoRapido(ym){
 async function carneExcluir(ym){
   if(!await confirma(`Excluir os dados informados do Carnê-Leão de <b>${mesNome(ym)}</b> (valor do extrato, INSS, DARF pago e observação)?<br><span class="small muted">O app volta a calcular o mês só pelos lançamentos de Uber/99.</span>`,'Excluir',{perigo:1}))return;
   delete S.tb_carne[ym];salvar('tb_carne');audit('Exclusão','Carnê-Leão',mesNome(ym));render();toast('Dados do mês excluídos')}
-const NOVO={corrida:()=>formCorrida(),carona:()=>formCarona(),repasse:()=>formRepasse(),custo:()=>formCusto(),multa:()=>formMulta(),despesa:()=>formReserva(),carne:()=>formCarne(addMes(mesAtual(),-1)),rodacalc:()=>{UI.tab='rodacalc';try{history.replaceState(history.state,'','#rodacalc')}catch(er){}render();window.scrollTo(0,0)}};
+const NOVO={agenda:()=>formEvento(null),corrida:()=>formCorrida(),carona:()=>formCarona(),repasse:()=>formRepasse(),custo:()=>formCusto(),multa:()=>formMulta(),despesa:()=>formReserva(),carne:()=>formCarne(addMes(mesAtual(),-1)),rodacalc:()=>{UI.tab='rodacalc';try{history.replaceState(history.state,'','#rodacalc')}catch(er){}render();window.scrollTo(0,0)}};
 const FABK='rodaliq_fab';
 // posição livre, guardada em proporção da tela (0 a 1) para servir em qualquer tamanho e ao girar o celular
 function fabPos(){let p=null;try{p=JSON.parse(localStorage.getItem(FABK)||'null')}catch(e){}
@@ -1238,9 +1281,10 @@ function vPainel(){
     ${kpi('R$ por viagem',G.viagens?brl(G.valor/G.viagens):'—',G.viagens?G.viagens+' viagens':'')}
     ${(()=>{const km=kmMes(ym,G);if(!km)return '';const sk=caronasSemKm(ym);return kpi('R$ por km',brl((G.valor+vCar)/km),'Uber/99 + carona ÷ '+fmtNum(km)+' km do mês'+(kmCarona(ym)?'<br>corridas '+fmtNum(G.km)+' km · caronas '+fmtNum(kmCarona(ym))+' km':'')+(sk?'<br><span class="am">⚠ '+sk+(sk===1?' carona sem km informado':' caronas sem km informado')+'</span>':''))})()}`)}
   ${bloco('🧾 Despesas e resultado do mês',filtroTxt,`
+    ${(()=>{const ce=cardsExtras(ym,G,vMeta,vCus,res,cus,pd,ehMesAtual,decorridos,n).split(/§1|§2/);return `<div class="grid cards pdTop">
     ${(()=>{const mu=cus.filter(r=>r.virtual);return kpi('Custos do veículo',brl(vCus),cus.length+(cus.length===1?' lançamento':' lançamentos')+(mu.length?'<br>inclui multas pagas '+brl(sum(mu,r=>r.valor)):'')+cmpMesPassado(ym,vCus))})()}
     ${kpi('Resultado líquido',`<span class="${res>=0?'pos':'neg'}">${brl(res)}</span>`,'Ganhos + carona − custos do veículo<br>'+brl(vMeta)+' (meta do mês) − '+brl(vCus)+' (custos)','hl')}
-    ${cardsExtras(ym,G,vMeta,vCus,res,cus,pd,ehMesAtual,decorridos,n)}
+    ${ce[0]}</div>${ce[1]}${ce[2]}`})()}
     ${(()=>{const cb=combMes(ym);let partes;if(G.fonte==='diário'){const c=doMes(S.tb_corridas,ym).filter(fVeic);partes=[['Uber',sum(c.filter(r=>r.plataforma==='Uber'),r=>r.valor)],['99',sum(c.filter(r=>r.plataforma==='99'),r=>r.valor)],['Carona',vCar]]}else partes=[['Uber/99 (repasses)',G.valor],['Carona',vCar]];
       const ab=custosMes(ym).filter(r=>r.cat==='Combustível'),cl=ab.filter(r=>r.litros),lt=sum(cl,r=>r.litros);
       const kComb=kpi('⛽ Combustível',brl(cb),ab.length?ab.length+(ab.length===1?' abastecimento':' abastecimentos')+(lt?' · '+lt.toLocaleString('pt-BR')+' L · média '+brl(sum(cl,r=>r.valor)/lt)+'/L':''):'Nenhum abastecimento lançado no mês');
@@ -1261,7 +1305,7 @@ function vPainel(){
   </div>`;
 }
 const combMes=ym=>r2(sum(custosMes(ym).filter(r=>r.cat==='Combustível'),r=>r.valor));
-const pctTxt=(v,c)=>Math.round(v/c*100)+'%';
+const pctTxt=(v,c)=>{const p=Math.round(v/c*100);return p>999?'999%+':p+'%'};
 // card de cobertura do combustível do mês (o tanque é um só: cada ganho mostra quanto do combustível pagaria sozinho)
 function kpiComb(titulo,quem,valor,comb,partes,hl){
   if(!comb)return kpi(titulo,'—','Lance os abastecimentos em Custos para ver quanto do combustível do mês '+quem+' paga.');
@@ -1551,12 +1595,13 @@ function vRodaCalc(){
   const f=v=>v?brl(v,1):'';
   return `<div class="note am small" style="margin-bottom:12px">Estimativa para corrida particular, fora do aplicativo. O preço final é decisão sua. Nada do que você digita aqui é gravado.</div>
   <div id="rcBox">
-  <div class="card kpi hl"><div class="l">Preço sugerido para a corrida</div><div class="v num" id="rcSug" style="font-size:32px">—</div>
+  <div class="card kpi hl rcFix"><div class="rcTop"><div class="l">Preço sugerido para a corrida</div><button type="button" class="btn sec sm" id="rcLimpa" aria-label="Limpar os dados da corrida">🧹 Limpar</button></div><div class="v num" id="rcSug" style="font-size:32px">—</div>
     <div class="grid cards" style="margin-top:10px"><div class="card kpi" style="box-shadow:none;border:1px solid var(--line)"><div class="l">Mínimo (abaixo dá prejuízo)</div><div class="v num" id="rcMin" style="font-size:18px">—</div></div>
       <div class="card kpi" style="box-shadow:none;border:1px solid var(--line)"><div class="l">Lucro estimado</div><div class="v num" id="rcLuc" style="font-size:18px">—</div></div>
       <div class="card kpi" style="box-shadow:none;border:1px solid var(--line)"><div class="l">Km que o veículo roda</div><div class="v num" id="rcKmT" style="font-size:18px">—</div></div>
       <div class="card kpi" style="box-shadow:none;border:1px solid var(--line)"><div class="l">Tempo ocupado</div><div class="v num" id="rcTmp" style="font-size:18px">—</div></div></div>
-    <div style="border-top:1px solid var(--line);margin-top:14px;padding-top:10px"><div class="field" style="margin-top:0;max-width:220px"><label for="rcOf">O passageiro propôs (R$)</label><input class="inp" id="rcOf" inputmode="decimal" placeholder="0,00" value="${f(R.of)}"></div>
+    <div style="border-top:1px solid var(--line);margin-top:14px;padding-top:10px"><div class="rcOfRow"><div class="field" style="margin-top:0"><label for="rcOf">O passageiro propôs (R$)</label><input class="inp" id="rcOf" inputmode="decimal" placeholder="0,00" value="${f(R.of)}"></div>
+      <div class="field" style="margin-top:0"><label for="rcCo">Sua contraproposta (R$)</label><input class="inp num" id="rcCo" readonly placeholder="—" aria-live="polite"></div></div><div class="small muted" id="rcCoMsg" style="margin-bottom:6px"></div>
       <div class="rcTrk" id="rcTrk" aria-hidden="true"><div class="rcMk" id="rcMkMin"><i>mínimo</i></div><div class="rcMk" id="rcMkSug"><i>sugerido</i></div><div class="rcPin hidden" id="rcPin"></div></div>
       <div class="rcVer hidden" id="rcVer" role="status"></div></div></div>
   <div class="rcG">
@@ -1584,13 +1629,18 @@ function rcCalc(){
   const m=R.vv?2:1,km=R.ka+R.km*m,min=R.tv*m+R.es,h=min/60;
   const pron=(R.km>0||R.tv>0)&&R.custo>0;
   const trk=document.getElementById('rcTrk'),pin=document.getElementById('rcPin'),ver=document.getElementById('rcVer');
-  if(!pron){['rcSug','rcMin','rcLuc','rcKmT','rcTmp'].forEach(i=>set(i,'—'));ver.classList.remove('hidden','ok','med','ruim');ver.classList.add(R.custo>0?'hidden':'med');
+  if(!pron){['rcSug','rcMin','rcLuc','rcKmT','rcTmp'].forEach(i=>set(i,'—'));{const co=document.getElementById('rcCo'),cm=document.getElementById('rcCoMsg');if(co)co.value='';if(cm)cm.textContent=''}ver.classList.remove('hidden','ok','med','ruim');ver.classList.add(R.custo>0?'hidden':'med');
     ver.textContent=R.custo>0?'':'Informe o custo por km e os dados da viagem para ver o preço.';pin.classList.add('hidden');return}
   const custo=km*R.custo+R.pd,sug=Math.max(km*R.mk,h*R.mh,km*R.custo)+R.pd;
   set('rcSug',brl(sug));set('rcMin',brl(custo));set('rcLuc',brl(sug-custo));set('rcKmT',fmtNum(km)+' km');set('rcTmp',minToHM(min));
   const max=Math.max(sug*1.3,R.of*1.1,1),p=v=>Math.min(100,v/max*100)+'%';
   document.getElementById('rcMkMin').style.left=p(custo);document.getElementById('rcMkSug').style.left=p(sug);
-  if(!(R.of>0)){pin.classList.add('hidden');ver.className='rcVer hidden';return}
+  const co=document.getElementById('rcCo'),cm=document.getElementById('rcCoMsg');
+  if(!(R.of>0)){co.value='';cm.textContent='';pin.classList.add('hidden');ver.className='rcVer hidden';return}
+  // V96: contraproposta = média entre a oferta e o sugerido, nunca abaixo do piso (custo da corrida + 10%), em múltiplos de R$ 0,50
+  if(R.of>=sug){co.value='';cm.textContent='A oferta já atinge o preço sugerido: aceite sem contraproposta.'}
+  else{const piso=Math.ceil(custo*1.1*2-1e-9)/2;let c2=Math.round((R.of+sug)/2*2)/2;if(c2<piso)c2=piso;if(c2>sug)c2=Math.ceil(sug*2)/2;if(c2<=R.of)c2=R.of;
+    co.value=brl(c2,1);cm.textContent=c2<=R.of?'A oferta já cobre o piso (custo + 10%). Pode contrapropor o sugerido: '+brl(sug)+'.':'Meio-termo entre a oferta e o sugerido, sem ficar abaixo do piso (custo da corrida + 10%).'}
   pin.classList.remove('hidden');pin.style.left=p(R.of);
   const luc=R.of-custo,pk=km?luc/km:0,ph=h?luc/h:0;let c,t;
   if(R.of<custo){c='ruim';t='✖ Abaixo do mínimo: você teria prejuízo de '+brl(custo-R.of)+'.'}
@@ -1604,6 +1654,7 @@ function rcInit(){
     const put=(id,v)=>{document.getElementById(id).value=v?brl(r2(v),1):''};put('rcCu',m.custoKm);put('rcMk',m.ganhoKm);put('rcMh',m.ganhoH);rcCalc()};
   document.getElementById('rcVei').onchange=e=>{UI.rc.veic=e.target.value;medias()};
   document.getElementById('rcMed').onclick=medias;
+  document.getElementById('rcLimpa').onclick=()=>{['rcKm','rcTv','rcKa','rcEs','rcPd','rcOf'].forEach(i=>{document.getElementById(i).value=''});rcCalc();toast('Dados da corrida limpos')};
   rcCalc()}
 function vRelatorios(){
   const M=relModelo(),F=UI.rel,at=relAtivo();
@@ -2113,13 +2164,14 @@ async function senAdminRender(box){
     UI.senF='atendido';await excAdminCache(true);atualizaSino();senAdminRender(box);admContagens()})}
 /* ---------- V55: 🤝 Apoiadores — contribuição voluntária. Não trava nada e não existe cobrança ---------- */
 // V56: ajustes guardados no banco (tb_ajustes), para mudar sem subir versão nova
-const AJU_PADRAO={ativo:true,nivel:'todos',pix:'rodaliq.app@gmail.com',valores:[10,25,50],sugerido:25,aviso:true,dias:30,rec:{impostos:'todos',relatorios:'todos',carona:'todos',rodacalc:'master',parceiros:'master'},msg60:null};
+const AJU_PADRAO={ativo:true,nivel:'todos',pix:'rodaliq.app@gmail.com',valores:[10,25,50],sugerido:25,aviso:true,dias:30,apDias:30,rec:{agenda:'master',carona:'todos',impostos:'todos',parceiros:'master',relatorios:'todos',reservas:'todos',rodacalc:'master'},msg60:null};
 const MSG_APOIO='O Rodaliq é gratuito e vai continuar sendo. Se ele te ajuda, você pode contribuir com o que achar justo: a ajuda contribui para amenizar alguns custos como domínio, servidores e as melhorias. Seu acesso ao Rodaliq não está condicionado a sua colaboração!';
-const REC_NOMES={impostos:'🧾 Impostos (Carnê-Leão)',relatorios:'📑 Relatórios',carona:'🧑‍🤝‍🧑 Caronas',rodacalc:'🧮 RodaCalc por KM',parceiros:'🤝 Parceiros do Rodaliq'};
-// V93: cada recurso tem 3 níveis — master (só o admin master), equipe (admins e colaboradores) ou todos
-const REC_NIVEIS={master:'Só o admin master',equipe:'Admins e colaboradores',todos:'Todos os usuários'};
+const REC_NOMES={agenda:'🗓 Agenda do Motorista',carona:'🧑‍🤝‍🧑 Caronas',reservas:'📅 Despesas programadas',impostos:'🧾 Impostos (Carnê-Leão)',parceiros:'🤝 Parceiros do Rodaliq',relatorios:'📑 Relatórios',rodacalc:'🧮 RodaCalc por KM'};
+// V96: cada recurso tem 4 níveis, cada um incluindo os de cima — master, equipe (admins e colaboradores), apoiadores ou todos
+const REC_NIVEIS={master:'Só o admin master',equipe:'Admins e colaboradores',apoiadores:'Apoiadores',todos:'Todos os usuários'};
 function recNorm(r){r=r||{};const o={};Object.keys(AJU_PADRAO.rec).forEach(k=>{const v=r[k];o[k]=v===true?'todos':v===false?'equipe':REC_NIVEIS[v]?v:AJU_PADRAO.rec[k]});return o}
-const recVe=k=>{const n=(AJU.rec&&AJU.rec[k])||AJU_PADRAO.rec[k];return !n||n==='todos'||ehMaster()||(n==='equipe'&&(invIsAdmin||SOU_COLAB))};
+let PREV_AP=false;
+const recVe=k=>{if(PREV_AP){const n=(AJU.rec&&AJU.rec[k])||AJU_PADRAO.rec[k];return !n||n==='todos'||n==='apoiadores'}const n=(AJU.rec&&AJU.rec[k])||AJU_PADRAO.rec[k];return !n||n==='todos'||ehMaster()||(n==='equipe'&&(invIsAdmin||SOU_COLAB))||(n==='apoiadores'&&(invIsAdmin||SOU_COLAB||SOU_APOIADOR))};
 const recOff=k=>!recVe(k);
 // V93: o copo "Ajude a manter o Rodaliq" também tem os 3 níveis (antes só ligado/desligado; desligado = só o master)
 const apoNivel=()=>AJU.nivel||(AJU.ativo===false?'master':'todos');
@@ -2129,11 +2181,14 @@ const CAN_PADRAO={colaborador:true,usuario:false};
 // V74: placa de manutenção. O admin master NUNCA é bloqueado.
 const MAN_PADRAO={ativo:false,mensagem:'',colabs:true};
 let MANUT=Object.assign({},MAN_PADRAO);
-let CANAIS=Object.assign({},CAN_PADRAO),SOU_COLAB=false,COLABS=[],REC_MEUS=[],REC_TODOS=[],REC_ABERTA=null;
+let CANAIS=Object.assign({},CAN_PADRAO),SOU_COLAB=false,SOU_APOIADOR=false,COLABS=[],REC_MEUS=[],REC_TODOS=[],REC_ABERTA=null;
 // V70: regra do imposto sobre a Carona Solidária, definida pelo admin principal para todo o app
 const IMP_PADRAO={permitir:true,padrao:false}; // permitir = cada pessoa escolhe em ⚙ Opções; padrao = valor de quem não escolheu
 let IMP=Object.assign({},IMP_PADRAO);
 let AJU=Object.assign({},AJU_PADRAO),APO_MEU=false,APO_ULT=null;
+const apoDias=()=>Math.min(365,Math.max(1,+AJU.apDias||30));
+const apoValidoAte=x=>{const d=new Date(x.confirmado_em||x.criado_em);if(isNaN(d))return null;return isoOf(new Date(d.getTime()+apoDias()*864e5))};
+let APO_FIM_MSG=null;
 let APO_CACHE=[];const ZAP_APO={};let DESP_CACHE=[];
 async function ajuCarregar(){
   try{
@@ -2160,6 +2215,8 @@ async function ajuCarregar(){
     if(!invProd())SOU_COLAB=true;
     else{const {data}=await DB.rpc('rodaliq_sou_colaborador');SOU_COLAB=!!data}
   }catch(e){SOU_COLAB=false}
+  try{if(!invProd())SOU_APOIADOR=true;else{const {data}=await DB.rpc('rodaliq_sou_apoiador');SOU_APOIADOR=!!data}}catch(e){SOU_APOIADOR=false}
+  try{if(invProd()&&!SOU_APOIADOR&&!ehMaster()&&!invIsAdmin){const mine=(await apoMeus()).filter(x=>x.status==='confirmado');const u=mine.map(x=>x.confirmado_em||x.criado_em).sort().pop();if(u&&apoValidoAte({confirmado_em:u})<hoje()&&cfg().apFim!==u){APO_FIM_MSG='Seu período de apoiador terminou. Obrigado pela contribuição!';cfg().apFim=u;salvar('tb_config')}}}catch(e){}
   try{REC_MEUS=await recMeus()}catch(e){REC_MEUS=[]}
   try{const am=await apoMeus();APO_MEU=am.length>0;APO_ULT=am.filter(x=>x.status==='confirmado'&&x.confirmado_em).map(x=>x.confirmado_em).sort().pop()||null}catch(e){APO_MEU=false;APO_ULT=null}
   aplicaAjustes();
@@ -2236,8 +2293,10 @@ async function ajuSalvar(v){const novo=Object.assign({},AJU_PADRAO,AJU,v);
   AJU=novo;AJU.rec=recNorm(AJU.rec);aplicaAjustes()}
 function aplicaAjustes(){const b=document.querySelector('#optMenu [data-m="apoio"]');if(b)b.classList.toggle('hidden',!apoVe());
   donoAtualiza();
-  [['impostos','[data-t="impostos"]'],['relatorios','[data-t="relatorios"]'],['carona','[data-t="carona"],[data-fab="carona"]'],['rodacalc','[data-t="rodacalc"],[data-fab="rodacalc"]']].forEach(([k,sel])=>document.querySelectorAll(sel).forEach(e=>e.classList.toggle('hidden',recOff(k))));
+  [['agenda','[data-t="agenda"],[data-fab="agenda"]'],['reservas','[data-t="reservas"],[data-fab="despesa"]'],['impostos','[data-t="impostos"]'],['relatorios','[data-t="relatorios"]'],['carona','[data-t="carona"],[data-fab="carona"]'],['rodacalc','[data-t="rodacalc"],[data-fab="rodacalc"]']].forEach(([k,sel])=>document.querySelectorAll(sel).forEach(e=>e.classList.toggle('hidden',recOff(k))));
+  {const vb=document.querySelector('#optMenu [data-m="prevap"]');if(vb)vb.classList.toggle('hidden',!ehMaster())}
   const pb=document.querySelector('#optMenu [data-m="parc"]');if(pb)pb.classList.toggle('hidden',recOff('parceiros'));
+  {const w=document.getElementById('whoName');if(w){let sl=document.getElementById('whoSelo');if(!sl){sl=document.createElement('span');sl.id='whoSelo';sl.className='selo';sl.textContent='💚 Apoiador';w.insertAdjacentElement('afterend',sl)}const ver=PREV_AP||(SOU_APOIADOR&&!ehMaster()&&!invIsAdmin);sl.classList.toggle('hidden',!ver);const hs=document.getElementById('hdrSelo');if(hs)hs.classList.toggle('hidden',!ver)}}
   document.querySelectorAll('[data-fab="carne"]').forEach(e=>e.classList.toggle('hidden',recOff('impostos')));
   aplicaCanais();
   if(typeof atualizaSino==='function')atualizaSino()}
@@ -2415,6 +2474,11 @@ async function apoHistHtml(){
           const et=x.status==='confirmado'?'':(x.status==='descartado'?' · não localizada':' · aguardando conferência');
           return `<div class="apoLin${x.status==='confirmado'?'':' pend'}"><span>${fmtBR(String(x.criado_em).slice(0,10))}${et}</span><b>${brl(x.valor)}</b></div>`}).join('')}</div>`}).join('')}
   </div>`}
+function apoVenceAlerts(){if(!ehMaster()||!APO_CACHE.length)return [];
+  const hj=hoje(),lim=isoOf(new Date(Date.now()+7*864e5)),m=new Map();
+  APO_CACHE.filter(x=>x.status==='confirmado').forEach(x=>{const e=String(apoEmail(x)||'').toLowerCase(),a=apoValidoAte(x);if(e&&a&&(!m.has(e)||a>m.get(e)))m.set(e,a)});
+  const n=[...m.values()].filter(a=>a>=hj&&a<=lim).length;
+  return n?[{n:'a',inv:1,tab:'apo',t:`${n} ${n===1?'apoiador perde':'apoiadores perdem'} o acesso de apoiador em até 7 dias`,nota:'Para manter alguém, cadastre em Apoiadores › Apoiadores cadastrados.'}]:[]}
 function apoAlerts(){if(!invIsAdmin)return [];
   return APO_CACHE.filter(x=>x.status==='informado').map(x=>({n:'a',inv:1,tab:'apo',apoC:1,
     t:`${apoNome(x)} sinalizou uma contribuição de ${brl(x.valor)}`,
@@ -2549,14 +2613,21 @@ async function reciboPDF(x,nome,btn){
 }
 // ⚙ Ajustes do app: só o admin principal
 const AJ_PAG=10;
+// V96: o master vê o app como um apoiador comum (só para teste)
+function prevApoiador(on){try{prevApoiador2(on)}catch(e){toast('Falha na visão de apoiador: '+(e&&e.message||e));console.error(e)}}
+function prevApoiador2(on){PREV_AP=!!on;let b=document.getElementById('prevBar');
+  if(on&&!b){b=document.createElement('div');b.id='prevBar';b.setAttribute('role','status');b.innerHTML='👁 Você está vendo o app como <span class="selo">💚 Apoiador</span>. <button type="button" class="btn sm" id="prevOut">Sair da visão de apoiador</button>';document.body.appendChild(b);b.querySelector('#prevOut').onclick=()=>prevApoiador(false)}
+  if(!on&&b)b.remove();
+  aplicaAjustes();if(PREV_AP&&recOff(UI.tab))UI.tab='painel';render();toast(on?'Visão de apoiador ligada':'Visão normal')}
 function formAjustes(){if(!ehMaster())return;
   const ov=document.createElement('div');ov.className='ov';
-  const NV3=[['master','Só o admin master'],['equipe','Admins e colaboradores'],['todos','Todos os usuários']],
+  const NV3=[['master','Só o admin master'],['equipe','Admins e colaboradores'],['todos','Todos os usuários']],NV4=[NV3[0],NV3[1],['apoiadores','Apoiadores'],NV3[2]],
     nvSel=(id,val,ops)=>`<select class="inp" id="${id}">${ops.map(([k,t])=>`<option value="${k}"${val===k?' selected':''}>${t}</option>`).join('')}</select>`,
     canNv=CANAIS.usuario?'todos':CANAIS.colaborador?'equipe':'master';
   const FUN=[
    {k:'apoio',ic:'💚',nome:'Ajude a manter o Rodaliq',corpo:`<div class="field" style="margin-top:0"><label for="ajNA">Quem vê o copo 💚 no cabeçalho e o menu de apoio</label>${nvSel('ajNA',apoNivel(),NV3)}</div>
     <label class="exChk"><input type="checkbox" id="ajV"${AJU.aviso?' checked':''}><span>Avisar no 🔔 sino, no <b>5º dia útil de cada mês</b>, quem usa o app há mais de <b id="ajDt">${AJU.dias}</b> dias e não contribuiu nos últimos 60 dias</span></label>
+    <div class="field"><label for="ajAD">Validade do apoio: quantos dias a contribuição confirmada vale como apoiador</label><input class="inp" id="ajAD" inputmode="numeric" value="${AJU.apDias||30}" style="max-width:120px"><span class="small muted">Quem você cadastra em “Apoiadores cadastrados” continua apoiador sem prazo.</span></div>
     <div class="field"><label for="ajP">Chave Pix</label><input class="inp" id="ajP" value="${esc(AJU.pix)}" autocomplete="off"></div>
     <div class="field"><label for="ajV1">Valores sugeridos (R$)</label><div style="display:flex;gap:6px">
       ${AJU.valores.slice(0,3).map((v,i)=>`<input class="inp num" id="ajV${i+1}" inputmode="decimal" value="${brl(v,1)}">`).join('')}</div></div>
@@ -2572,8 +2643,8 @@ function formAjustes(){if(!ehMaster())return;
     <div class="field" style="margin-top:10px"><label for="ajMT">Recado na tela <span id="ajMTob" class="small${MANUT.ativo?'':' hidden'}" style="color:var(--red)">· obrigatório</span></label>
       <textarea class="inp" id="ajMT" rows="3" maxlength="400" placeholder="Ex.: Estamos atualizando o Rodaliq. Voltamos hoje às 14h.">${esc(MANUT.mensagem||'')}</textarea>
       <div class="small muted" style="margin-top:4px">Diga a hora de volta, se souber — vale mais que um “em manutenção”.</div></div>`},
-   {k:'recursos',ic:'🎛',nome:'Recursos do app',corpo:`<p class="small muted" style="margin:0 0 8px">Escolha quem vê cada recurso. Esconder não apaga nada: os dados ficam guardados. <b>Você, admin master, sempre vê.</b></p>
-    ${Object.entries(REC_NOMES).map(([k,t])=>`<div class="field" style="margin-top:8px"><label for="ajR_${k}"><b>${t}</b></label>${nvSel('ajR_'+k,AJU.rec[k],NV3)}</div>`).join('')}`},
+   {k:'recursos',ic:'🎛',nome:'Recursos do app',corpo:`<p class="small muted" style="margin:0 0 8px">Escolha quem vê cada recurso, em 4 níveis: só o admin master, admins e colaboradores, apoiadores ou todos. Cada nível inclui os de cima. Esconder não apaga nada: os dados ficam guardados. <b>Você, admin master, sempre vê.</b></p>
+    ${Object.entries(REC_NOMES).map(([k,t])=>`<div class="field" style="margin-top:8px"><label for="ajR_${k}"><b>${t}</b></label>${nvSel('ajR_'+k,AJU.rec[k],NV4)}</div>`).join('')}`},
    {k:'termos',ic:'📄',nome:'Termos de uso',corpo:`<p class="small muted" style="margin:0 0 8px">Veja como o aviso de atualização aparece para quem já aceitou os Termos antes (nada é salvo).</p>
     <button type="button" class="btn sec sm" id="ajTv">👁 Ver o aviso de atualização dos Termos</button>`}
   ].sort((a,b)=>semAc(a.nome).localeCompare(semAc(b.nome),'pt-BR'));
@@ -2586,7 +2657,7 @@ function formAjustes(){if(!ehMaster())return;
     <div class="err" id="ajErr"></div>
     <div class="mfoot"><span class="small" id="ajAlt" style="margin-right:auto;color:var(--amberInk)"></span><button class="btn sec" id="ajN">Cancelar</button><button class="btn" id="ajS2">Salvar</button></div></div>`;
   document.body.appendChild(ov);const q=s=>ov.querySelector(s);
-  const NVT=Object.fromEntries(NV3),ligado=c=>q(c).checked?'ligado':'desligado';
+  const NVT=Object.fromEntries(NV4),ligado=c=>q(c).checked?'ligado':'desligado';
   const RESUMO={
     apoio:()=>NVT[q('#ajNA').value]+' · Pix '+(q('#ajP').value.trim()?'cadastrado':'não informado')+' · sugerido '+(q('#ajS').value?apoBRL(r2(parseBRL(q('#ajS').value))):'—'),
     canais:()=>'Quem fala com você: '+NVT[q('#ajNC').value].toLowerCase(),
@@ -2624,7 +2695,7 @@ function formAjustes(){if(!ehMaster())return;
     q('#ajErr').textContent='';
     let sg=r2(parseBRL(q('#ajS').value));if(!vs.includes(sg))sg=vs[0];
     q('#ajS2').disabled=true;
-    try{await ajuSalvar({ativo:q('#ajNA').value==='todos',nivel:q('#ajNA').value,aviso:q('#ajV').checked,pix,valores:vs,sugerido:sg,rec:Object.fromEntries(Object.keys(REC_NOMES).map(k=>[k,q('#ajR_'+k).value]))});
+    try{await ajuSalvar({ativo:q('#ajNA').value==='todos',nivel:q('#ajNA').value,aviso:q('#ajV').checked,apDias:Math.min(365,Math.max(1,parseInt(q('#ajAD').value,10)||30)),pix,valores:vs,sugerido:sg,rec:Object.fromEntries(Object.keys(REC_NOMES).map(k=>[k,q('#ajR_'+k).value]))});
       await impSalvar({permitir:q('#ajIP').checked,padrao:q('#ajID').checked});
       await canaisSalvar({colaborador:q('#ajNC').value!=='master',usuario:q('#ajNC').value==='todos'});
       await manutSalvar({ativo:q('#ajMA').checked,colabs:q('#ajNM').value==='equipe',mensagem:recadoManut});
@@ -2656,7 +2727,62 @@ async function apoNaoDoaram(box,L){
   box.querySelector('#ap60E').onclick=async()=>{const t=box.querySelector('#ap60T').value.trim();if(t.length<20)return toast('Escreva o texto da mensagem.');
     if(!await confirma(`Mostrar esta mensagem no 🔔 sino de <b>${nao.length}</b> usuário(s) que não contribuíram nos últimos 60 dias?`,'Enviar a MSG'))return;
     try{await ajuSalvar({msg60:{texto:t,em:new Date().toISOString()}});audit('Apoio','Admin','MSG de apoio enviada · '+nao.length+' usuário(s)');toast('MSG enviada');apoAdminRender(box)}catch(e){toast('Não foi possível enviar agora.')}}}
+// V96: 🤝 Apoiadores cadastrados — pessoas que você marca como apoiadoras (além de quem tem contribuição confirmada)
+async function apoCadListar(){
+  if(!invProd()){const r=await DB.collection('apoiadores').get();return r.docs.map(d=>Object.assign({email:d.id},d.data()))}
+  const {data,error}=await DB.from('tb_apoiadores').select('*').order('nome');if(error)throw error;return data||[]}
+async function apoCadCriar(o){
+  const rec={nome:o.nome,whatsapp:o.whatsapp||null,obs:o.obs||null};
+  if(!invProd()){await DB.doc('apoiadores/'+o.email).set(Object.assign({criado_em:new Date().toISOString()},rec));return}
+  const {error}=await DB.from('tb_apoiadores').insert(Object.assign({email:o.email},rec));if(error)throw error}
+async function apoCadApagar(email){
+  if(!invProd()){await DB.doc('apoiadores/'+email).delete();return}
+  const {error}=await DB.from('tb_apoiadores').delete().eq('email',email);if(error)throw error}
+const apoSubHtml=()=>{const s=UI.apoSub||'contrib';return `<div class="admTabs" style="margin:6px 0 10px"><button type="button" class="chip${s==='contrib'?' on':''}" data-aps="contrib">Contribuições</button><button type="button" class="chip${s==='cad'?' on':''}" data-aps="cad">Apoiadores cadastrados</button></div>`};
+const apoSubBind=box=>box.querySelectorAll('[data-aps]').forEach(b=>b.onclick=()=>{UI.apoSub=b.dataset.aps;UI.apoQ='';apoAdminRender(box)});
+async function apoCadRender(box){
+  await carregaPerfis();
+  let C=[],L=[];
+  try{C=await apoCadListar();L=await apoListar();APO_CACHE=L}catch(e){box.innerHTML='<h3 style="margin:0">🤝 Apoiadores</h3>'+apoSubHtml()+'<div class="empty">Não consegui carregar os apoiadores. Tente de novo em instantes.</div>';apoSubBind(box);return}
+  const emC=new Set(C.map(c=>String(c.email).toLowerCase())),auto=new Map();
+  L.filter(x=>x.status==='confirmado').forEach(x=>{const e=String(apoEmail(x)||'').toLowerCase(),ate=apoValidoAte(x);if(!e||emC.has(e)||!ate||ate<hoje())return;const a=auto.get(e);if(!a||ate>a.ate)auto.set(e,{email:e,nome:apoNome(x),auto:1,ate})});
+  const itens=[...C.map(c=>({email:c.email,nome:c.nome||c.email,whatsapp:c.whatsapp,obs:c.obs,criado_em:c.criado_em})),...auto.values()]
+    .sort((a,b)=>semAc(a.nome).localeCompare(semAc(b.nome),'pt-BR')||String(a.email).localeCompare(String(b.email)));
+  box.innerHTML=`<h3 style="margin:0">🤝 Apoiadores</h3>${apoSubHtml()}
+    <p class="small muted" style="margin:0 0 10px">Apoiador é quem você cadastra aqui (sem prazo) ou quem tem contribuição confirmada nos últimos ${apoDias()} dias (entra e sai sozinho; para manter alguém, cadastre). O vínculo é pelo e-mail da conta: quem você cadastrar antes de ter conta passa a ser apoiador quando se cadastrar. Apoiadores veem os recursos liberados no nível “Apoiadores” e ganham o selo 💚.</p>
+    <div style="border:1px solid var(--line);border-radius:12px;padding:13px;margin-bottom:14px"><div class="grid2">
+      <div class="field"><label for="acNome">Nome</label><input class="inp" id="acNome" autocomplete="off" placeholder="Como você chama a pessoa"></div>
+      <div class="field"><label for="acMail">E-mail</label><input class="inp" id="acMail" type="email" autocomplete="off" placeholder="email@exemplo.com"></div>
+      <div class="field"><label for="acZap">WhatsApp (opcional)</label><input class="inp" id="acZap" inputmode="tel" autocomplete="off" placeholder="(61) 90000-0000"></div>
+      <div class="field"><label for="acObs">Observação (opcional)</label><input class="inp" id="acObs" maxlength="200" autocomplete="off"></div></div>
+      <div class="err" id="acErr"></div><button type="button" class="btn" id="acAdd" style="margin-top:10px">＋ Cadastrar apoiador</button></div>
+    ${invProd()?'':'<div class="small" style="margin:0 0 10px;border:1px dashed var(--line);border-radius:10px;padding:8px 10px">🧪 Só no HMO: <button type="button" class="btn sec sm" id="acSim">Simular contribuição vencendo em 5 dias</button> <button type="button" class="btn sec sm" id="acSimX">Apagar simulações</button></div>'}
+    <div class="field" style="margin:0 0 6px"><label for="acQ">Buscar por nome ou e-mail</label><input class="inp" id="acQ" type="search" placeholder="Digite para filtrar" autocomplete="off" value="${esc(UI.apoQ||'')}"></div>
+    <div class="small muted" id="acCnt"></div><div id="acList"></div>`;
+  apoSubBind(box);
+  const paint=()=>{const q=semAc(UI.apoQ||''),f=q?itens.filter(i=>semAc(i.nome+' '+i.email).includes(q)):itens;
+    box.querySelector('#acCnt').textContent=q?`${f.length} de ${itens.length}`:`${itens.length} ${itens.length===1?'apoiador':'apoiadores'}`;
+    box.querySelector('#acList').innerHTML=f.map(i=>`<div class="admLin"><div><b>${esc(i.nome)}</b><span class="rcTag ts">${i.auto?'contribuição confirmada · válida até '+fmtBR(i.ate):'cadastrado'}</span>
+      <div class="small muted">${esc(i.email)}${i.whatsapp?' · 💬 '+esc(invFmtPhone(i.whatsapp)):''}${i.obs?' · '+esc(i.obs):''}</div></div>${i.auto?'':`<button type="button" class="btn sec sm" data-acd="${esc(i.email)}">Remover</button>`}</div>`).join('')||'<div class="empty">Ninguém encontrado.</div>';
+    box.querySelectorAll('[data-acd]').forEach(b=>b.onclick=async()=>{
+      if(!await confirma(`Remover <b>${esc(b.dataset.acd)}</b> dos apoiadores cadastrados? Se a pessoa tiver contribuição confirmada, ela continua apoiadora.`,'Remover apoiador'))return;
+      try{await apoCadApagar(b.dataset.acd);audit('Apoiador','Admin','Apoiador removido · '+b.dataset.acd);toast('Apoiador removido');apoCadRender(box)}catch(e){toast('Não foi possível remover agora.')}})};
+  const qi=box.querySelector('#acQ');qi.addEventListener('input',()=>{UI.apoQ=qi.value;paint()});paint();
+  {const sm=box.querySelector('#acSim'),sx=box.querySelector('#acSimX');
+   if(sm)sm.onclick=async()=>{const d=new Date(Date.now()-(apoDias()-5)*864e5).toISOString();await DB.doc('apoios/sim'+Date.now()).set({email:'simulado'+Math.floor(Math.random()*90+10)+'@teste.com',valor:25,status:'confirmado',criado_em:d,confirmado_em:d,simulado:true});APO_CACHE=await apoListar();atualizaSino();toast('Simulação criada: veja o sino 🔔');apoCadRender(box)};
+   if(sx)sx.onclick=async()=>{for(const x of (await apoListar()).filter(y=>y.simulado))await DB.doc('apoios/'+x.id).delete();APO_CACHE=await apoListar();atualizaSino();toast('Simulações apagadas');apoCadRender(box)}}
+  const er=t=>{const e=box.querySelector('#acErr');e.textContent=t||'';e.classList.toggle('on',!!t)};
+  box.querySelector('#acAdd').onclick=async()=>{
+    const nome=box.querySelector('#acNome').value.trim(),email=box.querySelector('#acMail').value.trim().toLowerCase(),zap=box.querySelector('#acZap').value.trim(),obs=box.querySelector('#acObs').value.trim();
+    if(!nome)return er('Escreva o nome.');
+    if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email))return er('E-mail inválido.');
+    if(emC.has(email))return er('Esse e-mail já está cadastrado.');
+    er('');
+    try{await apoCadCriar({nome,email,whatsapp:zap,obs});audit('Apoiador','Admin','Apoiador cadastrado · '+email);toast('Apoiador cadastrado');apoCadRender(box);admContagens()}
+    catch(e){er('Não consegui cadastrar. Tente de novo em instantes.')}};
+}
 async function apoAdminRender(box){
+  if(UI.apoSub==='cad'&&ehMaster())return apoCadRender(box);
   await carregaPerfis();
   let L;try{L=await apoListar();APO_CACHE=L}catch(e){box.innerHTML='<div class="empty">Não consegui carregar as contribuições. Tente de novo em instantes.</div>';return}
   if(!invCache.length)try{await invRefreshBadge(true)}catch(e){}
@@ -2676,13 +2802,14 @@ async function apoAdminRender(box){
       <div class="uLin">${esc(apoEmail(x))}${c?` · 💬 ${esc(invFmtPhone(c.whatsapp))}${invUfOf(c.whatsapp)?' · '+esc(invUfOf(c.whatsapp)):''}`:''}</div>
       <div class="uLin"><b>${apoBRL(x.valor)}</b> · informada em ${admData(x.criado_em)}${x.confirmado_em?' · confirmada em '+admData(x.confirmado_em):''}${x.descartado_em?' · descartada em '+admData(x.descartado_em):''}${x.recibo?' · recibo nº '+String(x.recibo).padStart(3,'0'):''}</div>
       <div class="ivActs" style="margin-top:8px">${bt}</div></div>`};
-  box.innerHTML=`<h3 style="margin:0">🤝 Apoiadores</h3>
+  box.innerHTML=`<h3 style="margin:0">🤝 Apoiadores</h3>${ehMaster()?apoSubHtml():''}
     <p class="small muted" style="margin:4px 0 8px">Contribuição é voluntária: ninguém fica sem o app por não contribuir, e o app nunca cobra. Confira o Pix no seu banco antes de confirmar; confirmar gera o número do recibo. O WhatsApp e o e-mail abrem com o texto pronto; para mandar o recibo em PDF, baixe e anexe.</p>
     <div class="mpick" style="margin-bottom:8px"><button type="button" data-apm="-1" aria-label="Mês anterior">‹</button><span style="text-transform:capitalize">${mesNome(ym)}</span><button type="button" data-apm="1" aria-label="Próximo mês"${ym>=mesAtual()?' disabled':''}>›</button></div>
     <div class="cards grid" style="margin-bottom:10px">${kpi('Confirmadas em '+mesNome(ym),apoBRL(sum(mes,x=>x.valor)),mes.length+(mes.length===1?' contribuição':' contribuições'))}${kpi('Acumulado até '+mesNome(ym),apoBRL(acumulado),'desde o lançamento')}${kpi('Para conferir',String(cnt('informado')),'aguardando a sua conferência')}${kpi('Apoiadores',String(new Set(L.filter(x=>x.status==='confirmado').map(x=>x.email)).size),'pessoas que já contribuíram')}</div>
     <div class="admTabs">${F.map(([k,t])=>`<button type="button" class="chip${f===k?' on':''}" data-apf="${k}">${t} (${cnt(k)})</button>`).join('')}</div>
     ${lst.length?lst.map(card).join(''):'<div class="empty" style="margin-top:8px">Nenhuma contribuição aqui.</div>'}`;
   try{await apoNaoDoaram(box,L)}catch(e){}
+  apoSubBind(box);
   box.querySelectorAll('[data-apf]').forEach(b=>b.onclick=()=>{UI.apoF=b.dataset.apf;apoAdminRender(box)});
   box.querySelectorAll('[data-apm]').forEach(b=>b.onclick=()=>{let n=addMes(ym,+b.dataset.apm);if(n>mesAtual())n=mesAtual();UI.apoYm=n;apoAdminRender(box)});
   box.querySelectorAll('[data-za]').forEach(b=>b.onclick=()=>{const z=ZAP_APO[b.dataset.za];if(z)abreZap(z.fone,z.txt)});
@@ -2772,8 +2899,8 @@ async function despAdminRender(box){
     despAdminRender(box);admContagens()};
 }
 /* ---------- V94: 🤝 Parceiros do Rodaliq (só o admin master cadastra; o usuário vê conforme o interruptor de 3 níveis) ---------- */
-const PARC_CANAIS={whatsapp:['💬','WhatsApp'],telefone:['📞','Telefone'],email:['✉️','E-mail'],site:['🌐','Site'],instagram:['📷','Instagram'],tiktok:['🎵','TikTok'],facebook:['👥','Facebook'],youtube:['▶️','YouTube'],linkedin:['💼','LinkedIn'],outro:['🔗','Outro link']};
-const PARC_DICA={whatsapp:'(61) 9xxxx-xxxx',telefone:'(61) xxxx-xxxx',email:'contato@empresa.com.br',site:'https://www.empresa.com.br',instagram:'@perfil ou link',tiktok:'@perfil ou link',facebook:'nome da página ou link',youtube:'nome do canal ou link',linkedin:'perfil ou link',outro:'https://...'};
+const PARC_CANAIS={whatsapp:['💬','WhatsApp'],telefone:['📞','Telefone'],email:['✉️','E-mail'],site:['🌐','Site'],instagram:['📷','Instagram'],tiktok:['🎵','TikTok'],facebook:['👥','Facebook'],youtube:['▶️','YouTube'],linkedin:['💼','LinkedIn'],mapas:['🗺','Mapas'],outro:['🔗','Outro link']};
+const PARC_DICA={whatsapp:'(61) 9xxxx-xxxx',telefone:'(61) xxxx-xxxx',email:'contato@empresa.com.br',site:'https://www.empresa.com.br',instagram:'@perfil ou link',tiktok:'@perfil ou link',facebook:'nome da página ou link',youtube:'nome do canal ou link',linkedin:'perfil ou link',mapas:'link do Google Maps (ou deixe o endereço do parceiro)',outro:'https://...'};
 const PARC_REDE={instagram:'https://www.instagram.com/',tiktok:'https://www.tiktok.com/@',facebook:'https://www.facebook.com/',youtube:'https://www.youtube.com/@',linkedin:'https://www.linkedin.com/in/'};
 const PARC_PT={cats:['parc_cats','tb_parc_categorias'],parc:['parceiros','tb_parceiros'],cand:['parc_cand','tb_parc_candidaturas'],rec:['parc_receb','tb_parc_receb'],cli:['parc_cliques','tb_parc_cliques']};
 let PARC_CACHE=[],PARC_CATS=[],PARC_CAND=[],PARC_REC=[],PARC_CLI=[];
@@ -2781,6 +2908,9 @@ const parcId=()=>'p'+Date.now().toString(36)+Math.random().toString(36).slice(2,
 const parcHoje=()=>isoOf(new Date());
 const parcAtivo=p=>p.status==='ativo'&&(!p.inicio||p.inicio<=parcHoje())&&(!p.fim||p.fim>=parcHoje());
 const parcDias=iso=>Math.round((new Date(iso+'T12:00:00')-new Date(parcHoje()+'T12:00:00'))/864e5);
+// V96: endereço estruturado do parceiro
+const parcEndTxt=e=>{if(!e||typeof e!=='object')return '';const a=[[e.logradouro,e.numero].filter(Boolean).join(', '),e.complemento,e.bairro,[e.cidade,e.uf].filter(Boolean).join('/'),e.cep?'CEP '+e.cep:''].filter(Boolean).join(' · ');return a}
+const parcEndMapa=e=>{if(!e||!e.logradouro)return '';return 'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent([e.logradouro,e.numero,e.bairro,e.cidade,e.uf,e.cep,'Brasil'].filter(Boolean).join(', '))}
 // link seguro de cada contato (só http/https, tel, mailto e wa.me; qualquer outra coisa vira vazio e o botão não aparece)
 function parcLink(c){
   const v=String((c&&c.valor)||'').trim();if(!v)return '';
@@ -2789,6 +2919,7 @@ function parcLink(c){
     case 'whatsapp':return d.length>=10&&d.length<=13?'https://wa.me/'+(d.startsWith('55')&&d.length>=12?d:'55'+d):'';
     case 'telefone':return d.length>=10&&d.length<=13?'tel:+'+(d.startsWith('55')&&d.length>=12?d:'55'+d):'';
     case 'email':return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)?'mailto:'+v:'';
+    case 'mapas':return /^https?:\/\/[^\s]+$/i.test(v)?v:'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(v);
     case 'site':case 'outro':return /^https?:\/\/[^\s]+$/i.test(v)?v:'';
     default:{if(/^https?:\/\/[^\s]+$/i.test(v))return v;const h=v.replace(/^@/,'');return PARC_REDE[c.tipo]&&/^[a-z0-9._-]{1,60}$/i.test(h)?PARC_REDE[c.tipo]+h:''}}
 }
@@ -2809,7 +2940,7 @@ async function parcCarrega(){const g=async k=>{try{return await pList(k)}catch(e
 // ----- lado do usuário -----
 async function parcUsuario(){
   if(!invProd()){const [P,C]=await Promise.all([pList('parc'),pList('cats')]),cn=Object.fromEntries(C.map(c=>[c.id,c.nome]));
-    return P.filter(parcAtivo).map(p=>({id:p.id,nome:p.nome,categoria:cn[p.categoria_id]||'',descricao:p.descricao,oferta:p.oferta,cidade:p.cidade,contatos:p.contatos||[]}))}
+    return P.filter(parcAtivo).map(p=>({id:p.id,nome:p.nome,categoria:cn[p.categoria_id]||'',descricao:p.descricao,oferta:p.oferta,cidade:p.cidade,contatos:p.contatos||[],endereco:p.endereco||null,exclusivo_texto:(p.exclusivo&&(PREV_AP||SOU_APOIADOR||invIsAdmin||SOU_COLAB))?(p.exclusivo_texto||''):''}))}
   const {data,error}=await DB.rpc('rodaliq_parc_listar');if(error)throw error;return Array.isArray(data)?data:[]}
 function parcClique(id,canal){try{
   if(invProd()){Promise.resolve(DB.rpc('rodaliq_parc_clique',{p_parceiro:id,p_canal:canal})).catch(()=>{});return}
@@ -2817,7 +2948,7 @@ function parcClique(id,canal){try{
   DB.doc(k).get().then(d=>DB.doc(k).set({parceiro_id:id,canal,dia,n:((d.exists&&d.data().n)||0)+1})).catch(()=>{})}catch(e){}}
 function parcModal(html,{id='',larg=560}={}){const ov=document.createElement('div');ov.className='ov';if(id)ov.id=id;
   ov.innerHTML=`<div class="modal pcMd" role="dialog" aria-modal="true" style="max-width:${larg}px">${html}</div>`;document.body.appendChild(ov);
-  ov.__fechar=()=>ov.remove();ov.addEventListener('mousedown',e=>{if(e.target===ov)ov.remove()});return ov}
+  ov.__fechar=()=>ov.remove();ov.addEventListener('mousedown',e=>{if(e.target===ov)ov.__fechar()});return ov}
 const parcBotoes=(cs)=>(cs||[]).map(c=>{const h=parcLink(c);if(!h)return '';const [ic,nm]=PARC_CANAIS[c.tipo]||PARC_CANAIS.outro;
   return `<a class="btn sec sm" href="${esc(h)}" target="_blank" rel="noopener noreferrer" data-pc="${esc(c.tipo)}">${ic} ${esc(c.tipo==='outro'&&c.rotulo?c.rotulo:nm)}</a>`}).join('');
 async function formParceiros(){
@@ -2832,7 +2963,7 @@ async function formParceiros(){
   let L=[];try{L=await parcUsuario()}catch(e){ov.querySelector('#pcLs').innerHTML='<div class="empty">Não consegui carregar os parceiros. Tente de novo em instantes.</div>';return}
   L.sort((a,b)=>semAc(a.nome).localeCompare(semAc(b.nome),'pt-BR'));
   let fil='',pg=1;const cats=[...new Set(L.map(p=>p.categoria).filter(Boolean))].sort((a,b)=>semAc(a).localeCompare(semAc(b),'pt-BR'));
-  const cartao=p=>`<div class="pcCard" data-id="${esc(p.id)}"><div class="pcT1"><b>${esc(p.nome)}</b><span class="pcTag">🤝 Parceiro</span></div><div class="small muted">${esc(p.categoria||'')}${p.cidade?' · 📍 '+esc(p.cidade):''}</div>${p.oferta?`<div class="pcOf">🎁 ${esc(p.oferta)}</div>`:''}${p.descricao?`<div class="small" style="margin-top:4px">${esc(p.descricao)}</div>`:''}<div class="pcBt">${parcBotoes(p.contatos)}</div></div>`;
+  const cartao=p=>`<div class="pcCard" data-id="${esc(p.id)}"><div class="pcT1"><b>${esc(p.nome)}</b><span class="pcTag">🤝 Parceiro</span></div><div class="small muted">${esc(p.categoria||'')}${p.cidade?' · 📍 '+esc(p.cidade):''}</div>${p.oferta?`<div class="pcOf">🎁 ${esc(p.oferta)}</div>`:''}${p.exclusivo_texto?`<div class="pcOf pcEx">💚 Oferta exclusiva para apoiadores: ${esc(p.exclusivo_texto)}</div>`:''}${p.descricao?`<div class="small" style="margin-top:4px">${esc(p.descricao)}</div>`:''}${parcEndTxt(p.endereco)?`<div class="small muted" style="margin-top:4px">📍 ${esc(parcEndTxt(p.endereco))}</div>`:''}<div class="pcBt">${parcBotoes(p.contatos)}${parcEndMapa(p.endereco)?`<a class="btn sec sm" href="${esc(parcEndMapa(p.endereco))}" target="_blank" rel="noopener noreferrer" data-pc="mapas">🧭 Como chegar</a>`:''}</div></div>`;
   const draw=()=>{const F=L.filter(p=>!fil||p.categoria===fil),lim=pg*10;
     ov.querySelector('#pcCh').innerHTML=cats.length>1?`<button type="button" class="chip${fil===''?' on':''}" data-f="">Todos (${L.length})</button>`+cats.map(c=>`<button type="button" class="chip${fil===c?' on':''}" data-f="${esc(c)}">${esc(c)} (${L.filter(p=>p.categoria===c).length})</button>`).join(''):'';
     ov.querySelector('#pcLs').innerHTML=F.length?F.slice(0,lim).map(cartao).join(''):'<div class="empty">Ainda não há parceiros por aqui. Volte em breve!</div>';
@@ -2862,6 +2993,7 @@ function parcFormCand(info,{previa=false}={}){
       <div class="field"><label for="pfN">Nome da empresa ou do profissional</label><input class="inp" id="pfN" maxlength="120" placeholder="Ex.: Auto Center Silva ou João da Silva"></div>
       <div class="field"><label for="pfR">Pessoa responsável pelo contato</label><input class="inp" id="pfR" maxlength="100" placeholder="Ex.: Maria Souza"></div>
       <div class="field"><label for="pfE">E-mail</label><input class="inp" type="email" id="pfE" maxlength="120" autocapitalize="none"></div>
+      <div class="field"><label for="pfE2">Confirmar e-mail</label><input class="inp" type="email" id="pfE2" maxlength="120" autocapitalize="none" autocomplete="off"></div>
       <div class="field"><label for="pfW">💬 WhatsApp (com DDD)</label><input class="inp" type="tel" id="pfW" inputmode="numeric" maxlength="16" placeholder="(61) 9xxxx-xxxx"></div>
       <div class="field"><label for="pfC">Categoria</label><select class="inp" id="pfC">${info.categorias.map(c=>`<option value="${esc(c.id)}">${esc(c.nome)}</option>`).join('')}<option value="__outra">Outra (descrever)</option></select></div>
       <div class="field hidden" id="pfOW"><label for="pfO">Qual categoria?</label><input class="inp" id="pfO" maxlength="60" placeholder="Ex.: Lavagem a seco"></div>
@@ -2869,7 +3001,7 @@ function parcFormCand(info,{previa=false}={}){
       <div class="field"><label for="pfOf">O que você oferece aos motoristas?</label><textarea class="inp" id="pfOf" maxlength="600" rows="3" placeholder="Ex.: 10% de desconto em revisão para quem mostrar o Rodaliq"></textarea></div>
       <div class="field"><label>Contatos que aparecerão para os motoristas (opcional)</label><div class="small muted">WhatsApp, e-mail, site e redes sociais. Se divulgarmos a parceria, só estes contatos serão mostrados.</div><div id="pfCt"></div></div>
       <div style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden" aria-hidden="true"><label>Não preencha<input type="text" id="pfWeb" tabindex="-1" autocomplete="off"></label></div>
-      <label class="ivCheck"><input type="checkbox" id="pfOk"><span>Em conformidade com a LGPD (Lei nº 13.709/2018), autorizo o Rodaliq a entrar em contato por e-mail e WhatsApp e a usar os dados informados somente para analisar esta candidatura. Li os <button type="button" class="lnk" data-tt="termos">Termos de uso</button> e a <button type="button" class="lnk" data-tt="priv">Política de privacidade</button>.</span></label>
+      <label class="ivCheck"><input type="checkbox" id="pfOk"><span>Autorizo o Rodaliq a usar estes dados para falar sobre a parceria, por e-mail e WhatsApp, conforme a LGPD (Lei nº 13.709/2018). Li os <button type="button" class="lnk" data-tt="termos">Termos de uso</button> e a <button type="button" class="lnk" data-tt="priv">Política de privacidade</button>.</span></label>
       <div id="pfMsg" class="err" role="alert"></div>
       <div class="mfoot"><button type="button" class="btn sec" id="pfX">Voltar</button><button type="submit" class="btn" id="pfS">${previa?'Testar envio (não envia)':'Enviar candidatura'}</button></div>
     </form>
@@ -2880,7 +3012,7 @@ function parcFormCand(info,{previa=false}={}){
   q('#pfC').onchange=()=>q('#pfOW').classList.toggle('hidden',q('#pfC').value!=='__outra');
   if(!info.categorias.length){q('#pfC').value='__outra';q('#pfOW').classList.remove('hidden')}
   q('#pfW').addEventListener('input',()=>{q('#pfW').value=invDigits(q('#pfW').value).slice(0,11)});
-  const sujo=()=>['#pfN','#pfR','#pfE','#pfW','#pfCi','#pfOf'].some(k=>q(k).value.trim()!=='')||q('#pfOk').checked;
+  const sujo=()=>['#pfN','#pfR','#pfE','#pfE2','#pfW','#pfCi','#pfOf'].some(k=>q(k).value.trim()!=='')||q('#pfOk').checked;
   const fecha=async()=>{if(sujo()&&!await confirma('Você começou a preencher. Se voltar agora, <b>o que digitou será perdido</b>.','Voltar e perder',{titulo:'Voltar?',voltar:'Continuar preenchendo',perigo:1}))return;ov.remove()};
   ov.__fechar=fecha;q('#pfX').onclick=fecha;q('#pfD').onclick=()=>ov.remove();
   q('#pfF').addEventListener('submit',async e=>{e.preventDefault();
@@ -2890,6 +3022,7 @@ function parcFormCand(info,{previa=false}={}){
       categoria_id:outra?null:q('#pfC').value,categoria_outra:outra?q('#pfO').value.trim().replace(/\s+/g,' '):null,cidade:q('#pfCi').value.trim(),oferta:q('#pfOf').value.trim(),contatos:ed.get(),consent:true,consent_v:TERMOS_V};
     if(rec.nome.length<2)return msg('Informe o nome da empresa ou do profissional.');
     if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(rec.email))return msg('Informe um e-mail válido.');
+    if(q('#pfE2').value.trim().toLowerCase()!==rec.email)return msg('Os e-mails informados não são iguais. Confira o campo “Confirmar e-mail”.');
     if(!DDD_UF[ddd])return msg('Informe o WhatsApp com DDD válido.');
     if(!/^9?\d{8}$/.test(num)||num.length<8)return msg('Informe o número do WhatsApp com DDD, por exemplo (61) 9xxxx-xxxx.');
     if(outra&&rec.categoria_outra.length<2)return msg('Conte qual é a categoria.');
@@ -2951,14 +3084,17 @@ async function parcAdminRender(box){
       <div class="pcBt">${parcBotoes(c.contatos)||'<span class="small muted">Sem contatos públicos informados.</span>'}</div>
       <div class="uAc" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px"><a class="btn sm sec" href="https://wa.me/${esc(String(c.whatsapp||'').replace(/\D/g,''))}" target="_blank" rel="noopener noreferrer">💬 Falar no WhatsApp</a>${c.status==='nova'?`<button type="button" class="btn sm" data-ca="${esc(c.id)}">✔ Aprovar (criar rascunho)</button><button type="button" class="btn sm sec" data-cr="${esc(c.id)}">✖ Recusar</button>`:''}<button type="button" class="btn sm sec" data-cd="${esc(c.id)}">🗑 Excluir</button></div></div></div>`};
   const cardK=c=>{const u=usoCat(c.id);return `<div class="uCard uCp"><div class="despRow"><span class="despInfo"><b>${esc(c.nome)}</b><span class="small muted">${u} em uso</span>${c.ativo===false?'<span class="rcTag ad">⏸ Desativada</span>':''}</span><span style="display:flex;gap:4px;flex-wrap:wrap"><button type="button" class="btn sm sec" data-ku="${esc(c.id)}" aria-label="Subir ${esc(c.nome)}">▲</button><button type="button" class="btn sm sec" data-kd="${esc(c.id)}" aria-label="Descer ${esc(c.nome)}">▼</button><button type="button" class="btn sm sec" data-kr="${esc(c.id)}">✏ Renomear</button><button type="button" class="btn sm sec" data-kt="${esc(c.id)}">${c.ativo===false?'↻ Ativar':'⏸ Desativar'}</button>${u?'':`<button type="button" class="btn sm sec" data-kx="${esc(c.id)}">🗑</button>`}</span></div></div>`};
-  const lista=F==='ativos'?ativos.sort(ord).map(cardP).join('')||'<div class="empty">Nenhum parceiro ativo.</div>'
-    :F==='inativos'?inativos.sort(ord).map(cardP).join('')||'<div class="empty">Nenhum parceiro inativo.</div>'
-    :F==='cand'?[...PARC_CAND].sort((a,b)=>(a.status==='nova'?0:1)-(b.status==='nova'?0:1)||String(b.criado_em).localeCompare(String(a.criado_em))).map(cardC).join('')||'<div class="empty">Nenhuma candidatura recebida.</div>'
-    :`<div class="despAdd"><div class="fld" style="flex:2 1 200px"><label for="kN">Nova categoria</label><input class="inp" id="kN" maxlength="60" placeholder="Ex.: Mecânica" autocomplete="off"></div><div class="fld" style="flex:0 0 auto"><button type="button" class="btn" id="kS">Adicionar</button></div>${PARC_CATS.length?'':'<div class="fld" style="flex:0 0 auto"><button type="button" class="btn sec" id="kSeed">Criar categorias sugeridas</button></div>'}</div><div class="err" id="kErr"></div>${[...PARC_CATS].sort((a,b)=>(a.ordem||0)-(b.ordem||0)||ord(a,b)).map(cardK).join('')||'<div class="empty">Nenhuma categoria ainda.</div>'}`;
+  const qb=semAc(UI.parcQ||''),fb=l=>qb?l.filter(x=>semAc([x.nome,x.whatsapp,x.email,x.responsavel,x.telefone].filter(Boolean).join(' ')+' '+String(x.whatsapp||'').replace(/\D/g,'')).includes(qb)):l;
+  const lista=F==='ativos'?fb(ativos).sort(ord).map(cardP).join('')||'<div class="empty">Nenhum parceiro ativo.</div>'
+    :F==='inativos'?fb(inativos).sort(ord).map(cardP).join('')||'<div class="empty">Nenhum parceiro inativo.</div>'
+    :F==='cand'?fb([...PARC_CAND]).sort((a,b)=>(a.status==='nova'?0:1)-(b.status==='nova'?0:1)||String(b.criado_em).localeCompare(String(a.criado_em))).map(cardC).join('')||'<div class="empty">Nenhuma candidatura recebida.</div>'
+    :`<div class="despAdd"><div class="fld" style="flex:2 1 200px"><label for="kN">Nova categoria</label><input class="inp" id="kN" maxlength="60" placeholder="Ex.: Mecânica" autocomplete="off"></div><div class="fld" style="flex:0 0 auto"><button type="button" class="btn" id="kS">Adicionar</button></div>${PARC_CATS.length?'':'<div class="fld" style="flex:0 0 auto"><button type="button" class="btn sec" id="kSeed">Criar categorias sugeridas</button></div>'}</div><div class="err" id="kErr"></div>${fb([...PARC_CATS]).sort((a,b)=>(a.ordem||0)-(b.ordem||0)||ord(a,b)).map(cardK).join('')||'<div class="empty">Nenhuma categoria ainda.</div>'}`;
   box.innerHTML=`<h3 style="margin:0">🤝 Parceiros do Rodaliq</h3>
     <p class="small muted" style="margin:4px 0 8px">Parceiros não têm conta nem acesso ao app: você cadastra e mantém tudo aqui. Quem aparece para os usuários é só quem está <b>ativo</b> (sem data fim, ou com data fim ainda no futuro). O nível de quem vê está em ⚙ Ajustes do app › Recursos.</p>
     <div class="admTabs" id="pcTabs">${tabs.map(([k,t])=>`<button type="button" class="chip${F===k?' on':''}" data-pf="${k}">${t}</button>`).join('')}</div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0"><button type="button" class="btn sm" id="pcNovo">＋ Novo parceiro</button><button type="button" class="btn sm sec" id="pcPrev">👁 Prévia do formulário de candidatura</button></div>${lista}`;
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0"><button type="button" class="btn sm" id="pcNovo">＋ Novo parceiro</button><button type="button" class="btn sm sec" id="pcPrev">👁 Prévia do formulário de candidatura</button></div>
+    <div class="field" style="margin:0 0 8px"><label for="pcQ">Buscar por nome, telefone ou e-mail</label><input class="inp" id="pcQ" type="search" autocomplete="off" placeholder="Digite para filtrar" value="${esc(UI.parcQ||'')}"></div>${lista}`;
+  {const qi=box.querySelector('#pcQ');qi.addEventListener('input',()=>{UI.parcQ=qi.value;const pos=qi.selectionStart;parcAdminRender(box).then(()=>{const n=box.querySelector('#pcQ');if(n){n.focus();try{n.setSelectionRange(pos,pos)}catch(e){}}})})}
   const again=()=>{parcAdminRender(box);admContagens()};
   box.querySelectorAll('[data-pf]').forEach(b=>b.onclick=()=>{UI.parcF=b.dataset.pf;UI.admPag=1;parcAdminRender(box)});
   box.querySelectorAll('.uHd').forEach(b=>b.onclick=()=>{const c=b.parentNode;c.classList.toggle('op');b.setAttribute('aria-expanded',c.classList.contains('op'))});
@@ -3008,43 +3144,62 @@ async function parcAdminRender(box){
       try{await pUpd('cats',c.id,{nome});audit('Parceiros','Admin','Categoria renomeada · '+c.nome+' → '+nome)}catch(e){ov.querySelector('#krE').textContent='Não foi possível salvar.';return}ov.remove();again()}})}
 // cadastro/edição de parceiro (modal)
 function parcFormP(p,done){
-  const novo=!p;p=p||{pessoa:'pj',status:'rascunho',contatos:[],valor:0};
+  const novo=!p;p=p||{pessoa:'pj',status:'rascunho',contatos:[],valor:0};const en=p.endereco||{};
   const cats=PARC_CATS.filter(c=>c.ativo!==false||c.id===p.categoria_id).sort((a,b)=>(a.ordem||0)-(b.ordem||0));
   const ov=parcModal(`<div class="ivHd"><h2>${novo?'＋ Novo parceiro':'✏ Editar parceiro'}</h2></div><div class="ajBd" style="max-height:68vh">
-    <div class="field"><label for="ppP">Tipo</label><select class="inp" id="ppP"><option value="pj"${p.pessoa==='pj'?' selected':''}>Empresa (CNPJ)</option><option value="pf"${p.pessoa==='pf'?' selected':''}>Autônomo (CPF)</option></select></div>
-    <div class="field"><label for="ppN">Nome (empresa ou profissional)</label><input class="inp" id="ppN" maxlength="120" value="${esc(p.nome||'')}"></div>
-    <div class="field"><label for="ppD">CPF/CNPJ (só para você, não aparece para os usuários)</label><input class="inp" id="ppD" maxlength="20" value="${esc(p.documento||'')}" inputmode="numeric"></div>
-    <div class="field"><label for="ppC">Categoria</label><select class="inp" id="ppC"><option value="">— escolha —</option>${cats.map(c=>`<option value="${esc(c.id)}"${p.categoria_id===c.id?' selected':''}>${esc(c.nome)}</option>`).join('')}</select></div>
-    <div class="field"><label for="ppR">Responsável (só para você)</label><input class="inp" id="ppR" maxlength="100" value="${esc(p.responsavel||'')}"></div>
-    <div class="field"><label for="ppE">E-mail de contato (só para você)</label><input class="inp" type="email" id="ppE" maxlength="120" value="${esc(p.email||'')}"></div>
-    <div class="field"><label for="ppW">WhatsApp de contato (só para você)</label><input class="inp" type="tel" id="ppW" maxlength="20" inputmode="numeric" value="${esc(p.whatsapp||'')}" placeholder="5561999999999"></div>
-    <div class="field"><label for="ppCi">Cidade</label><input class="inp" id="ppCi" maxlength="80" value="${esc(p.cidade||'')}"></div>
-    <div class="field"><label for="ppOf">Oferta para os motoristas (aparece no cartão)</label><input class="inp" id="ppOf" maxlength="300" value="${esc(p.oferta||'')}" placeholder="Ex.: 10% de desconto em revisão"></div>
-    <div class="field"><label for="ppDe">Descrição (aparece no cartão)</label><textarea class="inp" id="ppDe" maxlength="600" rows="3">${esc(p.descricao||'')}</textarea></div>
-    <div class="field"><label>Contatos públicos (botões que o motorista vê)</label><div id="ppCt"></div></div>
-    <div class="field"><label for="ppI">Início da parceria</label><input class="inp" type="date" id="ppI" value="${esc(p.inicio||'')}"></div>
+    <div class="field"><label for="ppP">Tipo *</label><select class="inp" id="ppP"><option value="pj"${p.pessoa==='pj'?' selected':''}>Empresa (CNPJ)</option><option value="pf"${p.pessoa==='pf'?' selected':''}>Autônomo (CPF)</option></select></div>
+    <div class="field"><label for="ppN">Nome (empresa ou profissional) *</label><input class="inp" id="ppN" maxlength="120" value="${esc(p.nome||'')}"></div>
+    <div class="field"><label for="ppD">CPF/CNPJ (só para você, não aparece para os usuários) *</label><input class="inp" id="ppD" maxlength="20" value="${esc(p.documento||'')}" inputmode="numeric"></div>
+    <div class="field"><label for="ppC">Categoria *</label><select class="inp" id="ppC"><option value="">— escolha —</option>${cats.map(c=>`<option value="${esc(c.id)}"${p.categoria_id===c.id?' selected':''}>${esc(c.nome)}</option>`).join('')}</select></div>
+    <div class="field"><label for="ppR">Responsável (só para você) *</label><input class="inp" id="ppR" maxlength="100" value="${esc(p.responsavel||'')}"></div>
+    <div class="field"><label for="ppE">E-mail de contato (só para você) *</label><input class="inp" type="email" id="ppE" maxlength="120" value="${esc(p.email||'')}"></div>
+    <div class="field"><label for="ppW">WhatsApp de contato (só para você) *</label><input class="inp" type="tel" id="ppW" maxlength="20" inputmode="numeric" value="${esc(p.whatsapp||'')}" placeholder="5561999999999"></div>
+    <div class="field"><label>Endereço do parceiro</label><div class="grid2">
+      <div class="field"><label for="ppEl">Logradouro</label><input class="inp" id="ppEl" maxlength="120" value="${esc(en.logradouro||'')}" placeholder="Rua, avenida, quadra…"></div>
+      <div class="field"><label for="ppEn">Número</label><input class="inp" id="ppEn" maxlength="12" value="${esc(en.numero||'')}" placeholder="Ex.: 120 ou s/n"></div>
+      <div class="field"><label for="ppEc">Complemento (opcional)</label><input class="inp" id="ppEc" maxlength="60" value="${esc(en.complemento||'')}"></div>
+      <div class="field"><label for="ppEb">Bairro</label><input class="inp" id="ppEb" maxlength="80" value="${esc(en.bairro||'')}"></div>
+      <div class="field"><label for="ppCi">Cidade</label><input class="inp" id="ppCi" maxlength="80" value="${esc(en.cidade||p.cidade||'')}"></div>
+      <div class="field"><label for="ppEu">UF</label><input class="inp" id="ppEu" maxlength="2" value="${esc(en.uf||'')}" placeholder="DF" style="text-transform:uppercase"></div>
+      <div class="field"><label for="ppEp">CEP</label><input class="inp" id="ppEp" inputmode="numeric" maxlength="9" value="${esc(en.cep||'')}" placeholder="00000-000"></div>
+      <div class="field"><label for="ppEr2">Ponto de referência (opcional)</label><input class="inp" id="ppEr2" maxlength="120" value="${esc(en.ref||'')}"></div></div>
+      <span class="small muted">O botão “Como chegar” (Mapas) é montado sozinho a partir deste endereço.</span></div>
+    <div class="field"><label for="ppOf">Oferta para os motoristas (aparece no cartão) *</label><input class="inp" id="ppOf" maxlength="300" value="${esc(p.oferta||'')}" placeholder="Ex.: 10% de desconto em revisão"></div>
+    <div class="field"><label class="exChk"><input type="checkbox" id="ppEx"${p.exclusivo?' checked':''}><span>💚 Tem oferta exclusiva para apoiadores</span></label>
+      <input class="inp${p.exclusivo?'':' hidden'}" id="ppExT" maxlength="300" value="${esc(p.exclusivo_texto||'')}" placeholder="Ex.: 15% de desconto, só para apoiadores" style="margin-top:6px"></div>
+    <div class="field"><label for="ppDe">Descrição (aparece no cartão) *</label><textarea class="inp" id="ppDe" maxlength="600" rows="3">${esc(p.descricao||'')}</textarea></div>
+    <div class="field"><label>Contatos públicos (botões que o motorista vê) *</label><div id="ppCt"></div></div>
+    <div class="field"><label for="ppI">Início da parceria *</label><input class="inp" type="date" id="ppI" value="${esc(p.inicio||'')}"></div>
     <div class="field"><label for="ppF">Fim da parceria (opcional — vazio = sem data fim)</label><input class="inp" type="date" id="ppF" value="${esc(p.fim||'')}"></div>
     <div class="field"><label for="ppV">Valor combinado (R$)</label><input class="inp num" id="ppV" inputmode="decimal" value="${p.valor?brl(p.valor,1):''}" placeholder="0,00"></div>
     <div class="field"><label for="ppB">Forma de cobrança</label><select class="inp" id="ppB"><option value="">—</option>${PARC_COBR.map(x=>`<option${p.cobranca===x?' selected':''}>${x}</option>`).join('')}</select></div>
     <div class="field"><label for="ppK">Link do contrato (https://…, por exemplo do seu Drive)</label><input class="inp" id="ppK" maxlength="400" value="${esc(p.contrato_url||'')}" placeholder="https://…"></div>
-    <div class="field"><label for="ppS">Situação</label><select class="inp" id="ppS"><option value="rascunho"${p.status==='rascunho'?' selected':''}>Rascunho (não aparece para os usuários)</option><option value="ativo"${p.status==='ativo'?' selected':''}>Ativo (aparece enquanto estiver dentro das datas)</option><option value="encerrado"${p.status==='encerrado'?' selected':''}>Encerrado</option></select></div>
+    <div class="field"><label for="ppS">Situação *</label><select class="inp" id="ppS"><option value="rascunho"${p.status==='rascunho'?' selected':''}>Rascunho (não aparece para os usuários)</option><option value="ativo"${p.status==='ativo'?' selected':''}>Ativo (aparece enquanto estiver dentro das datas)</option><option value="encerrado"${p.status==='encerrado'?' selected':''}>Encerrado</option></select></div>
     <div class="err" id="ppEr"></div></div><div class="mfoot"><button type="button" class="btn sec" id="ppX">Cancelar</button><button type="button" class="btn" id="ppSv">Salvar</button></div>`,{id:'parcEd',larg:600});
   const q=s=>ov.querySelector(s),err=t=>{q('#ppEr').textContent=t};
   const ed=parcContatosEd(q('#ppCt'),p.contatos||[],10);liveBRL(q('#ppV'));
-  ov.__fechar=()=>ov.remove();q('#ppX').onclick=()=>ov.remove();
+  ov.__fechar=()=>fechaComPerda(ov,()=>ov.remove());marcaPerda(ov);q('#ppX').onclick=()=>ov.__fechar();
+  q('#ppEx').onchange=()=>q('#ppExT').classList.toggle('hidden',!q('#ppEx').checked);
+  q('#ppEp').addEventListener('input',()=>{const d=invDigits(q('#ppEp').value).slice(0,8);q('#ppEp').value=d.length>5?d.slice(0,5)+'-'+d.slice(5):d});
   q('#ppSv').onclick=async()=>{
     const nome=q('#ppN').value.trim().replace(/\s+/g,' '),ini=q('#ppI').value,fim=q('#ppF').value,url=q('#ppK').value.trim(),st=q('#ppS').value,email=q('#ppE').value.trim();
-    if(nome.length<2)return err('Informe o nome.');if(email&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))return err('E-mail inválido.');
+    if(nome.length<2)return err('Informe o nome.');
+    const en2={logradouro:q('#ppEl').value.trim(),numero:q('#ppEn').value.trim(),complemento:q('#ppEc').value.trim(),bairro:q('#ppEb').value.trim(),cidade:q('#ppCi').value.trim(),uf:q('#ppEu').value.trim().toUpperCase(),cep:q('#ppEp').value.trim(),ref:q('#ppEr2').value.trim()};
+    const falta=[[q('#ppD').value.trim(),'CPF/CNPJ'],[q('#ppC').value,'a categoria'],[q('#ppR').value.trim(),'o responsável'],[email,'o e-mail de contato'],[q('#ppW').value.trim(),'o WhatsApp de contato'],[en2.logradouro,'o logradouro'],[en2.numero,'o número do endereço'],[en2.bairro,'o bairro'],[en2.cidade,'a cidade'],[en2.uf,'a UF'],[en2.cep,'o CEP'],[q('#ppOf').value.trim(),'a oferta para os motoristas'],[q('#ppDe').value.trim(),'a descrição'],[ed.get().length?'x':'','ao menos um contato público'],[ini,'o início da parceria']].find(x=>!x[0]);
+    if(falta)return err('Preencha '+falta[1]+'. Só contrato, data fim, valor e cobrança são opcionais.');
+    if(!/^[A-Z]{2}$/.test(en2.uf))return err('Informe a UF com 2 letras, por exemplo DF.');
+    if(q('#ppEx').checked&&q('#ppExT').value.trim().length<3)return err('Descreva a oferta exclusiva para apoiadores.');
+    if(email&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))return err('E-mail inválido.');
     if(ini&&fim&&fim<ini)return err('A data fim não pode ser antes do início.');if(url&&!/^https:\/\/[^\s]+$/i.test(url))return err('O link do contrato precisa começar com https://');
     const er=ed.erro();if(er)return err(er);
     if(st==='ativo'&&!q('#ppC').value)return err('Escolha uma categoria para ativar.');if(st==='ativo'&&!ed.get().length)return err('Cadastre ao menos um contato público para ativar.');
-    const rec={nome,pessoa:q('#ppP').value,documento:q('#ppD').value.trim()||null,categoria_id:q('#ppC').value||null,responsavel:q('#ppR').value.trim()||null,email:email||null,whatsapp:invDigits(q('#ppW').value)||null,descricao:q('#ppDe').value.trim()||null,oferta:q('#ppOf').value.trim()||null,cidade:q('#ppCi').value.trim()||null,contatos:ed.get(),inicio:ini||null,fim:fim||null,valor:r2(parseBRL(q('#ppV').value)),cobranca:q('#ppB').value||null,contrato_url:url||null,status:st};
+    const rec={nome,pessoa:q('#ppP').value,documento:q('#ppD').value.trim()||null,categoria_id:q('#ppC').value||null,responsavel:q('#ppR').value.trim()||null,email:email||null,whatsapp:invDigits(q('#ppW').value)||null,descricao:q('#ppDe').value.trim()||null,oferta:q('#ppOf').value.trim()||null,cidade:[en2.cidade,en2.uf].filter(Boolean).join('/')||null,endereco:en2,exclusivo:q('#ppEx').checked,exclusivo_texto:q('#ppEx').checked?q('#ppExT').value.trim():null,contatos:ed.get(),inicio:ini||null,fim:fim||null,valor:r2(parseBRL(q('#ppV').value)),cobranca:q('#ppB').value||null,contrato_url:url||null,status:st};
     q('#ppSv').disabled=true;
     try{if(novo)await pSet('parc',parcId(),{...rec,candidatura_id:null,criado_em:new Date().toISOString()});else await pUpd('parc',p.id,rec);
       audit('Parceiros','Admin',(novo?'Parceiro cadastrado · ':'Parceiro editado · ')+nome+' ('+st+')')}
     catch(e){q('#ppSv').disabled=false;return err('Não foi possível salvar. Só o admin principal pode.')}
     ov.remove();toast('Parceiro salvo');if(done)done()}}
-const PARC_FORMAS=['Pix','Transferência','Boleto','Dinheiro','Outra'];
+const PARC_FORMAS=['Pix','Transferência','Boleto','Crédito','Link de pagamento','Dinheiro','Outra'];
 // recebido conta no mês da data do pagamento (como as contribuições); previsto conta no mês da competência
 const parcRecMes=r=>r.situacao==='recebido'&&r.data_pagamento?String(r.data_pagamento).slice(0,7):r.competencia;
 const parcRecTag=r=>r.situacao==='recebido'?`<span class="rcTag ts">✔ Recebido${r.data_pagamento?' em '+fmtBR(r.data_pagamento):''}${r.forma_pagamento?' · '+esc(r.forma_pagamento):''}</span>`:`<span class="rcTag ad">⏳ Previsto</span>`;
@@ -3052,7 +3207,9 @@ const parcRecTag=r=>r.situacao==='recebido'?`<span class="rcTag ts">✔ Recebido
 function kpiCob(titulo,quem,valor,custo,partes){
   if(!custo)return kpi(titulo,'—','Cadastre as despesas do app para ver quanto do custo do mês '+quem+' cobrem.');
   const sobra=r2(valor-custo),det=(partes||[]).map(p=>p[0]+' '+pctTxt(p[1],custo)).join(' · ');
-  return kpi(titulo,`<span class="${valor>=custo?'pos':'neg'}">${pctTxt(valor,custo)}</span>`,`${apoBRL(valor)} de ${apoBRL(custo)} de despesas · ${sobra>=0?'sobram '+apoBRL(sobra):'faltam '+apoBRL(-sobra)}`+(det?'<br>'+det:'')+`<br>ⓘ quanto ${quem} cobrem${partes?'':' sozinhas'}`,'wide')}
+  // V96: valor em R$ em cima, porcentagem embaixo (card do mesmo tamanho dos demais)
+  const topo=partes?sobra:valor;
+  return kpi(titulo,`<span class="${valor>=custo?'pos':'neg'}">${partes&&sobra>0?'+':''}${apoBRL(topo)}</span>`,`<b>${pctTxt(valor,custo)}</b> das despesas (${apoBRL(custo)}) · ${sobra>=0?'sobram '+apoBRL(sobra):'faltam '+apoBRL(-sobra)}`+(det?'<br>'+det:'')+`<br>ⓘ ${partes?'contribuições e parcerias juntas':'só '+quem}`)}
 function parcMarcaRecebido(r,done){if(!r)return;
   const ov=parcModal(`<h2>✔ Marcar como recebido</h2><div class="field"><label for="mrD">Data do pagamento</label><input class="inp" type="date" id="mrD" value="${parcHoje()}" max="${parcHoje()}"></div><div class="field"><label for="mrF">Forma de pagamento</label><select class="inp" id="mrF">${PARC_FORMAS.map(f=>`<option>${f}</option>`).join('')}</select></div><div class="err" id="mrE"></div><div class="mfoot"><button type="button" class="btn sec" id="mrC">Cancelar</button><button type="button" class="btn" id="mrS">Salvar</button></div>`,{larg:420});
   ov.querySelector('#mrC').onclick=()=>ov.remove();
@@ -3261,14 +3418,16 @@ function colabRender(box){
     let L=[],A=[],er='';
     try{L=await colabListar()}catch(e){er='Não consegui carregar os colaboradores. Tente de novo em instantes.'}
     try{A=await admListar()}catch(e){}
+    await carregaPerfis();
     COLABS=L;
     const emails=new Set(L.map(c=>String(c.email).toLowerCase()));
-    const admLin=A.map(a=>`<div class="admLin"><div><b>${esc((a.user_id&&PERFIS[a.user_id])||a.email)}</b><span class="rcTag ad">${a.master?'admin master':'admin'}</span>
-      <div class="small muted">${esc(a.email)}${a.master?'':' · entrou automaticamente'}</div></div></div>`).join('');
-    const colLin=L.filter(c=>!A.some(a=>String(a.email).toLowerCase()===String(c.email).toLowerCase()))
-      .map(c=>`<div class="admLin"><div><b>${esc(c.nome)}</b><span class="rcTag ts">colaborador</span>
+    const nomeA=a=>(a.user_id&&PERFIS[a.user_id])||a.email;
+    const itens=[...A.slice().sort((x,y)=>(y.master?1:0)-(x.master?1:0)||semAc(nomeA(x)).localeCompare(semAc(nomeA(y)),'pt-BR')).map(a=>({n:nomeA(a),e:a.email,h:`<div class="admLin"><div><b>${esc(nomeA(a))}</b><span class="rcTag ad">${a.master?'admin master':'admin'}</span>
+      <div class="small muted">${esc(a.email)}${a.master?'':' · entrou automaticamente'}</div></div></div>`})),
+      ...L.filter(c=>!A.some(a=>String(a.email).toLowerCase()===String(c.email).toLowerCase())).sort((x,y)=>semAc(x.nome).localeCompare(semAc(y.nome),'pt-BR'))
+      .map(c=>({n:c.nome,e:c.email,h:`<div class="admLin"><div><b>${esc(c.nome)}</b><span class="rcTag ts">colaborador</span>
       <div class="small muted">${esc(c.email)} · desde ${esc(admData(c.criado_em))}</div></div>
-      <button type="button" class="btn sec sm" data-cdel="${esc(c.email)}">Remover</button></div>`).join('');
+      <button type="button" class="btn sec sm" data-cdel="${esc(c.email)}">Remover</button></div>`}))];
     box.innerHTML=`<p class="small muted" style="margin:0 0 12px">Colaboradores conversam com você em particular pelo app, em conversas separadas. <b>Todo admin já entra automaticamente.</b> Use a caixa abaixo para colaboradores que não são admins.</p>
       <div style="border:1px solid var(--line);border-radius:12px;padding:13px;margin-bottom:16px">
         <div class="grid2">
@@ -3278,7 +3437,18 @@ function colabRender(box){
         <div class="err" id="cbErr"></div>
         <button type="button" class="btn" id="cbAdd" style="margin-top:10px">＋ Cadastrar colaborador</button>
       </div>
-      ${er?`<div class="empty">${esc(er)}</div>`:admLin+colLin}`;
+      ${er?`<div class="empty">${esc(er)}</div>`:`<div class="field" style="margin:0 0 6px"><label for="cbQ">Buscar por nome ou e-mail</label><input class="inp" id="cbQ" type="search" placeholder="Digite para filtrar" autocomplete="off" value="${esc(UI.colQ||'')}"></div><div class="small muted" id="cbCnt"></div><div id="cbList"></div>`}`;
+    const paint=()=>{const lst=box.querySelector('#cbList');if(!lst)return;const q=semAc(UI.colQ||'');
+      const f=q?itens.filter(i=>semAc(i.n+' '+i.e).includes(q)):itens;
+      lst.innerHTML=f.map(i=>i.h).join('')||'<div class="empty">Ninguém encontrado.</div>';
+      const c=box.querySelector('#cbCnt');if(c)c.textContent=q?`${f.length} de ${itens.length}`:`${itens.length} ${itens.length===1?'pessoa':'pessoas'}`;
+      lst.querySelectorAll('[data-cdel]').forEach(b=>b.onclick=async()=>{
+        const m=b.dataset.cdel;
+        if(!confirm('Remover '+m+' dos colaboradores?\n\nOs recados já trocados continuam guardados.'))return;
+        try{await colabApagar(m);audit('Colaborador','Admin','Colaborador removido · '+m);toast('Colaborador removido');draw();admContagens()}
+        catch(e){toast('Não foi possível remover')}})};
+    const qi=box.querySelector('#cbQ');if(qi)qi.addEventListener('input',()=>{UI.colQ=qi.value;paint()});
+    paint();
     const erb=t=>{const e=box.querySelector('#cbErr');if(e){e.textContent=t||'';e.classList.toggle('on',!!t)}};
     box.querySelector('#cbAdd').onclick=async()=>{
       const n=box.querySelector('#cbNome').value.trim(),m=box.querySelector('#cbMail').value.trim().toLowerCase();
@@ -3288,11 +3458,6 @@ function colabRender(box){
       erb('');
       try{await colabCriar(n,m);audit('Colaborador','Admin','Colaborador cadastrado · '+m);toast('Colaborador cadastrado');draw();admContagens()}
       catch(e){erb('Não consegui cadastrar. Tente de novo em instantes.')}};
-    box.querySelectorAll('[data-cdel]').forEach(b=>b.onclick=async()=>{
-      const m=b.dataset.cdel;
-      if(!confirm('Remover '+m+' dos colaboradores?\n\nOs recados já trocados continuam guardados.'))return;
-      try{await colabApagar(m);audit('Colaborador','Admin','Colaborador removido · '+m);toast('Colaborador removido');draw();admContagens()}
-      catch(e){toast('Não foi possível remover')}});
   };
   box.innerHTML='<div class="empty">Carregando…</div>';draw();
 }
@@ -3369,27 +3534,35 @@ async function admListar(){
 }
 function formAdmins(){if(!ehMaster())return;
   const ov=document.createElement('div');ov.className='ov';ov.id='admsOv';document.body.appendChild(ov);
+  let busca='';
   const draw=async()=>{
-    let L=[],er='';try{L=await admListar()}catch(e){er='Não consegui carregar a lista de admins. Tente de novo em instantes.'}
-    ov.innerHTML=`<div class="modal" style="max-width:460px"><h2>🛡 Admins do app</h2>
+    let L=[],er='';try{L=await admListar();await carregaPerfis(true)}catch(e){er='Não consegui carregar a lista de admins. Tente de novo em instantes.'}
+    const nome=a=>(a.user_id&&PERFIS[a.user_id])||(a.master&&!invProd()?LOGADO:'')||'(sem nome)';
+    L=L.slice().sort((x,y)=>(y.master?1:0)-(x.master?1:0)||semAc(nome(x)).localeCompare(semAc(nome(y)),'pt-BR')||String(x.email).localeCompare(String(y.email)));
+    const linhas=()=>{const q=semAc(busca),f=q?L.filter(a=>semAc(nome(a)+' '+a.email).includes(q)):L;
+      return f.length?`<div class="admCols"><span>Nome</span><span>E-mail</span><span></span></div>`+f.map(a=>`<div class="admRow"><span class="admNm"><b>${esc(nome(a))}</b>${a.master?' <span class="rcTag ad">admin master</span>':''}</span><span class="admEm">${esc(a.email)}</span>${a.master?'<span></span>':`<button type="button" class="btn sec sm" data-rm="${esc(a.user_id)}">Remover</button>`}</div>`).join(''):'<div class="empty">Nenhum admin encontrado.</div>'};
+    ov.innerHTML=`<div class="modal" style="max-width:640px"><h2>🛡 Admins do app</h2>
       <p class="small">Só você, como admin principal, cadastra e descadastra admins.</p>
-      ${er?`<div class="empty">${er}</div>`:(L.map(a=>`<div class="admLin"><span class="admEm">${esc(a.email)}${a.master?' <span class="small muted">(você, admin principal)</span>':''}</span>${a.master?'':`<button type="button" class="btn sec sm" data-rm="${esc(a.user_id)}">Remover</button>`}</div>`).join('')||'<div class="empty">Nenhum admin cadastrado.</div>')}
+      <h3 style="margin:10px 0 4px">Admins ativos${er?'':` (${L.length})`}</h3>
+      ${er?`<div class="empty">${er}</div>`:`<input class="inp" type="search" id="caBusca" placeholder="Buscar por nome ou e-mail" autocomplete="off" value="${esc(busca)}"><div id="caLista">${linhas()}</div>`}
       <h3 style="margin:14px 0 4px">➕ Cadastrar admin</h3>
-      <p class="small muted" style="margin:0 0 6px">Informe o e-mail de um usuário que já tenha conta ativa no app.</p>
+      <p class="small muted" style="margin:0 0 6px">Informe o e-mail de um usuário que já tenha conta ativa no app. O nome aparece na lista automaticamente, como está no cadastro do app.</p>
       <input class="inp" type="email" id="caMail" placeholder="e-mail do usuário" autocomplete="off">
       <p style="margin:8px 0 0"><a class="supaLnk" href="${SUPA_TAB}" target="_blank" rel="noopener">↗ Abrir tabela tb_admins no Supabase</a></p>
       <div class="err" id="caErr"></div>
       <div class="mfoot"><button class="btn sec" id="caN">Fechar</button><button class="btn" id="caS">Cadastrar</button></div></div>`;
     const q=x=>ov.querySelector(x),err=t=>{q('#caErr').textContent=t};
-    q('#caN').onclick=()=>ov.remove();q('#caMail').addEventListener('input',()=>err(''));
-    ov.querySelectorAll('[data-rm]').forEach(b=>b.onclick=async()=>{const a=L.find(x=>String(x.user_id)===b.dataset.rm);if(!a)return;
-      if(!await confirma(`Remover o perfil de admin de <b>${esc(a.email)}</b>? A conta e os dados da pessoa continuam como estão; ela passa a ser um usuário comum assim que recarregar o app.`,'Remover admin'))return;
+    const rmBind=()=>ov.querySelectorAll('[data-rm]').forEach(b=>b.onclick=async()=>{const a=L.find(x=>String(x.user_id)===b.dataset.rm);if(!a)return;
+      if(!await confirma(`Remover o perfil de admin de <b>${esc(nome(a))}</b> (${esc(a.email)})? A conta e os dados da pessoa continuam como estão; ela passa a ser um usuário comum assim que recarregar o app.`,'Remover admin'))return;
       try{
         if(invProd()){const {error}=await DB.from('tb_admins').delete().eq('user_id',a.user_id);if(error)throw error}
         else ADM_HMO=ADM_HMO.filter(x=>x.user_id!==a.user_id);
         audit('Remoção de admin','Admin','Admin removido · '+a.email);toast('Admin removido: '+a.email)}
       catch(e){toast('Não foi possível remover. Só o admin principal pode.');return}
       draw()});
+    rmBind();
+    q('#caN').onclick=()=>ov.remove();q('#caMail').addEventListener('input',()=>err(''));
+    const cb=q('#caBusca');if(cb)cb.addEventListener('input',()=>{busca=cb.value;q('#caLista').innerHTML=linhas();rmBind()});
     q('#caS').onclick=async()=>{const em=q('#caMail').value.trim().toLowerCase();if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em))return err('Informe um e-mail válido.');
       if(L.some(a=>String(a.email).toLowerCase()===em))return err('Este usuário já é admin.');
       q('#caS').disabled=true;
@@ -3401,7 +3574,6 @@ function formAdmins(){if(!ehMaster())return;
         if(e2){q('#caS').disabled=false;return err(/23505|duplicate/i.test(e2.code+e2.message)?'Este usuário já é admin.':'Não foi possível cadastrar. Só o admin principal pode cadastrar admins.')}
         audit('Cadastro de admin','Admin','Admin cadastrado · '+em);toast('Admin cadastrado: '+em);draw()}
       catch(e){q('#caS').disabled=false;err('Não foi possível cadastrar agora. Tente de novo.')}};
-    setTimeout(()=>{const i=q('#caMail');if(i)i.focus()},50);
   };
   draw();
 }
@@ -3913,7 +4085,7 @@ function checarPrimeiroAcesso(){if(!cfg().onboardingOk&&contaVazia())primeiroAce
 const GUIA=[
  {t:'👋 Bem-vindo ao Rodaliq™',x:`O Rodaliq organiza o seu dia a dia de motorista: ganhos, custos do carro, multas e o Carnê-Leão.<br><br><b>Regra de ouro:</b> os números do Painel vêm do que você lança. Quanto mais completo o lançamento, mais o app consegue mostrar. Este guia mostra o que lançar e onde cada informação aparece.`},
  {t:'📲 Instale o Rodaliq no seu aparelho',x:`O Rodaliq é um app que roda no navegador, mas você pode ter o ícone na tela, como qualquer aplicativo (sem loja de apps e sem ocupar quase espaço).<br><br><b>📱 Android (Chrome):</b> abra rodaliq.com.br &gt; toque nos <b>3 pontinhos ⋮</b> &gt; <b>Instalar app</b> (ou <b>Adicionar à tela inicial</b>) &gt; confirme.<br><b>🍎 iPhone/iPad (Safari):</b> abra rodaliq.com.br no <b>Safari</b> &gt; toque em <b>Compartilhar</b> (quadrado com seta para cima) &gt; role e toque em <b>Adicionar à Tela de Início</b> &gt; <b>Adicionar</b>.<br><b>💻 Computador (Chrome ou Edge):</b> abra rodaliq.com.br &gt; clique no ícone de <b>instalar</b> (monitor com seta) no fim da barra de endereço, ou em <b>⋮ &gt; Salvar e compartilhar &gt; Instalar página como app</b>.<br><br>Depois é só abrir pelo ícone. Seus dados continuam os mesmos, na sua conta.`,m:'Ícone na tela inicial do celular ou do computador.'},
- {t:'💚 O copo no topo da tela',x:`O Rodaliq é gratuito e vai continuar sendo. O <b>copo</b> ao lado do logo é o jeito discreto de ajudar a manter o app no ar: toque nele se quiser contribuir com o que achar justo (Pix, sem cobrança e sem obrigação). O copo enche quando uma contribuição sua é confirmada e vai esvaziando em até 60 dias. Seu acesso nunca depende disso.`,m:'Contribuição voluntária e opcional.'},
+ {t:'💚 O copo no topo da tela',x:`O Rodaliq é gratuito e vai continuar sendo. O <b>copo</b> ao lado do logo é o jeito discreto de ajudar a manter o app no ar: toque nele se quiser contribuir com o que achar justo (Pix, sem cobrança e sem obrigação). Seu acesso nunca depende disso.<br><br>Como agradecimento, quem contribui ganha o selo <b>💚 Apoiador</b>, que aparece ao lado de <b>⚙ Opções</b>, e, quando houver, acesso antecipado a recursos novos. Contribuir continua opcional e o app segue completo para todo mundo.`,m:'Contribuição voluntária e opcional.'},
  {t:'🚗 Seu veículo',cfg:'veic'},
  {t:'🎯 Sua meta diária',x:`Defina quanto quer ganhar por dia e em quais dias da semana você roda, em <b>⚙ Opções › Metas e preferências</b>. É de lá que saem a meta do dia e a do mês.<br><br>Nessa mesma tela ficam duas escolhas que mexem no imposto: o <b>desconto simplificado</b> mensal e se a <b>Carona Solidária entra no Carnê-Leão</b>. As duas seguem as referências oficiais listadas na aba <b>🧮 Impostos</b> — e, no caso da carona, a ressalva explicada na aba <b>Caronas / BlaBlaCar</b>.`,cfg:'meta'},
  {t:'🚕 Seus ganhos (Uber e 99)',x:`Lance o ganho de cada dia em <b>Corridas &gt; ＋ Corridas</b> ou, mais rápido, em <b>⚡ Atalhos &gt; Lançar o dia (Uber + 99)</b>.<br>Preencha também viagens, tempo online e <b>km rodados</b>: sem km, os indicadores por km não aparecem.<br><br>A Uber e a 99 mostram o km <b>viagem por viagem</b>, nunca o total do dia. Por isso o campo de km tem o botão <b>🧮</b> ao lado: digite (ou cole) um km por linha, que ele soma e devolve o total, com a opção de <b>Usar</b> ou de <b>Somar ao campo</b> se você já tinha lançado parte do dia.${refBloco(REF_GANHOS)}`,
@@ -3928,7 +4100,7 @@ const GUIA=[
    m:'Pontos da CNH, alertas de vencimento e de limite de pontos, custos do mês (quando paga).',acts:[['＋ Multas',()=>formMulta()]]},
  {t:'🧮 Impostos (Carnê-Leão)',x:`Todo mês, lance o valor do <b>extrato da Uber/99</b> do mês anterior em <b>Impostos</b>. O app calcula o Carnê-Leão estimado, o DARF e avisa o vencimento.<br>⚠ Os valores são <b>estimativas</b>: confira no Carnê-Leão Web e, em caso de dúvida, consulte um <b>Contador</b>. As referências oficiais estão na aba Impostos.`,
    m:'DARF do mês, alerta de vencimento no sino e relatórios de impostos.',acts:[['🧾 Carnê-Leão do mês anterior',()=>formCarne(addMes(mesAtual(),-1))]]},
- {t:'📅 Despesas programadas',x:`IPVA, seguro e revisão chegam de uma vez. Na aba <b>Despesas programadas</b>, programe a despesa com o valor e a data de pagamento: o app divide o valor pelos meses até lá e mostra quanto separar por mês. Para não gastar sem querer, deixe esse valor numa conta separada da do dia a dia.`,
+ {t:'📅 Despesas programadas',x:`IPVA, seguro e revisão chegam de uma vez. Na aba <b>Despesas programadas</b>, programe a despesa com o valor e a data de pagamento: o app divide o valor pelos meses até lá e mostra quanto separar por mês. Pode ser à vista ou parcelada, e quando você pagar toca em <b>Marcar como paga</b> (e, se quiser, já lança em Custos). Parcela atrasada fica destacada e avisa no sino. Para não gastar sem querer, deixe esse valor numa conta separada da do dia a dia.`,
    m:'Card Despesas programadas e lucro livre, no Painel.',acts:[['＋ Programar despesa',()=>formReserva()],['📅 Abrir a aba',()=>irReservas()]]},
  {t:'🪪 Sua CNH (opcional)',x:`Guarde a <b>validade</b>, a categoria, o EAR e a data da 1ª habilitação, e o app avisa quando a renovação se aproximar e quando os pontos chegarem perto do limite. Não guardamos número da CNH, CPF nem foto.<br><br>⚠ ${TXT_SEM_ORGAO}`,cfg:'cnh'},
  {t:'📊 Para acompanhar',x:`• <b>Painel:</b> meta, ganhos, custos, resultado, previsão e despesas programadas (troque o mês e o veículo no topo).<br>• <b>Abas:</b> o Painel vem primeiro, as demais seguem em ordem alfabética e Relatórios fica por último. A aba <b>Despesas programadas</b> agora fica junto com as outras (antes ficava em ⚙ Opções).<br>• <b>🔔 Sino:</b> alertas (DARF, multas, CNH, manutenção e lembrete de backup) e novidades.<br>• <b>⚡ Atalhos:</b> todos os lançamentos num toque; arraste o botão para onde preferir.<br>• <b>Relatórios:</b> filtros e download em PDF, Word, Excel e CSV.<br>• <b>⚙ Opções:</b> veículos, metas, tema, backup e este guia. Exporte um backup pelo menos a cada 30 dias e guarde o arquivo fora do aparelho: o sino avisa quando passar disso. Se um dia quiser sair, use ⚙ Opções &gt; Excluir minha conta.<br>• <b>Esqueceu a senha?</b> Use “Esqueci minha senha”, na tela de entrada.<br>• <b>💚 Ajude a manter o Rodaliq:</b> o app é gratuito e vai continuar sendo. Se ele te ajuda, você pode contribuir com o que achar justo, em ⚙ Opções: escolha um valor, copie a chave Pix, faça o Pix pelo seu banco e avise no app. Na mesma tela você acompanha as suas contribuições, mês a mês. É opcional e nada aqui depende disso.`}
@@ -3988,25 +4160,179 @@ function cardPassos(){
 /* ---------- 6. Reservas para despesas grandes ---------- */
 const mesesEntre=(a,b)=>(+b.slice(0,4)-+a.slice(0,4))*12+(+b.slice(5,7)-+a.slice(5,7))+1; // inclusivo
 const reservas=()=>cfg().reservas||[];
-function reservasDoMes(ym){return reservas().filter(r=>r.criado<=ym&&ym<=r.venc.slice(0,7)).sort((a,b)=>String(a.venc).localeCompare(String(b.venc))).map(r=>({...r,parcela:Math.round(r.valor/Math.max(1,mesesEntre(r.criado,r.venc.slice(0,7)))*100)/100}))}
+// V96: cada despesa programada tem parcelas (1 = à vista). Registros antigos, sem parcelas, viram uma parcela só.
+const rvParc=r=>Array.isArray(r.parc)&&r.parc.length?r.parc:[{venc:r.venc,valor:r.valor,pago:r.pago||null}];
+const rvQuitada=r=>rvParc(r).every(p=>p.pago);
+const rvProx=r=>rvParc(r).find(p=>!p.pago)||null;
+const rvAddMes=(iso,n)=>{const y=+iso.slice(0,4),m=+iso.slice(5,7)-1,d=+iso.slice(8,10),t=new Date(y,m+n,1),ult=new Date(t.getFullYear(),t.getMonth()+1,0).getDate();return isoOf(new Date(t.getFullYear(),t.getMonth(),Math.min(d,ult)))};
+const rvGera=(valor,venc,np)=>{const base=Math.floor(valor/np*100)/100,out=[];let acc=0;for(let k=0;k<np;k++){const v=k===np-1?r2(valor-acc):base;acc=r2(acc+v);out.push({venc:rvAddMes(venc,k),valor:v,pago:null})}return out};
+// quanto separar no mês ym: cada parcela não paga é dividida pelos meses entre o fim da parcela anterior e o seu vencimento
+function reservasDoMes(ym){
+  const out=[];
+  reservas().forEach(r=>{if(rvQuitada(r))return;let total=0,ini=r.criado;
+    rvParc(r).forEach(p=>{const vm=p.venc.slice(0,7);let st=ini>vm?vm:ini;
+      if(!p.pago&&st<=ym&&ym<=vm)total+=p.valor/Math.max(1,mesesEntre(st,vm));
+      ini=addMes(vm,1)});
+    const px=rvProx(r);
+    if(total>0&&px)out.push({...r,venc:px.venc,parcela:Math.round(total*100)/100})});
+  return out.sort((a,b)=>String(a.venc).localeCompare(String(b.venc)))}
 function sugestaoReserva(cat){const lim=isoOf(new Date(new Date().setFullYear(new Date().getFullYear()-1)));return sum(todasDespesas().filter(r=>r.cat===cat&&r.data>lim),r=>r.valor)}
 function formReserva(r){
-  r=r||{cat:'IPVA/Licenciamento',venc:''};const novo=!r.id;
-  const f=openForm({titulo:novo?'Nova despesa programada':'Editar despesa programada',sub:'<div class="prevComo" style="margin:0"><b>Como funciona:</b> cadastre uma despesa grande que vai chegar e a data em que vai pagar. O app divide o valor pelos meses até lá e mostra, no Painel, quanto separar por mês. Exemplo: IPVA de R$ 2.160 em 31/01, cadastrado em novembro, dá R$ 720 por mês (novembro, dezembro e janeiro).</div>',
-    campos:[{k:'nome',l:'O que é a despesa?',t:'text',req:1,full:1,ph:'Ex.: IPVA 2027, Seguro anual, Revisão dos 60 mil km, Pneus'},{k:'cat',l:'Categoria',t:'select',op:comSep(CATS_FORM)},{k:'valor',l:'Valor previsto (R$)',t:'money',req:1,help:' '},{k:'venc',l:'Data prevista p/ pagamento',t:'date',req:1,allowFuture:1}],
-    val:Object.assign({nome:r.nome||''},r),
-    onSave:o=>{if(!(o.valor>0))return 'Informe o valor previsto.';const criado=r.criado||mesAtual();if(o.venc.slice(0,7)<criado)return 'A data precisa ser deste mês em diante.';
-      const lista=reservas().filter(x=>x.id!==r.id);lista.push({id:r.id||uid('rv'),nome:o.nome,cat:o.cat,valor:o.valor,venc:o.venc,criado});cfg().reservas=lista;salvar('tb_config');render();toast('Despesa programada salva')},
+  r=r||{cat:'IPVA/Licenciamento',venc:'',np:1};const novo=!r.id,bloq=!novo&&rvParc(r).some(p=>p.pago);
+  const campos=[{k:'nome',l:'O que é a despesa?',t:'text',req:1,full:1,ph:'Ex.: IPVA 2027, Seguro anual, Revisão dos 60 mil km, Pneus'},{k:'cat',l:'Categoria',t:'select',op:comSep(CATS_FORM)}];
+  if(!bloq)campos.push({k:'valor',l:'Valor total previsto (R$)',t:'money',req:1,help:' '},{k:'np',l:'Parcelas (1 = à vista)',t:'int',help:' '},{k:'venc',l:'Data prevista p/ pagamento (1ª parcela)',t:'date',req:1,allowFuture:1});
+  const f=openForm({titulo:novo?'Nova despesa programada':'Editar despesa programada',sub:bloq?'<div class="prevComo" style="margin:0">Esta despesa já tem parcela paga. Aqui você só muda o nome e a categoria; para mudar valor ou datas, exclua e programe de novo (o que foi pago continua nos seus Custos).</div>':'<div class="prevComo" style="margin:0"><b>Como funciona:</b> cadastre uma despesa grande que vai chegar e a data em que vai pagar. O app divide o valor pelos meses até lá e mostra, no Painel, quanto separar por mês. Se for parcelada, informe o valor total e o número de parcelas: cada parcela vence um mês depois da anterior e tem a sua própria reserva. Exemplo: IPVA de R$ 2.160 em 31/01, cadastrado em novembro, dá R$ 720 por mês (novembro, dezembro e janeiro).</div>',
+    campos,val:Object.assign({nome:r.nome||'',np:r.np||rvParc(r).length||1},r),
+    onSave:o=>{const criado=r.criado||mesAtual();let parc=r.parc,valor=r.valor,venc=r.venc;
+      if(!bloq){if(!(o.valor>0))return 'Informe o valor previsto.';if(o.venc.slice(0,7)<criado)return 'A data precisa ser deste mês em diante.';
+        const np=Math.round(o.np||1);if(np<1||np>60)return 'O número de parcelas vai de 1 a 60.';
+        valor=o.valor;venc=o.venc;parc=rvGera(valor,venc,np)}
+      const lista=reservas().filter(x=>x.id!==r.id);lista.push({id:r.id||uid('rv'),nome:o.nome,cat:o.cat,valor,venc,criado,np:rvParc({parc,venc,valor}).length,parc});cfg().reservas=lista;salvar('tb_config');render();toast('Despesa programada salva')},
     onDel:novo?null:()=>{cfg().reservas=reservas().filter(x=>x.id!==r.id);salvar('tb_config');render()}});
-  const ajuda=()=>{const h=f.ov.querySelector('#h_valor');if(!h)return;const s=sugestaoReserva(f.g('cat').value);h.textContent=s?`Últimos 12 meses em ${f.g('cat').value}: ${brl(s)}`:'Sem lançamentos dessa categoria nos últimos 12 meses.';
-    if(novo&&!f.g('valor').value&&s){f.g('valor').value=brl(s).replace('R$','').trim()}};
-  f.g('cat').addEventListener('change',()=>{if(novo)f.g('valor').value='';ajuda()});ajuda();if(novo)setTimeout(()=>{f.ov.__snap=navSerial(f.ov)},80);
+  if(bloq)return;
+  const ajuda=()=>{const h=f.ov.querySelector('#h_valor');if(h){const sg=sugestaoReserva(f.g('cat').value);h.textContent=sg?`Últimos 12 meses em ${f.g('cat').value}: ${brl(sg)}`:'Sem lançamentos dessa categoria nos últimos 12 meses.';
+      if(novo&&!f.g('valor').value&&sg){f.g('valor').value=brl(sg).replace('R$','').trim()}}
+    const hn=f.ov.querySelector('#h_np'),np=Math.round(parseBRL(f.g('np').value))||1,v=parseBRL(f.g('valor').value);
+    if(hn)hn.textContent=np>1&&v?`${np} parcelas de ${brl(Math.floor(v/np*100)/100)} (a última ajusta os centavos), uma por mês.`:'';};
+  f.g('cat').addEventListener('change',()=>{if(novo)f.g('valor').value='';ajuda()});
+  ['valor','np'].forEach(k=>f.g(k).addEventListener('input',ajuda));ajuda();if(novo)setTimeout(()=>{f.ov.__snap=navSerial(f.ov)},80);
 }
-function vReservas(){
-  const ym=mesAtual(),l=reservas().slice().sort((a,b)=>a.venc.localeCompare(b.venc)),dm=reservasDoMes(ym);
+// V96: marcar uma parcela como paga (e, se quiser, já lançar em Custos)
+function formPagaReserva(r,k){
+  const p=rvParc(r)[k];if(!p)return;const tot=rvParc(r).length;
+  const f=openForm({titulo:'Marcar como paga',sub:`<b>${esc(r.nome)}</b>${tot>1?` · parcela ${k+1} de ${tot}`:''} · previsto ${brl(p.valor)} em ${fmtBR(p.venc)}`,
+    campos:[{k:'data',l:'Data do pagamento',t:'date',req:1},{k:'valor',l:'Valor pago (R$)',t:'money',req:1},{k:'lanca',l:'Lançar em Custos?',t:'select',op:['Sim, lançar em Custos','Não, só marcar como paga'],full:1,help:'Lançar em Custos faz o valor entrar nos custos do mês do pagamento. Escolha “Não” se você já lançou.'}],
+    val:{data:hoje(),valor:p.valor,lanca:'Sim, lançar em Custos'},
+    onSave:o=>{if(!(o.valor>0))return 'Informe o valor pago.';
+      if(/^Sim/.test(o.lanca)&&semVeiculo())return 'Cadastre um veículo antes de lançar em Custos.';
+      const lista=reservas().map(x=>{if(x.id!==r.id)return x;const parc=rvParc(x).map(y=>({...y}));parc[k].pago={data:o.data,valor:o.valor};return {...x,parc,np:parc.length}});
+      cfg().reservas=lista;
+      if(/^Sim/.test(o.lanca))upsert('tb_custos',{id:uid('k'),data:o.data,cat:r.cat,veiculo:cfg().veiculoPadrao,valor:o.valor,desc:r.nome+(tot>1?` (parcela ${k+1}/${tot})`:''),obs:'Despesa programada'});
+      salvar('tb_config');render();toast(/^Sim/.test(o.lanca)?'Marcada como paga e lançada em Custos':'Marcada como paga')}});
+  return f}
+function vReservasDesp(){
+  const ym=mesAtual(),hj=hoje(),dm=reservasDoMes(ym);
+  const abertas=reservas().filter(r=>!rvQuitada(r)).sort((a,b)=>String(rvProx(a).venc).localeCompare(String(rvProx(b).venc)));
+  const pagas=reservas().filter(rvQuitada).sort((a,b)=>String(rvParc(b).map(p=>p.pago.data).sort().pop()).localeCompare(String(rvParc(a).map(p=>p.pago.data).sort().pop())));
+  const parcLin=(r,k,tot)=>{const p=rvParc(r)[k],atras=!p.pago&&p.venc<hj;
+    const st=p.pago?`✔ Paga em ${fmtBR(p.pago.data)} (${brl(p.pago.valor)})`:atras?'⏰ Atrasada':p.venc===hj?'⚠ Vence hoje':'A vencer';
+    return `<div class="rvParc${atras?' atr':''}"><span>${tot>1?`<b>${k+1}/${tot}</b> · `:''}${fmtBR(p.venc)} · ${brl(p.valor)}</span><span class="small">${st}</span>${p.pago?`<button class="btn sec sm" data-rvu="${esc(r.id)}|${k}" aria-label="Desfazer pagamento">↩ Desfazer</button>`:`<span style="display:flex;gap:6px"><button class="btn sm" data-rvp="${esc(r.id)}|${k}">✔ Marcar como paga</button><button class="btn sec sm" data-rvx="${esc(r.id)}|${k}" aria-label="Excluir parcela">🗑 ${rvParc(r).length===1?'Excluir despesa':'Excluir'}</button></span>`}</div>`};
+  const card=r=>{const tot=rvParc(r).length,px=rvProx(r),p=dm.find(x=>x.id===r.id),atras=px&&px.venc<hj;
+    const msg=atras?'⏰ Há parcela atrasada: pague e marque como paga abaixo.':p?`Separar <b>${brl(p.parcela)}</b>/mês`:'Começa no próximo mês';
+    return `<div class="ivCard"><div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start"><div><b>${esc(r.nome)}</b><div class="small muted">${esc(r.cat)} · ${brl(r.valor)}${tot>1?` em ${tot} parcelas`:''} · ${tot>1?'próxima':'até'} ${fmtBR(px.venc)}</div><div class="small">${msg}</div></div><button class="btn sec sm" data-rv="${esc(r.id)}" aria-label="Editar ${esc(r.nome)}">✎</button></div>
+      <div class="rvParcs">${rvParc(r).map((_,k)=>parcLin(r,k,tot)).join('')}</div><button class="btn sec sm" data-rvadd="${esc(r.id)}" style="margin-top:8px">＋ Adicionar parcela</button></div>`};
+  const cardPaga=r=>{const tot=rvParc(r).length,pg=sum(rvParc(r),p=>p.pago.valor),ult=rvParc(r).map(p=>p.pago.data).sort().pop();
+    return `<div class="ivCard"><div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start"><div><b>${esc(r.nome)}</b><div class="small muted">${esc(r.cat)} · ${tot>1?`${tot} parcelas pagas`:'Paga'} · ${brl(pg)} · última em ${fmtBR(ult)}</div></div><button class="btn sec sm" data-rv="${esc(r.id)}" aria-label="Ver ${esc(r.nome)}">✎</button></div>
+      <div class="rvParcs">${rvParc(r).map((_,k)=>parcLin(r,k,tot)).join('')}</div></div>`};
   return `<div class="card bloco"><div class="bh"><h2>📅 Despesas programadas</h2><span class="sp" style="flex:1"></span><span class="bacts"><button class="btn sm" data-acao="rvnovo">＋ Programar despesa</button></span></div>
-    <p class="small muted">Despesas grandes que vão chegar (IPVA, seguro, revisão). O app sugere quanto separar por mês até a data prevista de pagamento. A lista é ordenada por essa data. Para não gastar sem querer, deixe esse valor numa conta separada da do dia a dia.</p>
-    ${l.length?l.map(r=>{const p=dm.find(x=>x.id===r.id),venc=r.venc.slice(0,7)<ym;return `<div class="ivCard" style="display:flex;justify-content:space-between;gap:8px;align-items:center"><div><b>${esc(r.nome)}</b><div class="small muted">${esc(r.cat)} · ${brl(r.valor)} · até ${fmtBR(r.venc)}</div><div class="small">${venc?'⏰ Data já passou: lance o pagamento em Custos e exclua esta despesa programada.':p?`Separar <b>${brl(p.parcela)}</b>/mês`:'Começa no próximo mês'}</div></div><button class="btn sec sm" data-rv="${esc(r.id)}" aria-label="Editar ${esc(r.nome)}">✎</button></div>`}).join(''):'<div class="empty">Nenhuma despesa programada. Toque em “＋ Programar despesa” para começar.</div>'}</div>`}
+    <p class="small muted">Despesas grandes que vão chegar (IPVA, seguro, revisão). O app sugere quanto separar por mês até a data prevista de pagamento. Pode ser à vista ou parcelada. Quando pagar, toque em “Marcar como paga”: ela sai da lista e fica guardada em “Pagas”. Para não gastar sem querer, deixe esse valor numa conta separada da do dia a dia.</p>
+    ${abertas.length?abertas.map(card).join(''):'<div class="empty">Nenhuma despesa programada em aberto. Toque em “＋ Programar despesa” para começar.</div>'}
+    ${pagas.length?`<details class="rvPagas"><summary><b>✔ Pagas (${pagas.length})</b></summary>${pagas.map(cardPaga).join('')}</details>`:''}</div>`}
+/* ---------- V96: 🗓 Agenda do Motorista ---------- */
+const AG_TIPOS={compromisso:['📌','Compromisso'],aniversario:['🎂','Aniversário (todo ano)'],lembrete:['🔔','Lembrete']};
+const agLista=()=>Array.isArray(cfg().agenda)?cfg().agenda:(cfg().agenda=[]);
+const agTxt=ev=>(AG_TIPOS[ev.tipo]||AG_TIPOS.compromisso)[0]+' '+ev.titulo;
+// eventos (do usuário) que caem em [a,b]; aniversário repete todo ano
+function agEventos(a,b){const out=[];
+  agLista().forEach(ev=>{if(!ev.data)return;
+    if(ev.tipo==='aniversario'){for(let y=+a.slice(0,4);y<=+b.slice(0,4);y++){const d=y+ev.data.slice(4);if(d>=a&&d<=b)out.push({...ev,dia:d,ano:y-+ev.data.slice(0,4)})}}
+    else if(ev.data>=a&&ev.data<=b)out.push({...ev,dia:ev.data})});
+  return out}
+// itens automáticos: CNH, DARF, multas, despesas programadas (só leitura; abrem a aba certa)
+function agAuto(a,b){const out=[],hj=hoje();
+  const c=cfg().cnh;if(c&&c.validade&&c.validade>=a&&c.validade<=b)out.push({dia:c.validade,t:'🪪 CNH vence',tab:'cnh'});
+  try{const ano=+mesAtual().slice(0,4);[ano-1,ano,ano+1].forEach(an=>linhasAno(an).forEach(l=>{if(l.darf>0&&!l.reg.pago&&l.venc>=a&&l.venc<=b)out.push({dia:l.venc,t:'🧾 DARF de '+mesNome(l.ym)+' · '+brl(l.darf),tab:'impostos'})}))}catch(e){}
+  S.tb_multas.filter(r=>!r.pagto&&r.venc&&r.venc>=a&&r.venc<=b).forEach(r=>out.push({dia:r.venc,t:'🚨 Multa vence · '+brl(r.vDesc??r.vOrig)+' · '+r.motivo,tab:'multas'}));
+  if(!recOff('reservas'))reservas().forEach(r=>rvParc(r).forEach((p,k,A)=>{if(!p.pago&&p.venc>=a&&p.venc<=b)out.push({dia:p.venc,t:'📅 '+r.nome+(A.length>1?' ('+(k+1)+'/'+A.length+')':'')+' · '+brl(p.valor),tab:'reservas'})}));
+  return out}
+function agDiaItens(a,b){return [...agEventos(a,b).map(e=>({dia:e.dia,hora:e.hora||'',t:agTxt(e)+(e.tipo==='aniversario'&&e.ano>0?' ('+e.ano+' anos)':''),id:e.id,obs:e.obs})),...agAuto(a,b)].sort((x,y)=>x.dia.localeCompare(y.dia)||String(x.hora||'99').localeCompare(String(y.hora||'99')))}
+function formEvento(ev){
+  const novo=!ev||!ev.id;ev=ev||{tipo:'compromisso',data:UI.agDia||hoje()};
+  openForm({titulo:novo?'Novo evento':'Editar evento',campos:[{k:'tipo',l:'Tipo',t:'select',op:Object.values(AG_TIPOS).map(x=>x[1]),full:1},{k:'titulo',l:'Título',t:'text',req:1,full:1,ph:'Ex.: Revisão do carro, aniversário da Ana'},{k:'data',l:'Data',t:'date',req:1,allowFuture:1},{k:'hora',l:'Hora (opcional)',t:'time'},{k:'obs',l:'Observação (opcional)',t:'text',full:1}],
+    val:{...ev,tipo:(AG_TIPOS[ev.tipo]||AG_TIPOS.compromisso)[1],hora:ev.hora!=null&&ev.hora!==''?ev.hora:''},
+    onSave:o=>{const tp=Object.keys(AG_TIPOS).find(k=>AG_TIPOS[k][1]===o.tipo)||'compromisso';
+      const hora=o.hora>0?pad(Math.floor(o.hora/60))+':'+pad(o.hora%60):'';
+      const rec={id:ev.id||uid('ag'),tipo:tp,titulo:o.titulo,data:o.data,hora:hora||'',obs:o.obs||''};
+      cfg().agenda=agLista().filter(x=>x.id!==rec.id).concat([rec]);salvar('tb_config');render();toast('Evento salvo')},
+    onDel:novo?null:()=>{cfg().agenda=agLista().filter(x=>x.id!==ev.id);salvar('tb_config');render()}});
+}
+function agIcsEsc(t){return String(t||'').replace(/\\/g,'\\\\').replace(/;/g,'\;').replace(/,/g,'\\,').replace(/\r?\n/g,'\\n')}
+function agExportar(){
+  const L=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Rodaliq//Agenda do Motorista//PT-BR','CALSCALE:GREGORIAN'];
+  agLista().forEach(ev=>{const d=ev.data.replace(/-/g,'');L.push('BEGIN:VEVENT','UID:'+ev.id+'@rodaliq.com.br','DTSTAMP:'+new Date().toISOString().replace(/[-:]/g,'').slice(0,15)+'Z','SUMMARY:'+agIcsEsc((ev.tipo==='aniversario'?'🎂 ':'')+ev.titulo));
+    if(ev.hora&&/^\d{2}:\d{2}$/.test(ev.hora))L.push('DTSTART:'+d+'T'+ev.hora.replace(':','')+'00');else L.push('DTSTART;VALUE=DATE:'+d);
+    if(ev.tipo==='aniversario')L.push('RRULE:FREQ=YEARLY');
+    if(ev.obs)L.push('DESCRIPTION:'+agIcsEsc(ev.obs));
+    L.push('X-RODALIQ-TIPO:'+ev.tipo,'END:VEVENT')});
+  L.push('END:VCALENDAR');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([L.join('\r\n')],{type:'text/calendar'}));a.download='agenda_rodaliq.ics';document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500);toast('Agenda exportada (.ics)')}
+function agImportar(txt){
+  const un=txt.replace(/\r?\n[ \t]/g,'');let n=0,ig=0;const lista=agLista().slice();
+  un.split(/BEGIN:VEVENT/i).slice(1).forEach(bl=>{bl=bl.split(/END:VEVENT/i)[0];
+    const g=k=>{const m=bl.match(new RegExp('^'+k+'[^:\\r\\n]*:(.*)$','im'));return m?m[1].trim():''};
+    const sm=g('SUMMARY').replace(/\\([,;\\n])/g,(x,c)=>c==='n'?' ':c).replace(/\\\\/g,'\\').replace(/^🎂\s*/,''),ds=g('DTSTART').match(/(\d{4})(\d{2})(\d{2})(?:T(\d{2})(\d{2}))?/);
+    if(!sm||!ds){ig++;return}
+    const data=ds[1]+'-'+ds[2]+'-'+ds[3],hora=ds[4]?ds[4]+':'+ds[5]:'',an=/FREQ=YEARLY/i.test(g('RRULE'));
+    if(lista.some(x=>x.titulo===sm&&x.data===data&&(x.hora||'')===hora)){ig++;return}
+    lista.push({id:uid('ag'),tipo:an?'aniversario':'compromisso',titulo:sm.slice(0,120),data,hora,obs:g('DESCRIPTION').replace(/\\n/g,' ').replace(/\\([,;])/g,'$1').slice(0,200)});n++});
+  cfg().agenda=lista;if(n)salvar('tb_config');render();toast(n?n+(n===1?' evento importado':' eventos importados')+(ig?' ('+ig+' ignorados)':''):'Nenhum evento novo encontrado no arquivo')}
+function vAgenda(){
+  const hj=hoje(),sub=UI.agSub||'prox',ym=UI.agMes||mesAtual();
+  const fim=isoOf(new Date(Date.now()+60*864e5)),prox=agDiaItens(hj,fim);
+  const linha=i=>`<div class="agLin${i.dia===hj?' hj':''}"><span class="agD"><b>${fmtBR(i.dia).slice(0,5)}</b>${i.hora?'<br><small>'+esc(i.hora)+'</small>':''}</span><span class="agT">${esc(i.t)}${i.obs?'<div class="small muted">'+esc(i.obs)+'</div>':''}</span>${i.id?`<button class="btn sec sm" data-agE="${esc(i.id)}" aria-label="Editar">✎</button>`:i.tab?`<button class="btn sec sm" data-agA="${esc(i.tab)}" aria-label="Abrir">›</button>`:''}</div>`;
+  let corpo;
+  if(sub==='mes'){
+    const y=+ym.slice(0,4),m=+ym.slice(5,7)-1,pri=new Date(y,m,1).getDay(),nd=new Date(y,m+1,0).getDate(),a=ym+'-01',b=ym+'-'+pad(nd),it=agDiaItens(a,b),por={};it.forEach(i=>(por[i.dia]=por[i.dia]||[]).push(i));
+    let cel='';for(let k=0;k<pri;k++)cel+='<span class="agC vz"></span>';
+    for(let d=1;d<=nd;d++){const dia=ym+'-'+pad(d),n=(por[dia]||[]).length;cel+=`<button type="button" class="agC${dia===hj?' hj':''}${UI.agDia===dia?' sel':''}" data-agDia="${dia}" aria-label="${d} de ${MESES[m]}${n?', '+n+(n===1?' item':' itens'):''}">${d}${n?`<i class="agN">${n}</i>`:''}</button>`}
+    const sel=UI.agDia&&UI.agDia.slice(0,7)===ym?UI.agDia:null;
+    corpo=`<div class="agNav"><button class="btn sec sm" data-agM="-1" aria-label="Mês anterior">‹</button><b>${MESES[m]} ${y}</b><button class="btn sec sm" data-agM="1" aria-label="Próximo mês">›</button></div>
+      <div class="agG"><span>D</span><span>S</span><span>T</span><span>Q</span><span>Q</span><span>S</span><span>S</span>${cel}</div>
+      ${sel?`<h3 style="margin:12px 0 4px">${fmtBR(sel)}</h3>${(por[sel]||[]).map(linha).join('')||'<div class="small muted">Nada neste dia.</div>'}<button class="btn sm" data-agNovo="${sel}" style="margin-top:8px">＋ Novo evento neste dia</button>`:'<div class="small muted" style="margin-top:8px">Toque num dia para ver os itens dele. O número mostra quantos itens há.</div>'}`}
+  else corpo=prox.length?`<div class="small muted" style="margin-bottom:6px">Próximos 60 dias</div>${prox.map(linha).join('')}`:'<div class="empty">Nada nos próximos 60 dias. Toque em “＋ Novo evento”.</div>';
+  return `<div class="card bloco"><div class="bh"><h2>🗓 Agenda do Motorista</h2><span class="sp" style="flex:1"></span><span class="bacts"><button class="btn sm" data-agNovo="">＋ Novo evento</button></span></div>
+    <p class="small muted">Seus compromissos, aniversários e lembretes. CNH, DARF, multas e despesas programadas aparecem sozinhos nas datas. Você recebe um aviso no sino 1 dia antes de cada evento.</p>
+    <div class="admTabs" style="margin:6px 0 10px"><button type="button" class="chip${sub==='prox'?' on':''}" data-agS="prox">Próximos</button><button type="button" class="chip${sub==='mes'?' on':''}" data-agS="mes">Mês</button></div>
+    ${corpo}</div>
+    <div class="card bloco"><div class="bh"><h2>📝 Minhas anotações</h2></div><textarea class="inp" id="agNotas" rows="5" maxlength="4000" placeholder="Anotações livres: ideias, números, lembretes soltos…">${esc(cfg().agendaNotas||'')}</textarea><div class="small muted" style="margin-top:4px">Salvo ao sair do campo. Só você vê.</div></div>
+    <div class="card bloco"><div class="bh"><h2>📤 Levar para outro calendário</h2></div><p class="small muted">Exporte seus eventos em arquivo .ics (abre no Google Agenda, Apple Calendário e Outlook) ou importe um arquivo .ics.</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn sec sm" id="agExp">⬇ Exportar .ics</button><button class="btn sec sm" id="agImpB">⬆ Importar .ics</button><input type="file" id="agImp" accept=".ics,text/calendar" class="hidden"></div></div>`}
+function agBind(){
+  const v=$('#view');if(UI.tab!=='agenda'||!v.querySelector('#agNotas'))return;
+  v.querySelector('#agNotas').onblur=e=>{if((cfg().agendaNotas||'')!==e.target.value){cfg().agendaNotas=e.target.value;salvar('tb_config')}};
+  v.querySelector('#agExp').onclick=agExportar;v.querySelector('#agImpB').onclick=()=>v.querySelector('#agImp').click();
+  v.querySelector('#agImp').onchange=e=>{const f=e.target.files[0];if(!f)return;if(f.size>1e6){toast('Arquivo grande demais (máx. 1 MB)');return}const r=new FileReader();r.onload=()=>agImportar(String(r.result||''));r.readAsText(f)};
+  v.querySelectorAll('[data-agS]').forEach(b=>b.onclick=()=>{UI.agSub=b.dataset.ags;render()});
+  v.querySelectorAll('[data-agM]').forEach(b=>b.onclick=()=>{UI.agMes=addMes(UI.agMes||mesAtual(),+b.dataset.agm);UI.agDia=null;render()});
+  v.querySelectorAll('[data-agDia]').forEach(b=>b.onclick=()=>{UI.agDia=b.dataset.agdia;render()});
+  v.querySelectorAll('[data-agNovo]').forEach(b=>b.onclick=()=>{UI.agDia=b.dataset.agnovo||UI.agDia;formEvento(null)});
+  v.querySelectorAll('[data-agE]').forEach(b=>b.onclick=()=>{const e=agLista().find(x=>x.id===b.dataset.age);if(e)formEvento(JSON.parse(JSON.stringify(e)))});
+  v.querySelectorAll('[data-agA]').forEach(b=>b.onclick=()=>{const t=b.dataset.aga;if(t==='cnh'){formCnh();return}UI.tab=t;render();window.scrollTo(0,0)})}
+// V96: visão por mês (padrão) e por despesa
+function vReservas(){
+  const sub=UI.rvSub||'mes';
+  const kp=(l,v,d)=>`<div class="card kpi"><div class="l">${l}</div><div class="v num">${v}</div><div class="s">${d}</div></div>`;
+  if(sub==='desp'){const ab=reservas().filter(r=>!rvQuitada(r)),nao=[];ab.forEach(r=>rvParc(r).forEach(p=>{if(!p.pago)nao.push(p)}));const h0=hoje(),at=nao.filter(p=>p.venc<h0).length,ult=nao.map(p=>p.venc).sort().pop(),parc=ab.filter(r=>rvParc(r).length>1).length;
+    const cards=`<div class="grid cards" style="margin:10px 0;grid-template-columns:repeat(2,minmax(0,1fr))">${kp('Despesas em aberto',ab.length+(ab.length===1?' despesa':' despesas'),`${parc} ${parc===1?'parcelada':'parceladas'} · ${ab.length-parc} à vista<br>${brl(sum(nao,p=>p.valor))} ainda a pagar`)}${kp('Parcelas a pagar',nao.length+(nao.length===1?' parcela':' parcelas'),`${at} ${at===1?'atrasada':'atrasadas'} · ${nao.length-at} a vencer<br>${ult?'última: '+fmtBR(ult):'nenhuma pendente'}`)}</div>`;
+    return vReservasDesp().replace('</p>','</p>'+cards).replace('<span class="bacts">','<span class="bacts"><span class="admTabs" style="margin-right:8px"><button type="button" class="chip" data-rvs="mes">Por mês</button><button type="button" class="chip on" data-rvs="desp">Por despesa</button></span>')}
+  const hj=hoje(),hm=mesAtual(),todas=[];
+  reservas().forEach(r=>{const ps=rvParc(r);ps.forEach((p,k)=>todas.push({r,p,k,tot:ps.length}))});
+  const meses=todas.map(x=>x.p.venc.slice(0,7)).sort(),min=meses[0]||hm,max=meses[meses.length-1]||hm;
+  let ym=UI.rvMes||hm;if(ym<min)ym=min;if(ym>max)ym=max;UI.rvMes=ym;
+  const doMes=todas.filter(x=>x.p.venc.slice(0,7)===ym).sort((a,b)=>a.p.venc.localeCompare(b.p.venc)||a.r.nome.localeCompare(b.r.nome));
+  const atr=ym===hm?todas.filter(x=>!x.p.pago&&x.p.venc.slice(0,7)<hm).sort((a,b)=>a.p.venc.localeCompare(b.p.venc)):[];
+  const aPagar=sum(doMes.filter(x=>!x.p.pago),x=>x.p.valor),nPag=doMes.filter(x=>!x.p.pago).length,jaPago=sum(doMes.filter(x=>x.p.pago),x=>x.p.pago.valor);
+  const lin=x=>{const {r,p,k,tot}=x,atras=!p.pago&&p.venc<hj,st=p.pago?`✔ Paga em ${fmtBR(p.pago.data)} (${brl(p.pago.valor)})`:atras?'⏰ Atrasada':p.venc===hj?'⚠ Vence hoje':'A vencer';
+    return `<div class="rvParc${atras?' atr':''}"><span><b>${esc(r.nome)}</b>${tot>1?` · ${k+1}/${tot}`:''} · ${fmtBR(p.venc)} · ${brl(p.valor)}<br><span class="small muted">${esc(r.cat)}</span></span><span class="small">${st}</span>${p.pago?`<button class="btn sec sm" data-rvu="${esc(r.id)}|${k}" aria-label="Desfazer pagamento">↩ Desfazer</button>`:`<span style="display:flex;gap:6px"><button class="btn sm" data-rvp="${esc(r.id)}|${k}">✔ Marcar como paga</button><button class="btn sec sm" data-rvx="${esc(r.id)}|${k}" aria-label="Excluir parcela">🗑 ${tot===1?'Excluir despesa':'Excluir'}</button></span>`}</div>`};
+  const mesNome2=m=>MESES[+m.slice(5,7)-1]+'/'+m.slice(0,4),mn=MESES[+ym.slice(5,7)-1].toLowerCase();
+  const pend=doMes.filter(x=>!x.p.pago),atrT=pend.filter(x=>x.p.venc<hj).length+atr.length,aPagarT=aPagar+sum(atr,x=>x.p.valor),prox=pend.filter(x=>x.p.venc>=hj)[0],nPago=doMes.length-pend.length;
+  const cardsM=`<div class="grid cards" style="margin:10px 0;grid-template-columns:repeat(2,minmax(0,1fr))">${kp('Vencem em '+mn,doMes.length+(doMes.length===1?' parcela':' parcelas'),`${brl(sum(doMes,x=>x.p.valor))} no total<br>${nPago} ${nPago===1?'paga':'pagas'}${nPago?' ('+brl(jaPago)+')':''} · ${pend.length} a pagar`)}${kp('A pagar em '+mn,brl(aPagarT),`${atrT?atrT+(atrT===1?' atrasada':' atrasadas')+' ('+brl(sum(pend.filter(x=>x.p.venc<hj),x=>x.p.valor)+sum(atr,x=>x.p.valor))+')':'nenhuma atrasada'}<br>${prox?'próxima: '+fmtBR(prox.p.venc).slice(0,5)+' · '+esc(prox.r.nome):'nenhuma a vencer'}`)}</div>`;
+  return `<div class="card bloco"><div class="bh"><h2>📅 Despesas programadas</h2><span class="sp" style="flex:1"></span><span class="bacts"><span class="admTabs" style="margin-right:8px"><button type="button" class="chip on" data-rvs="mes">Por mês</button><button type="button" class="chip" data-rvs="desp">Por despesa</button></span><button class="btn sm" data-acao="rvnovo">＋ Programar despesa</button></span></div>
+    <p class="small muted">Despesas grandes que vão chegar (IPVA, seguro, revisão), à vista ou parceladas. Navegue pelos meses para ver o que vence em cada um. Quando pagar, toque em “Marcar como paga”. Para não gastar sem querer, deixe esse valor numa conta separada da do dia a dia.</p>
+    ${cardsM}<div class="agNav"><button class="btn sec sm" data-rvm="-1" aria-label="Mês anterior"${ym<=min?' disabled':''}>‹</button><b>${mesNome2(ym)}</b><button class="btn sec sm" data-rvm="1" aria-label="Próximo mês"${ym>=max?' disabled':''}>›</button></div>
+    ${atr.length?`<div class="ivCard" style="border-color:var(--red)"><b>⏰ Atrasadas (${atr.length})</b><div class="rvParcs">${atr.map(lin).join('')}</div></div>`:''}
+    ${doMes.length?`<div class="small" style="margin:8px 0"><b>${nPag?`Para pagar em ${MESES[+ym.slice(5,7)-1].toLowerCase()}: ${brl(aPagar)} · ${nPag} ${nPag===1?'parcela':'parcelas'}`:'Tudo pago neste mês'}</b>${jaPago?` · já pago: ${brl(jaPago)}`:''}</div><div class="rvParcs">${doMes.map(lin).join('')}</div>`:'<div class="empty">Nada vence neste mês.</div>'}
+    ${!todas.length?'<div class="empty">Nenhuma despesa programada. Toque em “＋ Programar despesa” para começar.</div>':''}</div>`}
 const irReservas=()=>{UI.tab='reservas';try{history.replaceState(history.state,'','#reservas')}catch(er){}render();window.scrollTo(0,0)};
 /* ---------- 4, 5 e 6: cards do bloco "Despesas e resultado do mês" ---------- */
 function cardsExtras(ym,G,vMeta,vCus,res,cus,pd,ehMesAtual,decorridos,n){
@@ -4015,6 +4341,7 @@ function cardsExtras(ym,G,vMeta,vCus,res,cus,pd,ehMesAtual,decorridos,n){
   const km=kmMes(ym,G),semKm=caronasSemKm(ym);
   if(km){h+=kpi('Custo por km',brl(vCus/km),fmtNum(km)+' km do mês'+(kmCarona(ym)?' (corridas '+fmtNum(G.km)+' · caronas '+fmtNum(kmCarona(ym))+')':'')+(semKm?'<br><span class="am">⚠ '+semKm+(semKm===1?' carona sem km':' caronas sem km')+'</span>':''))+kpi('Lucro por km',`<span class="${res>=0?'pos':'neg'}">${brl(res/km)}</span>`,'Resultado líquido ÷ km do mês')}
   else h+=kpi('Custo e lucro por km','—','Lance os km rodados nas corridas e nas caronas para ver quanto custa e quanto sobra por km.');
+  h+='§1';
   // 5. projeção (mês em andamento, a partir do 3º dia)
   const diasTrab=Object.keys(pd).length;
   if(ehMesAtual&&decorridos>=3&&diasTrab){
@@ -4025,10 +4352,18 @@ function cardsExtras(ym,G,vMeta,vCus,res,cus,pd,ehMesAtual,decorridos,n){
       <table class="prevT"><tr><th></th><th>Até hoje</th><th>Previsto</th></tr><tr><td>Ganhos</td><td>${brl(vMeta)}</td><td><b>${brl(pG)}</b></td></tr><tr><td>Custos</td><td>${brl(vCus)}</td><td><b>${brl(pC)}</b></td></tr></table>
       <div class="prevComo">Como calculamos: você ganhou em média ${brl(media)} por dia trabalhado. ${faltam?`Faltam ${faltam} ${faltam===1?'dia':'dias'} de meta em ${MESES[+ym.slice(5,7)-1].toLowerCase()}.`:'Não faltam dias de meta no mês.'} Combustível, lavagem e estacionamento seguem o ritmo do mês; parcela, seguro e IPVA entram só como já lançados.</div>`,'wide');
   }
+  h+='§2';
   // 6. reservas
   const rv=reservasDoMes(ym),vr=sum(rv,r=>r.parcela);
-  if(rv.length){h+=kpi('📅 Despesas programadas',brl(vr),'<span class="small muted">separar este mês</span><br>'+rv.slice(0,3).map(r=>`${esc(r.nome)} (${fmtBR(r.venc).slice(0,5)}): ${brl(r.parcela)}/mês`).join('<br>')+(rv.length>3?`<br>… e mais ${rv.length-3}`:'')+
-      `<div class="dica">💡 Para não gastar sem querer, deixe esse valor numa conta separada da do dia a dia até a data de pagamento.</div><button class="lnk" data-acao="reservas">Ver despesas programadas</button>`)
+  if(recOff('reservas')){}
+  else if(reservas().some(r=>!rvQuitada(r))){
+    const hj=hoje(),lin=reservas().filter(r=>!rvQuitada(r)).map(r=>({r,p:rvProx(r),dm:rv.find(x=>x.id===r.id)})).sort((x,y)=>x.p.venc.localeCompare(y.p.venc)),tot=rvParc;
+    const row=o=>{const d=diasEntre(hj,o.p.venc),np=rvParc(o.r),k=np.indexOf(o.p),nm=esc(o.r.nome)+(np.length>1?` ${k+1}/${np.length}`:'');
+      const tg=d<0?'<span class="pdTg a">Atrasada</span>':d===0?'<span class="pdTg h">Hoje</span>':d<=7?`<span class="pdTg h">em ${d} ${d===1?'dia':'dias'}</span>`:'';
+      const rt=d<=7?`${brl(o.p.valor)} · ${fmtBR(o.p.venc).slice(0,5)}`:o.dm?`${brl(o.dm.parcela)}/mês · até ${fmtBR(o.p.venc).slice(0,5)}`:`${brl(o.p.valor)} · ${fmtBR(o.p.venc).slice(0,5)}`;
+      return `<div class="pdRw"><span>${tg}${nm}</span><span>${rt}</span></div>`};
+    h+=kpi('📅 Despesas programadas',brl(vr),`<span class="small muted">separar este mês · ${lin.length} em aberto</span><div class="pdSc">${lin.map(row).join('')}</div>`+
+      `<div class="dica">💡 Para não gastar sem querer, deixe esse valor numa conta separada da do dia a dia até a data de pagamento.</div><button class="lnk" data-acao="reservas">Ver despesas programadas</button>`,'pdw')
     +kpi('💰 Lucro livre',`<span class="${res-vr>=0?'pos':'neg'}">${brl(res-vr)}</span>`,'Resultado líquido − valor a separar para as despesas programadas.','hl')}
   else h+=kpi('📅 Despesas programadas','—',`IPVA, seguro e revisão chegam de uma vez. Programe a despesa e o app mostra quanto separar por mês.<div class="dica">💡 Para não gastar sem querer, deixe esse valor numa conta separada da do dia a dia até a data de pagamento.</div><button class="lnk" data-acao="reservas">＋ Programar despesa</button>`);
   return h;
@@ -4099,14 +4434,15 @@ $('#impFile').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(
 /* ---------- render e eventos ---------- */
 function render(){
   if(UI.tab==='admin')UI.tab='painel';
-  let v={painel:vPainel,corridas:vCorridas,carona:vCarona,custos:vCustos,multas:vMultas,impostos:vImpostos,relatorios:vRelatorios,rodacalc:vRodaCalc,reservas:vReservas}[UI.tab];
+  let v={painel:vPainel,corridas:vCorridas,carona:vCarona,custos:vCustos,multas:vMultas,impostos:vImpostos,relatorios:vRelatorios,rodacalc:vRodaCalc,reservas:vReservas,agenda:vAgenda}[UI.tab];
   if(recOff(UI.tab))v=()=>'<div class="note am" style="margin-top:12px">🔧 <b>Este recurso está temporariamente indisponível.</b> Estamos ajustando e ele volta em breve. Seus dados continuam guardados e nada foi apagado.</div>';
   navRegistraAba();
   $('#view').innerHTML=v();
   document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.dataset.t===UI.tab));
   const vp=$('#vPick');if(vp)vp.onchange=()=>{UI.veic=vp.value.startsWith('Todos')?'Todos':vp.value;render()};
   ['simV','simD','simN'].forEach(i=>{const el=document.getElementById(i);if(el)el.oninput=simular});simular();if(UI.tab==='rodacalc'&&!recOff('rodacalc'))rcInit();
-  atualizaSino();if(!$('#bellMenu').classList.contains('hidden'))renderSino();
+  {const vw=$('#view');if(vw)vw.classList.toggle('rcScroll',UI.tab==='rodacalc')}
+  agBind();atualizaSino();if(!$('#bellMenu').classList.contains('hidden'))renderSino();
 }
 $('#tabAdmin').onclick=()=>abrirAdmin();
 $('#donoBtn').onclick=()=>formApoiar();
@@ -4114,6 +4450,23 @@ $('#tabs').onclick=e=>{const b=e.target.closest('.tab');if(!b)return;UI.tab=b.da
 $('#view').addEventListener('click',e=>{
   if(e.target.closest('[data-acao=reservas]')){irReservas();return}
   if(e.target.closest('[data-acao=rvnovo]')){formReserva();return}
+  {const sb=e.target.closest('[data-rvs]');if(sb){UI.rvSub=sb.dataset.rvs;render();return}}
+  {const mb=e.target.closest('[data-rvm]');if(mb&&!mb.disabled){UI.rvMes=addMes(UI.rvMes||mesAtual(),+mb.dataset.rvm);render();return}}
+  {const pg=e.target.closest('[data-rvp]');if(pg){const [id,k]=pg.dataset.rvp.split('|'),x=reservas().find(y=>y.id===id);if(x)formPagaReserva(JSON.parse(JSON.stringify(x)),+k);return}}
+  {const dx=e.target.closest('[data-rvx]');if(dx){const [id,k]=dx.dataset.rvx.split('|'),x=reservas().find(y=>y.id===id);if(!x)return;const ps=rvParc(x),tot=ps.length,unica=ps.length===1||ps.every((p,i)=>i===+k||p.pago)&&!ps.some((p,i)=>i!==+k&&!p.pago)&&ps.filter(p=>p.pago).length===0&&ps.length===1;
+    const so=ps.length===1;
+    confirma(so?`Excluir a despesa programada <b>${esc(x.nome)}</b> inteira? Isso não pode ser desfeito.`:`Excluir a parcela ${(+k)+1} de ${tot} (${fmtBR(ps[+k].venc)} · ${brl(ps[+k].valor)}) de <b>${esc(x.nome)}</b>? O valor total e a contagem de parcelas serão ajustados.`,so?'Excluir despesa':'Excluir parcela').then(ok=>{if(!ok)return;
+      if(so)cfg().reservas=reservas().filter(y=>y.id!==id);
+      else cfg().reservas=reservas().map(y=>{if(y.id!==id)return y;const parc=rvParc(y).filter((_,i)=>i!==+k).map(p=>({...p}));return {...y,parc,np:parc.length,valor:r2(sum(parc,p=>p.valor)),venc:parc[0].venc}});
+      salvar('tb_config');render();toast(so?'Despesa excluída':'Parcela excluída')});return}}
+  {const ad=e.target.closest('[data-rvadd]');if(ad){const x=reservas().find(y=>y.id===ad.dataset.rvadd);if(!x)return;const ps=rvParc(x),ult=ps[ps.length-1];
+    if(ps.length>=60){toast('Limite de 60 parcelas');return}
+    confirma(`Adicionar mais uma parcela de ${brl(ult.valor)} em ${fmtBR(rvAddMes(ult.venc,1))} a <b>${esc(x.nome)}</b>? O valor total passa a ${brl(r2(x.valor+ult.valor))}.`,'Adicionar parcela').then(ok=>{if(!ok)return;
+      cfg().reservas=reservas().map(y=>{if(y.id!==x.id)return y;const parc=rvParc(y).map(p=>({...p}));parc.push({venc:rvAddMes(ult.venc,1),valor:ult.valor,pago:null});return {...y,parc,np:parc.length,valor:r2(sum(parc,p=>p.valor))}});
+      salvar('tb_config');render();toast('Parcela adicionada')});return}}
+  {const un=e.target.closest('[data-rvu]');if(un){const [id,k]=un.dataset.rvu.split('|');
+    confirma('Desfazer o pagamento desta parcela? Se você a lançou em Custos, esse lançamento continua lá: apague-o em Custos se quiser.','Desfazer pagamento').then(ok=>{if(!ok)return;
+      cfg().reservas=reservas().map(x=>{if(x.id!==id)return x;const parc=rvParc(x).map(y=>({...y}));parc[+k].pago=null;return {...x,parc,np:parc.length}});salvar('tb_config');render();toast('Pagamento desfeito')});return}}
   {const rv=e.target.closest('[data-rv]');if(rv){const x=reservas().find(y=>y.id===rv.dataset.rv);if(x)formReserva(JSON.parse(JSON.stringify(x)));return}}
   const pa=e.target.closest('[data-acao]');if(pa){const a=pa.dataset.acao;
     if(a==='guia'){primeiroAcesso(false);return}
@@ -4151,7 +4504,7 @@ $('#optBtn').onclick=e=>{e.stopPropagation();$('#bellMenu').classList.add('hidde
 window.addEventListener('scroll',()=>{['bellMenu','optMenu'].forEach(id=>{const m=document.getElementById(id);if(m&&!m.classList.contains('hidden')&&window.innerWidth<=640)posMenu(m,document.getElementById(id==='bellMenu'?'bellBtn':'optBtn'))})},{passive:true});
 document.addEventListener('click',e=>{if(!e.target.closest('#optWrap'))$('#optMenu').classList.add('hidden');if(!e.target.closest('#bellWrap'))$('#bellMenu').classList.add('hidden')});
 $('#optMenu').onclick=e=>{const b=e.target.closest('[data-m]');if(!b)return;$('#optMenu').classList.add('hidden');
-  ({falar:formFalar,apoio:formApoiar,corrigir:formCorrigir,excluir:formExcluirConta,cfg:formCfg,veic:formVeic,parc:formParceiros,cnh:formCnh,tema:formTema,onb:()=>primeiroAcesso(false),termos:()=>verTermos(),aud:verAuditoria,pass:formSenha,exp:exportar,imp:()=>$('#impFile').click(),out:sair})[b.dataset.m]()};
+  ({falar:formFalar,apoio:formApoiar,corrigir:formCorrigir,excluir:formExcluirConta,cfg:formCfg,veic:formVeic,parc:formParceiros,cnh:formCnh,tema:formTema,onb:()=>primeiroAcesso(false),termos:()=>verTermos(),aud:verAuditoria,pass:formSenha,prevap:()=>prevApoiador(true),exp:exportar,imp:()=>$('#impFile').click(),out:sair})[b.dataset.m]()};
 (()=>{const h=(location.hash||'').slice(1);if(['painel','corridas','carona','custos','multas','impostos','relatorios','rodacalc','reservas'].includes(h))UI.tab=h})();
 iniciar();
 if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
