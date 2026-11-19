@@ -923,7 +923,7 @@ DL={save:async({filename,data})=>{const ext=filename.split('.').pop().toLowerCas
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([data],{type:mime}));a.download=filename;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},2000)}};
 // V100: CAPTCHA (Cloudflare Turnstile) no login. Com TS_KEY vazia nada muda; com a chave pública preenchida, o app pede o token
 // (invisível; só aparece uma caixa quando a Cloudflare achar necessário) e o envia ao Supabase em cada entrada com senha.
-const TS_KEY='0x4AAAAAAGJKrhLLBnIrG5RL';
+const TS_KEY='';// chave pública do Turnstile (0x4AAAAAAGJKrhLLBnIrG5RL) guardada aqui até a verificação concluir de forma confiável
 const TSS={id:null,tok:null,at:0,box:null};
 function tsCarrega(){if(!TS_KEY||window.turnstile||document.getElementById('tsApi'))return;
   const s=document.createElement('script');s.id='tsApi';s.src='https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';s.async=true;s.onload=tsPrepara;document.head.appendChild(s)}
