@@ -175,7 +175,7 @@ html[data-tema="escuro"] .vhRw{background:transparent}html[data-tema="escuro"] .
 .hbars .tr i{display:block;height:100%;background:var(--blue)}
 /* menu */
 .menuWrap{position:relative}
-.menu{position:absolute;right:0;top:calc(100% + 6px);background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 10px 30px rgba(20,33,61,.15);min-width:240px;padding:6px;z-index:40}
+.menu{position:absolute;right:0;top:calc(100% + 6px);background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 10px 30px rgba(20,33,61,.15);min-width:240px;padding:6px;z-index:40;max-height:calc(100vh - 110px);overflow-y:auto;overscroll-behavior:contain}
 .menu .who{padding:8px 10px;font-size:12px;color:var(--muted);border-bottom:1px solid var(--line);margin-bottom:4px}
 .menu .who b{display:block;font-size:14px;color:var(--ink);margin-top:2px;word-break:break-all}
 .menu .who .whoE{display:block;word-break:break-all}
@@ -827,7 +827,7 @@ $('#bellMenu').addEventListener('click',e=>{e.stopPropagation();const t=e.target
   else if(t.closest('[data-rcu]')){$('#bellMenu').classList.add('hidden');formFalar();return}
   else if(t.closest('[data-ap]')){$('#bellMenu').classList.add('hidden');formApoiar();return}
   else if(t.closest('[data-apq]')){NOT.reads.apoio=Object.assign({},NOT.reads.apoio,{mes:hoje().slice(0,7)});salvarReads();$('#bellMenu').classList.add('hidden');formApoiar();return}
-  else if(t.closest('[data-apl]')){const em=AJU.msg60&&AJU.msg60.em;if(em){NOT.reads.apoio=Object.assign({},NOT.reads.apoio,{msg:{em,lidoEm:new Date().toISOString()},mes:hoje().slice(0,7)});salvarReads();renderSino();atualizaSino();toast('Marcado como lido. O aviso some em '+DIAS_LIDO_APO+' dias.')}return}
+  else if(t.closest('[data-apl]')){const em=AJU.msg60&&AJU.msg60.em;if(em){NOT.reads.apoio=Object.assign({},NOT.reads.apoio,{msg:{em,lidoEm:new Date().toISOString()},mes:hoje().slice(0,7)});salvarReads();renderSino();atualizaSino();}return}
   else if(t.closest('[data-apn]')){NOT.reads.apoio=Object.assign({},NOT.reads.apoio,{em:new Date().toISOString(),em60:new Date().toISOString(),mes:hoje().slice(0,7)});salvarReads();renderSino();atualizaSino();return}
   else if(t.closest('[data-apx]')){NOT.reads.apoio=Object.assign({},NOT.reads.apoio,{nunca:true});salvarReads();renderSino();atualizaSino();toast('Não falo mais nisso.');return}
   else if(t.dataset.sl){r.supaLida=r.supaLida===t.dataset.sl?null:t.dataset.sl;salvarReads()}
