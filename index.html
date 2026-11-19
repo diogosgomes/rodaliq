@@ -380,7 +380,8 @@ svg text{font-family:Inter,system-ui,sans-serif}
   .row .dt{min-width:58px}
 }
 .pcCard{border:1px solid var(--line);border-radius:12px;padding:11px 13px;margin-bottom:9px;background:var(--card)}.pcT1{display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap}.pcTag{font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--amberSoft);color:var(--amberInk);border:1px solid var(--amber)}.pcOf{margin-top:6px;padding:6px 9px;border-radius:9px;background:var(--blueSoft);font-weight:600;font-size:13.5px}.pcBt{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.pcBt a.btn{text-decoration:none}.pcCt{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0;align-items:center}.pcCt select{flex:0 0 150px}.pcCt input{flex:1 1 150px;min-width:0}.pcMd .ajBd{overflow-y:auto}
-body:has(#admPage) .fab{z-index:61}body:has(#admPage) .fabMenu{z-index:62}body:has(#admPage) .ov:not(.admPage) ~ .fabWrap .fab,body:has(.ov:not(.admPage)) .fabWrap .fab{visibility:hidden}
+body:has(#admPage) .fab,body:has(#ajuPage) .fab{z-index:61}body:has(#admPage) .fabMenu,body:has(#ajuPage) .fabMenu{z-index:62}body:has(#admPage) .ov:not(.admPage) ~ .fabWrap .fab,body:has(.ov:not(.admPage)) .fabWrap .fab{visibility:hidden}
+.ajPg{max-width:760px}.ajPg .ajBd{margin-top:6px}.ajHdAcao{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.ajHdAcao .small{color:var(--amberInk)}.cpAct .btn{white-space:nowrap}.mstRow{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid var(--line);flex-wrap:wrap}.mstRow:last-child{border-bottom:0}.mstAc{display:flex;gap:6px;flex-wrap:wrap}.mstOk{font-size:13px;color:var(--blue2)}
 .selo{display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;background:rgba(40,200,120,.15);border:1px solid rgba(40,200,120,.5);font-size:11px;font-weight:700;vertical-align:middle}
 .admCols,.admRow{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1.4fr) auto;gap:8px;align-items:center}
 .admCols{margin-top:8px;padding:0 10px;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
@@ -487,12 +488,14 @@ body:has(#admPage) .fab{z-index:61}body:has(#admPage) .fabMenu{z-index:62}body:h
         <button data-m="onb">🧭 Guia do Rodaliq</button>
         <button data-m="aud">🕘 Histórico de auditoria</button>
         <button data-m="imp">⬆ Importar backup</button>
+        <button data-m="desf" class="hidden">↩ Desfazer última importação</button><div class="small muted hidden" id="desfInfo" style="padding:0 14px 6px"></div>
         <button data-m="cfg">🎯 Metas e preferências</button>
         <button data-m="cnh">🪪 Minha CNH</button>
         <button data-m="prevap" class="hidden">👁 Ver como apoiador</button>
         <button data-m="tema">🌓 Tema</button>
         <button data-m="termos">📄 Termos e privacidade</button>
         <button data-m="pass">🔑 Trocar senha</button>
+        <button data-m="mfa" class="hidden">🔐 Verificação em duas etapas</button><div class="small muted hidden" id="mfaInfo" style="padding:0 14px 6px"></div>
         <button data-m="veic">🚗 Veículos</button>
         <button data-m="parc" class="hidden">🤝 Parceiros do Rodaliq</button>
         <div class="sep"></div>
@@ -543,7 +546,7 @@ body:has(#admPage) .fab{z-index:61}body:has(#admPage) .fabMenu{z-index:62}body:h
 
 <script>
 "use strict";
-const VERSAO='V98';
+const VERSAO='V99';
 /* ---------- utilidades ---------- */
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -680,7 +683,7 @@ async function verAuditoria(){
     if(!completo){const u=ultimos();corpo=(u.length?`<div class="mgroup">${u.map(linhaAud).join('')}</div>`:'<div class="empty">Nenhum evento registrado ainda.</div>')+'<button class="btn sec sm" id="aFull">Ver histórico completo</button>'}
     else{const ms=Object.keys(completo).sort().reverse();if(aberto===null)aberto=ms[0]||'';
       corpo=ms.length?ms.map(m=>{const l=completo[m].slice().sort((a,b)=>b.seq-a.seq);return `<div class="mgroup"><div class="mhead" data-am="${m}"><span class="sg">${aberto===m?'−':'+'}</span><span class="t">${mesNome(m)}</span><span class="sp"></span><span class="small muted">${l.length} eventos</span></div>${aberto===m?`<div class="mbody">${l.map(linhaAud).join('')}</div>`:''}</div>`}).join(''):'<div class="empty">Nenhum evento registrado ainda.</div>'}
-    ov.innerHTML=`<div class="modal" style="max-width:640px"><h2>Histórico de auditoria</h2><div class="small muted" style="margin-bottom:10px">${completo?'Histórico completo, agrupado por mês (um mês aberto por vez).':'Os 5 eventos mais recentes.'} A numeração H fica gravada e não muda. Registra: exclusões, troca de senha, exportações, importações, veículos e configurações.</div>${corpo}<div class="mfoot">${completo?'<button class="btn sec" id="aBack">Últimos 5</button>':''}<button class="btn" id="aOk">Fechar</button></div></div>`};
+    ov.innerHTML=`<div class="modal" style="max-width:640px"><h2>Histórico de auditoria</h2><div class="small muted" style="margin-bottom:10px">${completo?'Histórico completo, agrupado por mês (um mês aberto por vez).':'Os 5 eventos mais recentes.'} A numeração H fica gravada e não muda. Registra: exclusões, troca de senha, exportações, importações, veículos e configurações.</div>${corpo}<div class="mfoot">${completo?'<button class="btn sec" id="aBack">Últimos 5</button>':''}<button class="btn" id="aOk">Fechar</button></div></div>`;if(ehMaster())admCopiarBind(ov,'.row')};
   ov.addEventListener('click',async e=>{const t=e.target;
     if(t.id==='aOk'||t===ov){ov.remove();return}
     if(t.id==='aBack'){completo=null;aberto=null;draw();return}
@@ -793,7 +796,7 @@ function renderSino(){
   const item=n=>{const lida=r.lidas.includes(n.id),imp=impValida(n);return `<div class="it${imp?' imp':''}${lida?'':' nova'}">${imp?'<div class="tagImp">⚠ IMPORTANTE</div>':''}<div class="ttl">${lida?'':'● '}${esc(n.titulo)}</div>${corpo(n)}<div class="acts"><button data-nl="${esc(n.id)}">${lida?'Marcar como não lida':'Marcar como lida'}</button><button data-nx="${esc(n.id)}">🗑 Excluir</button></div></div>`};
   const nl=naoLidas().length;
   let h=`<div class="hd"><button class="chip${tab==='alertas'?' on':''}" data-bt="alertas">Alertas (${al.filter(a=>!a.lida).length})</button><button class="chip${tab==='novidades'?' on':''}" data-bt="novidades">Novidades (${nl})</button></div>`;
-  if(tab==='alertas')h+=al.length?al.map((a,i)=>`<div class="it al${a.lida?' lida':''}${a.crit?' crit':''}${a.inv?' inv':''}" data-ai="${i}"><span class="tag ${a.n}">${a.n==='r'?'✕':'⚠'}</span><div><div>${esc(a.t)}</div>${a.nota?`<div class="nota">${esc(a.nota)}</div>`:''}${a.cnh?`<div class="acts"><button data-cl="${esc(a.cnh)}">${a.lida?'Marcar como não lida':'Marcar como lida'}</button></div>`:''}${a.bd?`<div class="acts"><a class="lnk" href="${esc(a.em)}" target="_blank" rel="noopener">✉ Parabenizar por e-mail</a><a class="lnk" href="${esc(a.wa)}" target="_blank" rel="noopener">💬 Parabenizar pelo WhatsApp</a><button data-bl="${esc(a.bd)}">Marcar como lido</button></div>`:''}${a.bk?`<div class="acts"><button class="bkBtn" data-bk="1">📥 Exportar backup</button></div>`:''}${a.apoC?`<div class="acts"><button data-apc="1">Para conferir</button></div>`:''}${a.recA?`<div class="acts"><button data-rca="1">Abrir os recados</button></div>`:''}${a.recU?`<div class="acts"><button data-rcu="1">Ler a resposta</button></div>`:''}${a.apo?`<div class="acts"><button data-ap="1">💚 Quero contribuir</button><button data-apn="1">Agora não</button></div>`:''}${a.sup?`<div class="acts"><button data-sl="${esc(a.sup)}">${a.lida?'Marcar como não lida':'Marcar como lida'}</button></div>`:''}</div></div>`).join(''):'<div class="empty">Nenhum alerta agora. ✓</div>';
+  if(tab==='alertas')h+=al.length?al.map((a,i)=>`<div class="it al${a.lida?' lida':''}${a.crit?' crit':''}${a.inv?' inv':''}" data-ai="${i}"><span class="tag ${a.n}">${a.n==='r'?'✕':'⚠'}</span><div><div>${esc(a.t)}${a.lidoTag?' <span class="tag b">Lido</span>':''}${a.aguard?' <span class="tag a">Aguardando confirmação</span>':''}</div>${a.nota?`<div class="nota">${esc(a.nota)}</div>`:''}${a.cnh?`<div class="acts"><button data-cl="${esc(a.cnh)}">${a.lida?'Marcar como não lida':'Marcar como lida'}</button></div>`:''}${a.bd?`<div class="acts"><a class="lnk" href="${esc(a.em)}" target="_blank" rel="noopener">✉ Parabenizar por e-mail</a><a class="lnk" href="${esc(a.wa)}" target="_blank" rel="noopener">💬 Parabenizar pelo WhatsApp</a><button data-bl="${esc(a.bd)}">Marcar como lido</button></div>`:''}${a.bk?`<div class="acts"><button class="bkBtn" data-bk="1">📥 Exportar backup</button></div>`:''}${a.apoC?`<div class="acts"><button data-apc="1">Para conferir</button></div>`:''}${a.recA?`<div class="acts"><button data-rca="1">Abrir os recados</button></div>`:''}${a.recU?`<div class="acts"><button data-rcu="1">Ler a resposta</button></div>`:''}${a.apoMsg?(a.aguard?'':`<div class="acts"><button data-apq="1">💚 Quero contribuir</button>${a.acoes?'<button data-apl="1">Agora não</button>':''}</div>`):a.apo?`<div class="acts"><button data-ap="1">💚 Quero contribuir</button><button data-apn="1">Agora não</button></div>`:''}${a.sup?`<div class="acts"><button data-sl="${esc(a.sup)}">${a.lida?'Marcar como não lida':'Marcar como lida'}</button></div>`:''}</div></div>`).join(''):'<div class="empty">Nenhum alerta agora. ✓</div>';
   else if(UI.bellExc){h+=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><b class="small">🗑 Excluídas (últimos ${DIAS_EXCL} dias)</b><span style="display:flex;gap:12px">${excl.length?'<button class="lnk ivDelTxt" data-besv="1">🗑 Esvaziar</button>':''}<button class="lnk" data-bexc="0">Voltar</button></span></div><div class="small muted" style="margin:-2px 0 8px">As novidades ficam aqui por 30 dias. <b>Esvaziar</b> apaga de vez.</div>`+(excl.length?excl.map(n=>`<div class="it"><div class="ttl">${esc(n.titulo)}</div>${corpo(n)}<div class="acts"><button data-nr="${esc(n.id)}">↩ Restaurar</button></div></div>`).join(''):'<div class="empty">Nenhuma novidade excluída nos últimos 30 dias.</div>')}
   else{h+=nl?`<div style="text-align:right;margin-bottom:4px"><button class="lnk" data-nall="1">Marcar todas como lidas (${nl})</button></div>`:'';
     h+=`<div class="novInfo"><button class="lnk" data-binfo="1">ℹ Como funcionam as novidades ${UI.bellInfo?'▴':'▾'}</button>${UI.bellInfo?`<ul>
@@ -809,7 +812,7 @@ function renderSino(){
   $('#bellMenu').innerHTML=h;
 }
 function posMenu(m,btn){if(window.innerWidth<=640){m.style.top=(btn.getBoundingClientRect().bottom+6)+'px'}else m.style.top=''}
-$('#bellBtn').onclick=e=>{e.stopPropagation();$('#optMenu').classList.add('hidden');const m=$('#bellMenu');m.classList.toggle('hidden');if(!m.classList.contains('hidden')){renderSino();posMenu(m,$('#bellBtn'))}};
+$('#bellBtn').onclick=e=>{e.stopPropagation();$('#optMenu').classList.add('hidden');const m=$('#bellMenu');m.classList.toggle('hidden');if(!m.classList.contains('hidden')){renderSino();posMenu(m,$('#bellBtn'));if(AJU.msg60&&AJU.msg60.em&&CAD)apoEstadoRefresh().then(()=>{atualizaSino();if(!m.classList.contains('hidden'))renderSino()})}};
 $('#bellMenu').addEventListener('click',e=>{e.stopPropagation();const t=e.target;if(t.closest('a[href]'))return; // Parabenizar: abre o WhatsApp e mantém o sino aberto
   const r=NOT.reads;r.exclEm=r.exclEm||{};
   if(t.dataset.bt){UI.bell=t.dataset.bt;UI.bellExc=false}
@@ -823,6 +826,8 @@ $('#bellMenu').addEventListener('click',e=>{e.stopPropagation();const t=e.target
   else if(t.closest('[data-rca]')){$('#bellMenu').classList.add('hidden');UI.recF='pend';REC_ABERTA=null;abrirAdmin('recados');return}
   else if(t.closest('[data-rcu]')){$('#bellMenu').classList.add('hidden');formFalar();return}
   else if(t.closest('[data-ap]')){$('#bellMenu').classList.add('hidden');formApoiar();return}
+  else if(t.closest('[data-apq]')){NOT.reads.apoio=Object.assign({},NOT.reads.apoio,{mes:hoje().slice(0,7)});salvarReads();$('#bellMenu').classList.add('hidden');formApoiar();return}
+  else if(t.closest('[data-apl]')){const em=AJU.msg60&&AJU.msg60.em;if(em){NOT.reads.apoio=Object.assign({},NOT.reads.apoio,{msg:{em,lidoEm:new Date().toISOString()},mes:hoje().slice(0,7)});salvarReads();renderSino();atualizaSino();toast('Marcado como lido. O aviso some em '+DIAS_LIDO_APO+' dias.')}return}
   else if(t.closest('[data-apn]')){NOT.reads.apoio=Object.assign({},NOT.reads.apoio,{em:new Date().toISOString(),em60:new Date().toISOString(),mes:hoje().slice(0,7)});salvarReads();renderSino();atualizaSino();return}
   else if(t.closest('[data-apx]')){NOT.reads.apoio=Object.assign({},NOT.reads.apoio,{nunca:true});salvarReads();renderSino();atualizaSino();toast('Não falo mais nisso.');return}
   else if(t.dataset.sl){r.supaLida=r.supaLida===t.dataset.sl?null:t.dataset.sl;salvarReads()}
@@ -870,6 +875,7 @@ $('#fLogin').onsubmit=async e=>{
   UID=data.user.id;LOGADO=data.user.email;CAD=data.user.created_at?new Date(data.user.created_at).toISOString():null;$('#lPass').value='';$('#lErr').textContent='';entrar('Entrada');
 };
 async function entrar(evento){
+  if(!await mfaDesafio())return;
   $('#login').classList.add('hidden');$('#app').classList.remove('hidden');$('#whoName').textContent=LOGADO;
   await carregar();render();ouvirNovidades();invAdminInit();carregaPerfil();ajuCarregar();navInicia();checarExclusao().then(async bloq=>{if(bloq)return;await checarTrocaSenha();checarTermos().then(checarPrimeiroAcesso)});
   if(evento)audit(evento,'Acesso','Login de '+LOGADO);
@@ -1882,6 +1888,7 @@ const ZAP_EXC={},ZAP_SEN={},ZAP_PES={}; // V53: telefone e texto de cada cartão
 const EXC_DIAS=30,SUPA_USERS='https://supabase.com/dashboard/project/dazgckfmvopeqfxhemll/auth/users',SUPA_TAB='https://supabase.com/dashboard/project/dazgckfmvopeqfxhemll/editor';
 const EXC_MOTIVOS=['Parei de rodar por aplicativo','O app não atendeu o que eu precisava','Achei difícil de usar','Vou usar outro app ou planilha','Preocupação com meus dados','Outro motivo'];
 let EXC_MEU=null; // pedido aberto do usuário (novo ou desativado)
+const EXC_ANA='Análise do admin'; // V99: desativação feita pelo admin para analisar (sem pedido de exclusão)
 async function excListar(){
   if(!invProd())return (await DB.collection('exclusoes').get()).docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>String(b.criado_em).localeCompare(String(a.criado_em)));
   const {data,error}=await DB.from('tb_exclusoes').select('*').order('criado_em',{ascending:false}).limit(1000);if(error)throw error;return data||[]}
@@ -1898,9 +1905,22 @@ async function excPatch(id,patch){
 // ao entrar: conta desativada mostra o bloqueio; pedido em andamento mostra o aviso no topo
 async function checarExclusao(){try{EXC_MEU=await excMeu()}catch(e){EXC_MEU=null}avisoExclusao();
   if(EXC_MEU&&EXC_MEU.status==='desativado'){telaDesativada();return true}return false}
+async function usrDesativarAnalise(u){
+  if(!await confirma(`Desativar o acesso de <b>${esc(u.email)}</b> para análise? A pessoa não consegue mais ver nem lançar dados. Nenhuma exclusão é pedida e nada é apagado. Para voltar, use <b>Reativar acesso</b> neste cartão.`,'Desativar para análise',{perigo:1}))return false;
+  try{
+    if(invProd()){const {error}=await DB.rpc('rodaliq_desativar_usuario',{p_user:u.user_id,p_motivo:EXC_ANA});if(error)throw error}
+    else{const ag=new Date().toISOString(),id='e'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+      await DB.doc('exclusoes/'+id).set({user_id:u.user_id,email:u.email,motivo:EXC_ANA,comentario:'Desativado pelo admin para análise',status:'desativado',criado_em:ag,desativado_em:ag})}
+  }catch(e){toast('Não foi possível desativar agora. Tente de novo.');return false}
+  audit('Desativação para análise','Admin','Acesso desativado para análise · '+u.email);toast('Acesso desativado para análise');return true}
+async function usrReativar(u){
+  const x=(EXC_CACHE||[]).find(v=>v.user_id===u.user_id&&v.status==='desativado');if(!x){toast('Esta pessoa não está desativada.');return false}
+  if(!await confirma(`Reativar o acesso de <b>${esc(u.email)}</b>? Tudo volta como estava.`,'Reativar acesso'))return false;
+  try{await excPatch(x.id,{status:'desistiu',reativado_em:new Date().toISOString()})}catch(e){toast('Não foi possível reativar agora. Tente de novo.');return false}
+  audit('Reativação','Admin','Acesso reativado · '+u.email);toast('Acesso reativado');return true}
 function telaDesativada(){document.querySelectorAll('.ov').forEach(o=>o.remove());
   const ov=document.createElement('div');ov.className='ov';ov.id='excBloq';
-  ov.innerHTML=`<div class="modal" style="max-width:440px"><h2>🔒 Conta desativada</h2><p>${EXC_MEU.motivo==='Inatividade'?'Sua conta foi desativada por falta de lançamentos (item 8.1 dos Termos de uso).':'Sua conta está desativada conforme sua solicitação.'} Fale com <a href="mailto:${MAIL_RODALIQ}">${MAIL_RODALIQ}</a>${EXC_MEU.motivo==='Inatividade'?' para voltar'  :''}.</p><p class="small muted">${EXC_MEU.motivo==='Inatividade'?'Desativada':'Pedido feito'} em ${dataHora(EXC_MEU.desativado_em||EXC_MEU.criado_em)}. Os dados ficam guardados por ${EXC_DIAS} dias após a desativação e depois são apagados de vez.</p><div class="mfoot"><button class="btn" id="excSair">↩ Sair</button></div></div>`;
+  ov.innerHTML=`<div class="modal" style="max-width:440px"><h2>🔒 Conta desativada</h2><p>${EXC_MEU.motivo===EXC_ANA?'Sua conta foi desativada temporariamente para análise pela equipe do Rodaliq.':EXC_MEU.motivo==='Inatividade'?'Sua conta foi desativada por falta de lançamentos (item 8.1 dos Termos de uso).':'Sua conta está desativada conforme sua solicitação.'} Fale com <a href="mailto:${MAIL_RODALIQ}">${MAIL_RODALIQ}</a>${EXC_MEU.motivo===EXC_ANA?' para saber mais':EXC_MEU.motivo==='Inatividade'?' para voltar':''}.</p><p class="small muted">${EXC_MEU.motivo===EXC_ANA||EXC_MEU.motivo==='Inatividade'?'Desativada':'Pedido feito'} em ${dataHora(EXC_MEU.desativado_em||EXC_MEU.criado_em)}. ${EXC_MEU.motivo===EXC_ANA?'Seus dados continuam guardados.':`Os dados ficam guardados por ${EXC_DIAS} dias após a desativação e depois são apagados de vez.`}</p><div class="mfoot"><button class="btn" id="excSair">↩ Sair</button></div></div>`;
   document.body.appendChild(ov);ov.querySelector('#excSair').onclick=()=>{try{sessionStorage.removeItem('mdd_s')}catch(e){}sairSemAudit()}}
 function sairSemAudit(){if(invProd()&&DB&&DB.auth)DB.auth.signOut().finally(()=>location.reload());else location.reload()}
 function avisoExclusao(){const el=$('#excAviso');if(!el)return;const p=EXC_MEU&&EXC_MEU.status==='novo'?EXC_MEU:null;el.classList.toggle('hidden',!p);
@@ -1935,7 +1955,7 @@ async function excAdminCache(force){if(!invIsAdmin){EXC_CACHE=[];SEN_CACHE=[];AP
 const excDiasDesde=iso=>iso?Math.floor((Date.now()-new Date(iso).getTime())/864e5):0;
 function excAlerts(){if(!invIsAdmin)return [];const out=[],nv=EXC_CACHE.filter(x=>x.status==='novo');
   if(nv.length)out.push({n:'r',inv:1,tab:'exc',t:`${nv.length} ${nv.length===1?'pedido de exclusão aguardando':'pedidos de exclusão aguardando'}`,nota:nv.slice(0,5).map(x=>x.email).join(' · ')+'. Responda em até 15 dias (prazo da LGPD para pedidos do titular).'});
-  EXC_CACHE.filter(x=>x.status==='desativado'&&excDiasDesde(x.desativado_em)>=EXC_DIAS).forEach(x=>{const c=invCache.find(v=>String(v.email||'').toLowerCase()===String(x.email||'').toLowerCase());
+  EXC_CACHE.filter(x=>x.status==='desativado'&&x.motivo!==EXC_ANA&&excDiasDesde(x.desativado_em)>=EXC_DIAS).forEach(x=>{const c=invCache.find(v=>String(v.email||'').toLowerCase()===String(x.email||'').toLowerCase());
     out.push({n:'a',inv:1,tab:'exc',t:`Excluir dados de ${c?c.name:x.email}: prazo de ${EXC_DIAS} dias concluído`,nota:'Abra Admin > Pedidos de exclusão e use “🗑 Excluir usuário”. O login e os dados são apagados juntos.'})});
   return out}
 const assina=()=>`\n\nAtenciosamente,\n${TERMOS_RESP}\nEquipe Rodaliq`;
@@ -1964,16 +1984,16 @@ async function excAdminRender(box){
   const lst=L.filter(x=>x.status===f);
   const card=x=>{const c=invCache.find(v=>String(v.email||'').toLowerCase()===String(x.email||'').toLowerCase()),u=us.find(v=>v.user_id===x.user_id),nome=soNome(x),txt=excTexto(x,nome);
     const dd=excDiasDesde(x.desativado_em),lib=x.desativado_em?fmtBR(isoOf(new Date(new Date(x.desativado_em).getTime()+EXC_DIAS*864e5))):'';
-    const tag={novo:`<span class="tag r">Novo · ${excDiasDesde(x.criado_em)} ${excDiasDesde(x.criado_em)===1?'dia':'dias'}</span>`,desativado:`<span class="tag a">Desativado · ${dd} ${dd===1?'dia':'dias'}</span>`,excluido:'<span class="tag g">Excluído</span>',desistiu:`<span class="tag b">${x.reativado_em?'Reativado':'Desistiu'}</span>`}[x.status]||'';
+    const tag={novo:`<span class="tag r">Novo · ${excDiasDesde(x.criado_em)} ${excDiasDesde(x.criado_em)===1?'dia':'dias'}</span>`,desativado:`<span class="tag a">${x.motivo===EXC_ANA?'Em análise':'Desativado'} · ${dd} ${dd===1?'dia':'dias'}</span>`,excluido:'<span class="tag g">Excluído</span>',desistiu:`<span class="tag b">${x.reativado_em?'Reativado':'Desistiu'}</span>`}[x.status]||'';
     ZAP_EXC[x.id]={fone:c?c.whatsapp:'',txt};
     let bt=`<a class="btn sm" href="${esc(invMailLink(x.email,'Seu pedido de exclusão no Rodaliq',txt))}" target="_blank" rel="noopener">✉ Responder por e-mail</a><button type="button" class="btn sm" data-zx="${esc(x.id)}">💬 Responder pelo WhatsApp</button>`;
     if(x.status==='novo')bt+=`<button class="btn sm warn" data-ex="desativar" data-id="${esc(x.id)}">🔒 Desativar acesso</button><button class="btn sm warn" data-ex="excluir" data-id="${esc(x.id)}">🗑 Excluir usuário</button>`;
     if(x.status==='desativado'){bt+=`<button class="btn sm sec" data-ex="reativar" data-id="${esc(x.id)}">↩ Reativar</button><button class="btn sm warn" data-ex="excluir" data-id="${esc(x.id)}">🗑 Excluir usuário</button>`;
-      bt+=dd>=EXC_DIAS?`<span class="small muted">Carência concluída</span>`:`<span class="small muted">Carência até ${lib} (faltam ${EXC_DIAS-dd} ${EXC_DIAS-dd===1?'dia':'dias'})</span>`}
+      bt+=x.motivo===EXC_ANA?`<span class="small muted">Em análise · sem prazo de exclusão</span>`:dd>=EXC_DIAS?`<span class="small muted">Carência concluída</span>`:`<span class="small muted">Carência até ${lib} (faltam ${EXC_DIAS-dd} ${EXC_DIAS-dd===1?'dia':'dias'})</span>`}
     if(!['novo','desativado'].includes(x.status))bt='';
     return `<div class="uCard"><div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start"><div class="uMail">${esc(nome||x.email)}</div>${tag}</div>
       <a class="supaLnk" href="${SUPA_TAB}" target="_blank" rel="noopener">↗ Tabela tb_exclusoes no Supabase</a>
-      <div class="uLin">${esc(x.email)}${c?` · 💬 ${esc(invFmtPhone(c.whatsapp))}${invUfOf(c.whatsapp)?' · '+esc(invUfOf(c.whatsapp)):''}`:''}</div>
+      <div class="uLin">${esc(x.email)}${c?` · 💬 ${esc(invFmtPhone(c.whatsapp))}${invUfOf(c.whatsapp)?' · '+esc(invUfOf(c.whatsapp)):''}`:' · 💬 sem WhatsApp cadastrado'}</div>
       <div class="uLin">Cadastro: ${u?admData(u.criado_em):'—'} · Pedido: ${admData(x.criado_em)}${x.desativado_em?' · Desativado: '+admData(x.desativado_em):''}${x.reativado_em?' · Reativado: '+admData(x.reativado_em):''}${x.desistiu_em?' · Desistiu: '+admData(x.desistiu_em):''}${x.excluido_em?' · Excluído: '+admData(x.excluido_em):''}</div>
       <div class="note small" style="margin-top:8px"><b>Motivo:</b> ${esc(x.motivo)}${x.comentario?`<br><i>“${esc(x.comentario)}”</i>`:''}</div>
       ${bt?`<div class="ivActs" style="margin-top:8px">${bt}</div>`:''}</div>`};
@@ -2061,7 +2081,7 @@ async function corrAdminRender(box){
     if(x.status==='novo'){bt+=(em&&!ehMaster())?'<span class="small muted">Só o admin principal troca e-mail.</span>':`<button type="button" class="btn sm warn" data-cx="aplicar" data-id="${esc(x.id)}">✔ Aplicar correção</button>`;
       bt+=`<button type="button" class="btn sm sec" data-cx="recusar" data-id="${esc(x.id)}">✖ Recusar</button>`}
     return `<div class="uCard"><div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start"><div class="uMail">${esc(nome||x.email||'(sem nome)')}</div>${tag}</div>
-      <div class="uLin">${esc(x.email||'')}${c?` · 💬 ${esc(invFmtPhone(c.whatsapp))}`:''}</div>
+      <div class="uLin">${esc(x.email||'')}${c?` · 💬 ${esc(invFmtPhone(c.whatsapp))}`:' · 💬 sem WhatsApp cadastrado'}</div>
       <div class="uLin"><b>${esc(CORR_CAMPOS[x.campo]||x.campo)}</b>: ${esc(x.valor_atual||'—')} → <b>${esc(x.campo==='celular'?invFmtPhone('55'+corrDig(x.valor_novo)):x.valor_novo)}</b>${ant}</div>
       ${x.motivo?`<div class="small muted">Motivo: ${esc(x.motivo)}</div>`:''}
       <div class="small muted">Pedido em ${admData(x.criado_em)}${x.resolvido_em?' · tratado em '+admData(x.resolvido_em):''}</div>
@@ -2144,7 +2164,7 @@ async function senAdminRender(box){
         <div class="ivActs" style="margin-top:8px"><a class="btn sm" href="${esc(invMailLink(x.email,'Sua nova senha temporária do Rodaliq',txt))}" target="_blank" rel="noopener">✉ Enviar senha por e-mail</a><button type="button" class="btn sm" data-zs="${esc(x.id)}">💬 Enviar senha pelo WhatsApp</button></div>`}
     else bt=`<div class="ivActs" style="margin-top:8px"><button class="btn sm" data-sg="${esc(x.id)}">🔑 ${x.status==='novo'?'Gerar senha temporária':'Gerar outra senha'}</button><button class="btn sm sec" data-sq="${esc(x.id)}">↗ Abrir SQL Editor (Supabase)</button></div>`;
     return `<div class="uCard"><div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start"><div class="uMail">${esc(c?c.name:x.email)}</div><span class="tag ${x.status==='novo'?'r':'g'}">${x.status==='novo'?'Novo':'Atendido'}</span></div>
-      <div class="uLin">${esc(x.email)}${c?` · 💬 ${esc(invFmtPhone(c.whatsapp))}${invUfOf(c.whatsapp)?' · '+esc(invUfOf(c.whatsapp)):''}`:''}</div>
+      <div class="uLin">${esc(x.email)}${c?` · 💬 ${esc(invFmtPhone(c.whatsapp))}${invUfOf(c.whatsapp)?' · '+esc(invUfOf(c.whatsapp)):''}`:' · 💬 sem WhatsApp cadastrado'}</div>
       <div class="uLin">Pedido: ${admData(x.criado_em)}${x.atendido_em?' · Atendido: '+admData(x.atendido_em):''}</div>${bt}</div>`};
   box.innerHTML=`<h3 style="margin:0">🔑 Pedidos de senha</h3>
     <p class="small muted" style="margin:4px 0 8px">“Gerar senha temporária” grava a senha no Supabase na hora e obriga a pessoa a criar a própria senha ao entrar. A senha aparece só nesta tela: envie por e-mail ou WhatsApp em seguida.${invProd()?'':' <b>No HMO a geração é simulada.</b>'}</p>
@@ -2178,7 +2198,7 @@ const recVe=k=>{if(PREV_AP){const n=(AJU.rec&&AJU.rec[k])||AJU_PADRAO.rec[k];ret
 const recOff=k=>!recVe(k);
 // V93: o copo "Ajude a manter o Rodaliq" também tem os 3 níveis (antes só ligado/desligado; desligado = só o master)
 const apoNivel=()=>AJU.nivel||(AJU.ativo===false?'master':'todos');
-const apoVe=()=>{const n=apoNivel();return n==='todos'||ehMaster()||(n==='equipe'&&(invIsAdmin||SOU_COLAB))};
+const apoVe=()=>{const n=apoNivel();return n==='todos'||ehMaster()||(n==='equipe'&&(invIsAdmin||SOU_COLAB))||(n==='apoiadores'&&(invIsAdmin||SOU_COLAB||SOU_APOIADOR))};
 // V73: canais de recado (colaboradores e, no futuro, usuários)
 const CAN_PADRAO={colaborador:true,usuario:false};
 // V74: placa de manutenção. O admin master NUNCA é bloqueado.
@@ -2188,7 +2208,7 @@ let CANAIS=Object.assign({},CAN_PADRAO),SOU_COLAB=false,SOU_APOIADOR=false,COLAB
 // V70: regra do imposto sobre a Carona Solidária, definida pelo admin principal para todo o app
 const IMP_PADRAO={permitir:true,padrao:false}; // permitir = cada pessoa escolhe em ⚙ Opções; padrao = valor de quem não escolheu
 let IMP=Object.assign({},IMP_PADRAO);
-let AJU=Object.assign({},AJU_PADRAO),APO_MEU=false,APO_ULT=null;
+let AJU=Object.assign({},AJU_PADRAO),APO_MEU=false,APO_ULT=null,APO_INF=null,APO_DESC=null;
 const apoDias=()=>Math.min(365,Math.max(1,+AJU.apDias||30));
 const apoValidoAte=x=>{const d=new Date(x.confirmado_em||x.criado_em);if(isNaN(d))return null;return isoOf(new Date(d.getTime()+apoDias()*864e5))};
 let APO_FIM_MSG=null;
@@ -2221,13 +2241,13 @@ async function ajuCarregar(){
   try{if(!invProd())SOU_APOIADOR=true;else{const {data}=await DB.rpc('rodaliq_sou_apoiador');SOU_APOIADOR=!!data}}catch(e){SOU_APOIADOR=false}
   try{if(invProd()&&!SOU_APOIADOR&&!ehMaster()&&!invIsAdmin){const mine=(await apoMeus()).filter(x=>x.status==='confirmado');const u=mine.map(x=>x.confirmado_em||x.criado_em).sort().pop();if(u&&apoValidoAte({confirmado_em:u})<hoje()&&cfg().apFim!==u){APO_FIM_MSG='Seu período de apoiador terminou. Obrigado pela contribuição!';cfg().apFim=u;salvar('tb_config')}}}catch(e){}
   try{REC_MEUS=await recMeus()}catch(e){REC_MEUS=[]}
-  try{const am=await apoMeus();APO_MEU=am.length>0;APO_ULT=am.filter(x=>x.status==='confirmado'&&x.confirmado_em).map(x=>x.confirmado_em).sort().pop()||null}catch(e){APO_MEU=false;APO_ULT=null}
+  await apoEstadoRefresh();
   aplicaAjustes();
   checarManutencao();
 }
 // ---- V73: recados ----
-const canalMeu=()=>SOU_COLAB?'colaborador':'usuario';
-const canalLigado=()=>!!CANAIS[canalMeu()];
+const canalMeu=()=>SOU_COLAB?'colaborador':SOU_APOIADOR?'apoiador':'usuario';
+const canalLigado=()=>{const c=canalMeu();return c==='apoiador'?(CANAIS.apoiador!==undefined?!!CANAIS.apoiador:!!CANAIS.usuario):!!CANAIS[c]};
 const recPend=()=>REC_MEUS.filter(r=>r.autor==='admin'&&!r.lido_em).length;
 async function manutSalvar(v){const novo=Object.assign({},MAN_PADRAO,MANUT,v);
   if(!invProd())await DB.doc('ajustes/manutencao').set({v:novo,at:Date.now()});
@@ -2317,12 +2337,29 @@ function feriadosBR(y){const a=y%19,b=Math.floor(y/100),c=y%100,d=Math.floor(b/4
   return new Set([...fx,mv(-48),mv(-47),mv(-2),mv(60)])}
 function quintoDiaUtil(y,m){const fer=feriadosBR(y);let n=0;for(let d=1;d<=31;d++){const dt=new Date(y,m,d);if(dt.getMonth()!==m)break;const w=dt.getDay();if(w===0||w===6||fer.has(isoOf(dt)))continue;if(++n===5)return isoOf(dt)}return isoOf(new Date(y,m,7))}
 const apoNaoDoou60=()=>!APO_ULT||excDiasDesde(APO_ULT)>=60;
+// V99: estado das minhas contribuições (confirmada, aguardando conferência, descartada pelo admin)
+async function apoEstadoRefresh(){
+  try{const am=await apoMeus(),ult=l=>l.sort().pop()||null;APO_MEU=am.length>0;
+    APO_ULT=ult(am.filter(x=>x.status==='confirmado'&&x.confirmado_em).map(x=>x.confirmado_em));
+    APO_INF=ult(am.filter(x=>x.status==='informado').map(x=>x.criado_em));
+    APO_DESC=ult(am.filter(x=>x.status==='descartado'&&x.descartado_em).map(x=>x.descartado_em))}
+  catch(e){APO_MEU=false;APO_ULT=null;APO_INF=null;APO_DESC=null}}
+// V99: o alerta da MSG de apoio tem ações. “Agora não” deixa o aviso como Lido por 5 dias; se o admin descartar a contribuição informada, ele volta a Lido por 5 dias
+const DIAS_LIDO_APO=5;
+function apoMsgAlerta(m){
+  const r=(NOT.reads&&NOT.reads.apoio)||{},T=x=>x?new Date(x).getTime():0,tm=T(m.em),g=r.msg&&r.msg.em===m.em?r.msg:null;
+  if(!g&&r.em60&&T(r.em60)>=tm)return null; // já tratado no formato antigo (V92 a V98)
+  const base={n:'a',apo:1,apoMsg:1,t:'O Rodaliq é gratuito e vai continuar assim.',nota:m.texto||MSG_APOIO};
+  if(T(APO_INF)>=tm)return {...base,lida:1,aguard:1};
+  const desc=T(APO_DESC)>=tm?T(APO_DESC):0,lido=Math.max(g?T(g.lidoEm):0,desc);
+  if(lido){if(Date.now()>lido+DIAS_LIDO_APO*864e5)return null;return {...base,lida:1,lidoTag:1}}
+  return {...base,acoes:1}}
 function apoAviso(){
   if(!apoVe()||!AJU.aviso||!CAD)return null;
   const r=(NOT.reads&&NOT.reads.apoio)||{};
   if(!apoNaoDoou60())return null;
   const m=AJU.msg60;
-  if(m&&m.em&&(!r.em60||r.em60<m.em))return {n:'a',apo:1,t:'O Rodaliq é gratuito e vai continuar assim.',nota:m.texto||MSG_APOIO};
+  if(m&&m.em){const am=apoMsgAlerta(m);if(am)return am}
   if(Math.floor((Date.now()-new Date(CAD).getTime())/864e5)<(AJU.dias||30))return null;
   const d=new Date(),h=isoOf(d);if(h<quintoDiaUtil(d.getFullYear(),d.getMonth()))return null;
   if(r.mes===h.slice(0,7))return null;
@@ -2368,7 +2405,7 @@ async function carregaPerfis(f){ // admin lê o nome em public.profiles e o e-ma
   try{const {data}=await DB.from('profiles').select('id,display_name');
     (data||[]).forEach(r=>{if(r.display_name)PERFIS[r.id]=String(r.display_name).trim()})}catch(e){}
   try{(await admUsuarios()).forEach(u=>{if(u.email)EMAILS[u.user_id]=u.email})}catch(e){}
-  try{const {data}=await DB.from('tb_admins').select('user_id');ADM_IDS=new Set((data||[]).map(r=>r.user_id))}catch(e){}}
+  try{const {data}=await DB.from('tb_admins').select('user_id,master');ADM_IDS=new Set((data||[]).map(r=>r.user_id));MASTER_IDS=new Set((data||[]).filter(r=>r.master).map(r=>r.user_id))}catch(e){}}
 function apoEmail(x){return (x.user_id&&EMAILS[x.user_id])||x.email||''}
 function soNome(x){const n=apoNome(x);return /@/.test(n)?'':n} // nome de verdade, ou vazio
 
@@ -2444,7 +2481,7 @@ function apoNome(x){
   return (c&&String(c.name||'').trim())||apoEmail(x)||'';}
 async function apoMeus(){
   if(!invProd())return (await DB.collection('apoios').get()).docs.map(d=>({id:d.id,...d.data()})).filter(x=>x.user_id===UID);
-  const {data,error}=await DB.from('tb_apoios').select('id,valor,status,criado_em,confirmado_em').eq('user_id',UID);if(error)throw error;return data||[]}
+  const {data,error}=await DB.from('tb_apoios').select('id,valor,status,criado_em,confirmado_em,descartado_em').eq('user_id',UID);if(error)throw error;return data||[]}
 async function apoCriar(valor,tipo){
   if(!invProd()){const id='a'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
     await DB.doc('apoios/'+id).set({user_id:UID,email:LOGADO,valor,tipo,status:'informado',criado_em:new Date().toISOString(),confirmado_em:null,recibo:null});return}
@@ -2583,7 +2620,7 @@ function formApoiar(){
   q('#apoS').onclick=async()=>{let v=sel;if(v==null)v=parseBRL(q('#apoOutro').value);
     if(!v||v<=0)return err('Escolha um valor ou digite quanto você contribuiu.');
     q('#apoS').disabled=true;
-    try{await apoCriar(r2(v),'avulso');APO_MEU=true;audit('Apoio','Configurações','Contribuição informada · '+apoBRL(v));ov.remove();atualizaSino();
+    try{await apoCriar(r2(v),'avulso');APO_MEU=true;await apoEstadoRefresh();audit('Apoio','Configurações','Contribuição informada · '+apoBRL(v));ov.remove();atualizaSino();
       confirma('Agradecemos pela sua contribuição e confiança no projeto! Sua ajuda voluntária faz toda a diferença para manter o Rodaliq no ar, contribuindo para amenizar alguns custos estruturais e viabilizando novas evoluções.','Fechar',{titulo:'💚 Contribuição registrada',voltar:null})}
     catch(e){q('#apoS').disabled=false;err('Não foi possível registrar agora. Tente de novo em instantes.')}};
 }
@@ -2623,12 +2660,13 @@ function prevApoiador2(on){PREV_AP=!!on;let b=document.getElementById('prevBar')
   if(!on&&b)b.remove();
   aplicaAjustes();if(PREV_AP&&recOff(UI.tab))UI.tab='painel';render();toast(on?'Visão de apoiador ligada':'Visão normal')}
 function formAjustes(){if(!ehMaster())return;
-  const ov=document.createElement('div');ov.className='ov';
+  {const ja=document.getElementById('ajuPage');if(ja){ja.scrollTop=0;return}}
+  const ov=document.createElement('div');ov.className='ov admPage';ov.id='ajuPage';
   const NV3=[['master','Só o admin master'],['equipe','Admins e colaboradores'],['todos','Todos os usuários']],NV4=[NV3[0],NV3[1],['apoiadores','Apoiadores'],NV3[2]],
     nvSel=(id,val,ops)=>`<select class="inp" id="${id}">${ops.map(([k,t])=>`<option value="${k}"${val===k?' selected':''}>${t}</option>`).join('')}</select>`,
-    canNv=CANAIS.usuario?'todos':CANAIS.colaborador?'equipe':'master';
+    canNv=CANAIS.usuario?'todos':CANAIS.apoiador?'apoiadores':CANAIS.colaborador?'equipe':'master';
   const FUN=[
-   {k:'apoio',ic:'💚',nome:'Ajude a manter o Rodaliq',corpo:`<div class="field" style="margin-top:0"><label for="ajNA">Quem vê o copo 💚 no cabeçalho e o menu de apoio</label>${nvSel('ajNA',apoNivel(),NV3)}</div>
+   {k:'apoio',ic:'💚',nome:'Ajude a manter o Rodaliq',corpo:`<div class="field" style="margin-top:0"><label for="ajNA">Quem vê o copo 💚 no cabeçalho e o menu de apoio</label>${nvSel('ajNA',apoNivel(),NV4)}</div>
     <label class="exChk"><input type="checkbox" id="ajV"${AJU.aviso?' checked':''}><span>Avisar no 🔔 sino, no <b>5º dia útil de cada mês</b>, quem usa o app há mais de <b id="ajDt">${AJU.dias}</b> dias e não contribuiu nos últimos 60 dias</span></label>
     <div class="field"><label for="ajAD">Validade do apoio: quantos dias a contribuição confirmada vale como apoiador</label><input class="inp" id="ajAD" inputmode="numeric" value="${AJU.apDias||30}" style="max-width:120px"><span class="small muted">Quem você cadastra em “Apoiadores cadastrados” continua apoiador sem prazo.</span></div>
     <div class="field"><label for="ajP">Chave Pix</label><input class="inp" id="ajP" value="${esc(AJU.pix)}" autocomplete="off"></div>
@@ -2636,7 +2674,7 @@ function formAjustes(){if(!ehMaster())return;
       ${AJU.valores.slice(0,3).map((v,i)=>`<input class="inp num" id="ajV${i+1}" inputmode="decimal" value="${brl(v,1)}">`).join('')}</div></div>
     <div class="field"><label for="ajS">Qual deles vem marcado</label><select class="inp" id="ajS">${AJU.valores.slice(0,3).map(v=>`<option value="${v}"${v===AJU.sugerido?' selected':''}>${apoBRL(v)}</option>`).join('')}</select></div>`},
    {k:'canais',ic:'💬',nome:'Canais de conversa',corpo:`<p class="small muted" style="margin:0 0 8px">Quem pode falar com você pelo app. Esconder o canal não apaga nada do que já foi escrito.</p>
-    <div class="field" style="margin-top:0"><label for="ajNC">Quem fala com você pelo app</label>${nvSel('ajNC',canNv,NV3)}</div>`},
+    <div class="field" style="margin-top:0"><label for="ajNC">Quem fala com você pelo app</label>${nvSel('ajNC',canNv,NV4)}</div>`},
    {k:'carona',ic:'🧾',nome:'Carona Solidária no Carnê-Leão',corpo:`<p class="small muted" style="margin:0 0 8px">A carona que só divide o custo do trajeto é rateio, não renda. Aqui você decide como o app trata isso para <b>todo mundo</b>.</p>
     <label class="exChk"><input type="checkbox" id="ajIP"${IMP.permitir?' checked':''}><span>Deixar <b>cada pessoa escolher</b> em ⚙ Opções › Metas e preferências</span></label>
     <label class="exChk"><input type="checkbox" id="ajID"${IMP.padrao?' checked':''}><span>Incluir a carona no imposto <b id="ajIDt">${IMP.permitir?'para quem ainda não escolheu':'para todo o app'}</b></span></label>`},
@@ -2649,14 +2687,13 @@ function formAjustes(){if(!ehMaster())return;
    {k:'termos',ic:'📄',nome:'Termos de uso',corpo:`<p class="small muted" style="margin:0 0 8px">Veja como o aviso de atualização aparece para quem já aceitou os Termos antes (nada é salvo).</p>
     <button type="button" class="btn sec sm" id="ajTv">👁 Ver o aviso de atualização dos Termos</button>`}
   ].sort((a,b)=>semAc(a.nome).localeCompare(semAc(b.nome),'pt-BR'));
-  ov.innerHTML=`<div class="modal ajM" style="max-width:460px"><h2>⚙ Ajustes do app</h2>
-    <p class="small" style="margin:0 0 6px">Valem para todo mundo, na hora. Não precisa subir versão nova. Toque no nome para abrir.</p>
+  ov.innerHTML=`<div class="admWrap"><div class="admStick"><div class="admHd"><button type="button" class="btn sec sm" id="ajN" aria-label="Voltar">← Voltar</button><h2>⚙ Ajustes do app</h2><div class="ajHdAcao"><span class="small" id="ajAlt" role="status"></span><button type="button" class="btn" id="ajS2">Salvar</button></div></div></div>
+    <div class="ajPg"><p class="small" style="margin:10px 0 6px">Valem para todo mundo, na hora. Não precisa subir versão nova. Toque no nome para abrir. Para escolher quem vê cada funcionalidade, use 🛡 Gestão Admin › 🎛 Funcionalidades.</p>
     <div class="ajBd">
     ${FUN.map((f,i)=>`<div class="ajIt${i>=AJ_PAG?' hidden':''}" data-aj="${f.k}"><button type="button" class="ajIh" aria-expanded="false"><span class="ajIc" aria-hidden="true">${f.ic}</span><span class="ajNm"><b>${f.nome}</b><small data-ajr="${f.k}"></small></span><span class="ajTg"></span><span class="ajCv" aria-hidden="true">▾</span></button><div class="ajDt">${f.corpo}</div></div>`).join('')}
     ${FUN.length>AJ_PAG?`<div style="text-align:center;margin:10px 0"><button type="button" class="btn sec sm" id="ajMais">Mostrar mais</button></div>`:''}
     </div>
-    <div class="err" id="ajErr"></div>
-    <div class="mfoot"><span class="small" id="ajAlt" style="margin-right:auto;color:var(--amberInk)"></span><button class="btn sec" id="ajN">Cancelar</button><button class="btn" id="ajS2">Salvar</button></div></div>`;
+    <div class="err" id="ajErr"></div></div></div>`;
   document.body.appendChild(ov);const q=s=>ov.querySelector(s);
   const NVT=Object.fromEntries(NV4),ligado=c=>q(c).checked?'ligado':'desligado';
   const RESUMO={
@@ -2684,7 +2721,6 @@ function formAjustes(){if(!ehMaster())return;
   q('#ajIP').addEventListener('change',refImp);
   const fecharAj=()=>ov.remove();
   ov.__fechar=()=>fechaComPerda(ov,fecharAj);marcaPerda(ov);
-  ov.addEventListener('mousedown',e=>{if(e.target===ov)ov.__fechar()});
   q('#ajN').onclick=ov.__fechar;
   q('#ajS2').onclick=async()=>{const pix=q('#ajP').value.trim();
     const recadoManut=q('#ajMT').value.trim();
@@ -2697,7 +2733,7 @@ function formAjustes(){if(!ehMaster())return;
     q('#ajS2').disabled=true;
     try{await ajuSalvar({ativo:q('#ajNA').value==='todos',nivel:q('#ajNA').value,aviso:q('#ajV').checked,apDias:Math.min(365,Math.max(1,parseInt(q('#ajAD').value,10)||30)),pix,valores:vs,sugerido:sg});
       await impSalvar({permitir:q('#ajIP').checked,padrao:q('#ajID').checked});
-      await canaisSalvar({colaborador:q('#ajNC').value!=='master',usuario:q('#ajNC').value==='todos'});
+      await canaisSalvar({colaborador:q('#ajNC').value!=='master',apoiador:q('#ajNC').value==='apoiadores'||q('#ajNC').value==='todos',usuario:q('#ajNC').value==='todos'});
       await manutSalvar({ativo:q('#ajMA').checked,colabs:q('#ajNM').value==='equipe',mensagem:recadoManut});
       audit('Ajustes','Admin','Ajustes do app salvos · apoio='+q('#ajNA').value+' · carona no imposto '+(q('#ajID').checked?'ligada':'desligada')+' · manutenção '+(q('#ajMA').checked?'LIGADA':'desligada')+' · canais='+q('#ajNC').value+' · manutenção entra='+q('#ajNM').value+(q('#ajIP').checked?' (cada um escolhe)':' (fixo para todos)'));
       toast('Ajustes salvos');ov.remove();render()}
@@ -2712,8 +2748,10 @@ async function apoNaoDoaram(box,L){
   const txt=(AJU.msg60&&AJU.msg60.texto)||MSG_APOIO;
   const rows=nao.map(({u,ult:ul})=>{const c=invCache.find(v=>String(v.email||'').toLowerCase()===String(u.email||'').toLowerCase()),nm=(u.user_id&&PERFIS[u.user_id])||(c&&c.name)||'',pn=String(nm).split(' ')[0];
     const t=`Olá${pn?', '+pn:''}!\nEsperamos que você esteja bem!\n\n${txt}`+assina();ZAP_APO['n:'+(u.user_id||u.email)]={fone:c?c.whatsapp:'',txt:t};
-    return `<div class="uCard"><div class="uMail">${esc(nm||u.email)}</div><div class="uLin">${esc(u.email||'')}${c?' · 💬 '+esc(invFmtPhone(c.whatsapp)):''} · ${ul?'última contribuição há '+excDiasDesde(ul)+' dias':'nunca contribuiu'}</div>
-      <div class="ivActs" style="margin-top:8px"><a class="btn sm" href="${esc(invMailLink(u.email,'O Rodaliq continua gratuito',t))}" target="_blank" rel="noopener">✉ E-mail</a><button type="button" class="btn sm" data-zn="${esc(u.user_id||u.email)}">💬 WhatsApp</button></div></div>`}).join('');
+    const ini=String(nm||u.email||'?').trim().split(/\s+/).map(w=>w[0]).slice(0,2).join('').toUpperCase(),sit=ul?'última contribuição há '+excDiasDesde(ul)+' dias':'nunca contribuiu';
+    return `<div class="uCard uCp"><button type="button" class="uHd" aria-expanded="false"><span class="uAv" aria-hidden="true">${esc(ini)}</span><span class="uNm"><b>${esc(nm||u.email)}</b><small>${esc(sit)}</small></span><span class="uCv" aria-hidden="true">▾</span></button>
+      <div class="uDt"><div class="uLin">${esc(u.email||'')}${c?' · 💬 '+esc(invFmtPhone(c.whatsapp)):' · 💬 sem WhatsApp cadastrado'} · ${esc(sit)}</div>
+      <div class="ivActs" style="margin-top:8px"><a class="btn sm" href="${esc(invMailLink(u.email,'O Rodaliq continua gratuito',t))}" target="_blank" rel="noopener">✉ E-mail</a><button type="button" class="btn sm" data-zn="${esc(u.user_id||u.email)}">💬 WhatsApp</button></div></div></div>`}).join('');
   const html=`<div class="cards grid" style="margin:10px 0">${kpi('Usuários ativos',String(us.length),'sem contar admins')}${kpi('Doadores',String(doadores.length),'com contribuição confirmada')}${kpi('Sem doar há +60 dias',String(nao.length),'inclui quem nunca contribuiu')}</div>
     <h3 style="margin:14px 0 4px">Usuários que não doaram +60 dias (${nao.length})</h3>
     <p class="small muted" style="margin:0 0 6px">Texto do lembrete (o “Olá, Nome!” é colocado na frente em cada mensagem). “Enviar a MSG” mostra o texto no 🔔 sino de todos esses usuários, uma vez. Cada pessoa pode escolher “não falar mais nisso”, e isso é respeitado. Por e-mail ou WhatsApp, use os botões de cada pessoa, só para quem informou esse canal no cadastro.</p>
@@ -2791,17 +2829,18 @@ async function apoAdminRender(box){
   UI.apoYm=UI.apoYm&&UI.apoYm<=mesAtual()?UI.apoYm:mesAtual();
   const ym=UI.apoYm,mes=L.filter(x=>x.status==='confirmado'&&String(x.confirmado_em||'').slice(0,7)===ym);
   const acumulado=sum(L.filter(x=>x.status==='confirmado'&&String(x.confirmado_em||'').slice(0,7)<=ym),x=>x.valor);
-  const card=x=>{const nome=apoNome(x),c=invCache.find(v=>String(v.email||'').toLowerCase()===String(x.email||'').toLowerCase()),txt=apoTexto(x,nome);
+  const card=(x,i)=>{const nome=apoNome(x),c=invCache.find(v=>String(v.email||'').toLowerCase()===String(x.email||'').toLowerCase()),txt=apoTexto(x,nome);
     ZAP_APO[x.id]={fone:c?c.whatsapp:'',txt,nome};
     const tag=x.status==='confirmado'?'<span class="tag b">Confirmada</span>':(x.status==='descartado'?'<span class="tag g">Descartada</span>':'<span class="tag a">Para conferir</span>');
     let bt='';
     if(x.status==='descartado')bt=`<button class="btn sm sec" data-ad="${esc(x.id)}">↩ Desfazer</button>`;
     else if(x.status==='informado')bt=`<button class="btn sm" data-ac="${esc(x.id)}">✓ Confirmar e gerar recibo</button><button class="btn sm sec" data-ax="${esc(x.id)}">✕ Descartar</button>`;
     else bt=`<button type="button" class="btn sm" data-ar="${esc(x.id)}">⬇ Baixar recibo (PDF)</button><a class="btn sm" href="${esc(invMailLink(apoEmail(x),'Seu recibo de contribuição ao Rodaliq',txt))}" target="_blank" rel="noopener">✉ Enviar por e-mail</a><button type="button" class="btn sm" data-za="${esc(x.id)}">💬 Enviar pelo WhatsApp</button><button class="btn sm sec" data-ad="${esc(x.id)}">↩ Desfazer</button>`;
-    return `<div class="uCard"><div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start"><div class="uMail">${esc(nome)}</div>${tag}</div>
-      <div class="uLin">${esc(apoEmail(x))}${c?` · 💬 ${esc(invFmtPhone(c.whatsapp))}${invUfOf(c.whatsapp)?' · '+esc(invUfOf(c.whatsapp)):''}`:''}</div>
+    const ini=String(nome||apoEmail(x)||'?').trim().split(/\s+/).map(w=>w[0]).slice(0,2).join('').toUpperCase(),dtC=x.criado_em?fmtD(isoOf(new Date(x.criado_em))):'';
+    return `<div class="uCard uCp${x.status==='informado'&&i===0?' op':''}"><button type="button" class="uHd" aria-expanded="${x.status==='informado'&&i===0}"><span class="uAv" aria-hidden="true">${esc(ini)}</span><span class="uNm"><b>${esc(nome)}</b><small>${apoBRL(x.valor)} · ${esc(dtC)}</small></span><span class="uTg">${tag}</span><span class="uCv" aria-hidden="true">▾</span></button>
+      <div class="uDt"><div class="uLin">${esc(apoEmail(x))}${c?` · 💬 ${esc(invFmtPhone(c.whatsapp))}${invUfOf(c.whatsapp)?' · '+esc(invUfOf(c.whatsapp)):''}`:' · 💬 sem WhatsApp cadastrado'}</div>
       <div class="uLin"><b>${apoBRL(x.valor)}</b> · informada em ${admData(x.criado_em)}${x.confirmado_em?' · confirmada em '+admData(x.confirmado_em):''}${x.descartado_em?' · descartada em '+admData(x.descartado_em):''}${x.recibo?' · recibo nº '+String(x.recibo).padStart(3,'0'):''}</div>
-      <div class="ivActs" style="margin-top:8px">${bt}</div></div>`};
+      <div class="ivActs" style="margin-top:8px">${bt}</div></div></div>`};
   box.innerHTML=`<h3 style="margin:0">🤝 Apoiadores</h3>${ehMaster()?apoSubHtml():''}
     <p class="small muted" style="margin:4px 0 8px">Contribuição é voluntária: ninguém fica sem o app por não contribuir, e o app nunca cobra. Confira o Pix no seu banco antes de confirmar; confirmar gera o número do recibo. O WhatsApp e o e-mail abrem com o texto pronto; para mandar o recibo em PDF, baixe e anexe.</p>
     <div class="mpick" style="margin-bottom:8px"><button type="button" data-apm="-1" aria-label="Mês anterior">‹</button><span style="text-transform:capitalize">${mesNome(ym)}</span><button type="button" data-apm="1" aria-label="Próximo mês"${ym>=mesAtual()?' disabled':''}>›</button></div>
@@ -2810,6 +2849,7 @@ async function apoAdminRender(box){
     ${lst.length?lst.map(card).join(''):'<div class="empty" style="margin-top:8px">Nenhuma contribuição aqui.</div>'}`;
   try{await apoNaoDoaram(box,L)}catch(e){}
   apoSubBind(box);
+  box.querySelectorAll('.uHd').forEach(b=>b.onclick=()=>{const c=b.parentNode;c.classList.toggle('op');b.setAttribute('aria-expanded',c.classList.contains('op'))});
   box.querySelectorAll('[data-apf]').forEach(b=>b.onclick=()=>{UI.apoF=b.dataset.apf;apoAdminRender(box)});
   box.querySelectorAll('[data-apm]').forEach(b=>b.onclick=()=>{let n=addMes(ym,+b.dataset.apm);if(n>mesAtual())n=mesAtual();UI.apoYm=n;apoAdminRender(box)});
   box.querySelectorAll('[data-za]').forEach(b=>b.onclick=()=>{const z=ZAP_APO[b.dataset.za];if(z)abreZap(z.fone,z.txt)});
@@ -3381,24 +3421,35 @@ function admRelLiga(box){
 }
 /* ---------- V48: aba 🛡 Admin (só administradores) ---------- */
 const ADMIN_MASTER='diogogomes2110@gmail.com';
-const ehMaster=()=>invProd()?String(LOGADO||'').toLowerCase()===ADMIN_MASTER:true; // no HMO o cadastro de admin é simulado
+let SOU_MASTER=false,MASTER_IDS=new Set();
+const ehMaster=()=>invProd()?(SOU_MASTER||String(LOGADO||'').toLowerCase()===ADMIN_MASTER):true; // no HMO o cadastro de admin é simulado
+const ehMasterId=(id,em)=>MASTER_IDS.has(id)||String(em||'').toLowerCase()===ADMIN_MASTER; // V99: pode haver mais de um master
 const semAc=t=>String(t||'').replace(/[^\p{L}\p{N} ]/gu,'').trim().normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
-const ADM_T=[['apoios','🤝 Apoiadores'],['despesas','💰 Receitas e despesas'],['parceiros','🤝 Parceiros'],['colab','🛠 Colaboradores'],['convites','📨 Pedidos de convite'],['exclusoes','🗑 Pedidos de exclusão'],['correcoes','✏ Correções de dados'],['senhas','🔑 Pedidos de senha'],['recados','💬 Recados'],['ativos','👥 Usuários ativos'],['excluidos','🚫 Usuários excluídos'],['relatorios','📑 Relatórios'],['versoes','📜 Versões em PROD'],['funcoes','🎛 Funcionalidades']]
+const ADM_T=[['apoios','🤝 Apoiadores'],['despesas','💰 Receitas e despesas'],['parceiros','🤝 Parceiros'],['colab','🛠 Colaboradores'],['convites','📨 Pedidos de convite'],['exclusoes','🗑 Pedidos de exclusão'],['correcoes','✏ Correções de dados'],['senhas','🔑 Pedidos de senha'],['recados','💬 Recados'],['ativos','👥 Usuários ativos'],['excluidos','🚫 Usuários excluídos'],['relatorios','📑 Relatórios'],['versoes','📜 Versões em PROD'],['masters','🛡 Masters'],['funcoes','🎛 Funcionalidades']]
   .sort((a,b)=>a[0]==='relatorios'?1:b[0]==='relatorios'?-1:semAc(a[1]).localeCompare(semAc(b[1]),'pt-BR')); // alfabética, Relatórios por último
 // V50: Gestão Admin abre como página inteira (computador e celular)
 function abrirAdmin(sub){['#bellMenu','#optMenu','#fabMenu'].forEach(s=>{const m=$(s);if(m)m.classList.add('hidden')});if(!invIsAdmin)return;
   if(sub)UI.admSub=sub;let ov=$('#admPage');
   if(!ov){ov=document.createElement('div');ov.className='ov admPage';ov.id='admPage';document.body.appendChild(ov);ov.__fechar=async()=>{if(funcSujo()&&!(await pedePerda()))return;ov.remove();invRefreshBadge(false);if(typeof atualizaSino==='function')atualizaSino()}}
   const sub2=UI.admSub||'convites';
-  ov.innerHTML=`<div class="admWrap"><div class="admStick"><div class="admHd"><h2>🛡 Gestão Admin</h2><div class="admHdB">${ehMaster()?'<button type="button" class="btn sec sm admMaster" id="admCad">🛡 Admins</button><button type="button" class="btn sec sm admMaster" id="admAju">⚙ Ajustes</button><button type="button" class="btn sec sm admMaster" id="admExp">💾 Exportar dados do app</button>':''}<button type="button" class="btn sec sm" id="admAniv">🎂 Aniversariantes</button></div><button type="button" class="btn sec sm admFch" id="admFechar">Fechar</button></div>
-    <div class="admTabs">${ADM_T.filter(([k])=>!['relatorios','colab','recados','despesas','parceiros','versoes','funcoes'].includes(k)||ehMaster()).map(([k,t])=>`<button type="button" class="chip${sub2===k?' on':''}" data-adm="${k}">${t} <span data-admn="${k}"></span></button>`).join('')}</div><div id="admQslot"></div></div>
+  ov.innerHTML=`<div class="admWrap"><div class="admStick"><div class="admHd"><h2>🛡 Gestão Admin</h2><div class="admHdB">${ehMaster()?'<button type="button" class="btn sec sm admMaster" id="admCad">🛡 Admins</button><button type="button" class="btn sec sm admMaster" id="admAju">⚙ Ajustes</button><button type="button" class="btn sec sm admMaster" id="admExp">💾 Exportar dados do app</button>':''}<button type="button" class="btn sec sm" id="admAud">🕘 Histórico de auditoria</button><button type="button" class="btn sec sm" id="admAniv">🎂 Aniversariantes</button></div><button type="button" class="btn sec sm admFch" id="admFechar">Fechar</button></div>
+    <input type="search" class="inp" id="admAbaQ" placeholder="🔎 Buscar aba (ex.: apoiadores)" aria-label="Buscar aba da Gestão Admin" autocomplete="off" style="margin:6px 0 2px">
+    <div class="admTabs" id="admAbas">${ADM_T.filter(([k])=>!['relatorios','colab','recados','despesas','parceiros','versoes','funcoes','masters'].includes(k)||ehMaster()).map(([k,t])=>`<button type="button" class="chip${sub2===k?' on':''}" data-adm="${k}">${t} <span data-admn="${k}"></span></button>`).join('')}</div><div id="admQslot"></div></div>
     <div id="admBox"><div class="empty">Carregando…</div></div><div id="admMore" style="text-align:center;margin:12px 0"></div></div>`;
   ov.querySelector('#admFechar').onclick=()=>ov.__fechar();
+  {const qa=ov.querySelector('#admAbaQ'),abas=ov.querySelector('#admAbas');let vz=null;
+    const filtra=()=>{const t=semAc(qa.value),bs=[...abas.querySelectorAll('[data-adm]')];let n=0;bs.forEach(b=>{const ok=!t||semAc(b.textContent).includes(t);b.classList.toggle('hidden',!ok);if(ok)n++});
+      if(!vz){vz=document.createElement('span');vz.className='small muted';vz.style.cssText='align-self:center;padding:4px 2px';vz.textContent='Nenhuma aba encontrada.';abas.appendChild(vz)}vz.classList.toggle('hidden',n>0)};
+    qa.addEventListener('input',filtra);
+    qa.addEventListener('keydown',e=>{if(e.key==='Enter'){const b=[...abas.querySelectorAll('[data-adm]')].find(x=>!x.classList.contains('hidden'));if(b){e.preventDefault();b.click()}}})}
   ov.querySelectorAll('[data-adm]').forEach(b=>b.onclick=async()=>{if(b.dataset.adm!==(UI.admSub||'convites')&&funcSujo()&&!(await pedePerda()))return;abrirAdmin(b.dataset.adm)});
   ov.querySelector('#admAniv').onclick=async()=>{if((UI.admSub||'convites')!=='convites')abrirAdmin('convites');for(let i=0;i<40;i++){const m=document.querySelector('#admBox #ivMode');if(m){if(!document.querySelector('#admBox #ivCalBox:not(.hidden)'))m.click();return}await new Promise(r=>setTimeout(r,50))}};
+  ov.querySelector('#admAud').onclick=verAuditoria;
   const cad=ov.querySelector('#admCad');if(cad)cad.onclick=formAdmins;
   const aju=ov.querySelector('#admAju');if(aju)aju.onclick=formAjustes;
   const exp=ov.querySelector('#admExp');if(exp)exp.onclick=exportaDadosApp;
+  {const bx=ov.querySelector('#admBox');if(ov.__mo)ov.__mo.disconnect();
+    if(bx&&ehMaster()){ov.__mo=new MutationObserver(()=>{clearTimeout(ov.__cpT);ov.__cpT=setTimeout(()=>admCopiarBind(bx),80)});ov.__mo.observe(bx,{childList:true,subtree:true})}}
   ov.scrollTop=0;montaAdmin();admContagens()}
 async function admContagens(){const put=(k,n)=>{const e=document.querySelector(`[data-admn="${k}"]`);if(e)e.textContent=n==null?'':'('+n+')'};
   try{if(!invCache.length)await invRefreshBadge(true)}catch(e){}
@@ -3414,7 +3465,193 @@ async function admContagens(){const put=(k,n)=>{const e=document.querySelector(`
     try{await parcCarrega();put('parceiros',PARC_CACHE.filter(parcAtivo).length)}catch(e){}}
   await carregaPerfis()}
 // ---- V73: 🛠 Colaboradores ----
-const HIST_SEED=[{"n": 98, "versao": "V98", "data": "2026-11-18", "commit": "pendente", "resumo": "Aba 🎛 Funcionalidades na Gestão Admin (antes “Recursos do app” em Ajustes), com filtro, etapa de cada funcionalidade, aviso ao sair com alteração não salva e atalho em ⚡ Atalhos; Guia do app segue os níveis de cada funcionalidade; Agenda: marca de origem e botão 🗑 Remover importação (nível próprio, padrão só master); backup automático antes de importar backup; auditoria da Agenda; anotações da Agenda salvam automaticamente com aviso; avisos do sino e do calendário (Carnê-Leão e DARF) e cartão de Carona do Painel passam a seguir os níveis das funcionalidades.", "testar": "Gestão Admin › Funcionalidades: filtrar, mudar um nível, tentar sair sem salvar e salvar; abrir o Guia com um nível restrito (👁 Ver como apoiador); Agenda: importar um .ics, remover a importação (EXCLUIR acima de 20 eventos) e ver o Histórico de auditoria; importar um backup de teste e conferir o arquivo baixado antes; digitar em Minhas anotações e ver o aviso “Salvo automaticamente ✓”; com Impostos restrito, conferir que o sino não mostra Carnê-Leão nem DARF (use 👁 Ver como apoiador).", "git": "Commit enviado ao GitHub · arquivo index.html", "supa": "Sem alteração (os níveis e as marcas de importação ficam nos dados já existentes)."}, {"n": 97, "versao": "V97", "data": "2026-11-18", "commit": "pendente", "resumo": "Despesas programadas: pagamento sempre lançado em Custos, seção “Pagas em [mês]”, aviso de parcelas pagas em outro mês, editar parcela e excluir parcela com opção de puxar as datas; etiqueta de oferta exclusiva para apoiadores; histórico de versões em PROD; botão “Exportar dados do app” (master); limites extras na candidatura de parceiros; funções internas do banco fechadas a quem não entrou no app.", "testar": "Marcar uma parcela como paga e ver o lançamento em Custos; desfazer e ver o lançamento sair; editar parcela (com e sem ratear); excluir parcela do meio e escolher puxar ou manter datas; ver a etiqueta de oferta exclusiva como usuário comum; abrir Gestão Admin › Versões em PROD; clicar em 💾 Exportar dados do app e conferir o arquivo baixado (em produção ele inclui também a estrutura do banco); entrar com a conta master e com uma conta comum, e abrir a candidatura de parceiros na tela de login.", "git": "Ainda não enviado ao GitHub · arquivo index.html", "supa": "Sim · arquivo v97.sql (inclui o fechamento de funções internas a quem não entrou no app) · tb_versoes (nova, só admin master) · função rodaliq_exportar_admin (nova, só master; também devolve a estrutura do banco: colunas, regras de acesso, funções e migrações) · funções rodaliq_parc_listar (informa se há oferta exclusiva) e rodaliq_parc_candidatar (limite de 3 por e-mail em 24 h e uma candidatura nova por WhatsApp)."}, {"n": 96, "versao": "V96", "data": "2026-11-18", "commit": "6939bc9", "resumo": "Apoiadores (cadastro, validade de 30 dias, selo 💚), Despesas programadas por parcela e por mês, Agenda do Motorista, Parceiros (endereço, oferta exclusiva, busca), RodaCalc (contraproposta), cards de Receitas e despesas e Painel reorganizado.", "testar": "Selo e Apoiadores no Admin; Despesas programadas por mês e por despesa; Agenda (só master); RodaCalc; Parceiros (endereço, oferta exclusiva); cards de Receitas e despesas; barra de rolagem nas abas.", "git": "Commit 6939bc9 · arquivo index.html", "supa": "Sim · migração v96_apoiadores_parceiros · tb_apoiadores (nova) · tb_parceiros (+ endereco, exclusivo, exclusivo_texto) · funções rodaliq_sou_apoiador, rodaliq_parc_nivel_ok e rodaliq_parc_listar."}, {"n": 95, "versao": "V95", "data": "2026-11-17", "commit": "f5c6d8b", "resumo": "Aba Despesas programadas, atalho Programar despesa, Atalhos acessível no Admin e Guia.", "testar": "", "git": "Commit f5c6d8b · arquivo index.html", "supa": "Sem alteração no banco neste deploy."}, {"n": 94, "versao": "V94", "data": "2026-11-17", "commit": "6b9ed81", "resumo": "Parceiros do Rodaliq: cadastro no Admin, tela do usuário em 3 níveis, candidatura no login, recebimentos e cobertura de despesas.", "testar": "", "git": "Commit 6b9ed81 · arquivo index.html", "supa": "Sim · migração v94_parceiros · tb_parceiros, tb_parc_categorias, tb_parc_candidaturas, tb_parc_cliques, tb_parc_receb (novas) · funções rodaliq_parc_form, rodaliq_parc_candidatar, rodaliq_parc_clique, rodaliq_parc_listar."}, {"n": 93, "versao": "V93", "data": "2026-11-17", "commit": "91623aa", "resumo": "RodaCalc por KM, recursos em 3 níveis, Ajustes do app em lista, Admin com topo fixo, ordem e paginação.", "testar": "", "git": "Commit 91623aa · arquivo index.html", "supa": "Sem alteração no banco neste deploy."}, {"n": 92, "versao": "V92 (inclui V90 e V91)", "data": "2026-11-17", "commit": "2c96c96", "resumo": "Ajustes de convite/admin/Carnê-Leão, inatividade, copo “Ajude a manter o Rodaliq” e recursos ligáveis; correção: “Ler os Termos” fecha o aviso de atualização antes (9dc1529).", "testar": "", "git": "Commit 2c96c96 · arquivo index.html", "supa": "Sim · migrações v90_correcoes_de_dados, v90b_correcoes_celular_55, v91_convites_motorista e v92_inatividade · tb_correcoes (nova) · funções rodaliq_aplicar_correcao e rodaliq_desativar_inatividade."}, {"n": 89, "versao": "V89", "data": "2026-11-16", "commit": "bd8e07a", "resumo": "Excluir usuário pelo app (admin master), com aviso dos dias que faltam da carência de 30 dias.", "testar": "", "git": "Commit bd8e07a · arquivo index.html", "supa": "Sim · migrações v89_excluir_usuario_pelo_app, v89_fix_criar_usuario_identities_email e v89b_fix_criar_usuario_identities_values · função rodaliq_excluir_usuario (nova) e correção de rodaliq_criar_usuario."}, {"n": 88, "versao": "V88", "data": "2026-11-15", "commit": "ab97304", "resumo": "Rótulos do Tipo em Despesas renomeados (Mensal / Anual (rateado) / Pontual).", "testar": "", "git": "Commit ab97304 · arquivo index.html", "supa": "Sem alteração no banco neste deploy."}, {"n": 87, "versao": "V87", "data": "2026-11-15", "commit": "f66f6f3", "resumo": "Aviso por e-mail na criação de contas e Despesas do app como aba própria na Gestão Admin (cards de custo e Benefício × custo).", "testar": "", "git": "Commit f66f6f3 · arquivo index.html", "supa": "Sem alteração no banco neste deploy."}, {"n": 84, "versao": "V84 (inclui V81 a V86)", "data": "2026-11-15", "commit": "c812383", "resumo": "Lembrete de backup do Rodaliq junto do alerta semanal de sexta-feira (só admin master).", "testar": "", "git": "Commit c812383 · arquivo index.html", "supa": "Sem alteração no banco neste deploy (as migrações v81 e v82 de 15/11 estão listadas na V83)."}, {"n": 83, "versao": "V83", "data": "2026-11-15", "commit": "da6373c", "resumo": "Criação de contas a partir dos pedidos de convite, Apoiadores (navegador de mês, acumulado, despesas do app) e correções de rolagem e máscara.", "testar": "", "git": "Commit da6373c · arquivo index.html", "supa": "Sim (ligação aproximada, mesmo dia) · migrações v81_criar_usuario_lote, v81_status_avisado e v82_tb_despesas · função rodaliq_criar_usuarios_lote · tb_despesas (nova)."}, {"n": 80, "versao": "V80", "data": "2026-11-15", "commit": "a79e82b", "resumo": "Aviso do Carnê-Leão só para quem já lançou corrida, repasse ou extrato.", "testar": "", "git": "Commit a79e82b · arquivo index.html", "supa": "Sem alteração no banco neste deploy."}, {"n": 79, "versao": "V79", "data": "2026-11-15", "commit": "51d2104", "resumo": "Calculadora de km nas 3 telas, km na Carona Solidária, denominador único nos indicadores por km e correção do parser pt-BR.", "testar": "", "git": "Commit 51d2104 · arquivo index.html", "supa": "Sem alteração no banco neste deploy."}, {"n": 78, "versao": "V78", "data": "2026-11-14", "commit": "16f35f4", "resumo": "Referências oficiais nas abas, aviso de que o Rodaliq não integra com sistemas oficiais, padronização para Contador e rolagem em Ajustes.", "testar": "", "git": "Commit 16f35f4 · arquivo index.html", "supa": "Sem alteração no banco neste deploy."}, {"n": 77, "versao": "V77", "data": "2026-11-14", "commit": "3129039", "resumo": "Canal de recados com colaboradores, placa de manutenção e ajustes de LGPD.", "testar": "", "git": "Commit 3129039 · arquivo index.html", "supa": "Sim (ligação aproximada) · migração rodaliq_v73_colaboradores_recados · tb_colaboradores e tb_recados (novas) · função rodaliq_sou_colaborador."}];
+
+/* ---------- V99: 🔐 verificação em duas etapas (2FA) para quem administra ---------- */
+const MFA_DEMO='123456'; // só no HMO (simulação): código aceito no lugar do app autenticador
+const MFA_QR_DEMO='data:image/svg+xml;utf-8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="180" height="180"><rect width="180" height="180" fill="#fff" stroke="#000" stroke-width="4"/><text x="90" y="86" font-size="14" text-anchor="middle" fill="#000">QR de exemplo</text><text x="90" y="106" font-size="12" text-anchor="middle" fill="#000">(só no HMO)</text></svg>');
+async function mfaEstado(){
+  if(invProd()){
+    try{const l=await DB.auth.mfa.listFactors();if(l.error)throw l.error;const f=((l.data&&l.data.totp)||[])[0];
+      if(!f)return {ativo:false,aal2:false};
+      const a=await DB.auth.mfa.getAuthenticatorAssuranceLevel();
+      return {ativo:true,fid:f.id,aal2:!!(a.data&&a.data.currentLevel==='aal2')}}
+    catch(e){return {ativo:false,aal2:false,erro:true}}}
+  try{const sn=await DB.doc('hmo/mfa').get();const on=!!(sn.exists&&sn.data().ativo);let a=false;try{a=sessionStorage.getItem('mdd_mfa')==='1'}catch(e){}return {ativo:on,aal2:a,fid:'demo'}}
+  catch(e){return {ativo:false,aal2:false}}}
+async function mfaVerificar(fid,codigo){
+  codigo=String(codigo||'').replace(/\D/g,'');
+  if(codigo.length!==6)return {erro:'Digite os 6 números que aparecem no app autenticador.'};
+  if(!invProd()){if(codigo===MFA_DEMO){try{sessionStorage.setItem('mdd_mfa','1')}catch(e){}return {ok:1}}return {erro:'Código incorreto ou vencido. Confira o app e tente de novo.'}}
+  try{const c=await DB.auth.mfa.challenge({factorId:fid});if(c.error)throw c.error;
+    const v=await DB.auth.mfa.verify({factorId:fid,challengeId:c.data.id,code:codigo});if(v.error)throw v.error;return {ok:1}}
+  catch(e){const m=String((e&&e.message)||''),st=e&&e.status;
+    return {erro:(st===429||/rate|too many|many requests/i.test(m))?'Muitas tentativas. Aguarde alguns minutos e tente de novo.':'Código incorreto ou vencido. Confira o app e tente de novo.'}}}
+async function mfaRemoverDe(uid){ // só o master; o banco confere (rodaliq_2fa_remover)
+  if(!invProd()){const m=(typeof MST_HMO!=='undefined'&&MST_HMO||[]).find(x=>x.user_id===uid);if(m)m.dois=false;const a=ADM_HMO.find(x=>x.user_id===uid);if(a)a.dois=false;return}
+  const {error}=await DB.rpc('rodaliq_2fa_remover',{p_user:uid});if(error)throw error}
+async function mfaMenu(){
+  const b=document.querySelector('#optMenu [data-m="mfa"]'),i=document.getElementById('mfaInfo');if(!b)return;
+  let st={ativo:false};try{st=await mfaEstado()}catch(e){}
+  const mostra=invIsAdmin||!!st.ativo; // quem deixou de ser admin mas ainda tem 2FA precisa poder desativar
+  b.classList.toggle('hidden',!mostra);if(i)i.classList.toggle('hidden',!mostra);if(!mostra)return;
+  if(i)i.textContent=st.ativo?'Ativada · o app pede o código ao entrar':'Não ativada · recomendada para quem administra'}
+// ao entrar: quem ativou o 2FA precisa digitar o código antes de ver o app
+async function mfaDesafio(){
+  const st=await mfaEstado();if(!st.ativo||st.aal2)return true;
+  return new Promise(res=>{
+    document.querySelectorAll('.ov').forEach(o=>o.remove());
+    const ov=document.createElement('div');ov.className='ov';ov.id='mfaDes';
+    ov.innerHTML=`<div class="modal" style="max-width:420px"><h2>🔐 Verificação em duas etapas</h2>
+      <p class="small">Abra o app autenticador no celular e digite o código de 6 números do Rodaliq.</p>
+      ${invProd()?'':'<p class="small muted">HMO (simulação): o código é <b>123456</b>.</p>'}
+      <div class="field"><label for="mfC">Código de 6 números</label><input class="inp" id="mfC" inputmode="numeric" autocomplete="one-time-code" maxlength="7" style="max-width:180px;letter-spacing:.2em"></div>
+      <div class="err" id="mfE"></div><div class="mfoot"><button class="btn sec" id="mfX">↩ Sair</button><button class="btn" id="mfOk">Confirmar</button></div></div>`;
+    document.body.appendChild(ov);const q=x=>ov.querySelector(x);setTimeout(()=>q('#mfC').focus(),50);
+    q('#mfX').onclick=()=>{if(!invProd()){try{sessionStorage.removeItem('mdd_s')}catch(e){}}sairSemAudit()};
+    const ok=async()=>{q('#mfE').textContent='';q('#mfOk').disabled=true;
+      const r=await mfaVerificar(st.fid,q('#mfC').value);q('#mfOk').disabled=false;
+      if(r.erro){q('#mfE').textContent=r.erro;q('#mfC').select();return}
+      ov.remove();res(true)};
+    q('#mfOk').onclick=ok;q('#mfC').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();ok()}});
+    q('#mfC').addEventListener('input',()=>{q('#mfE').textContent=''})})}
+// ⚙ Opções › 🔐 Verificação em duas etapas
+async function mfaTela(){
+  const st=await mfaEstado();if(!invIsAdmin&&!st.ativo)return;
+  document.querySelectorAll('#mfaTela').forEach(o=>o.remove());
+  const ov=document.createElement('div');ov.className='ov';ov.id='mfaTela';
+  ov.innerHTML=`<div class="modal" style="max-width:460px"><h2>🔐 Verificação em duas etapas</h2>
+    <p class="small">Além da senha, o app passa a pedir um código de 6 números gerado no seu celular (Google Authenticator, Microsoft Authenticator, Authy ou parecido). Protege a conta de administração mesmo que a senha vaze.</p>
+    ${invIsAdmin?'':'<p class="small">Sua conta não administra mais o app. Você pode desativar o 2FA aqui e voltar a entrar só com e-mail e senha.</p>'}
+    <p style="margin:6px 0"><b>Situação:</b> <span id="mfS">${st.ativo?'ativada':'não ativada'}</span></p>
+    ${st.ativo?'<p class="small muted">Se perder ou trocar o celular, peça a um master para usar Remover 2FA no seu cadastro (aba 🛡 Masters). Guarde o app autenticador com cuidado.</p>':''}
+    <div id="mfB"></div><div class="err" id="mfE"></div>
+    <div class="mfoot"><button class="btn sec" id="mfV">Fechar</button>${st.ativo?'<button class="btn sec" id="mfD">Desativar</button>':'<button class="btn" id="mfA">Ativar</button>'}</div></div>`;
+  document.body.appendChild(ov);const q=x=>ov.querySelector(x);let pend=null; // pend = fator ainda não confirmado
+  const fecha=async()=>{if(pend&&invProd()){try{await DB.auth.mfa.unenroll({factorId:pend})}catch(e){}}ov.remove();mfaMenu()};
+  q('#mfV').onclick=fecha;
+  const atv=q('#mfA');if(atv)atv.onclick=async()=>{
+    q('#mfE').textContent='';atv.disabled=true;let fid,qr,seg;
+    try{if(invProd()){
+        const l=await DB.auth.mfa.listFactors();for(const f of ((l.data&&l.data.all)||[]))if(f.status!=='verified'){try{await DB.auth.mfa.unenroll({factorId:f.id})}catch(e){}}
+        const r=await DB.auth.mfa.enroll({factorType:'totp',friendlyName:'Rodaliq'});if(r.error)throw r.error;
+        fid=r.data.id;qr=r.data.totp.qr_code;seg=r.data.totp.secret;pend=fid}
+      else{fid='demo';qr=MFA_QR_DEMO;seg='HMODEMO2FACODE'}}
+    catch(e){atv.disabled=false;q('#mfE').textContent='Não foi possível iniciar. Confira se a verificação em duas etapas (TOTP) está ligada no Supabase, em Authentication › MFA.';return}
+    atv.classList.add('hidden');
+    q('#mfB').innerHTML=`<ol class="small" style="margin:8px 0 8px 18px;padding:0"><li>No app autenticador, escolha adicionar conta e leia o QR code abaixo (ou digite a chave).</li><li>Digite aqui o código de 6 números que o app mostrar.</li></ol>
+      <div style="text-align:center"><img src="${qr}" alt="QR code para o app autenticador" width="180" height="180" style="background:#fff;border-radius:8px"></div>
+      <div class="small" style="margin:8px 0">Chave para digitar: <b id="mfK" style="font-family:monospace;word-break:break-all">${esc(seg)}</b> <button type="button" class="btn sec sm" id="mfCp">📋 Copiar</button></div>
+      ${invProd()?'':'<p class="small muted">HMO (simulação): o QR é de exemplo; use o código <b>123456</b>.</p>'}
+      <div class="field"><label for="mfC">Código de 6 números</label><input class="inp" id="mfC" inputmode="numeric" autocomplete="one-time-code" maxlength="7" style="max-width:180px;letter-spacing:.2em"></div>
+      <div class="mfoot" style="display:flex;justify-content:flex-end"><button class="btn" id="mfOk">Confirmar e ativar</button></div>`;
+    q('#mfCp').onclick=()=>copiaTxt(seg,'Chave copiada');q('#mfC').focus();
+    const ok=async()=>{q('#mfE').textContent='';q('#mfOk').disabled=true;const r=await mfaVerificar(fid,q('#mfC').value);q('#mfOk').disabled=false;
+      if(r.erro){q('#mfE').textContent=r.erro;return}
+      if(!invProd())await DB.doc('hmo/mfa').set({ativo:true,em:new Date().toISOString()});
+      pend=null;audit('Verificação em duas etapas','Admin','2FA ativada');toast('Verificação em duas etapas ativada');ov.remove();mfaMenu()};
+    q('#mfOk').onclick=ok;q('#mfC').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();ok()}})};
+  const des=q('#mfD');if(des)des.onclick=()=>{
+    des.classList.add('hidden');
+    q('#mfB').innerHTML=`<p class="small">Para desativar, confirme com o código atual do app autenticador.</p>
+      <div class="field"><label for="mfC">Código de 6 números</label><input class="inp" id="mfC" inputmode="numeric" autocomplete="one-time-code" maxlength="7" style="max-width:180px;letter-spacing:.2em"></div>
+      ${invProd()?'':'<p class="small muted">HMO (simulação): código <b>123456</b>.</p>'}
+      <div class="mfoot" style="display:flex;justify-content:flex-end"><button class="btn" id="mfOk">Confirmar e desativar</button></div>`;
+    q('#mfC').focus();
+    const ok=async()=>{q('#mfE').textContent='';q('#mfOk').disabled=true;const r=await mfaVerificar(st.fid,q('#mfC').value);
+      if(r.erro){q('#mfOk').disabled=false;q('#mfE').textContent=r.erro;return}
+      try{if(invProd()){const u=await DB.auth.mfa.unenroll({factorId:st.fid});if(u.error)throw u.error}
+        else{await DB.doc('hmo/mfa').set({ativo:false,em:new Date().toISOString()});try{sessionStorage.removeItem('mdd_mfa')}catch(e){}}}
+      catch(e){q('#mfOk').disabled=false;q('#mfE').textContent='Não foi possível desativar agora. Tente de novo.';return}
+      audit('Verificação em duas etapas','Admin','2FA desativada');toast('Verificação em duas etapas desativada');ov.remove();mfaMenu()};
+    q('#mfOk').onclick=ok;q('#mfC').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();ok()}})};
+}
+/* ---------- V99: 🛡 Masters (mais de um admin master, para o app nunca depender de uma conta só) ---------- */
+let MST_HMO=null;
+const MST_DEMO={'reserva@exemplo.com':'Conta reserva (teste)','ana@exemplo.com':'Ana Souza (teste)'},MST_DEMO_2FA={'reserva@exemplo.com':true}; // só no HMO: contas de mentira para testar o cadastro
+async function mstListar(){
+  if(!invProd()){if(!MST_HMO)MST_HMO=[{user_id:'hmo',email:LOGADO||'usuário de teste',nome:NOME_USR||'Usuário de teste',desde:new Date().toISOString(),eu:true}];{const eu=MST_HMO.find(x=>x.eu);if(eu)eu.dois=!!(await mfaEstado()).ativo}return MST_HMO.slice()}
+  const {data,error}=await DB.from('tb_admins').select('user_id,created_at,master,master_desde').eq('master',true);if(error)throw error;
+  await carregaPerfis(true);
+  const f2={};try{const r=await DB.rpc('rodaliq_admins_2fa');(r.data||[]).forEach(x=>{f2[x.user_id]=!!x.ativo})}catch(e){}
+  return (data||[]).map(r=>({user_id:r.user_id,email:EMAILS[r.user_id]||'(sem e-mail)',nome:PERFIS[r.user_id]||'',desde:r.master_desde||r.created_at,eu:r.user_id===UID,dois:!!f2[r.user_id]}))
+    .sort((a,b)=>(b.eu?1:0)-(a.eu?1:0)||semAc(a.nome||a.email).localeCompare(semAc(b.nome||b.email),'pt-BR'))}
+async function mstBuscaConta(em){ // conta já cadastrada no Rodaliq com este e-mail (ativa)
+  em=String(em||'').trim().toLowerCase();if(!em)return null;
+  if(!invProd()){return MST_DEMO[em]?{user_id:'hmo-'+em,email:em,nome:MST_DEMO[em],dois:!!MST_DEMO_2FA[em]}:null}
+  const esc_=em.replace(/[\\%_]/g,'\\$&');
+  const {data,error}=await DB.from('tb_usuarios').select('user_id,email,excluido_em').ilike('email',esc_).limit(5);if(error)throw error;
+  const u=(data||[]).find(x=>String(x.email||'').toLowerCase()===em&&!x.excluido_em);if(!u)return null;
+  let nome='';try{const r=await DB.from('profiles').select('display_name').eq('id',u.user_id).maybeSingle();nome=(r.data&&r.data.display_name)||''}catch(e){}
+  return {user_id:u.user_id,email:u.email,nome}}
+async function mstCadastrar(c){
+  if(!invProd()){MST_HMO.push({user_id:c.user_id,email:c.email,nome:c.nome,desde:new Date().toISOString(),eu:false,dois:!!c.dois});return}
+  const {error}=await DB.rpc('rodaliq_master_cadastrar',{p_email:c.email});if(error)throw error}
+async function mstRemover(m){
+  if(!invProd()){MST_HMO=MST_HMO.filter(x=>x.user_id!==m.user_id);return}
+  const {error}=await DB.rpc('rodaliq_master_remover',{p_user_id:m.user_id});if(error)throw error}
+function mstRender(box){
+  if(!ehMaster()){box.innerHTML='<div class="empty">Só o admin master vê esta aba.</div>';return}
+  box.removeAttribute('data-nocp');
+  box.innerHTML='<div class="empty">Carregando…</div>';
+  let L=[],busca='',conta=null,seq=0;
+  const nomeDe=m=>m.nome||m.email;
+  const desenha=()=>{
+    const q=s=>box.querySelector(s);
+    const t=semAc(busca),F=t?L.filter(m=>semAc(nomeDe(m)+' '+m.email).includes(t)):L;
+    box.innerHTML=`<div class="card bloco" data-nocp="1"><div class="bh"><h2>🛡 Admins master</h2><span class="small muted">${L.length} ${L.length===1?'master':'masters'}</span></div>
+      <p class="small muted">O master vê e altera tudo no app. Cadastre só pessoas de confiança, de preferência uma conta reserva sua. A pessoa precisa já ter conta no Rodaliq. Peça a cada master que ative a 🔐 verificação em duas etapas em ⚙ Opções. Não há limite de masters. Você não remove a si mesmo, e o app sempre mantém pelo menos um master.</p>
+      <input class="inp" type="search" id="msQ" placeholder="Pesquisar por nome ou e-mail" aria-label="Pesquisar masters por nome ou e-mail" autocomplete="off" value="${esc(busca)}">
+      <div id="msL">${F.length?F.map((m,i)=>`<div class="mstRow"><div><b>${esc(nomeDe(m))}</b> <span class="rcTag ad">${m.eu?'Você':'Master'}</span> <span class="rcTag">${m.dois?'2FA ativa':'2FA desligada'}</span><div class="small muted">${esc(m.email)} · master desde ${esc(m.desde?fmtBR(isoOf(new Date(m.desde))):'—')}</div></div><div class="mstAc"><button type="button" class="btn sec sm" data-mcp="${esc(m.email)}">📋 Copiar e-mail</button>${!m.eu&&m.dois?`<button type="button" class="btn sec sm" data-m2f="${esc(m.user_id)}">Remover 2FA</button>`:''}${m.eu?'':`<button type="button" class="btn sec sm" data-mrm="${esc(m.user_id)}">Remover master</button>`}</div></div>`).join(''):'<div class="empty">Nenhum master com esse nome ou e-mail.</div>'}</div>
+      <h3 style="margin:16px 0 4px">➕ Cadastrar novo master</h3>
+      <div class="field"><label for="msE">E-mail da conta (já cadastrada no Rodaliq)</label><input class="inp" type="email" id="msE" autocomplete="off" placeholder="e-mail da pessoa"></div>
+      <div class="field${conta?'':' hidden'}" id="msNW"><label for="msN">Nome (conforme o cadastro da conta)</label><input class="inp" id="msN" readonly value="${esc(conta?(conta.nome||'(sem nome no cadastro)'):'')}"></div>
+      <div class="err" id="msErr"></div>
+      <div class="mfoot" style="display:flex;justify-content:flex-end;margin-top:8px"><button type="button" class="btn" id="msS">Cadastrar como master</button></div></div>`;
+    const err=x=>{q('#msErr').textContent=x};
+    q('#msQ').oninput=e=>{busca=e.target.value;const pos=e.target.selectionStart;desenha();const n=box.querySelector('#msQ');if(n){n.focus();try{n.setSelectionRange(pos,pos)}catch(er){}}};
+    box.querySelectorAll('[data-mcp]').forEach(b=>b.onclick=()=>copiaTxt(b.dataset.mcp,'E-mail copiado'));
+    box.querySelectorAll('[data-m2f]').forEach(b=>b.onclick=async()=>{const m=L.find(x=>x.user_id===b.dataset.m2f);if(!m)return;
+      if(!await confirma(`Remover o 2FA de <b>${esc(nomeDe(m))}</b> (${esc(m.email)})? Ela passa a entrar só com e-mail e senha e pode ativar o 2FA de novo, por exemplo num celular novo.`,'Remover 2FA',{perigo:1}))return;
+      try{await mfaRemoverDe(m.user_id)}catch(e){const mm=String((e&&e.message)||'');toast(/nao_remover_a_si/.test(mm)?'Para o seu 2FA, use Desativar em ⚙ Opções.':'Não foi possível remover o 2FA agora. Tente de novo.');return}
+      audit('Remoção de 2FA','Admin','2FA removido de '+m.email);toast('2FA removido: '+m.email);await carrega()});
+    box.querySelectorAll('[data-mrm]').forEach(b=>b.onclick=async()=>{const m=L.find(x=>x.user_id===b.dataset.mrm);if(!m)return;
+      if(!await confirma(`Remover <b>${esc(nomeDe(m))}</b> (${esc(m.email)}) de master? A conta continua no app como usuário comum, sem acesso de administração. O 2FA dela também é apagado, e ela passa a entrar só com e-mail e senha.`,'Remover master',{perigo:1}))return;
+      try{await mstRemover(m)}catch(e){const mm=String((e&&e.message)||'');toast(/ultimo_master/.test(mm)?'O app precisa ter pelo menos um master.':/nao_remover_a_si/.test(mm)?'Você não pode remover a si mesmo.':'Não foi possível remover agora. Tente de novo.');return}
+      audit('Remoção de master','Admin','Master removido · '+m.email);toast('Master removido: '+m.email);await carrega()});
+    const e=q('#msE');
+    e.addEventListener('input',async()=>{err('');const v=e.value.trim().toLowerCase(),my=++seq;
+      if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v)||L.some(m=>String(m.email).toLowerCase()===v)){if(conta){conta=null;q('#msNW').classList.add('hidden')}return}
+      let c=null;try{c=await mstBuscaConta(v)}catch(er){}
+      if(my!==seq)return;conta=c;q('#msNW').classList.toggle('hidden',!c);q('#msN').value=c?(c.nome||'(sem nome no cadastro)'):''});
+    q('#msS').onclick=async()=>{const v=e.value.trim().toLowerCase();err('');
+      if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v))return err('Informe um e-mail válido.');
+      if(L.some(m=>String(m.email).toLowerCase()===v))return err('Essa conta já é master.');
+      q('#msS').disabled=true;
+      let c=null;try{c=await mstBuscaConta(v)}catch(er){q('#msS').disabled=false;return err('Não foi possível conferir a conta agora. Tente de novo.')}
+      if(!c){q('#msS').disabled=false;return err('Não há conta do Rodaliq com esse e-mail. Peça para a pessoa se cadastrar primeiro.')}
+      if(!await confirma(`Cadastrar <b>${esc(c.nome||c.email)}</b> (${esc(c.email)}) como admin master? Ela passa a ver e alterar tudo no app, inclusive ajustes e dados dos usuários.`,'Cadastrar master')){q('#msS').disabled=false;return}
+      try{await mstCadastrar(c)}catch(er){q('#msS').disabled=false;const mm=String((er&&er.message)||'');return err(/ja_master/.test(mm)?'Essa conta já é master.':/conta_inexistente/.test(mm)?'Não há conta do Rodaliq com esse e-mail. Peça para a pessoa se cadastrar primeiro.':'Não foi possível cadastrar agora. Só um admin master pode cadastrar masters.')}
+      audit('Cadastro de master','Admin','Master cadastrado · '+c.email);toast('Master cadastrado: '+c.email);conta=null;await carrega()};
+  };
+  const carrega=async()=>{try{L=await mstListar()}catch(e){box.innerHTML='<div class="empty">Não consegui carregar os masters. Tente de novo em instantes.</div>';return}desenha()};
+  carrega();
+}
+// V99: copiar e-mail / WhatsApp na Gestão Admin (só master), sem digitar nem selecionar
+async function copiaTxt(t,msg){let ok=false;
+  try{await navigator.clipboard.writeText(t);ok=true}catch(e){try{const a=document.createElement('textarea');a.value=t;a.setAttribute('readonly','');a.style.cssText='position:fixed;opacity:0;top:0;left:0';document.body.appendChild(a);a.select();ok=document.execCommand('copy');a.remove()}catch(er){}}
+  toast(ok?msg:'Não foi possível copiar. Selecione e copie manualmente.')}
+const CP_RE=/[A-Za-z0-9._%+\-]+@[A-Za-z0-9\-]+(?:\.[A-Za-z0-9\-]+)+/;
+function admCopiarBind(raiz,sel){if(!ehMaster()||!raiz)return;
+  raiz.querySelectorAll(sel||'.uCard,.ivCard,.admLin').forEach(c=>{if(c.dataset.cp||c.closest('[data-nocp]'))return;
+    const ns=[],w=document.createTreeWalker(c,NodeFilter.SHOW_TEXT);for(let n;(n=w.nextNode());)ns.push(n.nodeValue);const tx=ns.join(' '),m=CP_RE.exec(tx);if(!m)return;c.dataset.cp='1'; // junta os textos com espaço: o nome não gruda no e-mail
+    const f=/💬\s*(\+?[\d()\s\-]{8,})/.exec(tx);let fone=f?String(f[1]).replace(/\D/g,''):'';if(fone&&fone.length<=11)fone='55'+fone;
+    const host=c.querySelector('.ivActs')||c.querySelector('.uDt')||c.querySelector('.main')||c;
+    const d=document.createElement('div');d.className='ivActs cpAct';d.style.marginTop='8px';
+    d.innerHTML=`<button type="button" class="btn sec sm" data-cpm="${esc(m[0])}">📋 Copiar e-mail</button>`+(fone?`<button type="button" class="btn sec sm" data-cpw="${esc(fone)}">📋 Copiar WhatsApp</button>`:'');
+    host.appendChild(d)})}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-cpm],[data-cpw]');if(!b||b.closest('#mstNo'))return;e.stopPropagation();
+  if(b.dataset.cpm)copiaTxt(b.dataset.cpm,'E-mail copiado');else copiaTxt(b.dataset.cpw,'WhatsApp copiado')},true);
+const HIST_SEED=[{"n": 99, "versao": "V99", "data": "2026-11-19", "commit": "pendente", "resumo": "↩ Desfazer última importação de backup (cópia guardada por 7 dias, com auditoria); botões 📋 Copiar e-mail / Copiar WhatsApp na Gestão Admin (só master); ⚙ Ajustes do app abre como página, com aviso ao sair sem salvar; nova aba 🛡 Masters para cadastrar um master reserva (sem limite, com busca, nome automático, remoção e auditoria); alerta da MSG de apoio com “Quero contribuir” e “Agora não” (Lido por 5 dias, Aguardando confirmação e retorno se o admin descartar); Apoiadores: cartões compactos que abrem ao toque (contribuições e usuários sem doar há +60 dias), no mesmo desenho de Usuários ativos; Usuários ativos: botão ⏸ Desativar para análise / ▶ Reativar acesso (motivo “Análise do admin”, sem prazo de exclusão e com aviso próprio para a pessoa); busca de abas na Gestão Admin; 🔐 verificação em duas etapas (2FA por app autenticador) para quem administra, com exigência também no banco, e etiqueta de 2FA nas abas Masters e Admins do app; o master remove o 2FA de outra pessoa (celular perdido ou trocado); remover um admin ou master apaga o 2FA dele; quem ficou com 2FA sem ser admin ainda consegue desativá-lo; botão 🕘 Histórico de auditoria no cabeçalho da Gestão Admin; cartões mostram “sem WhatsApp cadastrado” quando não há número; ⚙ Ajustes do app: “Ajude a manter o Rodaliq” e “Canais de conversa” passam a ter os 4 níveis (inclui Apoiadores)", "testar": "Importar um backup de teste e usar ⚙ Opções › ↩ Desfazer última importação (conferir os dados e o histórico de auditoria); em Gestão Admin conferir 📋 Copiar e-mail nos cartões; abrir ⚙ Ajustes e tentar voltar com alteração não salva; em 🛡 Masters cadastrar a conta reserva, buscar, copiar e remover; enviar a MSG em Apoiadores e, em outra conta, testar Quero contribuir / Agora não / Aguardando confirmação / descarte pelo admin; em Apoiadores abrir e fechar os cartões, usar os filtros e pesquisar por nome ou e-mail; em Usuários ativos desativar e reativar um usuário (conferir a etiqueta Acesso desativado, Pedidos de exclusão › Desativados e a auditoria); digitar no campo 🔎 Buscar aba e apertar Enter; em ⚙ Opções › 🔐 Verificação em duas etapas ativar o 2FA com o app autenticador, sair, entrar de novo (deve pedir o código) e testar código errado; conferir a etiqueta 2FA ativa/desligada em 🛡 Masters e em Admins do app; cadastrar a conta reserva (no HMO ela já vem com 2FA ativa), usar Remover 2FA e conferir a etiqueta; remover um admin com 2FA; desativar o seu 2FA com o código; na Gestão Admin tocar em 🕘 Histórico de auditoria (abre por cima e volta ao fechar); conferir “sem WhatsApp cadastrado” nos cartões sem número; em ⚙ Ajustes escolher o nível Apoiadores nos dois campos de quem vê/fala e salvar", "git": "pendente", "supa": "Migração: tabela tb_backup_anterior (RLS só da própria linha), coluna master_desde e funções de master (rodaliq_master_cadastrar / rodaliq_master_remover), políticas de tb_admins, função rodaliq_desativar_usuario; 2FA: funções rodaliq_aal_ok e rodaliq_admins_2fa, rodaliq_eh_admin / rodaliq_eh_master passam a exigir o código (aal2) de quem ativou o 2FA, 4 políticas de tb_convites / tb_usuarios passam a usar rodaliq_eh_admin, gatilho tg_admin_removido (apaga o 2FA quando alguém deixa de ser admin) e função rodaliq_2fa_remover (só master)"}, {"n": 98, "versao": "V98", "data": "2026-11-18", "commit": "pendente", "resumo": "Aba 🎛 Funcionalidades na Gestão Admin (antes “Recursos do app” em Ajustes), com filtro, etapa de cada funcionalidade, aviso ao sair com alteração não salva e atalho em ⚡ Atalhos; Guia do app segue os níveis de cada funcionalidade; Agenda: marca de origem e botão 🗑 Remover importação (nível próprio, padrão só master); backup automático antes de importar backup; auditoria da Agenda; anotações da Agenda salvam automaticamente com aviso; avisos do sino e do calendário (Carnê-Leão e DARF) e cartão de Carona do Painel passam a seguir os níveis das funcionalidades.", "testar": "Gestão Admin › Funcionalidades: filtrar, mudar um nível, tentar sair sem salvar e salvar; abrir o Guia com um nível restrito (👁 Ver como apoiador); Agenda: importar um .ics, remover a importação (EXCLUIR acima de 20 eventos) e ver o Histórico de auditoria; importar um backup de teste e conferir o arquivo baixado antes; digitar em Minhas anotações e ver o aviso “Salvo automaticamente ✓”; com Impostos restrito, conferir que o sino não mostra Carnê-Leão nem DARF (use 👁 Ver como apoiador).", "git": "Commit enviado ao GitHub · arquivo index.html", "supa": "Sem alteração (os níveis e as marcas de importação ficam nos dados já existentes)."}, {"n": 97, "versao": "V97", "data": "2026-11-18", "commit": "pendente", "resumo": "Despesas programadas: pagamento sempre lançado em Custos, seção “Pagas em [mês]”, aviso de parcelas pagas em outro mês, editar parcela e excluir parcela com opção de puxar as datas; etiqueta de oferta exclusiva para apoiadores; histórico de versões em PROD; botão “Exportar dados do app” (master); limites extras na candidatura de parceiros; funções internas do banco fechadas a quem não entrou no app.", "testar": "Marcar uma parcela como paga e ver o lançamento em Custos; desfazer e ver o lançamento sair; editar parcela (com e sem ratear); excluir parcela do meio e escolher puxar ou manter datas; ver a etiqueta de oferta exclusiva como usuário comum; abrir Gestão Admin › Versões em PROD; clicar em 💾 Exportar dados do app e conferir o arquivo baixado (em produção ele inclui também a estrutura do banco); entrar com a conta master e com uma conta comum, e abrir a candidatura de parceiros na tela de login.", "git": "Ainda não enviado ao GitHub · arquivo index.html", "supa": "Sim · arquivo v97.sql (inclui o fechamento de funções internas a quem não entrou no app) · tb_versoes (nova, só admin master) · função rodaliq_exportar_admin (nova, só master; também devolve a estrutura do banco: colunas, regras de acesso, funções e migrações) · funções rodaliq_parc_listar (informa se há oferta exclusiva) e rodaliq_parc_candidatar (limite de 3 por e-mail em 24 h e uma candidatura nova por WhatsApp)."}, {"n": 96, "versao": "V96", "data": "2026-11-18", "commit": "6939bc9", "resumo": "Apoiadores (cadastro, validade de 30 dias, selo 💚), Despesas programadas por parcela e por mês, Agenda do Motorista, Parceiros (endereço, oferta exclusiva, busca), RodaCalc (contraproposta), cards de Receitas e despesas e Painel reorganizado.", "testar": "Selo e Apoiadores no Admin; Despesas programadas por mês e por despesa; Agenda (só master); RodaCalc; Parceiros (endereço, oferta exclusiva); cards de Receitas e despesas; barra de rolagem nas abas.", "git": "Commit 6939bc9 · arquivo index.html", "supa": "Sim · migração v96_apoiadores_parceiros · tb_apoiadores (nova) · tb_parceiros (+ endereco, exclusivo, exclusivo_texto) · funções rodaliq_sou_apoiador, rodaliq_parc_nivel_ok e rodaliq_parc_listar."}, {"n": 95, "versao": "V95", "data": "2026-11-17", "commit": "f5c6d8b", "resumo": "Aba Despesas programadas, atalho Programar despesa, Atalhos acessível no Admin e Guia.", "testar": "", "git": "Commit f5c6d8b · arquivo index.html", "supa": "Sem alteração no banco neste deploy."}, {"n": 94, "versao": "V94", "data": "2026-11-17", "commit": "6b9ed81", "resumo": "Parceiros do Rodaliq: cadastro no Admin, tela do usuário em 3 níveis, candidatura no login, recebimentos e cobertura de despesas.", "testar": "", "git": "Commit 6b9ed81 · arquivo index.html", "supa": "Sim · migração v94_parceiros · tb_parceiros, tb_parc_categorias, tb_parc_candidaturas, tb_parc_cliques, tb_parc_receb (novas) · funções rodaliq_parc_form, rodaliq_parc_candidatar, rodaliq_parc_clique, rodaliq_parc_listar."}, {"n": 93, "versao": "V93", "data": "2026-11-17", "commit": "91623aa", "resumo": "RodaCalc por KM, recursos em 3 níveis, Ajustes do app em lista, Admin com topo fixo, ordem e paginação.", "testar": "", "git": "Commit 91623aa · arquivo index.html", "supa": "Sem alteração no banco neste deploy."}, {"n": 92, "versao": "V92 (inclui V90 e V91)", "data": "2026-11-17", "commit": "2c96c96", "resumo": "Ajustes de convite/admin/Carnê-Leão, inatividade, copo “Ajude a manter o Rodaliq” e recursos ligáveis; correção: “Ler os Termos” fecha o aviso de atualização antes (9dc1529).", "testar": "", "git": "Commit 2c96c96 · arquivo index.html", "supa": "Sim · migrações v90_correcoes_de_dados, v90b_correcoes_celular_55, v91_convites_motorista e v92_inatividade · tb_correcoes (nova) · funções rodaliq_aplicar_correcao e rodaliq_desativar_inatividade."}, {"n": 89, "versao": "V89", "data": "2026-11-16", "commit": "bd8e07a", "resumo": "Excluir usuário pelo app (admin master), com aviso dos dias que faltam da carência de 30 dias.", "testar": "", "git": "Commit bd8e07a · arquivo index.html", "supa": "Sim · migrações v89_excluir_usuario_pelo_app, v89_fix_criar_usuario_identities_email e v89b_fix_criar_usuario_identities_values · função rodaliq_excluir_usuario (nova) e correção de rodaliq_criar_usuario."}, {"n": 88, "versao": "V88", "data": "2026-11-15", "commit": "ab97304", "resumo": "Rótulos do Tipo em Despesas renomeados (Mensal / Anual (rateado) / Pontual).", "testar": "", "git": "Commit ab97304 · arquivo index.html", "supa": "Sem alteração no banco neste deploy."}, {"n": 87, "versao": "V87", "data": "2026-11-15", "commit": "f66f6f3", "resumo": "Aviso por e-mail na criação de contas e Despesas do app como aba própria na Gestão Admin (cards de custo e Benefício × custo).", "testar": "", "git": "Commit f66f6f3 · arquivo index.html", "supa": "Sem alteração no banco neste deploy."}, {"n": 84, "versao": "V84 (inclui V81 a V86)", "data": "2026-11-15", "commit": "c812383", "resumo": "Lembrete de backup do Rodaliq junto do alerta semanal de sexta-feira (só admin master).", "testar": "", "git": "Commit c812383 · arquivo index.html", "supa": "Sem alteração no banco neste deploy (as migrações v81 e v82 de 15/11 estão listadas na V83)."}, {"n": 83, "versao": "V83", "data": "2026-11-15", "commit": "da6373c", "resumo": "Criação de contas a partir dos pedidos de convite, Apoiadores (navegador de mês, acumulado, despesas do app) e correções de rolagem e máscara.", "testar": "", "git": "Commit da6373c · arquivo index.html", "supa": "Sim (ligação aproximada, mesmo dia) · migrações v81_criar_usuario_lote, v81_status_avisado e v82_tb_despesas · função rodaliq_criar_usuarios_lote · tb_despesas (nova)."}, {"n": 80, "versao": "V80", "data": "2026-11-15", "commit": "a79e82b", "resumo": "Aviso do Carnê-Leão só para quem já lançou corrida, repasse ou extrato.", "testar": "", "git": "Commit a79e82b · arquivo index.html", "supa": "Sem alteração no banco neste deploy."}, {"n": 79, "versao": "V79", "data": "2026-11-15", "commit": "51d2104", "resumo": "Calculadora de km nas 3 telas, km na Carona Solidária, denominador único nos indicadores por km e correção do parser pt-BR.", "testar": "", "git": "Commit 51d2104 · arquivo index.html", "supa": "Sem alteração no banco neste deploy."}, {"n": 78, "versao": "V78", "data": "2026-11-14", "commit": "16f35f4", "resumo": "Referências oficiais nas abas, aviso de que o Rodaliq não integra com sistemas oficiais, padronização para Contador e rolagem em Ajustes.", "testar": "", "git": "Commit 16f35f4 · arquivo index.html", "supa": "Sem alteração no banco neste deploy."}, {"n": 77, "versao": "V77", "data": "2026-11-14", "commit": "3129039", "resumo": "Canal de recados com colaboradores, placa de manutenção e ajustes de LGPD.", "testar": "", "git": "Commit 3129039 · arquivo index.html", "supa": "Sim (ligação aproximada) · migração rodaliq_v73_colaboradores_recados · tb_colaboradores e tb_recados (novas) · função rodaliq_sou_colaborador."}];
 async function verListar(){
   if(!invProd())return HIST_SEED.slice();
   const {data,error}=await DB.from('tb_versoes').select('*').order('n',{ascending:false});if(error)throw error;return data||[]}
@@ -3572,12 +3809,13 @@ function recAlerts(){
 // 🛡 Admins: lista, cadastro e remoção. Só o admin master; no banco, só ele grava e apaga em tb_admins
 let ADM_HMO=[]; // no HMO a lista é simulada e vive só nesta sessão
 async function admListar(){
-  if(!invProd())return [{user_id:'hmo',email:LOGADO||'usuário de teste',master:true}].concat(ADM_HMO);
-  const {data,error}=await DB.from('tb_admins').select('user_id,created_at');if(error)throw error;
+  if(!invProd())return [{user_id:'hmo',email:LOGADO||'usuário de teste',master:true,dois:!!(await mfaEstado()).ativo}].concat(ADM_HMO);
+  const {data,error}=await DB.from('tb_admins').select('user_id,created_at,master');if(error)throw error;
+  const f2={};try{const r=await DB.rpc('rodaliq_admins_2fa');(r.data||[]).forEach(x=>{f2[x.user_id]=!!x.ativo})}catch(e){}
   let us=[];try{us=await admUsuarios()}catch(e){}
   const m=new Map(us.map(u=>[u.user_id,u.email]));
   return (data||[]).map(r=>{const em=m.get(r.user_id)||'(sem e-mail)';
-      return {user_id:r.user_id,email:em,criado_em:r.created_at,master:String(em).toLowerCase()===ADMIN_MASTER||(r.user_id===UID&&ehMaster())}})
+      return {user_id:r.user_id,email:em,criado_em:r.created_at,master:!!r.master||String(em).toLowerCase()===ADMIN_MASTER,dois:!!f2[r.user_id]}})
     .sort((a,b)=>(b.master?1:0)-(a.master?1:0)||String(a.email).localeCompare(String(b.email)));
 }
 function formAdmins(){if(!ehMaster())return;
@@ -3588,9 +3826,9 @@ function formAdmins(){if(!ehMaster())return;
     const nome=a=>(a.user_id&&PERFIS[a.user_id])||(a.master&&!invProd()?LOGADO:'')||'(sem nome)';
     L=L.slice().sort((x,y)=>(y.master?1:0)-(x.master?1:0)||semAc(nome(x)).localeCompare(semAc(nome(y)),'pt-BR')||String(x.email).localeCompare(String(y.email)));
     const linhas=()=>{const q=semAc(busca),f=q?L.filter(a=>semAc(nome(a)+' '+a.email).includes(q)):L;
-      return f.length?`<div class="admCols"><span>Nome</span><span>E-mail</span><span></span></div>`+f.map(a=>`<div class="admRow"><span class="admNm"><b>${esc(nome(a))}</b>${a.master?' <span class="rcTag ad">admin master</span>':''}</span><span class="admEm">${esc(a.email)}</span>${a.master?'<span></span>':`<button type="button" class="btn sec sm" data-rm="${esc(a.user_id)}">Remover</button>`}</div>`).join(''):'<div class="empty">Nenhum admin encontrado.</div>'};
+      return f.length?`<div class="admCols"><span>Nome</span><span>E-mail</span><span></span></div>`+f.map(a=>`<div class="admRow"><span class="admNm"><b>${esc(nome(a))}</b>${a.master?' <span class="rcTag ad">admin master</span>':''} <span class="rcTag">${a.dois?'2FA ativa':'2FA desligada'}</span></span><span class="admEm">${esc(a.email)}</span>${a.master?'<span></span>':`<span style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end">${a.dois?`<button type="button" class="btn sec sm" data-r2f="${esc(a.user_id)}">Remover 2FA</button>`:''}<button type="button" class="btn sec sm" data-rm="${esc(a.user_id)}">Remover</button></span>`}</div>`).join(''):'<div class="empty">Nenhum admin encontrado.</div>'};
     ov.innerHTML=`<div class="modal" style="max-width:640px"><h2>🛡 Admins do app</h2>
-      <p class="small">Só você, como admin principal, cadastra e descadastra admins.</p>
+      <p class="small">Só o admin master cadastra e descadastra admins. Para cadastrar ou remover outro master, use a aba 🛡 Masters da Gestão Admin.</p>
       <h3 style="margin:10px 0 4px">Admins ativos${er?'':` (${L.length})`}</h3>
       ${er?`<div class="empty">${er}</div>`:`<input class="inp" type="search" id="caBusca" placeholder="Buscar por nome ou e-mail" autocomplete="off" value="${esc(busca)}"><div id="caLista">${linhas()}</div>`}
       <h3 style="margin:14px 0 4px">➕ Cadastrar admin</h3>
@@ -3600,14 +3838,18 @@ function formAdmins(){if(!ehMaster())return;
       <div class="err" id="caErr"></div>
       <div class="mfoot"><button class="btn sec" id="caN">Fechar</button><button class="btn" id="caS">Cadastrar</button></div></div>`;
     const q=x=>ov.querySelector(x),err=t=>{q('#caErr').textContent=t};
-    const rmBind=()=>ov.querySelectorAll('[data-rm]').forEach(b=>b.onclick=async()=>{const a=L.find(x=>String(x.user_id)===b.dataset.rm);if(!a)return;
-      if(!await confirma(`Remover o perfil de admin de <b>${esc(nome(a))}</b> (${esc(a.email)})? A conta e os dados da pessoa continuam como estão; ela passa a ser um usuário comum assim que recarregar o app.`,'Remover admin'))return;
+    const r2fBind=()=>ov.querySelectorAll('[data-r2f]').forEach(b=>b.onclick=async()=>{const a=L.find(x=>String(x.user_id)===b.dataset.r2f);if(!a)return;
+      if(!await confirma(`Remover o 2FA de <b>${esc(nome(a))}</b> (${esc(a.email)})? Ela passa a entrar só com e-mail e senha e pode ativar o 2FA de novo, por exemplo num celular novo.`,'Remover 2FA',{perigo:1}))return;
+      try{await mfaRemoverDe(a.user_id)}catch(e){toast('Não foi possível remover o 2FA agora. Tente de novo.');return}
+      audit('Remoção de 2FA','Admin','2FA removido de '+a.email);toast('2FA removido: '+a.email);draw()});
+    const rmBind=()=>{r2fBind();ov.querySelectorAll('[data-rm]').forEach(b=>b.onclick=async()=>{const a=L.find(x=>String(x.user_id)===b.dataset.rm);if(!a)return;
+      if(!await confirma(`Remover o perfil de admin de <b>${esc(nome(a))}</b> (${esc(a.email)})? A conta e os dados da pessoa continuam como estão; ela passa a ser um usuário comum assim que recarregar o app. O 2FA dela também é apagado.`,'Remover admin'))return;
       try{
         if(invProd()){const {error}=await DB.from('tb_admins').delete().eq('user_id',a.user_id);if(error)throw error}
         else ADM_HMO=ADM_HMO.filter(x=>x.user_id!==a.user_id);
         audit('Remoção de admin','Admin','Admin removido · '+a.email);toast('Admin removido: '+a.email)}
       catch(e){toast('Não foi possível remover. Só o admin principal pode.');return}
-      draw()});
+      draw()})};
     rmBind();
     q('#caN').onclick=()=>ov.remove();q('#caMail').addEventListener('input',()=>err(''));
     const cb=q('#caBusca');if(cb)cb.addEventListener('input',()=>{busca=cb.value;q('#caLista').innerHTML=linhas();rmBind()});
@@ -3615,7 +3857,7 @@ function formAdmins(){if(!ehMaster())return;
       if(L.some(a=>String(a.email).toLowerCase()===em))return err('Este usuário já é admin.');
       q('#caS').disabled=true;
       try{
-        if(!invProd()){ADM_HMO.push({user_id:'hmo-'+Date.now(),email:em});audit('Cadastro de admin','Admin','Admin cadastrado (simulação) · '+em);toast('Admin cadastrado: '+em);draw();return}
+        if(!invProd()){ADM_HMO.push({user_id:'hmo-'+Date.now(),email:em,dois:!!MST_DEMO_2FA[em]});audit('Cadastro de admin','Admin','Admin cadastrado (simulação) · '+em);toast('Admin cadastrado: '+em);draw();return}
         const {data:us,error:e1}=await DB.from('tb_usuarios').select('user_id,email,excluido_em').ilike('email',em);if(e1)throw e1;
         const u=(us||[]).find(x=>!x.excluido_em);if(!u){q('#caS').disabled=false;return err('Não há usuário ativo com este e-mail.')}
         const {error:e2}=await DB.from('tb_admins').insert({user_id:u.user_id});
@@ -3629,7 +3871,8 @@ function formAdmins(){if(!ehMaster())return;
 async function admUsuarios(){
   if(invProd()){const {data,error}=await DB.from('tb_usuarios').select('user_id,email,criado_em,ultimo_login,ultimo_uso,excluido_em');if(error)throw error;return data||[]}
   let cri='';try{const a=await DB.doc('hmo/auth').get();cri=a.exists&&a.data().v&&a.data().v.criadoEm||''}catch(e){}
-  return [{user_id:'hmo',email:(LOGADO||'usuário de teste')+' (HMO)',criado_em:cri||null,ultimo_login:null,ultimo_uso:new Date().toISOString(),excluido_em:null}]}
+  return [{user_id:'hmo',email:(LOGADO||'usuário de teste')+' (HMO)',criado_em:cri||null,ultimo_login:null,ultimo_uso:new Date().toISOString(),excluido_em:null},
+    {user_id:'hmo-ana',email:'ana@exemplo.com',criado_em:'2026-11-01T12:00:00.000Z',ultimo_login:null,ultimo_uso:null,excluido_em:null}]} // a 2ª conta é de mentira, só no HMO, para testar Desativar para análise
 function registrarUso(){if(!invProd()||!DB||typeof DB.rpc!=='function')return;try{Promise.resolve(DB.rpc('rodaliq_registrar_uso')).catch(()=>{})}catch(e){}} // grava o "último uso" (produção); falha nunca atrapalha o login
 const admData=iso=>iso?dataHora(iso):'—';
 const ADM_BUSCA=['parceiros','apoios','exclusoes','senhas','ativos','excluidos','correcoes'];
@@ -3660,6 +3903,7 @@ async function montaAdmin(){const box=$('#admBox');if(!box)return;const sub=UI.a
   if(sub==='parceiros'){parcAdminRender(box);return}
   if(sub==='versoes'){versoesRender(box);return}
   if(sub==='funcoes'){funcRender(box);return}
+  if(sub==='masters'){mstRender(box);return}
   if(sub==='colab'){colabRender(box);return}
   if(sub==='recados'){recAdminRender(box);return}
   if(sub==='relatorios'){admRelRender(box);return}
@@ -3671,19 +3915,19 @@ async function montaAdmin(){const box=$('#admBox');if(!box)return;const sub=UI.a
   let colSet=new Set();try{COLABS=await colabListar();colSet=new Set(COLABS.map(c=>String(c.email||'').toLowerCase()))}catch(e){}
   const nomeDe=u=>{const c=conv.get(String(u.email||'').toLowerCase());return (u.user_id&&PERFIS[u.user_id])||(c&&c.name)||u.email||''};
   // V93: ordem 1º admin master, 2º admins, 3º colaboradores, depois os demais; cada grupo de A a Z. Vale pelo perfil de hoje (tirar o perfil devolve a pessoa ao grupo comum)
-  const rk=u=>{const e=String(u.email||'').toLowerCase();return e===ADMIN_MASTER?0:(u.user_id&&ADM_IDS.has(u.user_id))?1:colSet.has(e)?2:3};
+  const rk=u=>{const e=String(u.email||'').toLowerCase();return ehMasterId(u.user_id,e)?0:(u.user_id&&ADM_IDS.has(u.user_id))?1:colSet.has(e)?2:3};
   const exc=sub==='excluidos',lstAll=us.filter(u=>exc?!!u.excluido_em:!u.excluido_em),ativF=UI.ativF||'todos',ehAdm=u=>u.user_id&&ADM_IDS.has(u.user_id),emAviso=u=>!exc&&!ehAdm(u)&&inatDias(u,INAT)>=INAT_DIAS-INAT_AVISO,lst=lstAll.filter(u=>exc||ativF==='todos'||(ativF==='aviso'&&emAviso(u)))
     .sort((a,b)=>rk(a)-rk(b)||semAc(nomeDe(a)).localeCompare(semAc(nomeDe(b)),'pt-BR')||String(a.email||'').localeCompare(String(b.email||''))) ;
-  const card=u=>{const c=conv.get(String(u.email||'').toLowerCase()),nm=(u.user_id&&PERFIS[u.user_id])||(c&&c.name)||'';
+  const card=u=>{const c=conv.get(String(u.email||'').toLowerCase()),nm=(u.user_id&&PERFIS[u.user_id])||(c&&c.name)||'',dsAna=!exc?(EXC_CACHE||[]).find(x=>x.user_id===u.user_id&&x.status==='desativado'):null;
     const txt=pessoaTexto(u,nm);ZAP_PES[u.user_id||u.email]={fone:c?c.whatsapp:'',txt};if(u.user_id)ZAP_PES['i:'+u.user_id]={fone:c?c.whatsapp:'',txt:inatTexto(String(nm).split(' ')[0],inatDias(u,INAT),false)};
     const r0=rk(u),tagP=r0===0?'<span class="rcTag ad">Admin master</span>':r0===1?'<span class="rcTag ad">Admin</span>':r0===2?'<span class="rcTag ts">Colaborador</span>':'',
       dIn=(!exc&&invProd()&&!ehAdm(u))?inatDias(u,INAT):0,tagS=dIn>=INAT_DIAS?'<span class="tag r">inativo</span>':dIn>=INAT_DIAS-INAT_AVISO?'<span class="tag a">avisar</span>':'',
       sub2=exc?'Excluído em '+admData(u.excluido_em):(invProd()&&!ehAdm(u)?'Último lançamento: '+(INAT[u.user_id]?admData(INAT[u.user_id]):'nenhum'):'Último uso: '+admData(u.ultimo_uso)),
       ini=String(nm||u.email||'?').trim().split(/\s+/).map(x=>x[0]).slice(0,2).join('').toUpperCase();
-    return `<div class="uCard uCp"><button type="button" class="uHd" aria-expanded="false"><span class="uAv" aria-hidden="true">${esc(ini)}</span><span class="uNm"><b>${esc(nm||u.email||'(sem e-mail)')}</b><small>${esc(sub2)}</small></span><span class="uTg">${tagP}${tagS}</span><span class="uCv" aria-hidden="true">▾</span></button><div class="uDt"><div class="uLin">${esc(u.email||'(sem e-mail)')}${c?` · 💬 ${esc(invFmtPhone(c.whatsapp))}${invUfOf(c.whatsapp)?' · '+esc(invUfOf(c.whatsapp)):''}`:' · sem pedido de convite com este e-mail'}</div>
+    return `<div class="uCard uCp"><button type="button" class="uHd" aria-expanded="false"><span class="uAv" aria-hidden="true">${esc(ini)}</span><span class="uNm"><b>${esc(nm||u.email||'(sem e-mail)')}</b><small>${esc(sub2)}</small></span><span class="uTg">${tagP}${tagS}${dsAna?'<span class="tag r">Acesso desativado</span>':''}</span><span class="uCv" aria-hidden="true">▾</span></button><div class="uDt"><div class="uLin">${esc(u.email||'(sem e-mail)')}${c?` · 💬 ${esc(invFmtPhone(c.whatsapp))}${invUfOf(c.whatsapp)?' · '+esc(invUfOf(c.whatsapp)):''}`:' · sem pedido de convite com este e-mail'}</div>
       ${!exc&&invProd()&&!ehAdm(u)?(()=>{const d=inatDias(u,INAT),t=INAT[u.user_id];return `<div class="uLin">Último lançamento: <b>${t?admData(t):'nenhum'}</b> · ${d} ${d===1?'dia':'dias'} sem lançar${d>=INAT_DIAS?' <span class="tag r">inativo</span>':d>=INAT_DIAS-INAT_AVISO?' <span class="tag a">avisar</span>':''}</div>`})():''}
       <div class="uLin">Cadastro: ${admData(u.criado_em)}${exc?` · <b>Excluído em ${admData(u.excluido_em)}</b>`:` · Último login: ${admData(u.ultimo_login)} · Último uso: ${admData(u.ultimo_uso)}`}</div>
-      <div class="ivActs" style="margin-top:8px"><button type="button" class="btn sm" data-pdf="${esc(u.user_id||u.email)}">📄 Dados desta pessoa</button><a class="btn sm" href="${esc(invMailLink(u.email,'Seus dados pessoais no Rodaliq',txt))}" target="_blank" rel="noopener">✉ Responder o pedido</a><button type="button" class="btn sm" data-zp="${esc(u.user_id||u.email)}">💬 WhatsApp</button>${!exc&&invProd()&&ehMaster()&&u.user_id&&!ADM_IDS.has(u.user_id)?`${emAviso(u)?`<a class="btn sm" href="${esc(invMailLink(u.email,'Sua conta no Rodaliq',inatTexto(nm.split(' ')[0],inatDias(u,INAT),false)))}" target="_blank" rel="noopener">✉ Avisar da inatividade</a><button type="button" class="btn sm" data-zi="${esc(u.user_id)}">💬 Avisar no WhatsApp</button>`:''}${emAviso(u)&&inatDias(u,INAT)>=INAT_DIAS&&invProd()&&ehMaster()&&!(EXC_CACHE||[]).some(x=>x.user_id===u.user_id&&['novo','desativado'].includes(x.status))?`<button type="button" class="btn sm warn" data-uina="${esc(u.user_id)}">🔒 Desativar por inatividade</button>`:''}<button type="button" class="btn sm warn" data-udel="${esc(u.user_id)}">🗑 Excluir usuário</button>`:''}</div></div></div>`};
+      <div class="ivActs" style="margin-top:8px"><button type="button" class="btn sm" data-pdf="${esc(u.user_id||u.email)}">📄 Dados desta pessoa</button><a class="btn sm" href="${esc(invMailLink(u.email,'Seus dados pessoais no Rodaliq',txt))}" target="_blank" rel="noopener">✉ Responder o pedido</a><button type="button" class="btn sm" data-zp="${esc(u.user_id||u.email)}">💬 WhatsApp</button>${!exc&&ehMaster()&&u.user_id&&u.user_id!==UID&&u.user_id!=='hmo'&&!ADM_IDS.has(u.user_id)?(dsAna?`<button type="button" class="btn sm" data-uree="${esc(u.user_id)}">▶ Reativar acesso</button>`:`<button type="button" class="btn sm warn" data-uana="${esc(u.user_id)}">⏸ Desativar para análise</button>`):''}${!exc&&invProd()&&ehMaster()&&u.user_id&&!ADM_IDS.has(u.user_id)?`${emAviso(u)?`<a class="btn sm" href="${esc(invMailLink(u.email,'Sua conta no Rodaliq',inatTexto(nm.split(' ')[0],inatDias(u,INAT),false)))}" target="_blank" rel="noopener">✉ Avisar da inatividade</a><button type="button" class="btn sm" data-zi="${esc(u.user_id)}">💬 Avisar no WhatsApp</button>`:''}${emAviso(u)&&inatDias(u,INAT)>=INAT_DIAS&&invProd()&&ehMaster()&&!(EXC_CACHE||[]).some(x=>x.user_id===u.user_id&&['novo','desativado'].includes(x.status))?`<button type="button" class="btn sm warn" data-uina="${esc(u.user_id)}">🔒 Desativar por inatividade</button>`:''}<button type="button" class="btn sm warn" data-udel="${esc(u.user_id)}">🗑 Excluir usuário</button>`:''}</div></div></div>`};
   box.innerHTML=`<h3 style="margin:0">${exc?'🗑 Usuários excluídos':'👥 Usuários ativos'} (${lst.length})</h3>
     <p class="small muted" style="margin:4px 0 0">${exc?'Usuários apagados (pelo app ou pelo painel do Supabase), com a data da exclusão.':'Ordem: admin master, admins, colaboradores e depois os demais, cada grupo de A a Z. Toque no nome para ver os detalhes. “Último uso” muda sempre que a pessoa abre o app; “Último login”, só quando ela digita a senha.'} Para apagar uma pessoa, use “🗑 Excluir usuário” (definitivo).${invProd()?'':' <b>No HMO aparece só o usuário de teste; os dados reais aparecem em produção.</b>'}</p>
     ${sub==='ativos'&&invProd()?`<div class="admTabs" style="margin:8px 0"><button type="button" class="chip${ativF==='todos'?' on':''}" data-ativf="todos">Todos (${lstAll.length})</button><button type="button" class="chip${ativF==='aviso'?' on':''}" data-ativf="aviso">Sem lançar há ${INAT_DIAS-INAT_AVISO}+ dias (${lstAll.filter(emAviso).length})</button></div><p class="small muted" style="margin:0 0 8px">Só entrar no app não conta: vale o último lançamento. Aos ${INAT_DIAS-INAT_AVISO} dias você pode avisar a pessoa; aos ${INAT_DIAS} dias aparece “🔒 Desativar por inatividade” (mesma carência de ${EXC_DIAS} dias e mesma reativação dos pedidos de exclusão).</p>`:''}
@@ -3694,6 +3938,8 @@ async function montaAdmin(){const box=$('#admBox');if(!box)return;const sub=UI.a
   box.querySelectorAll('.uHd').forEach(b=>b.onclick=()=>{const c=b.parentNode;c.classList.toggle('op');b.setAttribute('aria-expanded',c.classList.contains('op'))});
   box.querySelectorAll('[data-ativf]').forEach(b=>b.onclick=()=>{UI.ativF=b.dataset.ativf;montaAdmin()});
   box.querySelectorAll('[data-zi]').forEach(b=>b.onclick=()=>{const z=ZAP_PES['i:'+b.dataset.zi];if(z)abreZap(z.fone,z.txt)});
+  box.querySelectorAll('[data-uana],[data-uree]').forEach(b=>b.onclick=async()=>{const id=b.dataset.uana||b.dataset.uree,u=lst.find(v=>v.user_id===id);if(!u)return;
+    if(await(b.dataset.uana?usrDesativarAnalise(u):usrReativar(u))){await excAdminCache(true);atualizaSino();montaAdmin();admContagens()}});
   box.querySelectorAll('[data-uina]').forEach(b=>b.onclick=async()=>{const u=lst.find(v=>v.user_id===b.dataset.uina);if(!u)return;const d=inatDias(u,INAT);
     if(!await confirma(`Desativar o acesso de <b>${esc(u.email)}</b> por inatividade (${d} dias sem lançamentos)? A pessoa não consegue mais ver nem lançar dados. Os dados ficam guardados por ${EXC_DIAS} dias e você pode reativar nesse prazo em <b>Pedidos de exclusão</b>.`,'Desativar acesso',{perigo:1}))return;
     try{const {error}=await DB.rpc('rodaliq_desativar_inatividade',{p_user:u.user_id});if(error)throw error;audit('Inatividade','Admin','Acesso desativado por inatividade · '+u.email+' · '+d+' dias');toast('Acesso desativado. Avise a pessoa.');await excAdminCache(true);atualizaSino();montaAdmin();admContagens()}catch(e){toast('Não foi possível desativar agora.')}});
@@ -3711,7 +3957,7 @@ function invSetAdmin(on){
   if(!invIsAdmin){invCache=[];invCacheAt=0;['#invBadge','#fabInvBadge'].forEach(i=>{const c=$(i);if(c)c.classList.add('hidden')})}
   // V53: quem administra o app não pede exclusão pelo app (pede pelo e-mail de contato, como dizem os Termos)
   const ex=document.querySelector('#optMenu [data-m="excluir"]');if(ex)ex.classList.toggle('hidden',invIsAdmin);
-  mostraQuem();
+  mfaMenu();mostraQuem();
 }
 /* ---------- V53: nome de quem está logado (tabela public.profiles, campo display_name) ---------- */
 let NOME_USR='';
@@ -3796,7 +4042,7 @@ async function invAdminInit(){
   registrarUso();
   excAdminCache(true).then(()=>{if(typeof atualizaSino==='function')atualizaSino()});
   if(!invProd()){if(DB&&typeof DB.collection==='function'){invSetAdmin(true);invRefreshBadge(true)}return} // HMO: o usuário de teste é o administrador
-  try{const {data}=await DB.from('tb_admins').select('user_id').eq('user_id',UID).maybeSingle();invSetAdmin(!!data)}catch(e){invSetAdmin(false)}
+  try{const {data}=await DB.from('tb_admins').select('user_id,master').eq('user_id',UID).maybeSingle();SOU_MASTER=!!(data&&data.master);invSetAdmin(!!data)}catch(e){invSetAdmin(false)}
   invRefreshBadge(true);
 }
 setInterval(()=>{if(invIsAdmin&&!document.hidden)invRefreshBadge(false)},120000);
@@ -4168,7 +4414,7 @@ const GUIA=[
  {t:'📅 Despesas programadas',rec:'reservas',x:`IPVA, seguro e revisão chegam de uma vez. Na aba <b>Despesas programadas</b>, programe a despesa com o valor e a data de pagamento: o app divide o valor pelos meses até lá e mostra quanto separar por mês. Pode ser à vista ou parcelada, e quando você pagar toca em <b>Marcar como paga</b>: o pagamento é lançado em Custos e entra nos indicadores. Nas despesas parceladas, cada parcela pode ser editada ou excluída, e ao excluir você escolhe se as seguintes avançam para o mês da excluída. Parcela atrasada fica destacada e avisa no sino. Para não gastar sem querer, deixe esse valor numa conta separada da do dia a dia.`,
    m:'Card Despesas programadas e lucro livre, no Painel.',acts:[['＋ Programar despesa',()=>formReserva()],['📅 Abrir a aba',()=>irReservas()]]},
  {t:'🪪 Sua CNH (opcional)',x:`Guarde a <b>validade</b>, a categoria, o EAR e a data da 1ª habilitação, e o app avisa quando a renovação se aproximar e quando os pontos chegarem perto do limite. Não guardamos número da CNH, CPF nem foto.<br><br>⚠ ${TXT_SEM_ORGAO}`,cfg:'cnh'},
- {t:'📊 Para acompanhar',x:`• <b>Painel:</b> meta, ganhos, custos, resultado, previsão e despesas programadas (troque o mês e o veículo no topo).<br>• <b>Abas:</b> o Painel vem primeiro, as demais seguem em ordem alfabética e Relatórios fica por último. A aba <b>Despesas programadas</b> agora fica junto com as outras (antes ficava em ⚙ Opções).<br>• <b>🔔 Sino:</b> alertas (DARF, multas, CNH, manutenção e lembrete de backup) e novidades.<br>• <b>⚡ Atalhos:</b> todos os lançamentos num toque; arraste o botão para onde preferir.<br>• <b>Relatórios:</b> filtros e download em PDF, Word, Excel e CSV.<br>• <b>⚙ Opções:</b> veículos, metas, tema, backup e este guia. Exporte um backup pelo menos a cada 30 dias e guarde o arquivo fora do aparelho: o sino avisa quando passar disso. Ao importar um backup, o app baixa antes um arquivo com os seus dados atuais, para você poder voltar atrás. Se um dia quiser sair, use ⚙ Opções &gt; Excluir minha conta.<br>• <b>Esqueceu a senha?</b> Use “Esqueci minha senha”, na tela de entrada.<br>• <b>💚 Ajude a manter o Rodaliq:</b> o app é gratuito e vai continuar sendo. Se ele te ajuda, você pode contribuir com o que achar justo, em ⚙ Opções: escolha um valor, copie a chave Pix, faça o Pix pelo seu banco e avise no app. Na mesma tela você acompanha as suas contribuições, mês a mês. É opcional e nada aqui depende disso.`}
+ {t:'📊 Para acompanhar',x:`• <b>Painel:</b> meta, ganhos, custos, resultado, previsão e despesas programadas (troque o mês e o veículo no topo).<br>• <b>Abas:</b> o Painel vem primeiro, as demais seguem em ordem alfabética e Relatórios fica por último. A aba <b>Despesas programadas</b> agora fica junto com as outras (antes ficava em ⚙ Opções).<br>• <b>🔔 Sino:</b> alertas (DARF, multas, CNH, manutenção e lembrete de backup) e novidades.<br>• <b>⚡ Atalhos:</b> todos os lançamentos num toque; arraste o botão para onde preferir.<br>• <b>Relatórios:</b> filtros e download em PDF, Word, Excel e CSV.<br>• <b>⚙ Opções:</b> veículos, metas, tema, backup e este guia. Exporte um backup pelo menos a cada 30 dias e guarde o arquivo fora do aparelho: o sino avisa quando passar disso. Ao importar um backup, o app baixa antes um arquivo com os seus dados atuais e guarda uma cópia por 7 dias: se mudar de ideia, use ⚙ Opções &gt; ↩ Desfazer última importação. Se um dia quiser sair, use ⚙ Opções &gt; Excluir minha conta.<br>• <b>Esqueceu a senha?</b> Use “Esqueci minha senha”, na tela de entrada.<br>• <b>💚 Ajude a manter o Rodaliq:</b> o app é gratuito e vai continuar sendo. Se ele te ajuda, você pode contribuir com o que achar justo, em ⚙ Opções: escolha um valor, copie a chave Pix, faça o Pix pelo seu banco e avise no app. Na mesma tela você acompanha as suas contribuições, mês a mês. É opcional e nada aqui depende disso.`}
 ];
 function primeiroAcesso(auto){
   const c=cfg(),DS=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];let passo=0;const G=GUIA.filter(g=>!g.rec||recVe(g.rec));
@@ -4546,11 +4792,60 @@ $('#impFile').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(
   let salvouAnt=false;
   if(DL){try{await DL.save({filename:fnAnt,data:dadosAnt});salvouAnt=true}catch(er){}}
   if(!salvouAnt){audit('Importação','Backup','Tentativa bloqueada: não foi possível guardar o backup automático antes de importar '+f.name+' (nada foi substituído)');toast('Não foi possível guardar o backup dos seus dados atuais. Nada foi substituído.');return}
+  let guardouDesf=true;try{await bkaGravar(JSON.parse(dadosAnt),f.name)}catch(er){guardouDesf=false;console.warn('desfazer importação',er)} // V99: cópia no app para desfazer por 7 dias
   TBS.forEach(t=>{if(t==='tb_carne')S[t]=o[t]||{};else if(t==='tb_config')S[t]=Object.assign(JSON.parse(JSON.stringify(CFG_PADRAO)),o[t]||{});else S[t]=Array.isArray(o[t])?o[t]:[]});
   migraVeiculos(o.tb_config);
   if(bkEm&&!(cfg().backupEm>bkEm))cfg().backupEm=bkEm; // o backup importado não apaga a data do último backup
-  for(const t of TBS)await salvar(t);audit('Importação','Backup','Arquivo '+f.name+' (dados substituídos) · backup anterior guardado em '+fnAnt,{antes,depois:contagem(S)});UI.open={};render();toast('Backup importado. Seu backup anterior foi guardado: '+fnAnt);
+  for(const t of TBS)await salvar(t);audit('Importação','Backup','Arquivo '+f.name+' (dados substituídos) · backup anterior guardado em '+fnAnt+(guardouDesf?' e no app por '+BKA_DIAS+' dias (dá para desfazer)':' (não foi possível guardar a cópia para desfazer)'),{antes,depois:contagem(S)});UI.open={};render();bkaAtualiza();
+  toast('Backup importado. Seu backup anterior foi guardado: '+fnAnt+(guardouDesf?'. Para voltar atrás: ⚙ Opções › ↩ Desfazer última importação.':''));
 };
+
+
+/* ---------- V99: ↩ desfazer a última importação de backup (um nível, guardado por 7 dias) ---------- */
+const BKA_DIAS=7;let BKA=null; // {arquivo,em,expira}: só os dados de identificação; a cópia fica no banco
+async function bkaGravar(obj,arquivo){
+  const em=new Date(),ex=new Date(em.getTime()+BKA_DIAS*864e5);
+  if(!invProd())await docRef('tb_backup_anterior').set({v:{dados:obj,arquivo,em:em.toISOString(),expira:ex.toISOString()},at:Date.now()});
+  else{const {error}=await DB.from('tb_backup_anterior').upsert({user_id:UID,dados:obj,arquivo,criado_em:em.toISOString(),expira_em:ex.toISOString()},{onConflict:'user_id'});if(error)throw error}
+  BKA={arquivo,em:em.toISOString(),expira:ex.toISOString()}}
+async function bkaMeta(){
+  try{
+    if(!invProd()){const sn=await docRef('tb_backup_anterior').get();const v=sn.exists?sn.data().v:null;return v&&v.dados?{arquivo:v.arquivo,em:v.em,expira:v.expira}:null}
+    const {data,error}=await DB.from('tb_backup_anterior').select('arquivo,criado_em,expira_em').maybeSingle();if(error)throw error;
+    return data?{arquivo:data.arquivo,em:data.criado_em,expira:data.expira_em}:null
+  }catch(e){return null}}
+async function bkaLer(){
+  if(!invProd()){const sn=await docRef('tb_backup_anterior').get();return sn.exists&&sn.data().v?sn.data().v.dados:null}
+  const {data,error}=await DB.from('tb_backup_anterior').select('dados').maybeSingle();if(error)throw error;return data?data.dados:null}
+async function bkaApagar(){
+  try{if(!invProd())await docRef('tb_backup_anterior').delete();else{const {error}=await DB.from('tb_backup_anterior').delete().eq('user_id',UID);if(error)throw error}}catch(e){console.warn('apagar cópia',e)}
+  BKA=null}
+async function bkaAtualiza(){
+  let m=await bkaMeta();
+  if(m&&new Date(m.expira).getTime()<=Date.now()){await bkaApagar();m=null} // passou de 7 dias: a cópia é apagada
+  BKA=m;
+  const b=document.querySelector('#optMenu [data-m="desf"]'),i=document.getElementById('desfInfo');
+  if(b)b.classList.toggle('hidden',!m);
+  if(i){i.classList.toggle('hidden',!m);i.textContent=m?'Última importação: '+m.arquivo+' · '+dataHora(m.em)+' · dados anteriores guardados até '+fmtBR(isoOf(new Date(m.expira))).slice(0,5):''}}
+async function desfazImportacao(){
+  await bkaAtualiza();
+  if(!BKA){toast('Não há importação para desfazer.');return}
+  const m=BKA,atual=contagem(S);let o=null;
+  try{o=await bkaLer()}catch(e){}
+  if(!o){toast('Não consegui ler a cópia guardada. Nada foi alterado.');return}
+  if(!await confirma(`Desfazer a importação de <b>${esc(m.arquivo)}</b>, feita em ${esc(dataHora(m.em))}?<br><br>Os dados de agora (<span class="small">${esc(atual)}</span>) serão <b>substituídos</b> pelos que você tinha antes da importação (<span class="small">${esc(contagem(o))}</span>). Só dá para desfazer uma vez.`,'Desfazer importação',{perigo:1}))return;
+  const d0=new Date(),fnAnt=pad(d0.getDate())+pad(d0.getMonth()+1)+String(d0.getFullYear()).slice(2)+'_'+pad(d0.getHours())+pad(d0.getMinutes())+'_rodaliq_antes_de_desfazer.json';
+  const dadosAnt=JSON.stringify(Object.assign({app:'RODALIQ',versaoDados:1,versaoApp:VERSAO,exportadoEm:d0.toISOString(),motivo:'backup automático antes de desfazer a importação de '+m.arquivo},Object.fromEntries(TBS.map(t=>[t,S[t]]))),null,1);
+  let salvou=false;if(DL){try{await DL.save({filename:fnAnt,data:dadosAnt});salvou=true}catch(er){}}
+  if(!salvou){audit('Importação','Backup','Tentativa bloqueada: não foi possível guardar o backup automático antes de desfazer a importação de '+m.arquivo+' (nada foi substituído)');toast('Não foi possível guardar o backup dos seus dados atuais. Nada foi substituído.');return}
+  const bkEm=cfg().backupEm;
+  TBS.forEach(t=>{if(t==='tb_carne')S[t]=o[t]||{};else if(t==='tb_config')S[t]=Object.assign(JSON.parse(JSON.stringify(CFG_PADRAO)),o[t]||{});else S[t]=Array.isArray(o[t])?o[t]:[]});
+  migraVeiculos(o.tb_config);
+  if(bkEm&&!(cfg().backupEm>bkEm))cfg().backupEm=bkEm;
+  for(const t of TBS)await salvar(t);
+  await bkaApagar();
+  audit('Importação','Backup','Importação de '+m.arquivo+' desfeita (dados anteriores restaurados) · backup automático guardado em '+fnAnt,{antes:atual,depois:contagem(S)});
+  UI.open={};render();bkaAtualiza();toast('Importação desfeita. Seus dados anteriores voltaram.')}
 
 /* ---------- render e eventos ---------- */
 function render(){
@@ -4634,7 +4929,7 @@ $('#optBtn').onclick=e=>{e.stopPropagation();$('#bellMenu').classList.add('hidde
 window.addEventListener('scroll',()=>{['bellMenu','optMenu'].forEach(id=>{const m=document.getElementById(id);if(m&&!m.classList.contains('hidden')&&window.innerWidth<=640)posMenu(m,document.getElementById(id==='bellMenu'?'bellBtn':'optBtn'))})},{passive:true});
 document.addEventListener('click',e=>{if(!e.target.closest('#optWrap'))$('#optMenu').classList.add('hidden');if(!e.target.closest('#bellWrap'))$('#bellMenu').classList.add('hidden')});
 $('#optMenu').onclick=e=>{const b=e.target.closest('[data-m]');if(!b)return;$('#optMenu').classList.add('hidden');
-  ({falar:formFalar,apoio:formApoiar,corrigir:formCorrigir,excluir:formExcluirConta,cfg:formCfg,veic:formVeic,parc:formParceiros,cnh:formCnh,tema:formTema,onb:()=>primeiroAcesso(false),termos:()=>verTermos(),aud:verAuditoria,pass:formSenha,prevap:()=>prevApoiador(true),exp:exportar,imp:()=>$('#impFile').click(),out:sair})[b.dataset.m]()};
+  ({falar:formFalar,apoio:formApoiar,corrigir:formCorrigir,excluir:formExcluirConta,cfg:formCfg,veic:formVeic,parc:formParceiros,cnh:formCnh,tema:formTema,onb:()=>primeiroAcesso(false),termos:()=>verTermos(),aud:verAuditoria,pass:formSenha,mfa:mfaTela,prevap:()=>prevApoiador(true),exp:exportar,imp:()=>$('#impFile').click(),desf:desfazImportacao,out:sair})[b.dataset.m]()};
 (()=>{const h=(location.hash||'').slice(1);if(['painel','corridas','carona','custos','multas','impostos','relatorios','rodacalc','reservas'].includes(h))UI.tab=h})();
 iniciar();
 if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
