@@ -4786,7 +4786,7 @@ $('#impFile').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(
   if(!['RODALIQ','MDD','MUDD'].includes(o.app)){toast('Este arquivo não é um backup do Rodaliq.');return}
   const cont=t=>Array.isArray(o[t])?o[t].length:0;
   if(!await confirma(`Importar <b>${esc(f.name)}</b> vai <b>substituir</b> todos os dados atuais pelos do arquivo:<br><span class="small">${cont('tb_corridas')} dias · ${cont('tb_repasses')} repasses · ${cont('tb_carona')} caronas · ${cont('tb_custos')} custos · ${cont('tb_multas')} multas · ${Object.keys(o.tb_carne||{}).length} meses de carnê-leão</span><br><span class="small">Antes de substituir, o app baixa um backup dos seus dados atuais. Guarde esse arquivo.</span>`,'Substituir dados'))return;
-  const antes=contagem(S),bkEm=cfg().backupEm;
+  const antes=contagem(S),bkEm=cfg().backupEm,aceiteAtual=cfg().aceite; // o aceite dos Termos é da pessoa, não do arquivo
   const d0=new Date(),fnAnt=pad(d0.getDate())+pad(d0.getMonth()+1)+String(d0.getFullYear()).slice(2)+'_'+pad(d0.getHours())+pad(d0.getMinutes())+'_rodaliq_antes_da_importacao.json';
   const dadosAnt=JSON.stringify(Object.assign({app:'RODALIQ',versaoDados:1,versaoApp:VERSAO,exportadoEm:d0.toISOString(),motivo:'backup automático antes de importar '+f.name},Object.fromEntries(TBS.map(t=>[t,S[t]]))),null,1);
   let salvouAnt=false;
@@ -4795,7 +4795,7 @@ $('#impFile').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(
   let guardouDesf=true;try{await bkaGravar(JSON.parse(dadosAnt),f.name)}catch(er){guardouDesf=false;console.warn('desfazer importação',er)} // V99: cópia no app para desfazer por 7 dias
   TBS.forEach(t=>{if(t==='tb_carne')S[t]=o[t]||{};else if(t==='tb_config')S[t]=Object.assign(JSON.parse(JSON.stringify(CFG_PADRAO)),o[t]||{});else S[t]=Array.isArray(o[t])?o[t]:[]});
   migraVeiculos(o.tb_config);
-  if(bkEm&&!(cfg().backupEm>bkEm))cfg().backupEm=bkEm; // o backup importado não apaga a data do último backup
+  if(bkEm&&!(cfg().backupEm>bkEm))cfg().backupEm=bkEm;if(aceiteAtual)cfg().aceite=aceiteAtual; // o backup importado não apaga a data do último backup
   for(const t of TBS)await salvar(t);audit('Importação','Backup','Arquivo '+f.name+' (dados substituídos) · backup anterior guardado em '+fnAnt+(guardouDesf?' e no app por '+BKA_DIAS+' dias (dá para desfazer)':' (não foi possível guardar a cópia para desfazer)'),{antes,depois:contagem(S)});UI.open={};render();bkaAtualiza();
   toast('Backup importado. Seu backup anterior foi guardado: '+fnAnt+(guardouDesf?'. Para voltar atrás: ⚙ Opções › ↩ Desfazer última importação.':''));
 };
@@ -4838,10 +4838,10 @@ async function desfazImportacao(){
   const dadosAnt=JSON.stringify(Object.assign({app:'RODALIQ',versaoDados:1,versaoApp:VERSAO,exportadoEm:d0.toISOString(),motivo:'backup automático antes de desfazer a importação de '+m.arquivo},Object.fromEntries(TBS.map(t=>[t,S[t]]))),null,1);
   let salvou=false;if(DL){try{await DL.save({filename:fnAnt,data:dadosAnt});salvou=true}catch(er){}}
   if(!salvou){audit('Importação','Backup','Tentativa bloqueada: não foi possível guardar o backup automático antes de desfazer a importação de '+m.arquivo+' (nada foi substituído)');toast('Não foi possível guardar o backup dos seus dados atuais. Nada foi substituído.');return}
-  const bkEm=cfg().backupEm;
+  const bkEm=cfg().backupEm,aceiteAtual=cfg().aceite;
   TBS.forEach(t=>{if(t==='tb_carne')S[t]=o[t]||{};else if(t==='tb_config')S[t]=Object.assign(JSON.parse(JSON.stringify(CFG_PADRAO)),o[t]||{});else S[t]=Array.isArray(o[t])?o[t]:[]});
   migraVeiculos(o.tb_config);
-  if(bkEm&&!(cfg().backupEm>bkEm))cfg().backupEm=bkEm;
+  if(bkEm&&!(cfg().backupEm>bkEm))cfg().backupEm=bkEm;if(aceiteAtual)cfg().aceite=aceiteAtual;
   for(const t of TBS)await salvar(t);
   await bkaApagar();
   audit('Importação','Backup','Importação de '+m.arquivo+' desfeita (dados anteriores restaurados) · backup automático guardado em '+fnAnt,{antes:atual,depois:contagem(S)});
