@@ -937,7 +937,7 @@ function tsToken(){return new Promise(res=>{if(!TS_KEY)return res(undefined);
   if(!window.turnstile)tsCarrega();
   const t0=Date.now(),espera=()=>{
     if(TSS.tok&&Date.now()-TSS.at<240000){const t=TSS.tok;TSS.tok=null;try{window.turnstile.reset(TSS.id)}catch(e){}return res(t)}
-    if(Date.now()-t0>20000)return res(undefined);
+    if(Date.now()-t0>8000)return res(undefined);
     if(window.turnstile&&TSS.id===null)tsPrepara();
     setTimeout(espera,150)};
   espera()})}
@@ -953,11 +953,10 @@ $('#fLogin').onsubmit=async e=>{
   if(!DB){$('#lErr').textContent='Sem conexão com o banco. Recarregue a página.';return}
   $('#lBtn').disabled=true;$('#lErr').textContent='Entrando…';
   const tk=await tsToken();
-  if(TS_KEY&&!tk){$('#lBtn').disabled=false;$('#lErr').textContent='A verificação de segurança não terminou. Se aparecer uma caixinha no canto da tela, confirme nela e toque em Entrar de novo; se não aparecer, recarregue a página.';return}
   const A=animIniciar();
   const {data,error}=await DB.auth.signInWithPassword({email:u,password:p,options:{captchaToken:tk}});
   $('#lBtn').disabled=false;
-  if(error){if(A)A.cancela();$('#lErr').textContent=/invalid/i.test(error.message)?'E-mail ou senha inválidos.':(/captcha/i.test(error.message)?'A verificação de segurança falhou. Recarregue a página e tente de novo.':'Não foi possível entrar ('+error.message+').');return}
+  if(error){if(A)A.cancela();$('#lErr').textContent=/invalid/i.test(error.message)?'E-mail ou senha inválidos.':(/captcha/i.test(error.message)?'A verificação de segurança não concluiu neste aparelho. Recarregue a página, aguarde uns segundos e tente de novo; se persistir, tente por outra rede ou navegador.':'Não foi possível entrar ('+error.message+').');return}
   if(A)A.ok();
   UID=data.user.id;LOGADO=data.user.email;CAD=data.user.created_at?new Date(data.user.created_at).toISOString():null;$('#lPass').value='';$('#lErr').textContent='';entrar('Entrada');
 };
