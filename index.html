@@ -982,7 +982,7 @@ async function iniciar(){
   if(!window.supabase){$('#lErr').textContent='Não foi possível conectar. Verifique a internet e recarregue a página.';return}
   DB=supabase.createClient(SB_URL,SB_KEY);animCarrega();tsCarrega();
   $('#lBtn').disabled=false;$('#lErr').textContent='';
-  try{const {data}=await DB.auth.getSession();const u=data&&data.session&&data.session.user;if(u){UID=u.id;LOGADO=u.email;CAD=u.created_at?new Date(u.created_at).toISOString():null;entrar(null)}}catch(e){}
+  try{const {data}=await DB.auth.getSession();let u=data&&data.session&&data.session.user;if(u){const vr=await DB.auth.getUser();if(vr&&vr.error&&(vr.error.status===401||vr.error.status===403)){try{await DB.auth.signOut()}catch(e2){}u=null}}if(u){UID=u.id;LOGADO=u.email;CAD=u.created_at?new Date(u.created_at).toISOString():null;entrar(null)}}catch(e){}
 }
 $('#fLogin').onsubmit=async e=>{
   e.preventDefault();const u=$('#lUser').value.trim().toLowerCase(),p=$('#lPass').value;$('#lErr').textContent='';
