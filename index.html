@@ -2247,7 +2247,7 @@ function formCorrigir(){
   ov.innerHTML=`<div class="modal ajM" style="max-width:460px"><h2>✏ Corrigir meus dados</h2>
     <div class="ajBd">
     <p class="small">Informou algo errado ou mudou de nome, celular ou e-mail? Envie o pedido e a equipe do Rodaliq faz a correção e avisa você (direito previsto no art. 18, III, da LGPD).</p>
-    <div class="field"><label for="coC">O que corrigir</label><select class="inp" id="coC">${Object.entries(CORR_CAMPOS).map(([k,t])=>`<option value="${k}">${t}</option>`).join('')}</select></div>
+    <div class="field"><label for="coC">O que corrigir</label><div class="admTabs" id="coCh" style="margin-top:4px">${Object.entries(CORR_CAMPOS).map(([k,t],i)=>`<button type="button" class="chip${i?'':' on'}" data-co="${k}">${t}</button>`).join('')}</div><input type="hidden" id="coC" value="${Object.keys(CORR_CAMPOS)[0]}"></div>
     <div class="small muted" id="coAt" style="margin:-2px 0 8px"></div>
     <div class="field hidden" id="coPW"><label for="coP">País do celular</label><select class="inp" id="coP">${[...new Map(PAISES.map(p=>[p[1],p])).values()].map(p=>`<option value="${p[0]}|${p[1]}">${p[1]} (+${p[0]})</option>`).join('')}<option value="|Outro">Outro país (informe o código abaixo)</option></select></div>
     <div class="field hidden" id="coDW"><label for="coD">Código do país (DDI)</label><input class="inp" id="coD" inputmode="numeric" maxlength="3" placeholder="Ex.: 351" autocomplete="off"></div>
@@ -2264,7 +2264,7 @@ function formCorrigir(){
     q('#coEm').classList.toggle('hidden',c!=='email');q('#coPW').classList.toggle('hidden',c!=='celular');paisUi()};
   const paisUi=()=>{const c=q('#coC').value,o=q('#coP').value;q('#coDW').classList.toggle('hidden',!(c==='celular'&&o==='|Outro'));if(c==='celular')q('#coN').placeholder=o.startsWith('55|')?'(61) 99999-9999':'Número com código de área'};
   q('#coP').onchange=paisUi;
-  q('#coC').onchange=troca;troca();q('#coV').onclick=()=>ov.remove();
+  q('#coCh').querySelectorAll('[data-co]').forEach(b=>b.onclick=()=>{q('#coC').value=b.dataset.co;q('#coCh').querySelectorAll('[data-co]').forEach(x=>x.classList.toggle('on',x===b));troca()});troca();q('#coV').onclick=()=>ov.remove();
   q('#coS').onclick=async()=>{const c=q('#coC').value;let v=q('#coN').value.trim();const motivo=q('#coM').value.trim();
     if(c==='nome'){if(v.length<2)return err('Informe o nome completo.');if(v.toLowerCase()===String(atual.nome).toLowerCase())return err('O nome informado é igual ao atual.')}
     if(c==='celular'){const o=q('#coP').value,br=o.startsWith('55|');let ddi=br?'55':(o==='|Outro'?corrDig(q('#coD').value):o.split('|')[0]);v=corrDig(v);
