@@ -3582,6 +3582,7 @@ function admRelLiga(box){
 const ADMIN_MASTER='diogogomes2110@gmail.com';
 let SOU_MASTER=false,MASTER_IDS=new Set();
 const ehMaster=()=>invProd()?(SOU_MASTER||String(LOGADO||'').toLowerCase()===ADMIN_MASTER):true; // no HMO o cadastro de admin é simulado
+const ehPrincipal=()=>invProd()?String(LOGADO||'').toLowerCase()===ADMIN_MASTER:true; // V101: a aba Masters é só do administrador principal
 const ehMasterId=(id,em)=>MASTER_IDS.has(id)||String(em||'').toLowerCase()===ADMIN_MASTER; // V99: pode haver mais de um master
 const semAc=t=>String(t||'').replace(/[^\p{L}\p{N} ]/gu,'').trim().normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
 const ADM_T=[['apoios','🤝 Apoiadores'],['despesas','💰 Receitas e despesas'],['parceiros','🤝 Parceiros'],['colab','🛠 Colaboradores'],['convites','📨 Pedidos de convite'],['exclusoes','🗑 Pedidos de exclusão'],['correcoes','✏ Correções de dados'],['senhas','🔑 Pedidos de senha'],['recados','💬 Recados'],['ativos','👥 Usuários ativos'],['excluidos','🚫 Usuários excluídos'],['relatorios','📑 Relatórios'],['versoes','📜 Versões em PROD'],['masters','🛡 Masters'],['funcoes','🎛 Funcionalidades']]
@@ -3590,10 +3591,11 @@ const ADM_T=[['apoios','🤝 Apoiadores'],['despesas','💰 Receitas e despesas'
 function abrirAdmin(sub){['#bellMenu','#optMenu','#fabMenu'].forEach(s=>{const m=$(s);if(m)m.classList.add('hidden')});if(!invIsAdmin)return;
   if(sub)UI.admSub=sub;let ov=$('#admPage');
   if(!ov){ov=document.createElement('div');ov.className='ov admPage';ov.id='admPage';document.body.appendChild(ov);ov.__fechar=async()=>{if(funcSujo()&&!(await pedePerda()))return;ov.remove();invRefreshBadge(false);if(typeof atualizaSino==='function')atualizaSino()}}
+  if(UI.admSub==='masters'&&!ehPrincipal())UI.admSub='convites';
   const sub2=UI.admSub||'convites';
   ov.innerHTML=`<div class="admWrap"><div class="admStick"><div class="admHd"><h2>🛡 Gestão Admin</h2><div class="admHdB">${ehMaster()?'<button type="button" class="btn sec sm admMaster" id="admCad">🛡 Admins</button><button type="button" class="btn sec sm admMaster" id="admAju">⚙ Ajustes</button><button type="button" class="btn sec sm admMaster" id="admExp">💾 Exportar dados do app</button>':''}<button type="button" class="btn sec sm" id="admAud">🕘 Histórico de auditoria</button><button type="button" class="btn sec sm" id="admAniv">🎂 Aniversariantes</button></div><button type="button" class="btn sec sm admFch" id="admFechar">Fechar</button></div>
     <input type="search" class="inp" id="admAbaQ" placeholder="🔎 Buscar aba (ex.: apoiadores)" aria-label="Buscar aba da Gestão Admin" autocomplete="off" style="margin:6px 0 2px">
-    <div class="admTabs" id="admAbas">${ADM_T.filter(([k])=>!['relatorios','colab','recados','despesas','parceiros','versoes','funcoes','masters'].includes(k)||ehMaster()).map(([k,t])=>`<button type="button" class="chip${sub2===k?' on':''}" data-adm="${k}">${t} <span data-admn="${k}"></span></button>`).join('')}</div><div id="admQslot"></div></div>
+    <div class="admTabs" id="admAbas">${ADM_T.filter(([k])=>k==='masters'?ehPrincipal():(!['relatorios','colab','recados','despesas','parceiros','versoes','funcoes'].includes(k)||ehMaster())).map(([k,t])=>`<button type="button" class="chip${sub2===k?' on':''}" data-adm="${k}">${t} <span data-admn="${k}"></span></button>`).join('')}</div><div id="admQslot"></div></div>
     <div id="admBox"><div class="empty">Carregando…</div></div><div id="admMore" style="text-align:center;margin:12px 0"></div></div>`;
   ov.querySelector('#admFechar').onclick=()=>ov.__fechar();
   {const qa=ov.querySelector('#admAbaQ'),abas=ov.querySelector('#admAbas');let vz=null;
@@ -3683,7 +3685,7 @@ async function mfaTela(){
     <p class="small">Além da senha, o app passa a pedir um código de 6 números gerado no seu celular (Google Authenticator, Microsoft Authenticator, Authy ou parecido). Protege a conta de administração mesmo que a senha vaze.</p>
     ${invIsAdmin?'':'<p class="small">Sua conta não administra mais o app. Você pode desativar o 2FA aqui e voltar a entrar só com e-mail e senha.</p>'}
     <p style="margin:6px 0"><b>Situação:</b> <span id="mfS">${st.ativo?'ativada':'não ativada'}</span></p>
-    ${st.ativo?'<p class="small muted">Se perder ou trocar o celular, peça a um master para usar Remover 2FA no seu cadastro (aba 🛡 Masters). Guarde o app autenticador com cuidado.</p>':''}
+    ${st.ativo?'<p class="small muted">Se perder ou trocar o celular, peça ao administrador principal para usar Remover 2FA no seu cadastro (aba 🛡 Masters da Gestão Admin). Guarde o app autenticador com cuidado.</p>':''}
     <div id="mfB"></div><div class="err" id="mfE"></div>
     <div class="mfoot"><button class="btn sec" id="mfV">Fechar</button>${st.ativo?'<button class="btn sec" id="mfD">Desativar</button>':'<button class="btn" id="mfA">Ativar</button>'}</div></div>`;
   document.body.appendChild(ov);const q=x=>ov.querySelector(x);let pend=null; // pend = fator ainda não confirmado
@@ -3990,7 +3992,7 @@ function formAdmins(){if(!ehMaster())return;
     const linhas=()=>{const q=semAc(busca),f=q?L.filter(a=>semAc(nome(a)+' '+a.email).includes(q)):L;
       return f.length?`<div class="admCols"><span>Nome</span><span>E-mail</span><span></span></div>`+f.map(a=>`<div class="admRow"><span class="admNm"><b>${esc(nome(a))}</b>${a.master?' <span class="rcTag ad">admin master</span>':''} <span class="rcTag">${a.dois?'2FA ativa':'2FA desligada'}</span></span><span class="admEm">${esc(a.email)}</span>${a.master?'<span></span>':`<span style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end">${a.dois?`<button type="button" class="btn sec sm" data-r2f="${esc(a.user_id)}">Remover 2FA</button>`:''}<button type="button" class="btn sec sm" data-rm="${esc(a.user_id)}">Remover</button></span>`}</div>`).join(''):'<div class="empty">Nenhum admin encontrado.</div>'};
     ov.innerHTML=`<div class="modal" style="max-width:640px"><h2>🛡 Admins do app</h2>
-      <p class="small">Só o admin master cadastra e descadastra admins. Para cadastrar ou remover outro master, use a aba 🛡 Masters da Gestão Admin.</p>
+      <p class="small">Só o admin master cadastra e descadastra admins. Só o administrador principal cadastra ou remove outro master, pela aba 🛡 Masters da Gestão Admin.</p>
       <h3 style="margin:10px 0 4px">Admins ativos${er?'':` (${L.length})`}</h3>
       ${er?`<div class="empty">${er}</div>`:`<input class="inp" type="search" id="caBusca" placeholder="Buscar por nome ou e-mail" autocomplete="off" value="${esc(busca)}"><div id="caLista">${linhas()}</div>`}
       <h3 style="margin:14px 0 4px">➕ Cadastrar admin</h3>
@@ -4065,7 +4067,7 @@ async function montaAdmin(){const box=$('#admBox');if(!box)return;const sub=UI.a
   if(sub==='parceiros'){parcAdminRender(box);return}
   if(sub==='versoes'){versoesRender(box);return}
   if(sub==='funcoes'){funcRender(box);return}
-  if(sub==='masters'){mstRender(box);return}
+  if(sub==='masters'&&ehPrincipal()){mstRender(box);return}
   if(sub==='colab'){colabRender(box);return}
   if(sub==='recados'){recAdminRender(box);return}
   if(sub==='relatorios'){admRelRender(box);return}
