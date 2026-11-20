@@ -1001,6 +1001,9 @@ async function entrar(evento){
   if(!await mfaDesafio(()=>{if(A)A.oculta()})){if(A)A.cancela();return}
   if(A)A.cobre();
   $('#login').classList.add('hidden');$('#app').classList.remove('hidden');$('#whoName').textContent=LOGADO;
+  // conta desativada: não carrega nem grava nada (o banco bloqueia leitura e gravação), só mostra o aviso
+  try{EXC_MEU=await excMeu()}catch(e){EXC_MEU=null}
+  if(EXC_MEU&&EXC_MEU.status==='desativado'){if(A)A.revela();telaDesativada();return}
   await carregar();render();if(A)A.revela();ouvirNovidades();invAdminInit();carregaPerfil();ajuCarregar();navInicia();checarExclusao().then(async bloq=>{if(bloq)return;await checarTrocaSenha();checarTermos().then(checarPrimeiroAcesso)});
   if(evento)audit(evento,'Acesso','Login de '+LOGADO);
 }
@@ -2140,7 +2143,7 @@ async function usrReativar(u){
   audit('Reativação','Admin','Acesso reativado · '+u.email);toast('Acesso reativado');return true}
 function telaDesativada(){document.querySelectorAll('.ov').forEach(o=>o.remove());
   const ov=document.createElement('div');ov.className='ov';ov.id='excBloq';
-  ov.innerHTML=`<div class="modal" style="max-width:440px"><h2>🔒 Conta desativada</h2><p>${EXC_MEU.motivo===EXC_ANA?'Sua conta foi desativada temporariamente para análise pela equipe do Rodaliq.':EXC_MEU.motivo==='Inatividade'?'Sua conta foi desativada por falta de lançamentos (item 8.1 dos Termos de uso).':'Sua conta está desativada conforme sua solicitação.'} Fale com <a href="mailto:${MAIL_RODALIQ}">${MAIL_RODALIQ}</a>${EXC_MEU.motivo===EXC_ANA?' para saber mais':EXC_MEU.motivo==='Inatividade'?' para voltar':''}.</p><p class="small muted">${EXC_MEU.motivo===EXC_ANA||EXC_MEU.motivo==='Inatividade'?'Desativada':'Pedido feito'} em ${dataHora(EXC_MEU.desativado_em||EXC_MEU.criado_em)}. ${EXC_MEU.motivo===EXC_ANA?'Seus dados continuam guardados.':`Os dados ficam guardados por ${EXC_DIAS} dias após a desativação e depois são apagados de vez.`}</p><div class="mfoot"><button class="btn" id="excSair">↩ Sair</button></div></div>`;
+  ov.innerHTML=`<div class="modal" style="max-width:440px"><h2>🔒 Conta desativada</h2><p>${EXC_MEU.motivo===EXC_ANA?'Sua conta foi desativada temporariamente para análise pela equipe do Rodaliq.':EXC_MEU.motivo==='Inatividade'?'Sua conta foi desativada por falta de lançamentos (item 8.1 dos Termos de uso).':`Sua conta está desativada conforme sua solicitação de ${fmtBR(String(EXC_MEU.criado_em).slice(0,10))}.`} Fale com <a href="mailto:${TERMOS_MAIL}">${TERMOS_MAIL}</a>${EXC_MEU.motivo===EXC_ANA?' para saber mais':EXC_MEU.motivo==='Inatividade'?' para voltar':''}.</p><p class="small muted">${EXC_MEU.motivo===EXC_ANA||EXC_MEU.motivo==='Inatividade'?'Desativada em '+dataHora(EXC_MEU.desativado_em||EXC_MEU.criado_em):'Pedido feito em '+dataHora(EXC_MEU.criado_em)+' · desativada em '+dataHora(EXC_MEU.desativado_em||EXC_MEU.criado_em)}. ${EXC_MEU.motivo===EXC_ANA?'Seus dados continuam guardados.':`Os dados ficam guardados por ${EXC_DIAS} dias após a desativação e depois são apagados de vez.`}</p><div class="mfoot"><button class="btn" id="excSair">↩ Sair</button></div></div>`;
   document.body.appendChild(ov);ov.querySelector('#excSair').onclick=()=>{try{sessionStorage.removeItem('mdd_s')}catch(e){}sairSemAudit()}}
 function sairSemAudit(){if(invProd()&&DB&&DB.auth)DB.auth.signOut().finally(()=>location.reload());else location.reload()}
 function avisoExclusao(){const el=$('#excAviso');if(!el)return;const p=EXC_MEU&&EXC_MEU.status==='novo'?EXC_MEU:null;el.classList.toggle('hidden',!p);
@@ -4789,7 +4792,7 @@ function verTermos(aba){
   ov.addEventListener('click',e=>{e.stopPropagation();if(e.target.dataset.ta){at=e.target.dataset.ta;draw()}else if(e.target.id==='tmF'||e.target===ov)ov.remove()});
 }
 function termosAvisoAtualizado(previa){const o=document.createElement('div');o.className='ov';o.style.zIndex='75';
-  o.innerHTML=`<div class="modal" style="max-width:440px"><h2>📄 Atualizamos os Termos de uso</h2><p class="small">Incluímos o item <b>8.1</b>: contas sem nenhum lançamento por muito tempo podem ter o acesso desativado, depois de aviso. Antes de qualquer desativação, avisamos você. Você continua usando o app normalmente, e qualquer dúvida é só falar com a gente pelo e-mail <b>${MAIL_RODALIQ}</b>.</p><div class="mfoot"><button class="btn sec" id="tvL">Ler os Termos</button><button class="btn" id="tvO">Entendi</button></div></div>`;
+  o.innerHTML=`<div class="modal" style="max-width:440px"><h2>📄 Atualizamos os Termos de uso</h2><p class="small">Incluímos o item <b>8.1</b>: contas sem nenhum lançamento por muito tempo podem ter o acesso desativado, depois de aviso. Antes de qualquer desativação, avisamos você. Você continua usando o app normalmente, e qualquer dúvida é só falar com a gente pelo e-mail <b>${TERMOS_MAIL}</b>.</p><div class="mfoot"><button class="btn sec" id="tvL">Ler os Termos</button><button class="btn" id="tvO">Entendi</button></div></div>`;
   document.body.appendChild(o);
   o.querySelector('#tvO').onclick=()=>{if(!previa){cfg().termosVisto=TERMOS_V;salvar('tb_config');audit('Termos atualizados','Configurações','📄 Aviso de atualização visto · versão '+TERMOS_V)}o.remove()};
   o.querySelector('#tvL').onclick=()=>{if(!previa){cfg().termosVisto=TERMOS_V;salvar('tb_config');audit('Termos atualizados','Configurações','📄 Aviso de atualização visto (leu os Termos) · versão '+TERMOS_V)}o.remove();verTermos('termos')}}
