@@ -433,6 +433,7 @@ body:has(#admPage) .fab,body:has(#ajuPage) .fab{z-index:61}body:has(#admPage) .f
 .rdlSr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .rdlBusy::before{content:'';display:inline-block;width:14px;height:14px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;margin-right:8px;vertical-align:-2px;animation:rdlG .7s linear infinite}
 @keyframes rdlG{to{transform:rotate(360deg)}}
+#lBtn:disabled{opacity:.45;cursor:not-allowed}
 @media (max-width:359px){.rdlW{width:96px;height:96px;margin-left:-48px}.rdlW svg{width:96px;height:96px}}
 </style>
 </head>
@@ -917,7 +918,7 @@ function animIniciar(){
     const H=window.innerHeight,tam=w.offsetWidth||110,br=document.querySelector('#login .brand'),r=br?br.getBoundingClientRect():null,
       topo=Math.max(6,r&&r.height?r.top+r.height/2-tam/2:30);
     try{
-      giro=w.querySelector('.rdlSp').animate([{transform:'rotate(0deg)'},{transform:'rotate(360deg)'}],{duration:500,iterations:Infinity});
+      giro=w.querySelector('.rdlSp').animate([{transform:'rotate(0deg)'},{transform:'rotate(360deg)'}],{duration:1300,iterations:Infinity});
       subida=w.animate([{transform:'translateY('+(H+20)+'px) scale(1)'},{transform:'translateY('+topo+'px) scale(.92)'}],{duration:1100,easing:'cubic-bezier(.45,.05,.55,.95)',fill:'forwards'});
       subida.finished.then(()=>{A.chegou=true;if(!A.resp&&!A.fim)try{pulso=w.querySelector('svg').animate([{transform:'scale(1)'},{transform:'scale(1.1)'},{transform:'scale(1)'}],{duration:800,iterations:Infinity})}catch(e){}}).catch(()=>{});
     }catch(e){A.chegou=true}
@@ -5278,8 +5279,9 @@ if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.ser
     if(l.length>64||l.startsWith('.')||l.endsWith('.')||l.includes('..')||l.includes('@'))return false;
     const ps=d.split('.');if(ps.length<2||ps.some(x=>!x||x.startsWith('-')||x.endsWith('-')||/[\s@,;:<>()\[\]\\"]/.test(x)))return false;return ps[ps.length-1].length>=2};
   let meu=false;
-  const ap=()=>{if(u.type!=='email')return;if(!ok(u.value)){if(!b.disabled){meu=true;b.disabled=true}}else if(meu){meu=false;b.disabled=false}};
-  ['input','change','keyup','blur'].forEach(e=>u.addEventListener(e,ap));
+  const pw=document.getElementById('lPass');
+  const ap=()=>{const bom=(u.type==='email'?ok(u.value):String(u.value||'').trim().length>0)&&!!(pw&&pw.value);if(!bom){if(!b.disabled){meu=true;b.disabled=true}}else if(meu){meu=false;b.disabled=false}};
+  ['input','change','keyup','blur'].forEach(e=>{u.addEventListener(e,ap);if(pw)pw.addEventListener(e,ap)});
   new MutationObserver(ap).observe(b,{attributes:true,attributeFilter:['disabled']});
   setInterval(ap,600);ap();
 })();
