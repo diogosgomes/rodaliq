@@ -3761,14 +3761,14 @@ function mstRender(box){
     const q=s=>box.querySelector(s);
     const t=semAc(busca),F=t?L.filter(m=>semAc(nomeDe(m)+' '+m.email).includes(t)):L;
     box.innerHTML=`<div class="card bloco" data-nocp="1"><div class="bh"><h2>🛡 Admins master</h2><span class="small muted">${L.length} ${L.length===1?'master':'masters'}</span></div>
-      <p class="small muted">O master vê e altera tudo no app. Cadastre só pessoas de confiança, de preferência uma conta reserva sua. A pessoa precisa já ter conta no Rodaliq. Peça a cada master que ative a 🔐 verificação em duas etapas em ⚙ Opções. Não há limite de masters. Você não remove a si mesmo, o app sempre mantém pelo menos um master e só o administrador principal remove outros masters ou apaga o 2FA deles, e ele mesmo não pode ser removido nem ter o 2FA apagado por ninguém.</p>
+      <p class="small muted">O master vê e altera tudo no app. Cadastre só pessoas de confiança, de preferência uma conta reserva sua. A pessoa precisa já ter conta no Rodaliq. Peça a cada master que ative a 🔐 verificação em duas etapas em ⚙ Opções. Não há limite de masters. Você não remove a si mesmo, o app sempre mantém pelo menos um master e só o administrador principal cadastra e remove outros masters ou apaga o 2FA deles, e ele mesmo não pode ser removido nem ter o 2FA apagado por ninguém.</p>
       <input class="inp" type="search" id="msQ" placeholder="Pesquisar por nome ou e-mail" aria-label="Pesquisar masters por nome ou e-mail" autocomplete="off" value="${esc(busca)}">
       <div id="msL">${F.length?F.map((m,i)=>`<div class="mstRow"><div><b>${esc(nomeDe(m))}</b> <span class="rcTag ad">${m.eu?'Você':'Master'}</span> <span class="rcTag">${m.dois?'2FA ativa':'2FA desligada'}</span><div class="small muted">${esc(m.email)} · master desde ${esc(m.desde?fmtBR(isoOf(new Date(m.desde))):'—')}</div></div><div class="mstAc"><button type="button" class="btn sec sm" data-mcp="${esc(m.email)}">📋 Copiar e-mail</button>${!m.eu&&m.dois&&!ehPrinc(m)&&souPrinc?`<button type="button" class="btn sec sm" data-m2f="${esc(m.user_id)}">Remover 2FA</button>`:''}${m.eu?'':ehPrinc(m)?'<span class="small muted">Administrador principal: só ele mesmo se altera</span>':!souPrinc?'<span class="small muted">Só o administrador principal remove masters</span>':`<button type="button" class="btn sec sm" data-mrm="${esc(m.user_id)}">Remover master</button>`}</div></div>`).join(''):'<div class="empty">Nenhum master com esse nome ou e-mail.</div>'}</div>
-      <h3 style="margin:16px 0 4px">➕ Cadastrar novo master</h3>
+      ${souPrinc?`<h3 style="margin:16px 0 4px">➕ Cadastrar novo master</h3>
       <div class="field"><label for="msE">E-mail da conta (já cadastrada no Rodaliq)</label><input class="inp" type="email" id="msE" autocomplete="off" placeholder="e-mail da pessoa"></div>
       <div class="field${conta?'':' hidden'}" id="msNW"><label for="msN">Nome (conforme o cadastro da conta)</label><input class="inp" id="msN" readonly value="${esc(conta?(conta.nome||'(sem nome no cadastro)'):'')}"></div>
       <div class="err" id="msErr"></div>
-      <div class="mfoot" style="display:flex;justify-content:flex-end;margin-top:8px"><button type="button" class="btn" id="msS">Cadastrar como master</button></div></div>`;
+      <div class="mfoot" style="display:flex;justify-content:flex-end;margin-top:8px"><button type="button" class="btn" id="msS">Cadastrar como master</button></div>`:'<p class="small muted" style="margin-top:14px">Só o administrador principal cadastra novos masters.</p>'}</div>`;
     const err=x=>{q('#msErr').textContent=x};
     q('#msQ').oninput=e=>{busca=e.target.value;const pos=e.target.selectionStart;desenha();const n=box.querySelector('#msQ');if(n){n.focus();try{n.setSelectionRange(pos,pos)}catch(er){}}};
     box.querySelectorAll('[data-mcp]').forEach(b=>b.onclick=()=>copiaTxt(b.dataset.mcp,'E-mail copiado'));
@@ -3780,7 +3780,7 @@ function mstRender(box){
       if(!await confirma(`Remover <b>${esc(nomeDe(m))}</b> (${esc(m.email)}) de master? A conta continua no app como usuário comum, sem acesso de administração. O 2FA dela também é apagado, e ela passa a entrar só com e-mail e senha.`,'Remover master',{perigo:1}))return;
       try{await mstRemover(m)}catch(e){const mm=String((e&&e.message)||'');toast(/master_principal/.test(mm)?'O administrador principal não pode ser removido por outro master.':/apenas_principal/.test(mm)?'Só o administrador principal remove masters.':/ultimo_master/.test(mm)?'O app precisa ter pelo menos um master.':/nao_remover_a_si/.test(mm)?'Você não pode remover a si mesmo.':'Não foi possível remover agora. Tente de novo.');return}
       audit('Remoção de master','Admin','Master removido · '+m.email);toast('Master removido: '+m.email);await carrega()});
-    const e=q('#msE');
+    const e=q('#msE');if(!e)return;
     e.addEventListener('input',async()=>{err('');const v=e.value.trim().toLowerCase(),my=++seq;
       if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v)||L.some(m=>String(m.email).toLowerCase()===v)){if(conta){conta=null;q('#msNW').classList.add('hidden')}return}
       let c=null;try{c=await mstBuscaConta(v)}catch(er){}
@@ -3792,7 +3792,7 @@ function mstRender(box){
       let c=null;try{c=await mstBuscaConta(v)}catch(er){q('#msS').disabled=false;return err('Não foi possível conferir a conta agora. Tente de novo.')}
       if(!c){q('#msS').disabled=false;return err('Não há conta do Rodaliq com esse e-mail. Peça para a pessoa se cadastrar primeiro.')}
       if(!await confirma(`Cadastrar <b>${esc(c.nome||c.email)}</b> (${esc(c.email)}) como admin master? Ela passa a ver e alterar tudo no app, inclusive ajustes e dados dos usuários.`,'Cadastrar master')){q('#msS').disabled=false;return}
-      try{await mstCadastrar(c)}catch(er){q('#msS').disabled=false;const mm=String((er&&er.message)||'');return err(/ja_master/.test(mm)?'Essa conta já é master.':/conta_inexistente/.test(mm)?'Não há conta do Rodaliq com esse e-mail. Peça para a pessoa se cadastrar primeiro.':'Não foi possível cadastrar agora. Só um admin master pode cadastrar masters.')}
+      try{await mstCadastrar(c)}catch(er){q('#msS').disabled=false;const mm=String((er&&er.message)||'');return err(/apenas_principal/.test(mm)?'Só o administrador principal cadastra novos masters.':/ja_master/.test(mm)?'Essa conta já é master.':/conta_inexistente/.test(mm)?'Não há conta do Rodaliq com esse e-mail. Peça para a pessoa se cadastrar primeiro.':'Não foi possível cadastrar agora. Só um admin master pode cadastrar masters.')}
       audit('Cadastro de master','Admin','Master cadastrado · '+c.email);toast('Master cadastrado: '+c.email);conta=null;await carrega()};
   };
   const carrega=async()=>{try{L=await mstListar()}catch(e){box.innerHTML='<div class="empty">Não consegui carregar os masters. Tente de novo em instantes.</div>';return}desenha()};
