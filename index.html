@@ -2189,7 +2189,7 @@ function excCarenciaTxt(x){
   if(!x)return 'Esta pessoa não pediu exclusão, então não há carência.';
   if(x.status==='desativado'){const dd=excDiasDesde(x.desativado_em),rest=EXC_DIAS-dd,lib=fmtBR(isoOf(new Date(new Date(x.desativado_em).getTime()+EXC_DIAS*864e5)));
     return rest>0?`Faltam <b>${rest} ${rest===1?'dia':'dias'}</b> para completar os ${EXC_DIAS} dias de carência (até ${lib}).`:`A carência de ${EXC_DIAS} dias já terminou.`}
-  return `O acesso ainda não foi desativado: a carência de ${EXC_DIAS} dias nem começou (faltam ${EXC_DIAS} dias).`}
+  return `O acesso ainda não foi desativado, então a carência de ${EXC_DIAS} dias não começou (ela só conta a partir da desativação). Excluir agora apaga tudo de imediato, sem carência.`}
 async function usrExcluir(userId,email,pedido){
   if(!invProd()){toast('No HMO não há usuários reais: a exclusão só roda em produção.');return false}
   if(!await confirma(`Excluir definitivamente <b>${esc(email)}</b>? ${excCarenciaTxt(pedido)}<br><br>Isso apaga o login e todos os dados da pessoa (corridas, custos, multas, ajustes) e <b>não dá para desfazer nem reativar</b>.`,'Excluir usuário',{perigo:1}))return false;
@@ -2204,10 +2204,10 @@ async function excAdminRender(box){
   const lst=L.filter(x=>x.status===f);
   const card=x=>{const c=invCache.find(v=>String(v.email||'').toLowerCase()===String(x.email||'').toLowerCase()),u=us.find(v=>v.user_id===x.user_id),nome=soNome(x),txt=excTexto(x,nome);
     const dd=excDiasDesde(x.desativado_em),lib=x.desativado_em?fmtBR(isoOf(new Date(new Date(x.desativado_em).getTime()+EXC_DIAS*864e5))):'';
-    const tag={novo:`<span class="tag r">Novo · ${excDiasDesde(x.criado_em)} ${excDiasDesde(x.criado_em)===1?'dia':'dias'}</span>`,desativado:`<span class="tag a">${x.motivo===EXC_ANA?'Em análise':'Desativado'} · ${dd} ${dd===1?'dia':'dias'}</span>`,excluido:'<span class="tag g">Excluído</span>',desistiu:`<span class="tag b">${x.reativado_em?'Reativado':'Desistiu'}</span>`}[x.status]||'';
+    const tag={novo:`<span class="tag r" title="A carência de ${EXC_DIAS} dias só começa quando você desativa o acesso.">Novo · pedido há ${excDiasDesde(x.criado_em)} ${excDiasDesde(x.criado_em)===1?'dia':'dias'}</span>`,desativado:`<span class="tag a">${x.motivo===EXC_ANA?'Em análise':'Desativado'} · ${dd} ${dd===1?'dia':'dias'}</span>`,excluido:'<span class="tag g">Excluído</span>',desistiu:`<span class="tag b">${x.reativado_em?'Reativado':'Desistiu'}</span>`}[x.status]||'';
     ZAP_EXC[x.id]={fone:c?c.whatsapp:'',txt};
     let bt=`<a class="btn sm" href="${esc(invMailLink(x.email,'Seu pedido de exclusão no Rodaliq',txt))}" target="_blank" rel="noopener">✉ Responder por e-mail</a><button type="button" class="btn sm" data-zx="${esc(x.id)}">💬 Responder pelo WhatsApp</button>`;
-    if(x.status==='novo')bt+=`<button class="btn sm warn" data-ex="desativar" data-id="${esc(x.id)}">🔒 Desativar acesso</button><button class="btn sm warn" data-ex="excluir" data-id="${esc(x.id)}">🗑 Excluir usuário</button>`;
+    if(x.status==='novo')bt+=`<button class="btn sm warn" data-ex="desativar" data-id="${esc(x.id)}">🔒 Desativar acesso</button><button class="btn sm warn" data-ex="excluir" data-id="${esc(x.id)}">🗑 Excluir usuário</button>`+`<span class="small muted">Carência de ${EXC_DIAS} dias começa ao desativar</span>`;
     if(x.status==='desativado'){bt+=`<button class="btn sm sec" data-ex="reativar" data-id="${esc(x.id)}">↩ Reativar</button><button class="btn sm warn" data-ex="excluir" data-id="${esc(x.id)}">🗑 Excluir usuário</button>`;
       bt+=x.motivo===EXC_ANA?`<span class="small muted">Em análise · sem prazo de exclusão</span>`:dd>=EXC_DIAS?`<span class="small muted">Carência concluída</span>`:`<span class="small muted">Carência até ${lib} (faltam ${EXC_DIAS-dd} ${EXC_DIAS-dd===1?'dia':'dias'})</span>`}
     if(!['novo','desativado'].includes(x.status))bt='';
