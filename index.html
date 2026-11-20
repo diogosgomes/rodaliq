@@ -914,12 +914,12 @@ function animIniciar(){
   else{
     ov=document.createElement('div');ov.id='rdlAn';ov.setAttribute('role','status');
     ov.innerHTML='<span class="rdlSr">Entrando…</span><div class="rdlW"><div class="rdlTr"></div>'+RDL_SVG+'</div>';
-    document.body.appendChild(ov);w=ov.querySelector('.rdlW');
+    ov.style.background=getComputedStyle(document.body).backgroundColor;document.body.appendChild(ov);try{ov.animate([{opacity:0},{opacity:1}],{duration:300})}catch(e){}w=ov.querySelector('.rdlW');
     const H=window.innerHeight,tam=w.offsetWidth||110,br=document.querySelector('#login .brand'),r=br?br.getBoundingClientRect():null,
       topo=Math.max(6,r&&r.height?r.top+r.height/2-tam/2:30);
     try{
       giro=w.querySelector('.rdlSp').animate([{transform:'rotate(0deg)'},{transform:'rotate(360deg)'}],{duration:1300,iterations:Infinity});
-      subida=w.animate([{transform:'translateY('+(H+20)+'px) scale(1)'},{transform:'translateY('+topo+'px) scale(.92)'}],{duration:1100,easing:'cubic-bezier(.45,.05,.55,.95)',fill:'forwards'});
+      subida=w.animate([{transform:'translateY('+(H+20)+'px) scale(1)'},{transform:'translateY('+topo+'px) scale(.92)'}],{duration:2600,easing:'cubic-bezier(.45,.05,.55,.95)',fill:'forwards'});
       subida.finished.then(()=>{A.chegou=true;if(!A.resp&&!A.fim)try{pulso=w.querySelector('svg').animate([{transform:'scale(1)'},{transform:'scale(1.1)'},{transform:'scale(1)'}],{duration:800,iterations:Infinity})}catch(e){}}).catch(()=>{});
     }catch(e){A.chegou=true}
   }
