@@ -2579,7 +2579,7 @@ function apoAviso(){
   const r=(NOT.reads&&NOT.reads.apoio)||{};
   if(!apoNaoDoou60())return null;
   const m=AJU.msg60;
-  if(m&&m.em){const am=apoMsgAlerta(m);if(am)return am}
+  if(m&&m.em&&(!CAD||new Date(CAD).getTime()<=new Date(m.em).getTime())){const am=apoMsgAlerta(m);if(am)return am} // a MSG só vale para quem já tinha conta quando ela foi enviada
   if(Math.floor((Date.now()-new Date(CAD).getTime())/864e5)<(AJU.dias||30))return null;
   const d=new Date(),h=isoOf(d);if(h<quintoDiaUtil(d.getFullYear(),d.getMonth()))return null;
   if(r.mes===h.slice(0,7))return null;
