@@ -5470,6 +5470,9 @@ function render(){
   if(!window.__paisAuto){window.__paisAuto=1;setTimeout(paisAuto,1500)}
   if(UI.tab==='admin')UI.tab='painel';
   if(foraBR()&&['impostos','multas'].includes(UI.tab))UI.tab='painel';
+  // fora do nível: quem cai numa aba que não é sua vai para o Painel; o aviso de "indisponível" fica só para quando o nível muda com a pessoa já na tela
+  if(recOff(UI.tab)&&window.__tabLiberada!==UI.tab)UI.tab='painel';
+  if(!recOff(UI.tab))window.__tabLiberada=UI.tab;
   let v={painel:vPainel,corridas:vCorridas,carona:vCarona,custos:vCustos,multas:vMultas,impostos:vImpostos,relatorios:vRelatorios,rodacalc:vRodaCalc,reservas:vReservas,agenda:vAgenda}[UI.tab];
   if(recOff(UI.tab))v=()=>'<div class="note am" style="margin-top:12px">🔧 <b>Esta funcionalidade está temporariamente indisponível.</b> Estamos ajustando e ele volta em breve. Seus dados continuam guardados e nada foi apagado.</div>';
   navRegistraAba();
