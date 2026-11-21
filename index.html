@@ -113,6 +113,7 @@ html[data-tema="escuro"] .vhRw{background:transparent}html[data-tema="escuro"] .
 .ajCv{color:var(--muted);transition:transform .15s}.ajIt.op .ajCv{transform:rotate(180deg)}.ajDt{display:none;padding:2px 2px 14px 39px}.ajIt.op .ajDt{display:block}
 @media(max-width:560px){.ajDt{padding-left:2px}}
 .rcTrk{position:relative;height:10px;background:var(--line);border-radius:6px;margin:26px 4px 6px}
+.rcVz .rcMk{display:none}
 .rcMk{position:absolute;top:-5px;width:2px;height:20px;background:var(--muted)}
 .rcMk i{position:absolute;top:-17px;left:-32px;width:66px;text-align:center;font-size:10.5px;color:var(--muted);font-style:normal}
 .rcPin{position:absolute;top:-4px;width:18px;height:18px;border-radius:50%;background:#fff;border:3px solid var(--blue);margin-left:-9px;box-sizing:border-box}
@@ -429,8 +430,7 @@ body:has(#admPage) .fab,body:has(#ajuPage) .fab{z-index:61}body:has(#admPage) .f
 .agC{position:relative;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);padding:9px 0;font:inherit;font-size:14px;cursor:pointer}
 .agC.vz{border:0;background:none;cursor:default}.agC.hj{border:2px solid var(--blue);font-weight:700}.agC.sel{background:var(--blue);color:#fff}
 .agN{position:absolute;top:1px;right:3px;font-size:10px;font-style:normal;font-weight:700}
-.rcScroll{max-height:calc(100vh - 150px);overflow-y:scroll;direction:rtl;scrollbar-width:auto;scrollbar-color:var(--muted) var(--line)}
-.rcScroll>*{direction:ltr}
+.rcScroll{max-height:calc(100vh - 150px);overflow-y:scroll;max-width:860px;scrollbar-width:auto;scrollbar-color:var(--muted) var(--line)} /* barra de rolagem à direita e página mais estreita, como uma calculadora */
 .rcScroll::-webkit-scrollbar{width:14px}.rcScroll::-webkit-scrollbar-track{background:var(--line);border-radius:7px}.rcScroll::-webkit-scrollbar-thumb{background:var(--muted);border-radius:7px;border:2px solid var(--line)}
 #prevBar{position:fixed;left:0;right:0;bottom:0;z-index:90;background:#1f6f43;color:#fff;padding:8px 12px;display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap;font-size:14px}
 .pdSc{margin-top:6px;max-height:172px;overflow-y:auto;border-top:1px solid var(--line)}
@@ -1912,7 +1912,8 @@ function rcCalc(){
   const pron=(R.km>0||R.tv>0)&&R.custo>0;
   const trk=document.getElementById('rcTrk'),pin=document.getElementById('rcPin'),ver=document.getElementById('rcVer');
   if(!pron){['rcSug','rcMin','rcLuc','rcKmT','rcTmp'].forEach(i=>set(i,'—'));{const co=document.getElementById('rcCo'),cm=document.getElementById('rcCoMsg');if(co)co.value='';if(cm)cm.textContent=''}ver.classList.remove('hidden','ok','med','ruim');ver.classList.add(R.custo>0?'hidden':'med');
-    ver.textContent=R.custo>0?'':'Informe o custo por km e os dados da viagem para ver o preço.';pin.classList.add('hidden');return}
+    ver.textContent=R.custo>0?'':'Informe o custo por km e os dados da viagem para ver o preço.';pin.classList.add('hidden');trk.classList.add('rcVz');return}
+  trk.classList.remove('rcVz');
   const custo=km*R.custo+R.pd,sug=Math.max(km*R.mk,h*R.mh,km*R.custo)+R.pd;
   set('rcSug',brl(sug));set('rcMin',brl(custo));set('rcLuc',brl(sug-custo));set('rcKmT',fmtNum(km)+' km');set('rcTmp',minToHM(min));
   const max=Math.max(sug*1.3,R.of*1.1,1),p=v=>Math.min(100,v/max*100)+'%';
