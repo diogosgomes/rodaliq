@@ -1944,7 +1944,8 @@ function rcInit(){
   const box=document.getElementById('rcBox');if(!box)return;
   box.querySelectorAll('input').forEach(e=>{e.addEventListener('input',rcCalc);if(e.type!=='checkbox')e.addEventListener('blur',()=>{const v=parseBRL(e.value);if(e.value.trim()&&['rcKm','rcKa','rcPd','rcCu','rcMk','rcMh','rcOf'].includes(e.id))e.value=brl(v,1)})});
   const medias=()=>{const R=UI.rc,m=rcMedias(R.veic||'Todos');
-    const put=(id,v)=>{document.getElementById(id).value=v?brl(r2(v),1):''};put('rcCu',m.custoKm);put('rcMk',m.ganhoKm);put('rcMh',m.ganhoH);rcCalc()};
+    const put=(id,v)=>{if(v)document.getElementById(id).value=brl(r2(v),1)}; // 1º as médias do histórico; sem média, fica o que a pessoa digitou na RodaCalc
+    put('rcCu',m.custoKm);put('rcMk',m.ganhoKm);put('rcMh',m.ganhoH);rcCalc()};
   document.getElementById('rcVei').onchange=e=>{UI.rc.veic=e.target.value;medias()};
   document.getElementById('rcMed').onclick=medias;
   document.getElementById('rcLimpa').onclick=()=>{['rcKm','rcTv','rcKa','rcEs','rcPd','rcOf'].forEach(i=>{document.getElementById(i).value=''});rcCalc();toast('Dados da corrida limpos')};
