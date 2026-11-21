@@ -5478,7 +5478,7 @@ function render(){
   document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.dataset.t===UI.tab));
   const vp=$('#vPick');if(vp)vp.onchange=()=>{UI.veic=vp.value.startsWith('Todos')?'Todos':vp.value;render()};
   ['simV','simD','simN'].forEach(i=>{const el=document.getElementById(i);if(el)el.oninput=simular});simular();if(UI.tab==='rodacalc'&&!recOff('rodacalc'))rcInit();
-  {const vw=$('#view');if(vw)vw.classList.toggle('rcScroll',UI.tab==='rodacalc')}
+  {const vw=$('#view');if(vw)vw.classList.toggle('rcScroll',UI.tab==='rodacalc'&&!recOff('rodacalc'))}
   agBind();atualizaSino();if(!$('#bellMenu').classList.contains('hidden'))renderSino();
 }
 $('#tabAdmin').onclick=()=>abrirAdmin();
