@@ -1920,8 +1920,9 @@ function rcCalc(){
   const m=R.vv?2:1,km=R.ka+R.km*m,min=R.tv*m+R.es,h=min/60;
   const pron=(R.km>0||R.tv>0)&&R.custo>0;
   const trk=document.getElementById('rcTrk'),pin=document.getElementById('rcPin'),ver=document.getElementById('rcVer');
-  if(!pron){['rcSug','rcMin','rcLuc','rcKmT','rcTmp'].forEach(i=>set(i,'—'));{const co=document.getElementById('rcCo'),cm=document.getElementById('rcCoMsg');if(co)co.value='';if(cm)cm.textContent=''}ver.classList.remove('hidden','ok','med','ruim');ver.classList.add(R.custo>0?'hidden':'med');
-    ver.textContent=R.custo>0?'':'Informe o custo por km e os dados da viagem para ver o preço.';pin.classList.add('hidden');trk.classList.add('rcVz');return}
+  if(!pron){['rcSug','rcMin','rcLuc','rcKmT','rcTmp'].forEach(i=>set(i,'—'));{const co=document.getElementById('rcCo'),cm=document.getElementById('rcCoMsg');if(co)co.value='';if(cm)cm.textContent=''}if(R.km>0||R.tv>0){set('rcKmT',fmtNum(km)+' km');set('rcTmp',minToHM(min))} // km e tempo já aparecem mesmo antes do custo por km
+    ver.classList.remove('hidden','ok','med','ruim');ver.classList.add(R.custo>0?'hidden':'med');
+    ver.textContent=R.custo>0?'':((R.km>0||R.tv>0)?'Km e tempo já foram calculados. Informe o custo por km (e a sua meta de ganho) para ver o preço sugerido.':'Informe o custo por km e os dados da viagem para ver o preço.');pin.classList.add('hidden');trk.classList.add('rcVz');return}
   trk.classList.remove('rcVz');
   const custo=km*R.custo+R.pd,sug=Math.max(km*R.mk,h*R.mh,km*R.custo)+R.pd;
   set('rcSug',brl(sug));set('rcMin',brl(custo));set('rcLuc',brl(sug-custo));set('rcKmT',fmtNum(km)+' km');set('rcTmp',minToHM(min));
