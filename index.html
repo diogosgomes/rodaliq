@@ -3703,14 +3703,13 @@ const ADM_T=[['apoios','🤝 Apoiadores'],['despesas','💰 Receitas e despesas'
 // V50: Gestão Admin abre como página inteira (computador e celular)
 /* sino de notificações dentro da Gestão Admin (mesmo conteúdo e mesmas ações do sino do cabeçalho) */
 function verSinoAdmin(){const m=$('#bellMenu'),wrap=$('#bellWrap');if(!m||!wrap||$('#sinoAdm'))return;
-  const ov=document.createElement('div');ov.className='ov';ov.id='sinoAdm';
-  ov.innerHTML='<div class="modal" style="max-width:420px;padding:12px"><div id="sinoBox"></div></div>';
-  document.body.appendChild(ov);ov.querySelector('#sinoBox').appendChild(m);
-  m.style.cssText='position:static;width:auto;min-width:0;max-height:68vh;box-shadow:none;border:0;padding:0';
+  const ov=document.createElement('div');ov.id='sinoAdm';ov.style.display='contents'; // V104: mesma tela do sino da página inicial, apenas acima da Gestão Admin
+  document.body.appendChild(ov);ov.appendChild(m);
+  m.style.cssText='z-index:90';
   m.classList.remove('hidden');rastro('aviso:sino');renderSino();
   let mo;const fecha=()=>{if(mo)mo.disconnect();m.style.cssText='';m.classList.add('hidden');wrap.appendChild(m);ov.remove()};
   mo=new MutationObserver(()=>{if(m.classList.contains('hidden'))fecha()});mo.observe(m,{attributes:true,attributeFilter:['class']});
-  ov.__fechar=fecha;ov.addEventListener('mousedown',e=>{if(e.target===ov)fecha()});ov.addEventListener('click',e=>e.stopPropagation());
+  ov.__fechar=fecha;ov.addEventListener('click',e=>e.stopPropagation());
   if(AJU.msg60&&AJU.msg60.em&&CAD)apoEstadoRefresh().then(()=>{atualizaSino();if(!m.classList.contains('hidden'))renderSino()})}
 const GRP_USU=['ativos','correcoes','convites','exclusoes','senhas','recados','excluidos'];let ADM_FOCO=null;
 const admNomeAba=k=>((ADM_T.find(x=>x[0]===k)||[])[1]||k);
@@ -4504,6 +4503,8 @@ async function invRefreshBadge(avisa){
     if(avisa&&n>0)toast(n===1?'1 pedido de convite novo':n+' pedidos de convite novos');
     atualizaSino();if(!$('#bellMenu').classList.contains('hidden'))renderSino();
   }catch(e){}
+  // V104: os alertas de exclusão, correção, senha, apoio e recado também precisam ser carregados aqui (antes só carregavam ao abrir a Gestão Admin)
+  try{await excAdminCache(true);if(ehMaster())REC_TODOS=await recTodos();await carregaPerfis();atualizaSino();if(!$('#bellMenu').classList.contains('hidden'))renderSino()}catch(e){}
 }
 async function invAdminInit(){
   registrarUso();
@@ -4512,7 +4513,8 @@ async function invAdminInit(){
   try{const {data}=await DB.from('tb_admins').select('user_id,master').eq('user_id',UID).maybeSingle();SOU_MASTER=!!(data&&data.master);invSetAdmin(!!data)}catch(e){invSetAdmin(false)}
   invRefreshBadge(true);
 }
-setInterval(()=>{if(invIsAdmin&&!document.hidden)invRefreshBadge(false)},120000);
+setInterval(()=>{if(invIsAdmin&&!document.hidden)invRefreshBadge(false)},45000);
+document.addEventListener('visibilitychange',()=>{if(invIsAdmin&&document.visibilityState==='visible')invRefreshBadge(false)});
 const invPrimeiro=x=>String(x.name||'').trim().split(/\s+/)[0]||'';
 const invBdayLink=x=>'https://wa.me/'+x.whatsapp+'?text='+encodeURIComponent(`Parabéns, ${invPrimeiro(x)}! Muitas felicidades neste dia. Feliz aniversário e um abraço do Rodaliq!`);
 // V48/V101: o computador abre o Gmail já escrito, na conta Google do administrador (nela, o remetente "De" pode ser contato@ ou diogo@rodaliq.com.br); celular abre o app de e-mail padrão
