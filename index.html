@@ -5032,7 +5032,7 @@ async function openInvitesModal(host){ // V48: com host, a tela é montada dentr
       const arma=k=>{if(armed!==k){armed=k;clearTimeout(armedT);armedT=setTimeout(()=>{armed=null;draw()},4000);draw();return true}armed=null;return false};
       if(a==='criar'){
         if(!ehMaster()){toast('Só o administrador principal cria contas.');return}
-        if(!await confirma(`Criar a conta de <b>${esc(r.name)}</b> (${esc(r.email)}) com uma senha provisória?<br><br>A senha aparece uma vez só, na tela seguinte.`,'Criar conta'))return;
+        if(!await confirma(invProd()&&autoModo('convite')==='auto'?`Criar a conta de <b>${esc(r.name)}</b> (${esc(r.email)}) e enviar o e-mail <b>Criar minha senha</b>?<br><br>A pessoa cria a própria senha pelo link (válido por 24 horas). Não há senha provisória.`:`Criar a conta de <b>${esc(r.name)}</b> (${esc(r.email)}) com uma senha provisória?<br><br>A senha aparece uma vez só, na tela seguinte.`,'Criar conta'))return;
         b.disabled=true;b.textContent='Criando…';
         try{const res=await invCriarContas([r]);invResultado(res,()=>{draw();atualizaSino()})}
         catch(ex){toast('Não foi possível criar: '+((ex&&ex.message)||ex))}
