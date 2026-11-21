@@ -2268,14 +2268,16 @@ function formExcluirConta(){
 // ---- Admin > Pedidos de exclusão ----
 let EXC_CACHE=[],EXC_AT=0;
 async function excAdminCache(force){if(!invIsAdmin){EXC_CACHE=[];SEN_CACHE=[];APO_CACHE=[];return}if(!force&&Date.now()-EXC_AT<15000)return;try{EXC_CACHE=await excListar();EXC_AT=Date.now()}catch(e){}try{CORR_CACHE=await corrListar()}catch(e){}try{SEN_CACHE=await senListar()}catch(e){}try{APO_CACHE=await apoListar()}catch(e){}await carregaPerfis()}
+// dias de carência contados por data (dia do calendário), não por 24 h corridas: desativada ontem = 1 dia
+const excDiasCal=iso=>{if(!iso)return 0;const a=new Date(iso),b=new Date();return Math.round((new Date(b.getFullYear(),b.getMonth(),b.getDate())-new Date(a.getFullYear(),a.getMonth(),a.getDate()))/864e5)};
 const excDiasDesde=iso=>iso?Math.floor((Date.now()-new Date(iso).getTime())/864e5):0;
 function excAlerts(){if(!invIsAdmin)return [];const out=[],nm=x=>soNome(x)||x.email,dd=n=>`${n} ${n===1?'dia':'dias'}`;
   EXC_CACHE.filter(x=>x.status==='novo').forEach(x=>out.push({n:'r',inv:1,tab:'exc',exf:'novo',fid:x.id,t:`${nm(x)} pediu exclusão da conta`,nota:`${x.email} · motivo: ${x.motivo} · há ${dd(excDiasDesde(x.criado_em))}. Responda em até 15 dias (prazo da LGPD para pedidos do titular). Toque para abrir o cartão.`}));
   EXC_CACHE.filter(x=>x.status==='desativado'&&x.reativacao_pedida_em).forEach(x=>out.push({n:'r',inv:1,tab:'exc',exf:'desativado',fid:x.id,t:`${nm(x)} pediu para voltar`,nota:`${x.email} desistiu do pedido de exclusão e aguarda a reativação (pedido em ${dataHora(x.reativacao_pedida_em)}). Toque para abrir o cartão.`}));
-  EXC_CACHE.filter(x=>x.status==='desativado'&&x.motivo!==EXC_ANA&&excDiasDesde(x.desativado_em)>=EXC_DIAS&&!x.reativacao_pedida_em).forEach(x=>{const c=invCache.find(v=>String(v.email||'').toLowerCase()===String(x.email||'').toLowerCase());
+  EXC_CACHE.filter(x=>x.status==='desativado'&&x.motivo!==EXC_ANA&&excDiasCal(x.desativado_em)>=EXC_DIAS&&!x.reativacao_pedida_em).forEach(x=>{const c=invCache.find(v=>String(v.email||'').toLowerCase()===String(x.email||'').toLowerCase());
     out.push({n:'a',inv:1,tab:'exc',exf:'desativado',fid:x.id,t:`Excluir dados de ${c?c.name:x.email}: prazo de ${EXC_DIAS} dias concluído`,nota:'Abra Admin > Pedidos de exclusão e use “🗑 Excluir usuário”. O login e os dados são apagados juntos.'})});
-  EXC_CACHE.filter(x=>x.status==='desativado'&&dlDisponivel(x)&&!x.dados_baixados_em&&!x.lembrete_dados_em&&!x.reativacao_pedida_em&&excDiasDesde(x.desativado_em)>=EXC_DIAS-EXC_AVISO).forEach(x=>{const nm=soNome(x)||x.email;
-    out.push({n:'a',inv:1,tab:'exc',exf:'desativado',fid:x.id,t:`Avisar ${nm}: a carência acaba em ${Math.max(0,Math.ceil((dlFim(x).getTime()-Date.now())/864e5))} ${Math.max(0,Math.ceil((dlFim(x).getTime()-Date.now())/864e5))===1?'dia':'dias'}`,nota:`Os dados serão apagados em ${fmtBR(isoOf(dlFim(x)))} e a pessoa ainda não baixou uma cópia. Abra Admin > Pedidos de exclusão e use “Avisar prazo” por e-mail ou WhatsApp.`})});
+  EXC_CACHE.filter(x=>x.status==='desativado'&&dlDisponivel(x)&&!x.dados_baixados_em&&!x.lembrete_dados_em&&!x.reativacao_pedida_em&&excDiasCal(x.desativado_em)>=EXC_DIAS-EXC_AVISO).forEach(x=>{const nm=soNome(x)||x.email;
+    out.push({n:'a',inv:1,tab:'exc',exf:'desativado',fid:x.id,t:`Avisar ${nm}: a carência acaba em ${Math.max(0,EXC_DIAS-excDiasCal(x.desativado_em))} ${Math.max(0,EXC_DIAS-excDiasCal(x.desativado_em))===1?'dia':'dias'}`,nota:`Os dados serão apagados em ${fmtBR(isoOf(dlFim(x)))} e a pessoa ainda não baixou uma cópia. Abra Admin > Pedidos de exclusão e use “Avisar prazo” por e-mail ou WhatsApp.`})});
   return out}
 function excTextoReativ(x,nome){return `Olá${nome?', '+nome:''}!\nEsperamos que você esteja bem!\n\nSeu pedido para voltar a usar o Rodaliq foi atendido: o pedido de exclusão da conta foi cancelado e o seu acesso foi reativado.\n\nVocê já pode entrar normalmente com o seu e-mail e a sua senha. Todos os seus dados continuam como estavam.\n\nSe tiver qualquer dúvida, é só responder esta mensagem ou escrever para ${TERMOS_MAIL}.`+assina()}
 const EXC_AVISO=5;
@@ -2290,7 +2292,7 @@ function excTexto(x,nome){const d=fmtBR(String(x.criado_em).slice(0,10));
 // V89: exclusão definitiva pelo app (só admin master). Apaga o login no Supabase; os dados saem junto e o gatilho marca "excluído".
 function excCarenciaTxt(x){
   if(!x)return 'Esta pessoa não pediu exclusão, então não há carência.';
-  if(x.status==='desativado'){const dd=excDiasDesde(x.desativado_em),rest=EXC_DIAS-dd,lib=fmtBR(isoOf(new Date(new Date(x.desativado_em).getTime()+EXC_DIAS*864e5)));
+  if(x.status==='desativado'){const dd=excDiasCal(x.desativado_em),rest=EXC_DIAS-dd,lib=fmtBR(isoOf(new Date(new Date(x.desativado_em).getTime()+EXC_DIAS*864e5)));
     return rest>0?`Faltam <b>${rest} ${rest===1?'dia':'dias'}</b> para completar os ${EXC_DIAS} dias de carência (até ${lib}).`:`A carência de ${EXC_DIAS} dias já terminou.`}
   return `O acesso ainda não foi desativado, então a carência de ${EXC_DIAS} dias não começou (ela só conta a partir da desativação). Excluir agora apaga tudo de imediato, sem carência.`}
 async function usrExcluir(userId,email,pedido){
@@ -2306,7 +2308,7 @@ async function excAdminRender(box){
   const F=[['novo','Novos'],['desativado','Desativados'],['excluido','Excluídos'],['desistiu','Desistiram']],f=UI.excF||'novo',cnt=k=>L.filter(x=>x.status===k).length;
   const lst=L.filter(x=>x.status===f);
   const card=x=>{const c=invCache.find(v=>String(v.email||'').toLowerCase()===String(x.email||'').toLowerCase()),u=us.find(v=>v.user_id===x.user_id),nome=soNome(x),txt=excTexto(x,nome);
-    const dd=excDiasDesde(x.desativado_em),lib=x.desativado_em?fmtBR(isoOf(new Date(new Date(x.desativado_em).getTime()+EXC_DIAS*864e5))):'';
+    const dd=excDiasCal(x.desativado_em),lib=x.desativado_em?fmtBR(isoOf(new Date(new Date(x.desativado_em).getTime()+EXC_DIAS*864e5))):'';
     const tag={novo:`<span class="tag r" title="A carência de ${EXC_DIAS} dias só começa quando você desativa o acesso.">Novo · pedido há ${excDiasDesde(x.criado_em)} ${excDiasDesde(x.criado_em)===1?'dia':'dias'}</span>`,desativado:`<span class="tag a">${x.motivo===EXC_ANA?'Em análise':'Desativado'} · ${dd} ${dd===1?'dia':'dias'}</span>`,excluido:'<span class="tag g">Excluído</span>',desistiu:`<span class="tag b">${x.reativado_em?'Reativado':'Desistiu'}</span>`}[x.status]||'';
     ZAP_EXC[x.id]={fone:c?c.whatsapp:'',txt};
     let bt=`<a class="btn sm" href="${esc(invMailLink(x.email,'Seu pedido de exclusão no Rodaliq',txt))}" target="_blank" rel="noopener">✉ Responder por e-mail</a><button type="button" class="btn sm" data-zx="${esc(x.id)}">💬 Responder pelo WhatsApp</button>`;
