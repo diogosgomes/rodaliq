@@ -2683,7 +2683,7 @@ async function checarTrocaSenha(){if(!await precisoTrocarSenha())return;
     q('#csSair').onclick=()=>sairSemAudit();
     q('#csOk').onclick=async()=>{const n=q('#csN').value,n2=q('#csN2').value;if(n.length<8)return err('A senha precisa de 8 caracteres ou mais.');if(n!==n2)return err('As senhas não conferem.');
       q('#csOk').disabled=true;
-      try{const r=await DB.auth.updateUser({password:n});if(r.error){q('#csOk').disabled=false;return err(/different|same/i.test(r.error.message)?'A nova senha precisa ser diferente da provisória.':'Não foi possível salvar a senha. Tente de novo.')}
+      try{const r=await DB.auth.updateUser({password:n});if(r.error){q('#csOk').disabled=false;return err(/different|same/i.test(r.error.message)?(REC_LINK?'A nova senha precisa ser diferente da sua senha atual.':'A nova senha precisa ser diferente da provisória.'):'Não foi possível salvar a senha. Tente de novo.')}
         const {error}=await DB.rpc('rodaliq_senha_trocada');if(error)throw error;
         audit('Troca de senha','Acesso',REC_LINK?'Senha redefinida por link':'Senha provisória trocada');if(REC_LINK){REC_LINK=false;try{history.replaceState(null,'',location.pathname)}catch(e2){}}ov.remove();toast('Senha criada');res()}
       catch(e){q('#csOk').disabled=false;err('Não foi possível salvar a senha. Tente de novo.')}}})}
