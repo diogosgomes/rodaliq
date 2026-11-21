@@ -1,7 +1,7 @@
 {
-  "name": "Rodaliq – Gestão do motorista de app",
+  "name": "Rodaliq – Gestão de quem “roda”",
   "short_name": "Rodaliq",
-  "description": "Ganhos, custos, multas e Carnê-Leão do motorista de app.",
+  "description": "Gestão de quem “roda”, de carro ou de moto.",
   "lang": "pt-BR",
   "start_url": "./",
   "scope": "./",
