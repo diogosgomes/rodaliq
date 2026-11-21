@@ -5795,7 +5795,7 @@ $('#optBtn').onclick=e=>{e.stopPropagation();$('#bellMenu').classList.add('hidde
 window.addEventListener('scroll',()=>{['bellMenu','optMenu'].forEach(id=>{const m=document.getElementById(id);if(m&&!m.classList.contains('hidden')&&window.innerWidth<=640)posMenu(m,document.getElementById(id==='bellMenu'?'bellBtn':'optBtn'))})},{passive:true});
 document.addEventListener('click',e=>{if(!e.target.closest('#optWrap'))$('#optMenu').classList.add('hidden');if(!e.target.closest('#bellWrap'))$('#bellMenu').classList.add('hidden')});
 $('#optMenu').onclick=e=>{const b=e.target.closest('[data-m]');if(!b)return;$('#optMenu').classList.add('hidden');
-  ({falar:formFalar,apoio:formApoiar,corrigir:formCorrigir,excluir:formExcluirConta,cfg:formCfg,veic:formVeic,parc:formParceiros,cnh:formCnh,tema:formTema,onb:()=>primeiroAcesso(false),termos:()=>verTermos(),aud:verAuditoria,pass:formSenha,mfa:mfaTela,prevap:()=>prevApoiador(true),exp:exportar,imp:()=>$('#impFile').click(),desf:desfazImportacao,out:sair})[b.dataset.m]()};
+  ({falar:formFalar,apoio:formApoiar,corrigir:async()=>{try{await ajuCarregar()}catch(e){}formCorrigir()},excluir:formExcluirConta,cfg:formCfg,veic:formVeic,parc:formParceiros,cnh:formCnh,tema:formTema,onb:()=>primeiroAcesso(false),termos:()=>verTermos(),aud:verAuditoria,pass:formSenha,mfa:mfaTela,prevap:()=>prevApoiador(true),exp:exportar,imp:()=>$('#impFile').click(),desf:desfazImportacao,out:sair})[b.dataset.m]()};
 (()=>{const h=(location.hash||'').slice(1);if(['painel','corridas','carona','custos','multas','impostos','relatorios','rodacalc','reservas'].includes(h))UI.tab=h})();
 iniciar();
 if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
