@@ -3083,7 +3083,7 @@ function aplicaAjustes(){const b=document.querySelector('.menu [data-m="apoio"]'
   {const fb=document.querySelector('.menu [data-m="foto"]');if(fb)fb.classList.toggle('hidden',!fotoOn());if(fotoOn()&&!FOTO_CARREGADA&&UID){FOTO_CARREGADA=true;fotoCarregar()}else perfIniciais()}
   donoAtualiza();
   [['agenda','[data-t="agenda"],[data-fab="agenda"]'],['reservas','[data-t="reservas"],[data-fab="despesa"]'],['impostos','[data-t="impostos"]'],['relatorios','[data-t="relatorios"]'],['carona','[data-t="carona"],[data-fab="carona"]'],['ifood','[data-t="ifood"],[data-fab="ifood"],[data-fab="ifoodRep"]'],['rodacalc','[data-t="rodacalc"],[data-fab="rodacalc"]']].forEach(([k,sel])=>document.querySelectorAll(sel).forEach(e=>e.classList.toggle('hidden',recOff(k))));
-  {const vb=document.querySelector('.menu [data-m="prevap"]');if(vb)vb.classList.toggle('hidden',!ehMasterReal())}
+  {const vb=document.querySelector('.menu [data-m="prevap"]');if(vb)vb.classList.toggle('hidden',!ehPrincipalReal())}
   {const ov=document.getElementById('optVer');if(ov){const eu=String(LOGADO||'').toLowerCase()===ADMIN_MASTER;ov.classList.toggle('hidden',!eu);const n=document.getElementById('optVerN');if(n)n.textContent=VERSAO}} // versão no fim de Opções: só para o admin principal
   const pb=document.querySelector('.menu [data-m="parc"]');if(pb)pb.classList.toggle('hidden',recOff('parceiros'));
   {const w=document.getElementById('whoName');if(w){let sl=document.getElementById('whoSelo');if(!sl){sl=document.createElement('span');sl.id='whoSelo';sl.className='selo';sl.textContent='💚 Apoiador';w.insertAdjacentElement('afterend',sl)}const ver=VISAO?VISAO==='apoiador':(SOU_APOIADOR&&!ehMaster()&&!invIsAdmin);sl.classList.toggle('hidden',!ver);const hs=document.getElementById('hdrSelo');if(hs)hs.classList.toggle('hidden',!ver)}}
@@ -3425,7 +3425,7 @@ async function reciboPDF(x,nome,btn){
 // ⚙ Ajustes do app: só o admin principal
 const AJ_PAG=10;
 // V96: o master vê o app como um apoiador comum (só para teste)
-function prevApoiador(on){try{prevApoiador2(on)}catch(e){toast('Falha na simulação: '+(e&&e.message||e));console.error(e)}}
+function prevApoiador(on){if(!ehPrincipalReal())return;try{prevApoiador2(on)}catch(e){toast('Falha na simulação: '+(e&&e.message||e));console.error(e)}}
 // V117: o master escolhe com quais olhos ver o app (Master, Equipe, Apoiador, Usuário comum) e se simula país fora do Brasil. Só muda o que aparece; nada é gravado.
 function prevBarra(){let b=document.getElementById('prevBar');
   if(!b){b=document.createElement('div');b.id='prevBar';b.setAttribute('role','status');
@@ -4522,7 +4522,7 @@ const funcSujo=()=>{const l=document.getElementById('fnLista');return !!(l&&FUNC
 function funcRender(box){
   const atual=()=>Object.fromEntries(Object.keys(REC_NOMES).map(k=>[k,(AJU.rec&&AJU.rec[k])||AJU_PADRAO.rec[k]]));
   const nome=k=>REC_NOMES[k].replace(/^\S+\s/,'');
-  box.innerHTML=`<div class="card bloco" id="fnCard"><div class="bh"><h2>🎛 Funcionalidades do app</h2><span class="sp" style="flex:1"></span><button type="button" class="btn sec sm" id="fnPrev">👁 Ver como outro usuário</button></div>
+  box.innerHTML=`<div class="card bloco" id="fnCard"><div class="bh"><h2>🎛 Funcionalidades do app</h2><span class="sp" style="flex:1"></span>${ehPrincipalReal()?'<button type="button" class="btn sec sm" id="fnPrev">👁 Ver como outro usuário</button>':''}</div>
     <p class="small muted">Escolha quem vê cada funcionalidade, em 4 níveis: só o admin master, admins e colaboradores, apoiadores ou todos. Cada nível inclui os de cima. Esconder não apaga nada: os dados ficam guardados. <b>Você, admin master, sempre vê.</b> <b>O Guia do app segue estes mesmos níveis:</b> o tópico de uma funcionalidade só aparece para quem a vê.</p>
     <p class="small muted">Use esta lista como um backlog: funcionalidade pronta e testada entra aqui só para você, passa para a equipe e para os apoiadores e, por fim, é liberada para todos.</p>
     <div class="field"><input type="search" class="inp" id="fnQ" placeholder="Filtrar pelo nome da funcionalidade" aria-label="Filtrar funcionalidades pelo nome" autocomplete="off"></div>
@@ -4541,7 +4541,7 @@ function funcRender(box){
     try{await ajuSalvar({rec:novo})}catch(e){q('#fnErr').textContent='Não foi possível salvar agora. Tente de novo.';return}
     audit('Ajustes','Admin','Funcionalidades do app salvas · '+mud.map(k=>nome(k)+': '+REC_NIVEIS[ant[k]]+' → '+REC_NIVEIS[novo[k]]).join(' · '));
     FUNC_SNAP=navSerial(lista);pend();render();toast('Funcionalidades salvas')};
-  q('#fnPrev').onclick=async()=>{const ov=document.getElementById('admPage');if(funcSujo()&&!(await pedePerda()))return;FUNC_SNAP=null;if(ov)await ov.__fechar();prevApoiador(true)};
+  if(q('#fnPrev'))q('#fnPrev').onclick=async()=>{const ov=document.getElementById('admPage');if(funcSujo()&&!(await pedePerda()))return;FUNC_SNAP=null;if(ov)await ov.__fechar();prevApoiador(true)};
 }
 // V105: histórico das versões dos Termos de uso e da Política de Privacidade (Gestão Admin › Versões em PROD › Termos e Privacidade).
 // Cada mudança nos Termos/Política (novo TERMOS_V) ganha uma linha aqui, na mesma implantação. Só entra o que está documentado no código publicado.
