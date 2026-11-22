@@ -656,7 +656,8 @@ $('#logoL').innerHTML=logoSVG(40);$('#seloLogin').innerHTML=emblemaSVG(64);$('#l
 
 
 /* proteção leve (seleção e cópia continuam livres) */
-document.addEventListener('contextmenu',e=>{if(!e.target.closest('input,textarea'))e.preventDefault()});
+/* V114 (correção em produção): o menu de contexto não é mais bloqueado, para permitir selecionar e copiar texto (web e celular) */
+document.body&&document.documentElement.style.setProperty('-webkit-touch-callout','default');
 document.addEventListener('keydown',e=>{const k=e.key.toUpperCase();if(k==='F12'||(e.ctrlKey&&k==='U')||(e.ctrlKey&&e.shiftKey&&['I','J','C'].includes(k)))e.preventDefault()});
 
 /* ---------- estado ---------- */
@@ -4281,6 +4282,7 @@ function autoErro(e){const m=String((e&&e.message)||'');
   if(/nome inv/i.test(m))return 'Informe nome e sobrenome, sem e-mail.';
   if(/limite di/i.test(m))return 'Você já alterou este dado hoje. Tente amanhã ou escreva para '+TERMOS_MAIL+'.';
   if(/igual ao atual/i.test(m))return 'O valor informado é igual ao atual.';
+  if(/celular j[aá] existe|duplicate key|tb_convites_whatsapp_uq/i.test(m))return 'Este nº de telefone já existe.';
   if(/inv[aá]lido|n[aã]o h[aá] cadastro/i.test(m))return 'Não foi possível usar este dado. Confira e tente de novo.';
   return 'Não foi possível salvar agora. Tente de novo em instantes.'}
 async function autoCorrigir(c,v,motivo,antigo){
