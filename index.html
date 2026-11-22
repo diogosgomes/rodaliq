@@ -395,7 +395,7 @@ html[data-tema="escuro"] i[style*="#f6f8fb"]{background:#1A2640!important;border
 .modal{background:#fff;border-radius:16px;width:100%;max-width:560px;padding:18px 18px 16px;box-shadow:0 20px 50px rgba(0,0,0,.25)}
 .modal h2{font-size:17px;margin-bottom:4px}
 /* V102: telas sobrepostas — fundo opaco, rolagem do fundo travada, formulários e listas em tela cheia */
-html.travado,body.travado{overflow:hidden}
+html.travado,body.travado,html.travadoM{overflow:hidden}
 body.travado{position:fixed;left:0;right:0;width:100%}
 .ov{background:var(--bg);overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
 .ov.tela{padding:0;align-items:stretch}
@@ -561,6 +561,7 @@ body:has(#admPage) .fab,body:has(#ajuPage) .fab{z-index:61}body:has(#admPage) .f
         <button data-m="parc" class="hidden">🤝 Parceiros do Rodaliq</button>
         <div class="sep"></div>
         <button data-m="falar" class="hidden">✉️ Falar com o Rodaliq<span class="mCount hidden" id="falarN"></span></button>
+        <div class="small muted hidden" id="optVer" style="padding:6px 12px 4px">Rodaliq <b id="optVerN"></b></div>
       </div>
     </div>
     <div class="menuWrap" id="perfWrap">
@@ -1478,7 +1479,7 @@ function vIfood(){
   // imposto: só no Brasil (as regras de Carnê-Leão e DARF são brasileiras)
   if(br)h+=`<div class="card" style="margin-top:12px"><h2>🧾 Imposto do iFood</h2>
     <div class="note am small" style="margin-bottom:10px">${TXT_IFOOD_EST}</div>
-    <div class="fgrid"><div class="field"><label for="ifTr">% de Tributação (parte do ganho que conta como tributável)</label><input class="inp num" id="ifTr" inputmode="decimal" value="${String(ifoodTrib()).replace('.',',')}" style="max-width:120px"><span class="small muted" id="ifHelp">Valor atual: <b>${String(ifoodTrib()).replace('.',',')}%</b> (${ifoodTrib()===10?'padrão':'padrão é 10%'}). Não pode ser menor que 10%. Altere só conforme a orientação do seu Contador.</span>${window.__ifSalvo&&Date.now()-window.__ifSalvo<8000?'<span class="tag b" id="ifOk" style="margin-left:6px">✓ Salvo</span>':''}</div>
+    <div class="fgrid"><div class="field"><label for="ifTr">% de Tributação (parte do ganho que conta como tributável)</label><input class="inp num" id="ifTr" inputmode="decimal" value="${String(ifoodTrib()).replace('.',',')}" style="max-width:120px"><span class="small muted" id="ifHelp">Valor atual: <b>${String(ifoodTrib()).replace('.',',')}%</b> (${ifoodTrib()===10?'padrão':'padrão é 10%'}). Não pode ser menor que 10%. Altere só conforme a orientação do seu Contador. <b>O valor é salvo automaticamente ao apertar Enter ou ao sair do campo.</b></span>${window.__ifSalvo&&Date.now()-window.__ifSalvo<8000?'<span class="tag b" id="ifOk" style="margin-left:6px">✓ Salvo</span>':''}</div>
     <div class="field"><label style="display:flex;gap:8px;align-items:center;font-weight:500;color:var(--ink)"><input type="checkbox" id="ifCa"${ifoodCarneOn()?' checked':''}> Enviar iFood para o Carnê-Leão</label><span class="small muted">Desligue se a sua OL já desconta o imposto na fonte.</span></div></div>
     <div class="note small" style="margin-top:10px">${TXT_IFOOD_OL}</div>
     <div class="err" id="ifErr"></div></div>`;
@@ -3079,6 +3080,7 @@ function aplicaAjustes(){const b=document.querySelector('.menu [data-m="apoio"]'
   donoAtualiza();
   [['agenda','[data-t="agenda"],[data-fab="agenda"]'],['reservas','[data-t="reservas"],[data-fab="despesa"]'],['impostos','[data-t="impostos"]'],['relatorios','[data-t="relatorios"]'],['carona','[data-t="carona"],[data-fab="carona"]'],['ifood','[data-t="ifood"],[data-fab="ifood"],[data-fab="ifoodRep"]'],['rodacalc','[data-t="rodacalc"],[data-fab="rodacalc"]']].forEach(([k,sel])=>document.querySelectorAll(sel).forEach(e=>e.classList.toggle('hidden',recOff(k))));
   {const vb=document.querySelector('.menu [data-m="prevap"]');if(vb)vb.classList.toggle('hidden',!ehMaster())}
+  {const ov=document.getElementById('optVer');if(ov){const eu=String(LOGADO||'').toLowerCase()===ADMIN_MASTER;ov.classList.toggle('hidden',!eu);const n=document.getElementById('optVerN');if(n)n.textContent=VERSAO}} // versão no fim de Opções: só para o admin principal
   const pb=document.querySelector('.menu [data-m="parc"]');if(pb)pb.classList.toggle('hidden',recOff('parceiros'));
   {const w=document.getElementById('whoName');if(w){let sl=document.getElementById('whoSelo');if(!sl){sl=document.createElement('span');sl.id='whoSelo';sl.className='selo';sl.textContent='💚 Apoiador';w.insertAdjacentElement('afterend',sl)}const ver=PREV_AP||(SOU_APOIADOR&&!ehMaster()&&!invIsAdmin);sl.classList.toggle('hidden',!ver);const hs=document.getElementById('hdrSelo');if(hs)hs.classList.toggle('hidden',!ver)}}
   document.querySelectorAll('[data-fab="carne"]').forEach(e=>e.classList.toggle('hidden',recOff('impostos')));
@@ -6100,7 +6102,7 @@ if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.ser
 
 /* V102: telas sobrepostas (janelas e menus): travam o fundo, cobrem a tela de trás e sempre abrem no início */
 (function(){
-  const MENUS=['#bellMenu','#optMenu','#perfMenu','#fabMenu'];let y=0,travado=false,sinoAb=false;
+  const MENUS=['#bellMenu','#optMenu','#perfMenu','#fabMenu'];let y=0,travado='',sinoAb=false;
   const aberto=s=>{const m=document.querySelector(s);return !!m&&!m.classList.contains('hidden')};
   function sync(){
     const ovs=[...document.querySelectorAll('.ov')];
@@ -6111,8 +6113,14 @@ if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.ser
     sinoAb=sino;
     document.body.classList.toggle('menuAb',menu);document.body.classList.toggle('sheetAb',sino);
     const quer=ovs.length>0||menu;
-    if(quer&&!travado){y=window.scrollY||document.documentElement.scrollTop||0;document.body.style.top=(-y)+'px';document.body.classList.add('travado');document.documentElement.classList.add('travado');travado=true}
-    else if(!quer&&travado){document.body.classList.remove('travado');document.documentElement.classList.remove('travado');document.body.style.top='';window.scrollTo(0,y);travado=false}
+    const modo=!quer?'':(ovs.length===0&&!sino?'m':'f'); // 'm' = só um menu pequeno aberto: só trava a rolagem (o cabeçalho e o menu continuam visíveis); janelas e o sino usam o travamento total
+    if(modo!==travado){
+      if(travado==='f'){document.body.classList.remove('travado');document.documentElement.classList.remove('travado');document.body.style.top='';window.scrollTo(0,y)}
+      else if(travado==='m'){document.documentElement.classList.remove('travadoM')}
+      if(modo==='f'){y=window.scrollY||document.documentElement.scrollTop||0;document.body.style.top=(-y)+'px';document.body.classList.add('travado');document.documentElement.classList.add('travado')}
+      else if(modo==='m'){document.documentElement.classList.add('travadoM')}
+      travado=modo;
+    }
   }
   new MutationObserver(sync).observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['class']});
   sync();
