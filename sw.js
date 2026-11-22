@@ -10,6 +10,8 @@ self.addEventListener('fetch',e=>{
 });
 /* V120: avisos push (só o administrador principal se inscreve) */
 self.addEventListener('push',e=>{let d={};try{d=e.data?e.data.json():{}}catch(x){}
-  e.waitUntil(self.registration.showNotification(d.titulo||'Rodaliq',{body:d.corpo||'Toque para abrir o Rodaliq.',tag:d.tag||'rodaliq',icon:'icons/icon-192.png',badge:'icons/icon-192.png',data:{url:d.url||'./'}}))});
+  const agora=new Date(),hora=agora.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit',timeZone:'America/Sao_Paulo'});
+  const tag=(d.tag||'rodaliq')+'-'+agora.getTime(); // cada aviso é único: o Android não descarta repetidos
+  e.waitUntil(self.registration.showNotification(d.titulo||'Rodaliq',{body:(d.corpo||'Toque para abrir o Rodaliq.')+' · '+hora,tag,renotify:true,timestamp:agora.getTime(),icon:'icons/icon-192.png',badge:'icons/icon-192.png',data:{url:d.url||'./'}}))});
 self.addEventListener('notificationclick',e=>{e.notification.close();
   e.waitUntil(self.clients.matchAll({type:'window',includeUncontrolled:true}).then(l=>{for(const c of l){if('focus' in c)return c.focus()}return self.clients.openWindow((e.notification.data&&e.notification.data.url)||'./')}))});
