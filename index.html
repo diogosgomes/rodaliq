@@ -2581,7 +2581,7 @@ function formCorrigir(){
     if(c==='email'&&emailAuto()){v=v.toLowerCase();if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v))return err('Informe um e-mail válido.');if(v===String(atual.email).toLowerCase())return err('O e-mail informado é igual ao atual.');
       q('#coS').disabled=true;try{const {error}=await DB.auth.updateUser({email:v});if(error){q('#coS').disabled=false;return err(/already|registered|exists/i.test(error.message)?'Este e-mail já está em uso.':(/rate|seconds|limit/i.test(error.message)?'Aguarde um minuto antes de pedir outro código.':'Não foi possível enviar o código agora. Tente de novo.'))}
         emailCodigo(ov,v)}catch(e){q('#coS').disabled=false;err('Não foi possível enviar o código agora. Tente de novo.')}return}
-    if(c==='nome'){if(v.length<2)return err('Informe o nome completo.');if(v.toLowerCase()===String(atual.nome).toLowerCase())return err('O nome informado é igual ao atual.')}
+    if(c==='nome'){if(/@/.test(v))return err('Isto parece um e-mail. Para trocar o e-mail, toque na aba E-mail.');if(!/^\S+\s+\S+/.test(v)||v.length<3)return err('Informe nome e sobrenome.');if(v.length>80)return err('O nome pode ter até 80 letras.');if(v.toLowerCase()===String(atual.nome).toLowerCase())return err('O nome informado é igual ao atual.')}
     if(c==='celular'){const o=q('#coP').value,br=o.startsWith('55|');let ddi=br?'55':(o==='|Outro'?corrDig(q('#coD').value):o.split('|')[0]);v=corrDig(v);
       if(br){if(v.startsWith('55')&&v.length>=12)v=v.slice(2);if(v.length<10||v.length>11)return err('Informe o celular com DDD (10 ou 11 números).')}
       else{if(!ddi)return err('Informe o código do país (DDI).');if(v.startsWith(ddi)&&v.length>ddi.length+8)v=v.slice(ddi.length);if(!/^[1-9]\d{9,14}$/.test(ddi+v))return err('Informe o número com código de área (de 10 a 15 algarismos, contando o código do país).')}
@@ -4248,6 +4248,7 @@ function autoSimular(k,resumo){
   try{if(invProd()){Promise.resolve(DB.rpc('rodaliq_auto_simular',{p_auto:k,p_resumo:resumo})).catch(()=>{})}
   else{const id='s'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);DB.doc('autolog/'+id).set({ts:new Date().toISOString(),automacao:k,modo:'sim',user_id:UID,email:LOGADO,resumo,ciente_em:null})}}catch(e){}}
 function autoErro(e){const m=String((e&&e.message)||'');
+  if(/nome inv/i.test(m))return 'Informe nome e sobrenome, sem e-mail.';
   if(/limite di/i.test(m))return 'Você já alterou este dado hoje. Tente amanhã ou escreva para '+TERMOS_MAIL+'.';
   if(/igual ao atual/i.test(m))return 'O valor informado é igual ao atual.';
   if(/inv[aá]lido|n[aã]o h[aá] cadastro/i.test(m))return 'Não foi possível usar este dado. Confira e tente de novo.';
