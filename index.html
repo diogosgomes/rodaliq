@@ -659,6 +659,17 @@ $('#logoL').innerHTML=logoSVG(40);$('#seloLogin').innerHTML=emblemaSVG(64);$('#l
 /* proteção leve (seleção e cópia continuam livres) */
 /* V114 (correção em produção): o menu de contexto não é mais bloqueado, para permitir selecionar e copiar texto (web e celular) */
 document.body&&document.documentElement.style.setProperty('-webkit-touch-callout','default');
+/* correção em produção: Enter num campo de janela (modal) aciona o botão principal (Salvar/Enviar/Confirmar) */
+document.addEventListener('keydown',e=>{
+  if(e.key!=='Enter'||e.defaultPrevented||e.isComposing||e.shiftKey||e.ctrlKey||e.altKey||e.metaKey)return;
+  const t=e.target;if(!t||t.tagName!=='INPUT')return;
+  if(!/^(text|email|tel|number|password|date|time|search|url)?$/i.test(t.type||''))return;
+  const m=t.closest('.modal,.ov');if(!m)return;
+  const bs=[...m.querySelectorAll('.btn')].filter(b=>!b.classList.contains('sec')&&!b.classList.contains('warn')&&!b.classList.contains('hidden')&&!b.disabled&&b.offsetParent!==null);
+  const f=m.querySelectorAll('.mfoot .btn'),pf=[...f].filter(b=>bs.includes(b));
+  const b=pf.length?pf[pf.length-1]:(bs.length===1?bs[0]:null);
+  if(b){e.preventDefault();b.click()}
+});
 document.addEventListener('keydown',e=>{const k=e.key.toUpperCase();if(k==='F12'||(e.ctrlKey&&k==='U')||(e.ctrlKey&&e.shiftKey&&['I','J','C'].includes(k)))e.preventDefault()});
 
 /* ---------- estado ---------- */
@@ -1309,7 +1320,7 @@ function pedeFone(){return new Promise(res=>{const ov=document.createElement('di
     <div class="err" id="pfE"></div><div class="mfoot"><button class="btn sec" id="pfC">Cancelar</button><button class="btn" id="pfOk">Abrir WhatsApp</button></div></div>`;
   document.body.appendChild(ov);const q=s=>ov.querySelector(s);setTimeout(()=>q('#pfN').focus(),50);
   q('#pfC').onclick=()=>{ov.remove();res('')};
-  q('#pfN').addEventListener('keydown',e=>{if(e.key==='Enter')q('#pfOk').click()});
+  q('#pfN').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();q('#pfOk').click()}});
   q('#pfOk').onclick=()=>{const d=String(q('#pfN').value||'').replace(/\D/g,'');
     const f=d.length>=12&&d.startsWith('55')?d:((d.length===10||d.length===11)?'55'+d:'');
     if(!f){q('#pfE').textContent='Informe o número com DDD, só os algarismos.';return}
