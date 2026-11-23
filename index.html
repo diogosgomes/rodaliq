@@ -4984,7 +4984,7 @@ async function indicRender(box,aba,recarrega){
   if(aba==='geral'){
     const cnt=k=>at.filter(u=>u.n(k)>0).length,exAc=A.ex.length,ap=A.R.apoios||[];
     const disp={android:0,ios:0,desktop:0,sem:0};at.forEach(u=>{disp[u.disp||'sem']++});
-    const motT=EXC_MOTIVOS.concat(['Outro motivo']),cel=(l,m)=>A.ex.filter(e=>A.mot(e.motivo)===l&&(m?String(e.criado||'').slice(0,7)===m:true)).length;
+    const motT=EXC_MOTIVOS.slice(),cel=(l,m)=>A.ex.filter(e=>A.mot(e.motivo)===l&&(m?String(e.criado||'').slice(0,7)===m:true)).length;
     h=grid([['Usuários ativos',fm(T),'últimos 30 dias · '+cad.length+' cadastrados'],['Salvaram registro',pc(A.salv.length,T),A.salv.length+' de '+T+' usaram de verdade'],['Só consultaram',pc(A.so.length,T),A.so.length+' de '+T+' usam e não salvaram'],
         ['Voltaram em 7 dias',A.ret0.length?pc(A.ret.length,A.ret0.length):'—',A.ret0.length?A.ret.length+' de '+A.ret0.length+' que entraram na semana anterior':'ainda sem histórico (contagem desde a V103)'],
         ['Novos no mês',fm(A.novos.length),'cadastros no mês · '+A.convMes.length+' pedidos de convite recebidos'],['Exclusões no mês',fm(A.exMes.length),exAc+' no acumulado'+(T?' = '+(Math.round(exAc/T*1000)/10).toString().replace('.',',')+'% da base ativa':'')],
