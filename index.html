@@ -4316,7 +4316,7 @@ function abrirAdmin(sub){if(sub==='usuarios')sub=UI.usuSub||'ativos';['#bellMenu
 async function admContagens(){let pend=0;const put=(k,n)=>{const e=document.querySelector(`[data-admn="${k}"]`);if(e)e.textContent=n==null?'':'('+n+')'};
   try{if(!invCache.length)await invRefreshBadge(true)}catch(e){}
   {const n=invCache.filter(r=>invVivo(r)&&!r.archived&&r.status==='novo').length;put('convites',n);pend+=n;put('usuarios',pend||null)}
-  try{const us=await admUsuarios();put('ativos',us.filter(u=>!u.excluido_em).length);put('excluidos',us.filter(u=>u.excluido_em).length)}catch(e){}
+  try{const us=await admUsuarios(),dz=new Set((await excListar().catch(()=>[])).filter(x=>x.status==='desativado').map(x=>x.user_id));put('ativos',us.filter(u=>!u.excluido_em&&!dz.has(u.user_id)).length);put('excluidos',us.filter(u=>u.excluido_em).length)}catch(e){}
   try{const L=await excListar();put('exclusoes',L.filter(x=>x.status==='novo'||x.status==='desativado').length);pend+=L.filter(x=>x.status==='novo'||(x.status==='desativado'&&x.reativacao_pedida_em)).length;put('usuarios',pend||null)}catch(e){}
   try{const L=await corrListar();CORR_CACHE=L;put('correcoes',L.filter(x=>x.status==='novo').length);pend+=L.filter(corrPend).length;put('usuarios',pend||null)}catch(e){}
   try{const L=await senListar();SEN_CACHE=L;put('senhas',L.filter(x=>x.status==='novo').length);pend+=L.filter(senPend).length;put('usuarios',pend||null)}catch(e){}
