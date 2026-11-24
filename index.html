@@ -4911,7 +4911,8 @@ async function indContatoRemover(id){
   if(invProd()){const {error}=await DB.from('tb_contatos').delete().eq('id',id);if(error)throw error;return}
   await DB.doc('contatos/'+id).delete()}
 async function pfMapa(){ // perfil de cada pessoa, lido pela mesma função dos Indicadores (só Admin Supremo); atualiza também o cache dos Indicadores
-  const R=await indCarrega();IND_R=R;const m={};(R.usuarios||[]).forEach(u=>{if(u.id)m[u.id]=u.perfil||null});return m}
+  if(invProd()){const {data,error}=await DB.rpc('rodaliq_perfis_usuarios');if(error)throw error;return data||{}} // inclui admins (os Indicadores não contam admins)
+  const R=await indCarrega();const m={};(R.usuarios||[]).forEach(u=>{if(u.id)m[u.id]=u.perfil||null});return m}
 async function indCarrega(){
   if(invProd()){const {data,error}=await DB.rpc('rodaliq_indicadores');if(error)throw error;return data}
   return indDemo(await indContatos().catch(()=>[]))}
