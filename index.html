@@ -4922,10 +4922,10 @@ function indCalc(R){
   const mes=String(R.hoje).slice(0,7),pf=x=>(x||[]).filter(Boolean);
   const U=(R.usuarios||[]).map(u=>{const ev=u.ev||{},n=k=>ev[k]?ev[k][0]:0,ult=k=>ev[k]?ev[k][1]:null,
     salv=Object.keys(ev).some(k=>k.indexOf('salvou:')===0)||(!!u.reg&&dd(u.reg)<30),
-    excl=!!u.excluido,ativo=!excl&&!!u.uso&&dd(u.uso)<30,w=String(u.whats||''),pais=w?paisDoDDI(w):'Sem telefone',uf=w.indexOf('55')===0?(DDD_UF[w.slice(2,4)]||''):'';
+    excl=!!u.excluido,ativo=!excl&&!u.desativado&&!!u.uso&&dd(u.uso)<30,w=String(u.whats||''),pais=w?paisDoDDI(w):'Sem telefone',uf=w.indexOf('55')===0?(DDD_UF[w.slice(2,4)]||''):'';
     const disp=['android','ios','desktop'].map(k=>[k,n('disp:'+k),ult('disp:'+k)]).filter(x=>x[1]>0).sort((a,b)=>String(b[2]).localeCompare(String(a[2]))||b[1]-a[1])[0];
     return {...u,ev,n,ult,salv,excl,ativo,w,pais,uf,disp:disp?disp[0]:null}});
-  const cad=U.filter(u=>!u.excl),at=U.filter(u=>u.ativo),T=at.length;
+  const cad=U.filter(u=>!u.excl),cadA=cad.filter(u=>!u.desativado),at=U.filter(u=>u.ativo),T=at.length; // cadA = contas ativas (cadastradas, sem exclusão nem desativação)
   const telas=IND_TELAS.map(([k,nome])=>{const ab=at.filter(u=>u.n('abriu:'+k)>0),sv=at.filter(u=>u.n('salvou:'+k)>0);return {k,nome,so:ab.filter(u=>u.n('salvou:'+k)===0).length,sv:sv.length}});
   const salv=at.filter(u=>u.salv),so=at.filter(u=>!u.salv);
   const ret0=U.filter(u=>!u.excl&&u.d7b>0),ret=ret0.filter(u=>u.d7a>0);
@@ -4949,7 +4949,7 @@ function indCalc(R){
    consultaram:at.filter(u=>!u.salv&&!u.reg&&dd(u.criado)>=14).map(u=>({alvo:u.email,nome:u.nome||u.email,email:u.email,whats:u.w,loc:loc(u),tempo:(u.uso?dd(u.uso):0)+' dias',det:resumoTelas(u)})),
    agoranao:at.filter(u=>u.n('aviso:doacao_agora_nao')>0&&dDia(u.ult('aviso:doacao_agora_nao'))>=7&&u.n('abriu:painel')>=8&&!ap.has(u.id)).map(u=>({alvo:u.email,nome:u.nome||u.email,email:u.email,whats:u.w,loc:loc(u),tempo:dDia(u.ult('aviso:doacao_agora_nao'))+' dias',det:resumoTelas(u)}))};
   const L={};Object.keys(I).forEach(k=>{L[k]={todos:I[k],pend:I[k].filter(x=>!bloqueado(x.alvo)&&!recente(x.alvo)),feitos:I[k].filter(x=>bloqueado(x.alvo)||recente(x.alvo))}});
-  return {R,U,cad,at,T,telas,salv,so,ret,ret0,novos,convMes,mails,ex,exMes,meses,mot,ap,L,cont,ultCont,bloqueado,mes,dd,dDia};
+  return {R,U,cad,cadA,at,T,telas,salv,so,ret,ret0,novos,convMes,mails,ex,exMes,meses,mot,ap,L,cont,ultCont,bloqueado,mes,dd,dDia};
 }
 function indLista(key,aoFechar){
   const C=IND_L[key],K=IND_CALC;if(!C||!K)return;const ov=document.createElement('div');ov.className='ov tela';
@@ -4986,7 +4986,7 @@ const IND_DESDE='20/11/2026';
 async function indicRender(box,aba,recarrega){
   aba=aba||UI.indAba||'geral';UI.indAba=aba;
   if(!IND_R||recarrega){box.innerHTML='<div class="empty">Carregando indicadores…</div>';try{IND_R=await indCarrega()}catch(e){box.innerHTML='<div class="empty">Não consegui carregar os indicadores. Tente de novo em instantes.</div>';return}}
-  const A=indCalc(IND_R);IND_CALC=A;const {T,at,cad,U}=A,pc=(n,t)=>t?Math.round(n/t*100)+'%':'—',fm=n=>String(n);
+  const A=indCalc(IND_R);IND_CALC=A;const {T,at,cad,cadA,U}=A,pc=(n,t)=>t?Math.round(n/t*100)+'%':'—',fm=n=>String(n);
   const bar=(n,t,c,cor)=>{const p=t?Math.round(n/t*100):0;return `<div style="display:flex;align-items:center;gap:8px;margin:5px 0"><div style="flex:0 0 150px;font-size:13px">${c}</div><div style="flex:1;background:var(--line,#e5e7eb);border-radius:6px;height:14px;overflow:hidden"><div style="width:${p}%;height:100%;background:${cor||'#2563eb'}"></div></div><div style="flex:0 0 78px;text-align:right;font-size:13px"><b>${p}%</b> <span class="muted">(${n})</span></div></div>`};
   const card=(t,sub,h)=>`<div class="card" style="margin-top:10px"><h3 style="margin:0 0 4px">${t}</h3><div class="small muted" style="margin-bottom:6px">${sub}</div>${h}</div>`;
   const grid=L=>`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:10px">${L.map(([l,v,s2])=>kpi(l,v,s2)).join('')}</div>`;
@@ -5000,7 +5000,7 @@ async function indicRender(box,aba,recarrega){
     const cnt=k=>at.filter(u=>u.n(k)>0).length,exAc=A.ex.length,ap=A.R.apoios||[];
     const disp={android:0,ios:0,desktop:0,sem:0};at.forEach(u=>{disp[u.disp||'sem']++});
     const motT=EXC_MOTIVOS.slice(),cel=(l,m)=>A.ex.filter(e=>A.mot(e.motivo)===l&&(m?String(e.criado||'').slice(0,7)===m:true)).length;
-    h=grid([['Usuários ativos',fm(T),'últimos 30 dias · '+cad.length+' cadastrados'],['Salvaram registro',pc(A.salv.length,T),A.salv.length+' de '+T+' usaram de verdade'],['Só consultaram',pc(A.so.length,T),A.so.length+' de '+T+' usam e não salvaram'],
+    h=grid([['Usuários ativos',fm(T),'últimos 30 dias · '+cadA.length+' contas ativas'],['Salvaram registro',pc(A.salv.length,T),A.salv.length+' de '+T+' usaram de verdade'],['Só consultaram',pc(A.so.length,T),A.so.length+' de '+T+' usam e não salvaram'],
         ['Voltaram em 7 dias',A.ret0.length?pc(A.ret.length,A.ret0.length):'—',A.ret0.length?A.ret.length+' de '+A.ret0.length+' que entraram na semana anterior':'ainda sem histórico (contagem desde a V103)'],
         ['Novos no mês',fm(A.novos.length),'cadastros no mês · '+A.convMes.length+' pedidos de convite recebidos'],['Exclusões no mês',fm(A.exMes.length),exAc+' no acumulado'+(T?' = '+(Math.round(exAc/T*1000)/10).toString().replace('.',',')+'% da base ativa':'')],
         ['Inativos há 30+ dias',fm(nl('inativos')),'sem usar o app · ver lista'],['Ativação',fm(nl('ativacao')),'novos sem o 1º registro · ver lista']])+vazio
@@ -5014,7 +5014,7 @@ async function indicRender(box,aba,recarrega){
   }else if(aba==='perfil'){
     // V122: perfil de habilitação, tipo de trabalho e veículo — base ativa (últimos 30 dias) no topo, tudo calculado sobre ela
     // contas de admin entram só nesta aba (usam o app como motoristas); nas outras abas a base continua sem admins
-    const admAt=(A.R.admins||[]).filter(u=>!u.excluido&&u.uso&&(Date.now()-new Date(u.uso).getTime())/IND_DIA<30).map(u=>({...u,nome:u.nome||u.email}));
+    const admAt=(A.R.admins||[]).filter(u=>!u.excluido&&!u.desativado&&u.uso&&(Date.now()-new Date(u.uso).getTime())/IND_DIA<30).map(u=>({...u,nome:u.nome||u.email}));
     const at=A.at.concat(admAt),T=at.length;
     const N=at.map(u=>({u,n:pfNorm(u.perfil)})),inf=N.filter(x=>x.n.inf),sem=N.length-inf.length,I=inf.map(x=>x.n),TI=I.length;
     const c=f=>I.filter(f).length,hab=I.filter(n=>!n.sem);
@@ -5024,7 +5024,7 @@ async function indicRender(box,aba,recarrega){
     const mails=A.mails;
     const cv=(A.R.convites||[]).map(cn=>({cn,n:pfNorm(cn)}));
     const grp=[['Com CNH e EAR',x=>x.n.inf&&x.n.ear==='sim'],['Com CNH sem EAR',x=>x.n.inf&&x.n.ear==='nao'],['Sem CNH',x=>x.n.inf&&x.n.sem],['Não informado (pedidos antigos)',x=>!x.n.inf]];
-    h=`<div class="card" style="margin-top:10px;border:2px solid #2563eb"><h3 style="margin:0 0 4px">Base ativa · últimos 30 dias</h3><div style="display:flex;align-items:baseline;gap:10px"><b style="font-size:32px">${T}</b><span class="muted">usuários ativos (100% da base) · ${cad.length} cadastrados</span></div>
+    h=`<div class="card" style="margin-top:10px;border:2px solid #2563eb"><h3 style="margin:0 0 4px">Base ativa · últimos 30 dias</h3><div style="display:flex;align-items:baseline;gap:10px"><b style="font-size:32px">${T}</b><span class="muted">usuários ativos (100% da base) · ${cadA.length+(A.R.admins||[]).filter(u=>!u.excluido&&!u.desativado).length} contas ativas, ${cadA.length+(A.R.admins||[]).filter(u=>!u.excluido&&!u.desativado).length-T} sem uso nos últimos 30 dias</span></div>
         ${bar(TI,T,'Perfil informado','#16a34a')}${bar(sem,T,'Ainda sem perfil','#f59e0b')}
         <div class="small muted" style="margin-top:6px">Tudo abaixo é calculado sobre a base ativa, <b>incluindo as contas de admin</b> (só nesta aba; nas outras a base não conta admins). “Ainda sem perfil” entra como uma fatia própria, para não distorcer os percentuais. Os números leem o perfil atual de cada conta (o que a pessoa editou), não a resposta antiga do convite. Dados declarados pelas pessoas, só para estatística interna.</div></div>`
       +(T?'':vazio)
@@ -5090,6 +5090,7 @@ async function montaAdmin(){const box=$('#admBox');if(!box)return;const sub=UI.a
     .sort((a,b)=>rk(a)-rk(b)||semAc(nomeDe(a)).localeCompare(semAc(nomeDe(b)),'pt-BR')||String(a.email||'').localeCompare(String(b.email||''))) ;
   if(invProd()&&fotoOn()){try{const ids=lst.map(u=>u.user_id).filter(id=>id&&!(id in FOTOS)).slice(0,30);if(ids.length){ids.forEach(id=>{FOTOS[id]=null});const {data}=await DB.from('tb_fotos').select('user_id,dados').in('user_id',ids);(data||[]).forEach(r=>{FOTOS[r.user_id]=r.dados})}}catch(e){}}
   let PFMAP=null;if(!exc&&ehPrincipal()){try{PFMAP=await pfMapa()}catch(e){PFMAP=null}}
+  const desatU=u=>!!u.user_id&&(EXC_CACHE||[]).some(x=>x.user_id===u.user_id&&x.status==='desativado');
   const card=u=>{const c=conv.get(String(u.email||'').toLowerCase()),nm=(u.user_id&&PERFIS[u.user_id])||(c&&c.name)||'',dsAna=!exc?(EXC_CACHE||[]).find(x=>x.user_id===u.user_id&&x.status==='desativado'):null;
     const txt=pessoaTexto(u,nm);ZAP_PES[u.user_id||u.email]={fone:c?c.whatsapp:'',txt};if(u.user_id)ZAP_PES['i:'+u.user_id]={fone:c?c.whatsapp:'',txt:inatTexto(String(nm).split(' ')[0],inatDias(u,INAT),false)};
     const r0=rk(u),tagP=r0===0?'<span class="rcTag ad">'+rotMaster(u.email)+'</span>':r0===1?'<span class="rcTag ad">Admin</span>':r0===2?'<span class="rcTag ts">Colaborador</span>':'',
@@ -5101,9 +5102,9 @@ async function montaAdmin(){const box=$('#admBox');if(!box)return;const sub=UI.a
       ${PFMAP?(()=>{const n=pfNorm(PFMAP[u.user_id]),at=pfAtencao(n);return `<div class="uLin">🪪 Perfil: <b>${esc(pfResumo(n))}</b>${at.length?` · <span class="tag a">⚠ ${esc(at.join('; '))}</span>`:''}</div>`})():''}
       <div class="uLin">Cadastro: ${admData(u.criado_em)}${exc?` · <b>Excluído em ${admData(u.excluido_em)}</b>`:` · Último login: ${admData(u.ultimo_login)} · Último uso: ${admData(u.ultimo_uso)}`}</div>
       <div class="ivActs" style="margin-top:8px"><button type="button" class="btn sm" data-pdf="${esc(u.user_id||u.email)}">📄 Dados desta pessoa</button><a class="btn sm" href="${esc(invMailLink(u.email,'Seus dados pessoais no Rodaliq',txt))}" target="_blank" rel="noopener">✉ Responder o pedido</a><button type="button" class="btn sm" data-zp="${esc(u.user_id||u.email)}">💬 WhatsApp</button>${!exc&&ehMaster()&&u.user_id&&u.user_id!==UID&&u.user_id!=='hmo'&&!ADM_IDS.has(u.user_id)?(dsAna?`<button type="button" class="btn sm" data-uree="${esc(u.user_id)}">▶ Reativar acesso</button>`:`<button type="button" class="btn sm warn" data-uana="${esc(u.user_id)}">⏸ Desativar para análise</button>`):''}${!exc&&invProd()&&ehMaster()&&u.user_id&&!ADM_IDS.has(u.user_id)?`${emAviso(u)?`<a class="btn sm" href="${esc(invMailLink(u.email,'Sua conta no Rodaliq',inatTexto(nm.split(' ')[0],inatDias(u,INAT),false)))}" target="_blank" rel="noopener">✉ Avisar da inatividade</a><button type="button" class="btn sm" data-zi="${esc(u.user_id)}">💬 Avisar no WhatsApp</button>`:''}${emAviso(u)&&inatDias(u,INAT)>=INAT_DIAS&&invProd()&&ehMaster()&&!(EXC_CACHE||[]).some(x=>x.user_id===u.user_id&&['novo','desativado'].includes(x.status))?`<button type="button" class="btn sm warn" data-uina="${esc(u.user_id)}">🔒 Desativar por inatividade</button>`:''}<button type="button" class="btn sm warn" data-udel="${esc(u.user_id)}">🗑 Excluir usuário</button>`:''}</div></div></div>`};
-  box.innerHTML=`<h3 style="margin:0">${exc?'🗑 Usuários excluídos':'👥 Usuários ativos'} (${lst.length})</h3>
+  box.innerHTML=`<h3 style="margin:0">${exc?'🗑 Usuários excluídos':'👥 Usuários ativos'} (${exc?lst.length:lst.filter(u=>!desatU(u)).length})${!exc&&lst.some(desatU)?` · ${lst.filter(desatU).length} ${lst.filter(desatU).length===1?'desativado':'desativados'}`:''}</h3>
     <p class="small muted" style="margin:4px 0 0">${exc?'Usuários apagados (pelo app ou pelo painel do Supabase), com a data da exclusão.':'Ordem: admin supremo, admins master, admins, colaboradores e depois os demais, cada grupo de A a Z. Toque no nome para ver os detalhes. “Último uso” muda sempre que a pessoa abre o app; “Último login”, só quando ela digita a senha.'} Para apagar uma pessoa, use “🗑 Excluir usuário” (definitivo).${invProd()?'':' <b>No HMO aparece só o usuário de teste; os dados reais aparecem em produção.</b>'}</p>
-    ${sub==='ativos'&&invProd()?`<div class="admTabs" style="margin:8px 0"><button type="button" class="chip${ativF==='todos'?' on':''}" data-ativf="todos">Todos (${lstAll.length})</button><button type="button" class="chip${ativF==='aviso'?' on':''}" data-ativf="aviso">Sem lançar há ${INAT_DIAS-INAT_AVISO}+ dias (${lstAll.filter(emAviso).length})</button></div><p class="small muted" style="margin:0 0 8px">Só entrar no app não conta: vale o último lançamento. Aos ${INAT_DIAS-INAT_AVISO} dias você pode avisar a pessoa; aos ${INAT_DIAS} dias aparece “🔒 Desativar por inatividade” (mesma carência de ${EXC_DIAS} dias e mesma reativação dos pedidos de exclusão).</p>`:''}
+    ${sub==='ativos'&&invProd()?`<div class="admTabs" style="margin:8px 0"><button type="button" class="chip${ativF==='todos'?' on':''}" data-ativf="todos">Todos (${lstAll.length} contas)</button><button type="button" class="chip${ativF==='aviso'?' on':''}" data-ativf="aviso">Sem lançar há ${INAT_DIAS-INAT_AVISO}+ dias (${lstAll.filter(emAviso).length})</button></div><p class="small muted" style="margin:0 0 8px">Só entrar no app não conta: vale o último lançamento. Aos ${INAT_DIAS-INAT_AVISO} dias você pode avisar a pessoa; aos ${INAT_DIAS} dias aparece “🔒 Desativar por inatividade” (mesma carência de ${EXC_DIAS} dias e mesma reativação dos pedidos de exclusão).</p>`:''}
     ${lst.length?(()=>{let h='',g=null,l=null;const eq=lst.some(u=>rk(u)<3);lst.forEach(u=>{const r0=rk(u),gr=r0<3?'e':'u';
       if(gr!==g){g=gr;l=null;if(eq)h+=`<div class="uGrp">${gr==='e'?'Equipe · admin supremo, admins master, admins e colaboradores':'Usuários'}</div>`}
       if(gr==='u'){const L=(semAc(nomeDe(u))[0]||'#').toUpperCase();if(L!==l){l=L;h+=`<div class="uGrp uLt">${esc(L)}</div>`}}
