@@ -5013,6 +5013,9 @@ async function indicRender(box,aba,recarrega){
       +card('Avisos e alertas · últimos 30 dias','Quantos usuários viram cada aviso e o que fizeram.',[['Alerta de doação: viram','aviso:doacao_viu'],['Alerta de doação: “Agora não”','aviso:doacao_agora_nao'],['Alerta de doação: abriram Apoiar','aviso:doacao_apoiar'],['Sino: abriram o sino','aviso:sino'],['Novidades: abriram','aviso:novidades'],['Alerta de km: viram','aviso:km_viu'],['Alerta de km: “Já troquei”','aviso:km_troquei']].map(([c,k])=>bar(cnt(k),T,c)).join(''));
   }else if(aba==='perfil'){
     // V122: perfil de habilitação, tipo de trabalho e veículo — base ativa (últimos 30 dias) no topo, tudo calculado sobre ela
+    // contas de admin entram só nesta aba (usam o app como motoristas); nas outras abas a base continua sem admins
+    const admAt=(A.R.admins||[]).filter(u=>!u.excluido&&u.uso&&(Date.now()-new Date(u.uso).getTime())/IND_DIA<30).map(u=>({...u,nome:u.nome||u.email}));
+    const at=A.at.concat(admAt),T=at.length;
     const N=at.map(u=>({u,n:pfNorm(u.perfil)})),inf=N.filter(x=>x.n.inf),sem=N.length-inf.length,I=inf.map(x=>x.n),TI=I.length;
     const c=f=>I.filter(f).length,hab=I.filter(n=>!n.sem);
     const ct=(l,k)=>bar(k,T,l);
@@ -5023,7 +5026,7 @@ async function indicRender(box,aba,recarrega){
     const grp=[['Com CNH e EAR',x=>x.n.inf&&x.n.ear==='sim'],['Com CNH sem EAR',x=>x.n.inf&&x.n.ear==='nao'],['Sem CNH',x=>x.n.inf&&x.n.sem],['Não informado (pedidos antigos)',x=>!x.n.inf]];
     h=`<div class="card" style="margin-top:10px;border:2px solid #2563eb"><h3 style="margin:0 0 4px">Base ativa · últimos 30 dias</h3><div style="display:flex;align-items:baseline;gap:10px"><b style="font-size:32px">${T}</b><span class="muted">usuários ativos (100% da base) · ${cad.length} cadastrados</span></div>
         ${bar(TI,T,'Perfil informado','#16a34a')}${bar(sem,T,'Ainda sem perfil','#f59e0b')}
-        <div class="small muted" style="margin-top:6px">Tudo abaixo é calculado sobre a base ativa. “Ainda sem perfil” entra como uma fatia própria, para não distorcer os percentuais. Os números leem o perfil atual de cada conta (o que a pessoa editou), não a resposta antiga do convite. Dados declarados pelas pessoas, só para estatística interna.</div></div>`
+        <div class="small muted" style="margin-top:6px">Tudo abaixo é calculado sobre a base ativa, <b>incluindo as contas de admin</b> (só nesta aba; nas outras a base não conta admins). “Ainda sem perfil” entra como uma fatia própria, para não distorcer os percentuais. Os números leem o perfil atual de cada conta (o que a pessoa editou), não a resposta antiga do convite. Dados declarados pelas pessoas, só para estatística interna.</div></div>`
       +(T?'':vazio)
       +card('Tipo de trabalho · % da base ativa ('+T+')','Quem trabalha por aplicativo e em quê.',ct('Passageiros (Uber, 99…)',c(n=>n.trab===true&&n.tipo==='passageiros'))+ct('Entregas (iFood…)',c(n=>n.trab===true&&n.tipo==='entregas'))+ct('Os dois',c(n=>n.trab===true&&n.tipo==='ambos'))+ct('Não trabalha por app',c(n=>n.trab===false))+bar(sem,T,'Sem perfil','#f59e0b'))
       +card('Habilitação · % da base ativa ('+T+')','Cascata: base ativa → perfil informado → habilitados → EAR → carro/moto. “Sem CNH de carro/moto” traz quem não dirige aquele veículo (inclui quem só tem o outro).',
