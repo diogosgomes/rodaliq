@@ -2699,6 +2699,11 @@ function excAlerts(){if(!invIsAdmin)return [];const out=[],nm=x=>soNome(x)||x.em
   EXC_CACHE.filter(x=>x.status==='desativado'&&dlDisponivel(x)&&!x.dados_baixados_em&&!x.lembrete_dados_em&&!x.reativacao_pedida_em&&excDiasCal(x.desativado_em)>=EXC_DIAS-EXC_AVISO).forEach(x=>{const nm=soNome(x)||x.email;
     out.push({n:'a',inv:1,tab:'exc',exf:'desativado',fid:x.id,t:`Avisar ${nm}: a carência acaba em ${Math.max(0,EXC_DIAS-excDiasCal(x.desativado_em))} ${Math.max(0,EXC_DIAS-excDiasCal(x.desativado_em))===1?'dia':'dias'}`,nota:`Os dados serão apagados em ${fmtBR(isoOf(dlFim(x)))} e a pessoa ainda não baixou uma cópia. Abra Admin > Pedidos de exclusão e use “Avisar prazo” por e-mail ou WhatsApp.`})});
   return out}
+function excAvisaReativ(x){ // depois de reativar: oferece avisar a pessoa por e-mail e WhatsApp
+  const c=invCache.find(v=>String(v.email||'').toLowerCase()===String(x.email||'').toLowerCase()),nome=soNome(x),tr=excTextoReativ(x,nome);
+  const ov=document.createElement('div');ov.className='ov';ov.style.zIndex='80';
+  ov.innerHTML=`<div class="modal" style="max-width:420px"><h2>✅ Acesso reativado</h2><p>O acesso de <b>${esc(nome||x.email)}</b> voltou. Avise a pessoa, pois ela foi informada de que o retorno viria por e-mail.</p><div class="ivActs"><a class="btn sm" href="${esc(invMailLink(x.email,'Seu acesso ao Rodaliq foi reativado',tr))}" target="_blank" rel="noopener">✉ Avisar por e-mail</a><button type="button" class="btn sm" id="rvZ">💬 Avisar pelo WhatsApp</button></div><div class="mfoot"><button type="button" class="btn sec" id="rvF">Fechar</button></div></div>`;
+  document.body.appendChild(ov);ov.querySelector('#rvF').onclick=()=>ov.remove();ov.querySelector('#rvZ').onclick=()=>abreZap(c?c.whatsapp:'',tr)}
 function excTextoReativ(x,nome){return `Olá${nome?', '+nome:''}!\nEsperamos que você esteja bem!\n\nSeu pedido para voltar a usar o Rodaliq foi atendido: o pedido de exclusão da conta foi cancelado e o seu acesso foi reativado.\n\nVocê já pode entrar normalmente com o seu e-mail e a sua senha. Todos os seus dados continuam como estavam.\n\nSe tiver qualquer dúvida, é só responder esta mensagem ou escrever para ${TERMOS_MAIL}.`+assina()}
 const EXC_AVISO=5;
 function excTextoPrazo(x,nome){const ped=fmtBR(String(x.criado_em).slice(0,10)),des=fmtBR(isoOf(new Date(x.desativado_em))),lim=fmtBR(isoOf(dlFim(x)));
@@ -2739,7 +2744,7 @@ async function excAdminRender(box){
     if(x.status==='desativado'&&dlDisponivel(x)&&!x.dados_baixados_em&&!x.reativacao_pedida_em){const tp=excTextoPrazo(x,nome);ZAP_EXC[x.id+'p']={fone:c?c.whatsapp:'',txt:tp};
       bt+=`<a class="btn sm" data-lb="${esc(x.id)}" href="${esc(invMailLink(x.email,'Prazo para baixar os seus dados do Rodaliq',tp))}" target="_blank" rel="noopener">✉ Avisar prazo por e-mail</a><button type="button" class="btn sm" data-zx="${esc(x.id)}p" data-lb="${esc(x.id)}">💬 Avisar prazo pelo WhatsApp</button>`}
     if(!['novo','desativado'].includes(x.status))bt='';
-    if((x.status==='desativado'&&x.reativacao_pedida_em)||(x.status==='desistiu'&&x.reativado_em)){const tr=excTextoReativ(x,nome);ZAP_EXC[x.id+'r']={fone:c?c.whatsapp:'',txt:tr};
+    if(x.status==='desistiu'&&x.reativado_em){const tr=excTextoReativ(x,nome);ZAP_EXC[x.id+'r']={fone:c?c.whatsapp:'',txt:tr};
       bt+=`<a class="btn sm" href="${esc(invMailLink(x.email,'Seu acesso ao Rodaliq foi reativado',tr))}" target="_blank" rel="noopener">✉ Avisar reativação por e-mail</a><button type="button" class="btn sm" data-zx="${esc(x.id)}r">💬 Avisar reativação pelo WhatsApp</button>`}
     return `<div class="uCard" data-fid="${esc(x.id)}"><div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start"><div class="uMail">${esc(nome||x.email)}</div><div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end">${tag}${tagPz}${x.status==='desativado'&&x.reativacao_pedida_em?`<span class="tag r">Pediu reativação · ${dataHora(x.reativacao_pedida_em)}</span>`:''}</div></div>
       <a class="supaLnk" href="${SUPA_TAB}" target="_blank" rel="noopener">↗ Tabela tb_exclusoes no Supabase</a>
@@ -2757,15 +2762,15 @@ async function excAdminRender(box){
   box.querySelectorAll('[data-lb]').forEach(b=>b.addEventListener('click',async()=>{const x=L.find(v=>v.id===b.dataset.lb);if(!x||x.lembrete_dados_em)return;
     try{await excPatch(x.id,{lembrete_dados_em:new Date().toISOString()});audit('Exclusão de conta','Admin','Prazo dos dados avisado · '+x.email)}catch(e){toast('Não foi possível registrar o aviso. Tente de novo.');return}
     setTimeout(async()=>{await excAdminCache(true);atualizaSino();excAdminRender(box)},400)}));
-  box.querySelectorAll('[data-ex]').forEach(b=>b.onclick=async()=>{const x=L.find(v=>v.id===b.dataset.id);if(!x)return;const a=b.dataset.ex,agora=new Date().toISOString();
+  box.querySelectorAll('[data-ex]').forEach(b=>b.onclick=async()=>{const x=L.find(v=>v.id===b.dataset.id);if(!x)return;const a=b.dataset.ex,agora=new Date().toISOString();let avisarReativ=null;
     try{
       if(a==='desativar'){if(!await confirma(`Desativar o acesso de <b>${esc(x.email)}</b>? A pessoa não consegue mais ver nem lançar dados. Os dados ficam guardados por ${EXC_DIAS} dias e você pode reativar nesse prazo.`,'Desativar acesso'))return;
         await excPatch(x.id,{status:'desativado',desativado_em:agora});audit('Exclusão de conta','Admin','Acesso desativado · '+x.email);toast('Acesso desativado')}
       else if(a==='reativar'){if(!await confirma(`Reativar o acesso de <b>${esc(x.email)}</b>? Tudo volta como estava.`,'Reativar'))return;
-        await excPatch(x.id,{status:'desistiu',reativado_em:agora});audit('Exclusão de conta','Admin','Acesso reativado · '+x.email);toast('Acesso reativado')}
+        await excPatch(x.id,{status:'desistiu',reativado_em:agora});audit('Exclusão de conta','Admin','Acesso reativado · '+x.email);toast('Acesso reativado');x.reativado_em=agora;avisarReativ=x}
       else if(a==='excluir'){if(!await usrExcluir(x.user_id,x.email,x))return}
     }catch(e){toast('Não foi possível concluir agora. Tente de novo.');return}
-    await excAdminCache(true);atualizaSino();excAdminRender(box);admContagens()})}
+    await excAdminCache(true);atualizaSino();excAdminRender(box);admContagens();if(avisarReativ)excAvisaReativ(avisarReativ)})}
 /* ---------- V90: ✏ Corrigir meus dados (LGPD, art. 18, III) ---------- */
 const CORR_CAMPOS={nome:'Nome',celular:'Celular (WhatsApp)',email:'E-mail'};
 let CORR_CACHE=[],AUTO_CACHE=[],BKP_ST=null;
@@ -3249,8 +3254,10 @@ function dadosDaPessoa(u){ // monta as seções que só o admin guarda sobre alg
     rows:ap.map(x=>[x.valor,APO_ST[x.status]||x.status,String(x.criado_em).slice(0,10),x.confirmado_em?String(x.confirmado_em).slice(0,10):null,x.recibo?String(x.recibo).padStart(3,'0'):'—']),
     nota:'O Pix é feito pelo banco da própria pessoa: nenhum dado de pagamento é guardado pelo app.'});
   const ex=EXC_CACHE.filter(x=>x.user_id===uid||String(x.email||'').toLowerCase()===em);
-  if(ex.length)sec.push({t:'Pedidos de exclusão',cols:[['Motivo','txt'],['Comentário','txt'],['Situação','txt'],['Pedido em','date']],
-    rows:ex.map(x=>[x.motivo||'—',x.comentario||'—',x.status==='novo'?'Novo':'Atendido',String(x.criado_em).slice(0,10)])});
+  const dd10=v=>v?String(v).slice(0,10):null,EXS={novo:'Novo',desativado:'Acesso desativado',desistiu:'Desistiu / reativado',excluido:'Excluído'};
+  if(ex.length)sec.push({t:'Pedidos de exclusão e reativação',cols:[['Motivo','txt'],['Comentário','txt'],['Situação','txt'],['Pedido em','date'],['Desativada em','date'],['Pediu reativação em','date'],['Reativada em','date'],['Desistiu em','date']],
+    rows:ex.map(x=>[x.motivo||'—',x.comentario||'—',(x.status==='desistiu'&&x.reativado_em)?'Reativada':(EXS[x.status]||x.status||'—'),dd10(x.criado_em),dd10(x.desativado_em),dd10(x.reativacao_pedida_em),dd10(x.reativado_em),dd10(x.desistiu_em)]),
+    nota:'Datas dos pedidos de exclusão da conta, da desativação do acesso, do pedido para voltar e da reativação.'});
   const sn=SEN_CACHE.filter(x=>String(x.email||'').toLowerCase()===em);
   if(sn.length)sec.push({t:'Pedidos de nova senha',cols:[['Situação','txt'],['Pedido em','date'],['Atendido em','date']],
     rows:sn.map(x=>[x.status==='novo'?'Novo':'Atendido',String(x.criado_em).slice(0,10),x.atendido_em?String(x.atendido_em).slice(0,10):null])});
