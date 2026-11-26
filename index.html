@@ -1378,7 +1378,8 @@ function openForm({titulo,sub,campos,val={},onSave,onDel}){
   const fechar=()=>ov.remove();
   ov.__fechar=()=>fechaComPerda(ov,fechar);marcaPerda(ov);
   ov.querySelector('#fCan').onclick=ov.__fechar;
-  ov.addEventListener('mousedown',e=>{if(e.target===ov)ov.__fechar()});
+  ['input','change'].forEach(ev=>ov.addEventListener(ev,e=>{if(e.isTrusted)ov.__tocado=1},true));
+  ov.addEventListener('mousedown',e=>{if(e.target===ov&&!ov.__tocado&&!sujo(ov))ov.__fechar()}); // depois de editar, clicar fora não fecha: só Cancelar/Voltar
   if(onDel)ov.querySelector('#fDel').onclick=async()=>{if(await confirma('Excluir este lançamento?')){onDel();fechar()}};
   const ler=()=>{const o={};campos.forEach(c=>{const el=g(c.k);if(!el)return;
     if(c.t==='money')o[c.k]=el.value.trim()===''?null:parseBRL(el.value);
@@ -2624,7 +2625,8 @@ function formVeic(opt){opt=opt||{};
   const ler=()=>{ov.querySelectorAll('[data-vi]').forEach(el=>{const v=tmp[+el.dataset.vi];v[el.dataset.vk]=el.type==='checkbox'?el.checked:el.value});tmp.forEach(v=>{if(v.tipo==='bicicleta'&&!['semmotor','eletrico'].includes(v.motor))v.motor='semmotor';else if(v.tipo!=='bicicleta'&&v.motor==='semmotor')v.motor='flex'})};
   ov.__fechar=()=>fechaComPerda(ov,()=>{cfg().veiculos=orig;ov.remove()});
   document.body.appendChild(ov);draw();marcaPerda(ov);
-  ov.addEventListener('mousedown',e=>{if(e.target===ov)ov.__fechar()});
+  ['input','change'].forEach(ev=>ov.addEventListener(ev,e=>{if(e.isTrusted)ov.__tocado=1},true));
+  ov.addEventListener('mousedown',e=>{if(e.target===ov&&!ov.__tocado&&!sujo(ov))ov.__fechar()});
 }
 function formSenha(){
   openForm({titulo:'Trocar senha',campos:[{k:'a',l:'Senha atual',t:'text',full:1},{k:'n',l:'Nova senha',t:'text',full:1},{k:'n2',l:'Repita a nova senha',t:'text',full:1}],
