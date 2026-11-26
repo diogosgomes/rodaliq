@@ -4787,6 +4787,9 @@ function regLinha(e,nomeAuto){
 // Convite 1 clique, troca de e-mail e redefinição de senha gravam no registro (texto fixo, sem dados da pessoa); só em produção
 function autoRegistra(k){try{if(invProd())Promise.resolve(DB.rpc('rodaliq_auto_registra',{p_auto:k})).catch(()=>{})}catch(e){}}
 let REG_FILTRO='todas';
+function regVazio(k){const d=AUTO_DEF.find(x=>x.k===k);if(!d)return 'Nada registrado para este filtro.';
+  if(autoModo(k)!=='auto')return 'Esta automação não está em Automático, por isso não grava no registro.';
+  return 'Nenhum evento registrado ainda. Esta automação grava aqui a cada vez que atende alguém, a partir de 26/11/2026.'}
 function regDesenha(box,L,nomeAuto){
   const N=10;
   if(!L.length){box.innerHTML='<div class="small muted">Nada registrado ainda.</div>';return}
@@ -4794,7 +4797,7 @@ function regDesenha(box,L,nomeAuto){
   const mais=REG_MAIS&&E.length>N,vis=mais?E:E.slice(0,N),oculto=E.length-N;
   const chips=[['todas','Todas']].concat(AUTO_DEF.map(d=>[d.k,d.nome.replace(/ \(push\)$/,'')]));
   box.innerHTML=(`<div class="regChips" role="group" aria-label="Filtrar o registro por automação">${chips.map(([k,t])=>`<button type="button" data-rf="${k}" class="${REG_FILTRO===k?'on':''}" aria-pressed="${REG_FILTRO===k}">${REG_FILTRO===k?'✔ ':''}${esc(t)}</button>`).join('')}</div>`)+
-    (E.length?`<div id="regBox"${mais?' class="regBox" tabindex="0" role="region" aria-label="Registro das automações, lista com rolagem"':''}>${vis.map(e=>regLinha(e,nomeAuto)).join('')}</div>`+(E.length>N?`<div style="margin-top:8px"><button type="button" class="btn sec sm" id="regTog" aria-expanded="${mais}">${mais?'Mostrar menos':'Mostrar mais ('+oculto+')'}</button></div>`:''):'<div class="small muted">Nada registrado para este filtro.</div>');
+    (E.length?`<div id="regBox"${mais?' class="regBox" tabindex="0" role="region" aria-label="Registro das automações, lista com rolagem"':''}>${vis.map(e=>regLinha(e,nomeAuto)).join('')}</div>`+(E.length>N?`<div style="margin-top:8px"><button type="button" class="btn sec sm" id="regTog" aria-expanded="${mais}">${mais?'Mostrar menos':'Mostrar mais ('+oculto+')'}</button></div>`:''):'<div class="small muted">'+regVazio(REG_FILTRO)+'</div>');
   box.querySelectorAll('[data-rf]').forEach(b=>b.onclick=()=>{REG_FILTRO=b.dataset.rf;REG_MAIS=false;regDesenha(box,L,nomeAuto)});
   const b=box.querySelector('#regTog');if(b)b.onclick=()=>{REG_MAIS=!REG_MAIS;regDesenha(box,L,nomeAuto)}}
 async function autoRender(box){
