@@ -2937,7 +2937,7 @@ function bkpAlerts(){if(!invIsAdmin||!invProd()||!BKP_ST)return [];const d=bkpDi
   if(d!==null&&d<2&&!(BKP_ST.ultima_falha&&(!BKP_ST.ultimo_ok||BKP_ST.ultima_falha>BKP_ST.ultimo_ok)))return [];
   return [{n:'r',inv:1,tab:'automacoes',t:d===null?'O backup automático ainda não registrou nenhuma execução.':`O backup automático está há ${d} dias sem rodar com sucesso.`,nota:'Abra o repositório rodaliq-backup no GitHub, aba Actions, e veja o erro. Toque para abrir ⚙ Automações.'}]}
 function autoAlerts(){if(!invIsAdmin)return [];const lim=Date.now()-7*864e5,G={};
-  AUTO_CACHE.filter(l=>new Date(l.ts).getTime()>=lim).forEach(l=>{const d=isoOf(new Date(l.ts)),k=d+'|'+l.automacao;(G[k]=G[k]||{d,a:l.automacao,L:[]}).L.push(l)});
+  AUTO_CACHE.filter(l=>new Date(l.ts).getTime()>=lim&&['convite','email','senha'].indexOf(l.automacao)<0).forEach(l=>{const d=isoOf(new Date(l.ts)),k=d+'|'+l.automacao;(G[k]=G[k]||{d,a:l.automacao,L:[]}).L.push(l)});
   return Object.values(G).sort((x,y)=>y.d.localeCompare(x.d)).map(g=>{const n=g.L.length,hj=g.d===isoOf(new Date()),nome=(AUTO_DEF.find(d=>d.k===g.a)||{}).nome||g.a,pend=g.L.filter(l=>!l.ciente_em);
     return {n:'a',auto:1,lida:!pend.length,tab:'corr',ids:pend.map(l=>l.id),t:`✔ ${nome}: ${n} ${n===1?'atendida':'atendidas'} automaticamente (${hj?'hoje':fmtBR(g.d)})`,nota:g.L.map(l=>l.resumo).slice(0,6).join(' · ')+(n>6?' · …':'')+' · Já foi resolvido, não precisa fazer nada.'}})}
 function corrAlerts(){if(!invIsAdmin)return [];return CORR_CACHE.filter(corrPend).map(x=>{const c=invCache.find(v=>String(v.email||'').toLowerCase()===String(x.email||'').toLowerCase());return {n:'r',inv:1,tab:'corr',fid:x.id,t:`${(x.user_id&&PERFIS[x.user_id])||(c&&c.name)||x.email} pediu correção de ${CORR_CAMPOS[x.campo]||'dados'}${x.status==='atendido'?' (aplicada)':x.status==='recusado'?' (recusada)':''}`,nota:x.status!=='novo'?`${x.email} · falta avisar a pessoa: abra o cartão e use “✉ Avisar por e-mail” ou “💬 WhatsApp”.`:`${x.email} · há ${excDiasDesde(x.criado_em)} ${excDiasDesde(x.criado_em)===1?'dia':'dias'}. Responda em até 15 dias (prazo da LGPD para pedidos do titular). Toque para abrir o cartão.`}})}
@@ -2952,7 +2952,7 @@ function emailCodigo(ov,novo){ // V112: troca de e-mail por código (Supabase Au
   const err=t=>{q('#ecE').textContent=t};q('#ecV').onclick=()=>ov.remove();setTimeout(()=>q('#ecC').focus(),50);
   q('#ecO').onclick=async()=>{const tk=corrDig(q('#ecC').value);if(tk.length<6||tk.length>10)return err('Digite os números do código recebido por e-mail.');q('#ecO').disabled=true;
     try{const {error}=await DB.auth.verifyOtp({email:novo,token:tk,type:'email_change'});if(error){q('#ecO').disabled=false;return err('Código inválido ou vencido. Confira e tente de novo.')}
-      const ant=LOGADO;LOGADO=novo;try{$('#whoName').textContent=novo}catch(e){}audit('Correção de dados','Configurações','Troca de e-mail por código · '+ant+' → '+novo);ov.remove();toast('✅ E-mail atualizado')}
+      const ant=LOGADO;LOGADO=novo;try{$('#whoName').textContent=novo}catch(e){}audit('Correção de dados','Configurações','Troca de e-mail por código · '+ant+' → '+novo);autoRegistra('email');ov.remove();toast('✅ E-mail atualizado')}
     catch(e){q('#ecO').disabled=false;err('Não foi possível confirmar agora. Tente de novo.')}}}
 function formCorrigir(){
   const ov=document.createElement('div');ov.className='ov';
@@ -3065,6 +3065,7 @@ function formPedirSenha(){
     q('#psS').disabled=true;
     try{let modo='manual';if(invProd()){try{const r=await DB.rpc('rodaliq_senha_modo');if(!r.error&&r.data)modo=r.data}catch(e2){}}
       if(invProd()&&modo==='auto'){const {error}=await DB.auth.resetPasswordForEmail(em,{redirectTo:location.origin+location.pathname});if(error&&!/rate|seconds|limit/i.test(error.message||''))throw error;
+        if(!error)autoRegistra('senha');
         q('#psOk').textContent=MSG_SENHA_LINK;q('#psOk').classList.remove('hidden');q('#psS').classList.add('hidden');q('#psV').textContent='Voltar ao login';q('#psMail').disabled=true;return}
       if(invProd()){const {error}=await DB.rpc('rodaliq_pedir_senha',{p_email:em});if(error)throw error}
       else{const l=(await DB.collection('senhas').get()).docs.map(d=>d.data());const ab=l.find(x=>x.email===em&&(x.status==='novo'||Date.now()-new Date(x.criado_em).getTime()<36e5));
@@ -4783,6 +4784,8 @@ function regLinha(e,nomeAuto){
   const g=e.g,pl=(n,a,b)=>n+' '+(n===1?a:b);
   const det=g.modo==='sim'?pl(g.n,'aviso simulado','avisos simulados'):[pl(g.env,'aviso enviado','avisos enviados')].concat(g.fal?[pl(g.fal,'falha','falhas')]:[],g.rem?[pl(g.rem,'aparelho removido','aparelhos removidos')]:[]).join(', ');
   return `<div class="small regRow">${fmtBR(g.dia)} · ${esc(nomeAuto('push'))} · <b>${g.modo==='sim'?'Simulação':'Automático'}</b> · ${esc(g.titulo)} · ${det}</div>`}
+// Convite 1 clique, troca de e-mail e redefinição de senha gravam no registro (texto fixo, sem dados da pessoa); só em produção
+function autoRegistra(k){try{if(invProd())Promise.resolve(DB.rpc('rodaliq_auto_registra',{p_auto:k})).catch(()=>{})}catch(e){}}
 let REG_FILTRO='todas';
 function regDesenha(box,L,nomeAuto){
   const N=10;
@@ -5573,7 +5576,7 @@ async function invCriarContas(pedidos){
     const {data,error}=await DB.rpc('rodaliq_convite_enviar',{p_pedidos:pedidos.map(r=>r.id)});if(error)throw error;
     res=[];
     for(const d of (data||[])){const r=pedidos.find(x=>x.id===d.pedido)||{};let ok=!!d.ok,erro=d.erro;
-      if(ok){try{const e=await DB.auth.resetPasswordForEmail(String(r.email||d.email).trim().toLowerCase(),{redirectTo:location.origin+location.pathname});if(e.error)throw e.error;await invSetStatus(r.id,'avisado');r.status='avisado'}
+      if(ok){try{const e=await DB.auth.resetPasswordForEmail(String(r.email||d.email).trim().toLowerCase(),{redirectTo:location.origin+location.pathname});if(e.error)throw e.error;await invSetStatus(r.id,'avisado');r.status='avisado';autoRegistra('convite')}
         catch(er){ok=false;erro='Conta criada, mas o e-mail não saiu ('+String((er&&er.message)||'erro').slice(0,60)+'). Use “Pedidos de senha” ou gere o acesso de novo.'}}
       res.push({r,senha:null,ok,erro,enviado:ok})}
     audit('Criacao de contas','Admin',`${res.filter(x=>x.ok).length} convite(s) enviado(s) por e-mail · ${res.filter(x=>!x.ok).length} falha(s)`);
