@@ -527,9 +527,11 @@ body:has(#admPage) .fab,body:has(#ajuPage) .fab{z-index:61}body:has(#admPage) .f
           <div class="pfOpts" id="invVeic"><label><input type="checkbox" value="carro"> Carro</label><label><input type="checkbox" value="moto"> Moto</label><label><input type="checkbox" value="bicicleta"> Bicicleta</label><label><input type="checkbox" value="outro"> Outro</label><label><input type="checkbox" value="nenhum"> Não tenho veículo</label></div></div>
         <div class="field"><label for="invHow">Como soube do app?</label><input class="inp" type="text" id="invHow" maxlength="140"></div>
         <div style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden" aria-hidden="true"><label>Não preencha<input type="text" id="invWeb" tabindex="-1" autocomplete="off"></label></div>
-        <label class="ivCheck"><input type="checkbox" id="invOk"><span>Em conformidade com a Lei Geral de Proteção de Dados (LGPD, Lei nº 13.709/2018), autorizo o contato por e-mail e WhatsApp sobre o meu acesso e o uso dos meus dados somente para essa finalidade. Li os <button type="button" class="lnk" data-tt="termos">Termos de uso</button> e a <button type="button" class="lnk" data-tt="priv">Política de privacidade</button>.</span></label>
+        <label class="ivCheck"><input type="checkbox" id="invOk"><span>Em conformidade com a Lei Geral de Proteção de Dados (LGPD, Lei nº 13.709/2018), autorizo o contato por e-mail e WhatsApp sobre o meu acesso e o uso dos meus dados somente para essa finalidade.</span></label>
+        <div id="invTm" class="ivCheck" style="display:block;border:1px solid var(--line,#e5e7eb);border-radius:10px;padding:10px 12px;margin-top:8px"><div style="display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap"><span><b>📄 Termos de uso e Política de privacidade</b><br><span class="small muted" id="invTmSt">Leia e dê o seu “De acordo” para poder enviar o pedido.</span></span><button type="button" class="btn sec sm" id="invTmBtn">Ler e dar o aceite</button></div></div>
         <div id="invMsg" class="err" role="alert"></div>
-        <div style="display:flex;gap:10px"><button type="button" class="btn sec" id="invClose" style="flex:1">Voltar</button><button type="submit" class="btn" id="invBtn" style="flex:1">Enviar pedido</button></div>
+        <div style="display:flex;gap:10px"><button type="button" class="btn sec" id="invClose" style="flex:1">Voltar</button><button type="submit" class="btn" id="invBtn" style="flex:1" disabled>Enviar pedido</button></div>
+        <div id="invCancW" class="hidden" style="margin-top:10px"><button type="button" class="btn sec block" id="invCanc">Cancelar pedido de convite</button></div>
       </div>
       <div id="invDone" class="ivDone hidden">
         <div class="big">✅</div>
@@ -641,7 +643,7 @@ body:has(#admPage) .fab,body:has(#ajuPage) .fab{z-index:61}body:has(#admPage) .f
 
 <script>
 "use strict";
-const VERSAO='V129';
+const VERSAO='V130';
 /* ---------- utilidades ---------- */
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -925,7 +927,7 @@ function checaAlertaNovo(){
   if(novos.length)toast('🔔 Novo alerta recebido');
 }
 // V103: registro de uso (produção). No máximo 1 por evento por dia, sem conteúdo; falha nunca atrapalha o app
-const RASTRO_OK=new Set(),RASTRO_TELAS=['painel','corridas','ifood','carona','custos','reservas','impostos','multas','rodacalc','relatorios'];
+const RASTRO_OK=new Set(),RASTRO_TELAS=['painel','corridas','ifood','carona','custos','reservas','impostos','multas','rodacalc','relatorios','meuveiculo','agenda'];
 function rastro(ev){if(!invProd()||!UID||typeof DB.rpc!=='function')return;const k='rd_ev_'+UID+'_'+hoje(),m=ev;if(RASTRO_OK.has(k+m))return;RASTRO_OK.add(k+m);
   let l=[];try{l=JSON.parse(localStorage.getItem(k)||'[]');if(l.indexOf(m)>=0)return}catch(e){}
   try{Promise.resolve(DB.rpc('rodaliq_evento',{p_evento:m})).then(r=>{if(r&&r.error){RASTRO_OK.delete(k+m);return}try{l.push(m);localStorage.setItem(k,JSON.stringify(l))}catch(e){}}).catch(()=>RASTRO_OK.delete(k+m))}catch(e){RASTRO_OK.delete(k+m)}}
@@ -5071,7 +5073,7 @@ function admBuscaMonta(sub){const box=$('#admBox');if(!box)return;let w=$('#admQ
     new MutationObserver(()=>{if(!box.__bq){box.__bq=1;setTimeout(()=>{box.__bq=0;admBuscaAplica()},0)}}).observe(box,{childList:true,subtree:true})}
   else{$('#admQ').value='';$('#admQn').textContent=''}}
 /* V103: Indicadores (só master). Em produção lê a função rodaliq_indicadores (dados reais); no HMO usa dados de exemplo no mesmo formato. */
-const IND_DIA=864e5,IND_TELAS=[['painel','Painel'],['corridas','Corridas'],['custos','Custos'],['reservas','Despesas programadas'],['carona','Viagens e caronas'],['ifood','iFood'],['impostos','Impostos'],['multas','Multas'],['rodacalc','RodaCalc'],['relatorios','Relatórios']];
+const IND_DIA=864e5,IND_TELAS=[['painel','Painel'],['corridas','Corridas'],['custos','Custos'],['reservas','Despesas programadas'],['carona','Viagens e caronas'],['ifood','iFood'],['impostos','Impostos'],['multas','Multas'],['rodacalc','RodaCalc'],['relatorios','Relatórios'],['meuveiculo','Meu veículo'],['agenda','Agenda do Motorista']];
 const IND_CONT_DIAS=90; // quem foi contatado só volta para a lista depois de 90 dias (e nunca, se pediu para não ser contatado)
 const IND_L={
  inativos:{t:'Inativos há 30+ dias',intro:'Quem tem conta e não usa o app há mais de 30 dias. A ideia é só oferecer ajuda e entender o motivo, uma única vez.',col:'Parado há',assunto:'Podemos ajudar no Rodaliq?',
@@ -5093,7 +5095,7 @@ const IND_L={
 let IND_R=null;
 // ---------- dados de exemplo (só HMO): mesmo formato que a função do banco entrega em produção ----------
 // V122 (só HMO): perfis de exemplo — alguns sem perfil, o restante variado
-function indDemoPerfil(i){const L=[null,{trabalha:true,tipo:'passageiros',ear:'sim',carro:true,moto:true,veic:['carro']},{trabalha:true,tipo:'passageiros',ear:'sim',carro:true,moto:false,veic:['carro']},{trabalha:true,tipo:'entregas',ear:'sim',carro:false,moto:true,veic:['moto']},{trabalha:true,tipo:'entregas',ear:'sem_cnh',carro:false,moto:false,veic:['bicicleta']},{trabalha:true,tipo:'ambos',ear:'nao',carro:true,moto:false,veic:['carro','bicicleta']},{trabalha:false,tipo:null,ear:'sem_cnh',carro:false,moto:false,veic:['nenhum']},{trabalha:true,tipo:'passageiros',ear:'nao',carro:false,moto:false,veic:['carro']},{trabalha:true,tipo:'passageiros',ear:'sim',carro:true,moto:true,veic:['carro','moto']}];return L[i%L.length]}
+function indDemoPerfil(i){const L=[null,{trabalha:true,tipo:'passageiros',ear:'sim',carro:true,moto:true,veic:['carro']},{trabalha:true,tipo:'passageiros',ear:'sim',carro:true,moto:false,veic:['carro']},{trabalha:true,tipo:'entregas',ear:'sim',carro:false,moto:true,veic:['moto']},{trabalha:true,tipo:'entregas',ear:'sem_cnh',carro:false,moto:false,veic:['bicicleta']},{trabalha:true,tipo:'ambos',ear:'nao',carro:true,moto:false,veic:['carro','bicicleta']},{trabalha:false,tipo:null,ear:'sem_cnh',carro:false,moto:false,veic:['nenhum']},{trabalha:true,tipo:'passageiros',ear:'nao',carro:false,moto:false,veic:['carro']},{trabalha:true,tipo:'passageiros',ear:'sim',carro:true,moto:true,veic:['carro','moto']}];const U=[null,['corridas'],['corridas'],['entregas'],['entregas'],['corridas','entregas'],['pessoal'],['corridas','pessoal'],['corridas','carona']],p=L[i%L.length];return p?{...p,usos:U[i%L.length]}:p}
 function indDemo(contatos){
   const agora=Date.now(),iso=d=>d==null?null:new Date(agora-d*IND_DIA).toISOString(),dia=d=>isoOf(new Date(agora-d*IND_DIA));let sd=7;const rnd=()=>(sd=(sd*9301+49297)%233280)/233280;
   const nomes=['Carlos Mendes','Ana Paula Souza','Rafael Lima','Marcos Teixeira','João Pedro Alves','Felipe Ramos','Camila Duarte','Thiago Rocha','Vanessa Lopes','Eduardo Silva','Renata Pires','Gustavo Pinto','Mônica Reis','Bruno Carvalho','Luciana Prado','Paulo Henrique','Sandra Melo','Ricardo Alves','Fernanda Costa','Diego Martins','Helena Ribeiro','Tiago Barros','Patrícia Lemos','André Nogueira','Joana Ferreira'];
@@ -5110,7 +5112,10 @@ function indDemo(contatos){
   const conv=[['Patrícia Nunes','patricia@exemplo.com','5561999990021','convidado',12,12],['Diego Farias','diego@exemplo.com','5511999990022','convidado',9,9],['Sérgio Batista','sergio@exemplo.com','5562999990023','avisado',7,7],['Helena Costa','helena@exemplo.com','351912000024','convidado',6,6],['Nilton Gomes','nilton@exemplo.com','5561999990025','novo',1,null],['Aline Prado','aline@exemplo.com','5521999990026','recusado',14,13]].map((c,i)=>({id:'c'+i,nome:c[0],email:c[1],whats:c[2],status:c[3],criado:iso(c[4]),tratado:iso(c[5])}));
   us.slice(0,6).forEach((u,i)=>conv.push({id:'cu'+i,nome:u.nome,email:u.email,whats:u.whats,status:'avisado',criado:iso(30),tratado:iso(29)}));
   const ex=[['Parei de rodar por aplicativo',3],['O app não atendeu o que eu precisava',12],['Achei difícil de usar',40],['Vou usar outro app ou planilha',44],['Outro motivo',5]].map((x,i)=>({user_id:'x'+i,email:'saiu'+i+'@exemplo.com',motivo:x[0],status:'excluido',criado:iso(x[1])}));
-  return {gerado:new Date().toISOString(),hoje:dia(0),usuarios:us,convites:conv,exclusoes:ex,apoios:[{user_id:'d3',status:'informado',criado:iso(2)},{user_id:'d1',status:'confirmado',criado:iso(10)}],contatos:contatos||[]}}
+  us.forEach((u,i)=>{u.colab=i===2||i===9;if(u.ev['salvou:corridas']&&u.perfil&&u.perfil.usos&&u.perfil.usos.length===1&&u.perfil.usos[0]==='pessoal'&&i%2===0)u.ev['salvou:corridas']=[3,dia(2)];if(i%5===0)u.ev['abriu:meuveiculo']=[3,dia(1)];if(i%10===0)u.ev['salvou:meuveiculo']=[2,dia(2)]});
+  const admEv=(n,sv)=>{const e={'abriu:painel':[10,dia(0)],'abriu:corridas':[8,dia(0)],'salvou:corridas':[5,dia(1)],'abriu:ifood':[4,dia(1)],'abriu:carona':[2,dia(2)],'abriu:meuveiculo':[6,dia(0)],'salvou:meuveiculo':[3,dia(1)],'abriu:agenda':[3,dia(2)],'abriu:rodacalc':[1,dia(3)]};if(sv)e['salvou:carona']=[1,dia(3)];return e};
+  const admins=[{id:'a0',email:'supremo@exemplo.com',uso:iso(0),papel:'principal',ev:admEv(0,true)},{id:'a1',email:'master@exemplo.com',uso:iso(1),papel:'master',ev:{'abriu:painel':[4,dia(1)],'abriu:agenda':[2,dia(2)],'abriu:rodacalc':[1,dia(2)]}},{id:'a2',email:'admin@exemplo.com',uso:iso(3),papel:'admin',ev:{'abriu:painel':[2,dia(3)],'abriu:agenda':[1,dia(3)]}}];
+  return {gerado:new Date().toISOString(),funil:{abriu:48,leu:37,deacordo:31,naoconcordo:4,cancelou:6,enviou:28},hoje:dia(0),usuarios:us.concat(admins.map(a=>({...a,criado:iso(60),login:a.uso,reg:a.uso,d7a:3,d7b:2,nome:null,whats:'',perfil:null}))),convites:conv,exclusoes:ex,apoios:[{user_id:'d3',status:'informado',criado:iso(2)},{user_id:'d1',status:'confirmado',criado:iso(10)}],contatos:contatos||[]}}
 // ---------- contatos registrados (produção: tb_contatos · HMO: coleção de teste) ----------
 async function indContatos(){
   if(invProd()){const {data,error}=await DB.from('tb_contatos').select('id,lista,alvo,resposta,motivo,obs,em').order('em',{ascending:false}).limit(2000);if(error)throw error;return (data||[]).map(x=>({...x,alvo:String(x.alvo||'').toLowerCase()}))}
@@ -5131,6 +5136,7 @@ async function indCarrega(){
 function indCalc(R){
   const now=Date.now(),D=x=>x?new Date(x).getTime():0,dd=x=>x?Math.floor((now-D(x))/IND_DIA):null,dDia=x=>x?Math.floor((now-new Date(x+'T12:00:00').getTime())/IND_DIA):null;
   const mes=String(R.hoje).slice(0,7),pf=x=>(x||[]).filter(Boolean);
+  const isAdm=u=>u.papel==='principal'||u.papel==='master'||u.papel==='admin';
   const U=(R.usuarios||[]).map(u=>{const ev=u.ev||{},n=k=>ev[k]?ev[k][0]:0,ult=k=>ev[k]?ev[k][1]:null,
     salv=Object.keys(ev).some(k=>k.indexOf('salvou:')===0)||(!!u.reg&&dd(u.reg)<30),
     excl=!!u.excluido,ativo=!excl&&!u.desativado&&!!u.uso&&dd(u.uso)<30,w=String(u.whats||''),pais=w?paisDoDDI(w):'Sem telefone',uf=w.indexOf('55')===0?(DDD_UF[w.slice(2,4)]||''):'';
@@ -5138,6 +5144,14 @@ function indCalc(R){
     return {...u,ev,n,ult,salv,excl,ativo,w,pais,uf,disp:disp?disp[0]:null}});
   const cad=U.filter(u=>!u.excl),cadA=cad.filter(u=>!u.desativado),at=U.filter(u=>u.ativo),T=at.length; // cadA = contas ativas (cadastradas, sem exclusão nem desativação)
   const telas=IND_TELAS.map(([k,nome])=>{const ab=at.filter(u=>u.n('abriu:'+k)>0),sv=at.filter(u=>u.n('salvou:'+k)>0);return {k,nome,so:ab.filter(u=>u.n('salvou:'+k)===0).length,sv:sv.length}});
+  // V130: contas de admin ativas (com eventos e papel) e quem enxerga cada nível — usado no cartão "Uso das funcionalidades"
+  const adm=at.filter(isAdm);
+  const apC=new Set((R.apoios||[]).filter(a=>a.status==='confirmado').map(a=>a.user_id));
+  const aud=nv=>{const pr=a=>a.papel==='principal',ms=a=>a.papel==='master'||pr(a);
+    const nu=at.filter(x=>!isAdm(x));
+    if(nv==='supremo')return {u:[],a:adm.filter(pr)};if(nv==='master')return {u:[],a:adm.filter(ms)};
+    if(nv==='equipe')return {u:nu.filter(x=>x.colab),a:adm};if(nv==='apoiadores')return {u:nu.filter(x=>x.colab||apC.has(x.id)),a:adm};
+    return {u:nu,a:adm}};
   const salv=at.filter(u=>u.salv),so=at.filter(u=>!u.salv);
   const ret0=U.filter(u=>!u.excl&&u.d7b>0),ret=ret0.filter(u=>u.d7a>0);
   const novos=cad.filter(u=>String(u.criado||'').slice(0,7)===mes);
@@ -5159,8 +5173,11 @@ function indCalc(R){
    convites:(R.convites||[]).filter(c=>['convidado','avisado'].indexOf(c.status)>=0&&!mails.has(c.email)&&c.tratado&&dd(c.tratado)>=3).map(c=>({alvo:c.email,nome:c.nome,email:c.email,whats:c.whats,loc:c.whats?(c.whats.indexOf('55')===0?('Brasil'+(DDD_UF[c.whats.slice(2,4)]?' · '+DDD_UF[c.whats.slice(2,4)]:'')):paisDoDDI(c.whats)):'',tempo:dd(c.tratado)+' dias',det:'Ainda não cadastrou'})),
    consultaram:at.filter(u=>!u.salv&&!u.reg&&dd(u.criado)>=14).map(u=>({alvo:u.email,nome:u.nome||u.email,email:u.email,whats:u.w,loc:loc(u),tempo:(u.uso?dd(u.uso):0)+' dias',det:resumoTelas(u)})),
    agoranao:at.filter(u=>u.n('aviso:doacao_agora_nao')>0&&dDia(u.ult('aviso:doacao_agora_nao'))>=7&&u.n('abriu:painel')>=8&&!ap.has(u.id)).map(u=>({alvo:u.email,nome:u.nome||u.email,email:u.email,whats:u.w,loc:loc(u),tempo:dDia(u.ult('aviso:doacao_agora_nao'))+' dias',det:resumoTelas(u)}))};
+  // V130: admins aparecem nas listas de contato (devem ser mais ativos), menos o admin supremo; a lista indica o papel
+  const sup=new Set(U.filter(u=>u.papel==='principal').map(u=>u.email)),pap={master:'Admin master',admin:'Admin'},papDe={};U.forEach(u=>{if(pap[u.papel])papDe[u.email]=pap[u.papel]});
+  Object.keys(I).forEach(k=>{I[k]=I[k].filter(x=>!sup.has(x.alvo)).map(x=>papDe[x.alvo]?{...x,det:papDe[x.alvo]+' · '+x.det}:x)});
   const L={};Object.keys(I).forEach(k=>{L[k]={todos:I[k],pend:I[k].filter(x=>!bloqueado(x.alvo)&&!recente(x.alvo)),feitos:I[k].filter(x=>bloqueado(x.alvo)||recente(x.alvo))}});
-  return {R,U,cad,cadA,at,T,telas,salv,so,ret,ret0,novos,convMes,mails,ex,exMes,meses,mot,ap,L,cont,ultCont,bloqueado,mes,dd,dDia};
+  return {R,U,cad,cadA,at,T,telas,adm,aud,funil:R.funil||{},salv,so,ret,ret0,novos,convMes,mails,ex,exMes,meses,mot,ap,L,cont,ultCont,bloqueado,mes,dd,dDia};
 }
 function indLista(key,aoFechar){
   const C=IND_L[key],K=IND_CALC;if(!C||!K)return;const ov=document.createElement('div');ov.className='ov tela';
@@ -5194,11 +5211,26 @@ function indLista(key,aoFechar){
   draw();document.body.appendChild(ov)}
 let IND_CALC=null;
 const IND_DESDE='20/11/2026';
+const IND_REC_DE={reservas:'reservas',carona:'carona',ifood:'ifood',impostos:'impostos',rodacalc:'rodacalc',relatorios:'relatorios',meuveiculo:'pessoal',agenda:'agenda'},IND_SEM_SALVAR=['rodacalc','relatorios','agenda'];
+function indFuncRows(A){ // V130: uma linha por funcionalidade, com o nível e a base = quem enxerga
+  return A.telas.filter(x=>x.k!=='painel').map(x=>{
+    const rk=IND_REC_DE[x.k],nv=rk?((AJU.rec&&AJU.rec[rk])||AJU_PADRAO.rec[rk]||'todos'):'todos',au=A.aud(nv),pop=au.u.concat(au.a),M=pop.length,so=IND_SEM_SALVAR.indexOf(x.k)>=0;
+    const ab=pop.filter(p=>p.n('abriu:'+x.k)>0||p.n('salvou:'+x.k)>0).length,sv=pop.filter(p=>p.n('salvou:'+x.k)>0).length,pa=M?Math.round(ab/M*100):0,ps=M?Math.round(sv/M*100):0,pt=so?pa:ps;
+    return `<div style="display:grid;grid-template-columns:minmax(130px,280px) 1fr minmax(120px,170px);gap:10px;align-items:center;margin:10px 0;font-size:13px"><div><b>${esc(x.nome)}</b> <span style="display:inline-block;font-size:10px;font-weight:700;padding:2px 7px;border-radius:8px;background:var(--line,#e5e9f2);color:var(--ink,#374151)">${esc(REC_NIVEIS[nv]||nv)}</span></div><div title="${ab} abriram${so?'':', '+sv+' salvaram'} de ${M}" style="position:relative;height:14px;background:var(--line,#e5e7eb);border-radius:7px;overflow:hidden"><div style="position:absolute;left:0;top:0;height:14px;width:${pa}%;background:#9ca3af"></div>${so?'':`<div style="position:absolute;left:0;top:0;height:14px;width:${ps}%;background:#16a34a"></div>`}</div><div style="text-align:right;line-height:1.35">${ab} abriram${so?'':' · '+sv+' salvaram'}<br><span class="muted">de ${M} que enxerga${M===1?'':'m'} · ${pt}%</span></div></div>`}).join('')}
+function indFunilRows(F){ // V130: funil anônimo do pedido de convite
+  const g=k=>+F[k]||0,ab=g('abriu');if(!ab&&!g('enviou'))return '<div class="small muted">Ainda sem registros nos últimos 30 dias.</div>';
+  const L=[['abriu','Abriram o pedido','#9ca3af'],['leu','Abriram os Termos para ler','#9ca3af'],['deacordo','Deram “De acordo”','#16a34a'],['naoconcordo','Tocaram “Não concordo”','#dc2626'],['cancelou','Cancelaram o pedido','#f59e0b'],['enviou','Enviaram o pedido','#2563eb']];
+  const base=Math.max(1,ab,...L.map(x=>g(x[0])));
+  const lin=L.map(([k,t,c])=>{const n=g(k),p=ab?Math.round(n/ab*100):0;return `<div style="display:grid;grid-template-columns:minmax(120px,210px) 1fr auto;gap:8px;align-items:center;margin:6px 0;font-size:13px"><div>${t}</div><div style="background:var(--line,#e5e7eb);border-radius:6px;height:14px;overflow:hidden"><div style="width:${Math.round(n/base*100)}%;height:100%;background:${c}"></div></div><div style="text-align:right;white-space:nowrap"><b>${n}</b> <span class="muted">${k==='abriu'?'· base':'· '+p+'%'}</span></div></div>`}).join('');
+  const dec=g('deacordo')+g('naoconcordo'),rec=dec?Math.round(g('naoconcordo')/dec*100):0;
+  return lin+`<div class="small" style="margin-top:8px;padding-top:8px;border-top:1px solid var(--line,#e5e7eb)"><b>Recusa dos Termos: ${rec}%</b> <span class="muted">(${g('naoconcordo')} de ${dec} que decidiram) · <b>Conversão do pedido: ${ab?Math.round(g('enviou')/ab*100):0}%</b> (${g('enviou')} de ${ab} que abriram)</span></div>`}
 async function indicRender(box,aba,recarrega){
   aba=aba||UI.indAba||'geral';UI.indAba=aba;
   if(!IND_R||recarrega){box.innerHTML='<div class="empty">Carregando indicadores…</div>';try{IND_R=await indCarrega()}catch(e){box.innerHTML='<div class="empty">Não consegui carregar os indicadores. Tente de novo em instantes.</div>';return}}
   const A=indCalc(IND_R);IND_CALC=A;const {T,at,cad,cadA,U}=A,pc=(n,t)=>t?Math.round(n/t*100)+'%':'—',fm=n=>String(n);
   const bar=(n,t,c,cor)=>{const p=t?Math.round(n/t*100):0;return `<div style="display:flex;align-items:center;gap:8px;margin:5px 0"><div style="flex:0 0 150px;font-size:13px">${c}</div><div style="flex:1;background:var(--line,#e5e7eb);border-radius:6px;height:14px;overflow:hidden"><div style="width:${p}%;height:100%;background:${cor||'#2563eb'}"></div></div><div style="flex:0 0 78px;text-align:right;font-size:13px"><b>${p}%</b> <span class="muted">(${n})</span></div></div>`};
+  const nu=n=>n+' usuário'+(n===1?'':'s');
+  const barU=(n,t,c,cor,fk)=>{const p=t?Math.round(n/t*100):0;return `<div${fk?` data-indf="${fk}" role="button" tabindex="0" title="Ver essas pessoas na lista de usuários ativos"`:''} style="display:grid;grid-template-columns:minmax(110px,190px) 1fr auto;gap:8px;align-items:center;margin:6px 0${fk?';cursor:pointer':''}"><div style="font-size:13px">${c}</div><div style="background:var(--line,#e5e7eb);border-radius:6px;height:14px;overflow:hidden"><div style="width:${p}%;height:100%;background:${cor||'#2563eb'}"></div></div><div style="text-align:right;font-size:13px;white-space:nowrap"><b>${nu(n)}</b> <span class="muted">· ${p}%</span></div></div>`};
   const card=(t,sub,h)=>`<div class="card" style="margin-top:10px"><h3 style="margin:0 0 4px">${t}</h3><div class="small muted" style="margin-bottom:6px">${sub}</div>${h}</div>`;
   const grid=L=>`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:10px">${L.map(([l,v,s2])=>kpi(l,v,s2)).join('')}</div>`;
   const vazio=T?'':'<div class="note small" style="margin-top:10px">Ainda não há usuários ativos nos últimos 30 dias para calcular os percentuais.</div>';
@@ -5215,8 +5247,9 @@ async function indicRender(box,aba,recarrega){
         ['Voltaram em 7 dias',A.ret0.length?pc(A.ret.length,A.ret0.length):'—',A.ret0.length?A.ret.length+' de '+A.ret0.length+' que entraram na semana anterior':'ainda sem histórico (contagem desde a V103)'],
         ['Novos no mês',fm(A.novos.length),'cadastros no mês · '+A.convMes.length+' pedidos de convite recebidos'],['Exclusões no mês',fm(A.exMes.length),exAc+' no acumulado'+(T?' = '+(Math.round(exAc/T*1000)/10).toString().replace('.',',')+'% da base ativa':'')],
         ['Inativos há 30+ dias',fm(nl('inativos')),'sem usar o app · ver lista'],['Ativação',fm(nl('ativacao')),'novos sem o 1º registro · ver lista']])+vazio
-      +card('Consulta das funcionalidades · últimos 30 dias',`% dos ${T} usuários ativos que abriram a tela ao menos 1 vez mas não salvaram nenhum registro nela. Cada pessoa conta uma vez por tela por dia, sem horário e sem conteúdo. Contagem desde a V103 (${IND_DESDE}).`,A.telas.map(x=>bar(x.so,T,x.nome,'#94a3b8')).join(''))
-      +card('Uso das funcionalidades · últimos 30 dias',`% dos ${T} usuários ativos que salvaram registros em cada funcionalidade. Cada pessoa conta uma vez por tela por dia, sem horário e sem conteúdo.`,A.telas.filter(x=>x.k!=='painel'&&x.k!=='rodacalc'&&x.k!=='relatorios').map(x=>bar(x.sv,T,x.nome,'#16a34a')).join(''))
+      +card('Uso das funcionalidades · últimos 30 dias',`Quantas contas ativas abriram a tela e quantas salvaram registro. A base de cada linha é <b>quem enxerga a funcionalidade</b> no nível atual (inclui contas de admin), e não toda a base ativa. O nível aparece ao lado do nome. Cada pessoa conta uma vez por tela por dia, sem horário e sem conteúdo.`,
+        `<div class="small" style="margin:4px 0 8px"><span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:#9ca3af;vertical-align:-2px;margin-right:4px"></span>Abriram a tela &nbsp;&nbsp;<span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:#16a34a;vertical-align:-2px;margin-right:4px"></span>Salvaram registro (parte de quem abriu)</div>`+indFuncRows(A))
+      +card('Funil do pedido de convite · últimos 30 dias','Contagem anônima de quem passou pelo formulário de pedido: não guarda nome, e-mail, WhatsApp nem IP. Um evento de cada tipo por aparelho por dia, então quem volta no dia seguinte conta de novo. Quem toca “Não concordo” e depois “De acordo” entra nas duas linhas.',indFunilRows(A.funil))
       +card('Pedidos de exclusão e motivos','Por mês e acumulado. O motivo é o que a pessoa escolhe ao pedir a exclusão da conta.',`<table style="width:100%;border-collapse:collapse;font-size:13px"><tr class="muted"><th style="text-align:left;padding:4px 0">Motivo</th>${A.meses.map(m=>`<th style="text-align:right">${MESES[+m.slice(5,7)-1].slice(0,3)}</th>`).join('')}<th style="text-align:right">Acumulado</th></tr>${motT.map(l=>`<tr style="border-top:1px solid var(--line)"><td style="padding:5px 0">${esc(l)}</td>${A.meses.map(m=>`<td style="text-align:right">${cel(l,m)}</td>`).join('')}<td style="text-align:right"><b>${cel(l)}</b></td></tr>`).join('')}<tr style="border-top:1px solid var(--line)"><td style="padding:5px 0"><b>Total</b></td>${A.meses.map(m=>`<td style="text-align:right"><b>${A.ex.filter(e=>String(e.criado||'').slice(0,7)===m).length}</b></td>`).join('')}<td style="text-align:right"><b>${exAc}</b></td></tr></table>`)
       +card('Conversão do convite · mês','Do pedido ao cadastro efetivado, no mês corrente.',bar(A.convMes.length,A.convMes.length,'Pedidos recebidos','#2563eb')+bar(A.convMes.filter(c=>['convidado','avisado'].indexOf(c.status)>=0).length,A.convMes.length,'Convidados','#2563eb')+bar(A.convMes.filter(c=>A.mails.has(c.email)).length,A.convMes.length,'Cadastraram (efetivados)','#16a34a')+'<div class="small muted" style="margin-top:6px">Os % são sobre os pedidos recebidos no mês.</div>')
       +card('Apoio e alerta de doação · últimos 30 dias','Do aviso ao apoio. % sobre os usuários ativos.',bar(cnt('aviso:doacao_viu'),T,'Viram o alerta','#2563eb')+bar(cnt('aviso:doacao_agora_nao'),T,'“Agora não”','#94a3b8')+bar(cnt('aviso:doacao_apoiar'),T,'Abriram Apoiar','#2563eb')+bar(at.filter(u=>A.ap.has(u.id)).length,T,'Apoiaram','#16a34a'))
@@ -5224,30 +5257,36 @@ async function indicRender(box,aba,recarrega){
       +card('Avisos e alertas · últimos 30 dias','Quantos usuários viram cada aviso e o que fizeram.',[['Alerta de doação: viram','aviso:doacao_viu'],['Alerta de doação: “Agora não”','aviso:doacao_agora_nao'],['Alerta de doação: abriram Apoiar','aviso:doacao_apoiar'],['Sino: abriram o sino','aviso:sino'],['Novidades: abriram','aviso:novidades'],['Alerta de km: viram','aviso:km_viu'],['Alerta de km: “Já troquei”','aviso:km_troquei']].map(([c,k])=>bar(cnt(k),T,c)).join(''));
   }else if(aba==='perfil'){
     // V122: perfil de habilitação, tipo de trabalho e veículo — base ativa (últimos 30 dias) no topo, tudo calculado sobre ela
-    // contas de admin entram só nesta aba (usam o app como motoristas); nas outras abas a base continua sem admins
-    const admAt=(A.R.admins||[]).filter(u=>!u.excluido&&!u.desativado&&u.uso&&(Date.now()-new Date(u.uso).getTime())/IND_DIA<30).map(u=>({...u,nome:u.nome||u.email}));
-    const at=A.at.concat(admAt),T=at.length;
+    const at=A.at,T=at.length;
+    const bar=barU; // nesta aba tudo aparece como “n usuários · %”
+    const US=n=>n.usos||[];
     const N=at.map(u=>({u,n:pfNorm(u.perfil)})),inf=N.filter(x=>x.n.inf),sem=N.length-inf.length,I=inf.map(x=>x.n),TI=I.length;
     const c=f=>I.filter(f).length,hab=I.filter(n=>!n.sem);
     const ct=(l,k)=>bar(k,T,l);
     const tab2=(cab,linhas)=>`<table style="width:100%;border-collapse:collapse;font-size:13px"><tr class="muted"><th style="text-align:left;padding:4px 0"></th>${cab.map(x=>`<th style="text-align:right">${x}</th>`).join('')}</tr>${linhas.map(r=>`<tr style="border-top:1px solid var(--line)"><td style="padding:5px 0">${r[0]}</td>${r.slice(1).map((x,i)=>`<td style="text-align:right${i===r.length-2?';font-weight:700':''}">${x}</td>`).join('')}</tr>`).join('')}</table>`;
-    const att=[];inf.forEach(x=>{pfAtencao(x.n).forEach(m=>att.push([x.u.nome||x.u.email||'—',m]))});
+    const att=[];inf.forEach(x=>{const nm=x.u.nome||x.u.email||'—',ev=x.u.ev||{},sc=ev['salvou:corridas']?ev['salvou:corridas'][0]:0,us=US(x.n);pfAtencao(x.n).forEach(m=>att.push([nm,m]));
+      if(us.length&&!x.n.trab&&sc>0)att.push([nm,'escolheu só uso pessoal, mas lançou corridas nos últimos 30 dias (o perfil pode estar desatualizado)']);
+      if(us.includes('corridas')&&sc===0&&x.u.criado&&A.dd(x.u.criado)>=14)att.push([nm,'marcou corridas, mas não lançou nenhuma nos últimos 30 dias'])});
     const mails=A.mails;
     const cv=(A.R.convites||[]).map(cn=>({cn,n:pfNorm(cn)}));
+    const sP=c(n=>US(n).includes('pessoal')&&!n.trab),pT=c(n=>US(n).includes('pessoal')&&n.trab===true),sT=c(n=>!US(n).includes('pessoal')&&n.trab===true),outras=TI-sP-pT-sT;
     const grp=[['Com CNH e EAR',x=>x.n.inf&&x.n.ear==='sim'],['Com CNH sem EAR',x=>x.n.inf&&x.n.ear==='nao'],['Sem CNH',x=>x.n.inf&&x.n.sem],['Não informado (pedidos antigos)',x=>!x.n.inf]];
     h=`<div class="card" style="margin-top:10px;border:2px solid #2563eb"><h3 style="margin:0 0 4px">Base ativa · últimos 30 dias</h3><div style="display:flex;align-items:baseline;gap:10px"><b style="font-size:32px">${T}</b><span class="muted">usuários ativos (100% da base) · ${cadA.length+(A.R.admins||[]).filter(u=>!u.excluido&&!u.desativado).length} contas ativas, ${cadA.length+(A.R.admins||[]).filter(u=>!u.excluido&&!u.desativado).length-T} sem uso nos últimos 30 dias</span></div>
         ${bar(TI,T,'Perfil informado','#16a34a')}${bar(sem,T,'Ainda sem perfil','#f59e0b')}
-        <div class="small muted" style="margin-top:6px">Tudo abaixo é calculado sobre a base ativa, <b>incluindo as contas de admin</b> (só nesta aba; nas outras a base não conta admins). “Ainda sem perfil” entra como uma fatia própria, para não distorcer os percentuais. Os números leem o perfil atual de cada conta (o que a pessoa editou), não a resposta antiga do convite. Dados declarados pelas pessoas, só para estatística interna.</div></div>`
+        <div class="small muted" style="margin-top:6px">Tudo abaixo é calculado sobre a base ativa, <b>incluindo as contas de admin</b>, que também são usuários com outro perfil. “Ainda sem perfil” entra como uma fatia própria, para não distorcer os percentuais. Os números leem o perfil atual de cada conta (o que a pessoa editou), não a resposta antiga do convite. Dados declarados pelas pessoas, só para estatística interna.</div></div>`
       +(T?'':vazio)
-      +card('Tipo de trabalho · % da base ativa ('+T+')','Quem trabalha por aplicativo e em quê.',ct('Passageiros (Uber, 99…)',c(n=>n.trab===true&&n.tipo==='passageiros'))+ct('Entregas',c(n=>n.trab===true&&n.tipo==='entregas'))+ct('Os dois',c(n=>n.trab===true&&n.tipo==='ambos'))+ct('Não trabalha por app',c(n=>n.trab===false))+bar(sem,T,'Sem perfil','#f59e0b'))
-      +card('Habilitação · % da base ativa ('+T+')','Cascata: base ativa → perfil informado → habilitados → EAR → carro/moto. “Sem CNH de carro/moto” traz quem não dirige aquele veículo (inclui quem só tem o outro).',
+      +card('Como usam o veículo <span class="muted" style="font-weight:400;font-size:12px">· base: '+T+' ativos</span>','Vem do perfil de uso de cada conta. Marcar mais de um uso é permitido, então a soma passa de 100%. Toque numa linha para ver essas pessoas na lista de usuários ativos.',
+        bar(c(n=>US(n).includes('pessoal')),T,'🚗 Uso pessoal e família','#2563eb','pessoal')+bar(c(pfPass),T,'🚕 Corridas (Uber, 99…)','#2563eb','pass')+bar(c(pfEnt),T,'🛵 Entregas','#2563eb','ent')+bar(c(n=>US(n).includes('carona')),T,'🧑‍🤝‍🧑 Viagens e caronas','#2563eb','carona')
+        +'<div class="small" style="font-weight:700;margin:12px 0 2px;padding-top:8px;border-top:1px solid var(--line,#e5e7eb)">Combinações (cada pessoa conta uma vez; somam 100%)</div>'
+        +bar(sP,T,'👤 Só uso pessoal','#f59e0b','spessoal')+bar(pT,T,'🔀 Pessoal + trabalho','#f59e0b','ptrab')+bar(sT,T,'💼 Só trabalho (corridas e/ou entregas)','#f59e0b','strab')+(outras>0?bar(outras,T,'Outras combinações (por ex.: só Viagens e caronas)','#f59e0b'):'')+bar(sem,T,'❔ Sem perfil','#6b7280','ninf'))
+      +card('Habilitação <span class="muted" style="font-weight:400;font-size:12px">· base: '+T+' ativos</span>','Cascata: base ativa → perfil informado → habilitados → EAR → carro/moto. “Sem CNH de carro/moto” traz quem não dirige aquele veículo (inclui quem só tem o outro).',
         grid([['Habilitados',fm(hab.length),'com CNH'],['Habilitados com EAR',fm(c(n=>n.ear==='sim')),'EAR = sim'],['Carro + moto',fm(c(n=>n.carro&&n.moto)),'as duas'],['Sem CNH',fm(c(n=>n.sem)),'“Comum”'],['EAR + carro + moto',fm(c(n=>n.ear==='sim'&&n.carro&&n.moto)),'perfil completo'],['Sem perfil',fm(sem),'ainda não informaram']])
         +ct('Habilitados (com CNH)',hab.length)+ct('Com EAR',c(n=>n.ear==='sim'))+ct('CNH sem EAR',c(n=>n.ear==='nao'))+ct('Carro e moto',c(n=>n.carro&&n.moto))+ct('Só carro',c(n=>n.carro&&!n.moto))+ct('Só moto',c(n=>n.moto&&!n.carro))+ct('Sem CNH de carro',c(n=>!n.carro))+ct('Sem CNH de moto',c(n=>!n.moto))+ct('Sem CNH (“Comum”)',c(n=>n.sem))+bar(sem,T,'Sem perfil','#f59e0b'))
-      +card('Veículo em uso · % de quem informou ('+TI+')','Pode marcar mais de um, então a soma passa de 100%.',PF_VEIC.map(([k,t])=>bar(c(n=>n.veic.includes(k)),TI,t,k==='nenhum'?'#f59e0b':'#2563eb')).join(''))
+      +card('Veículo em uso <span class="muted" style="font-weight:400;font-size:12px">· base: '+TI+' que informaram</span>','Pode marcar mais de um, então a soma passa de 100%.',PF_VEIC.map(([k,t])=>bar(c(n=>n.veic.includes(k)),TI,t,k==='nenhum'?'#f59e0b':'#2563eb')).join(''))
       +card('Cruzamento · EAR × CNH (quem informou)','Contagem de pessoas. “Carro + moto” = categorias para os dois.',tab2(['Só carro','Só moto','Carro + moto','Total'],[['Com EAR',c(n=>n.ear==='sim'&&n.carro&&!n.moto),c(n=>n.ear==='sim'&&n.moto&&!n.carro),c(n=>n.ear==='sim'&&n.carro&&n.moto),c(n=>n.ear==='sim')],['Sem EAR',c(n=>n.ear==='nao'&&n.carro&&!n.moto),c(n=>n.ear==='nao'&&n.moto&&!n.carro),c(n=>n.ear==='nao'&&n.carro&&n.moto),c(n=>n.ear==='nao')],['Sem CNH','—','—','—',c(n=>n.sem)]]))
       +card('Cruzamento · habilitação × veículo em uso (quem informou)','Mostra, por exemplo, quem tem CNH de moto e usa bicicleta, ou usa carro sem CNH de carro.',tab2(['Carro','Moto','Bicicleta','Outro','Sem veículo'],[['CNH de carro',...['carro','moto','bicicleta','outro','nenhum'].map(v=>c(n=>n.carro&&n.veic.includes(v)))],['CNH de moto',...['carro','moto','bicicleta','outro','nenhum'].map(v=>c(n=>n.moto&&n.veic.includes(v)))],['Sem CNH',...['carro','moto','bicicleta','outro','nenhum'].map(v=>c(n=>n.sem&&n.veic.includes(v)))]]))
-      +card('Funil por perfil · pedido → convidado → cadastrou','Do pedido de convite à conta criada, pelo perfil que a pessoa informou no pedido.',tab2(['Pedidos','Convidados','Cadastraram'],grp.map(([t,f])=>{const g=cv.filter(f);return [t,g.length,g.filter(x=>['convidado','avisado'].indexOf(x.cn.status)>=0).length,g.filter(x=>mails.has(x.cn.email)).length]})))
-      +card('Pontos de atenção','Não bloqueiam ninguém. Entregador de bicicleta sem CNH é normal e não entra aqui.',att.length?`<ul style="margin:4px 0 0 18px;padding:0;font-size:13px">${att.map(a=>`<li><b>${esc(a[0])}</b>: ${esc(a[1])}</li>`).join('')}</ul>`:'<div class="small muted">Nenhum ponto de atenção na base ativa.</div>');
+      +card('Funil por perfil · pedido → convidado → cadastrou','Do pedido de convite à conta criada, pelo uso e pelo perfil que a pessoa informou no pedido.',tab2(['Pedidos','Convidados','Cadastraram','Conversão'],[['👤 Só uso pessoal',x=>x.n.inf&&US(x.n).includes('pessoal')&&!x.n.trab],['🔀 Pessoal + trabalho',x=>x.n.inf&&US(x.n).includes('pessoal')&&x.n.trab===true],['💼 Só trabalho (corridas e/ou entregas)',x=>x.n.inf&&!US(x.n).includes('pessoal')&&x.n.trab===true]].concat(grp).map(([t,f])=>{const g=cv.filter(f),cd=g.filter(x=>mails.has(x.cn.email)).length;return [t,g.length,g.filter(x=>['convidado','avisado'].indexOf(x.cn.status)>=0).length,cd,g.length?Math.round(cd/g.length*100)+'%':'—']})))
+      +card('Pontos de atenção','Não bloqueiam ninguém. Entregador de bicicleta sem CNH é normal e não entra aqui.',att.length?`<div${att.length>10?' style="max-height:240px;overflow-y:auto;direction:rtl;border:1px solid var(--line,#e5e7eb);border-radius:8px;padding:6px 8px" tabindex="0"':''}><ul style="margin:4px 0 0 18px;padding:0;font-size:13px;direction:ltr">${att.map(a=>`<li><b>${esc(a[0])}</b>: ${esc(a[1])}</li>`).join('')}</ul></div>${att.length>10?`<div class="small muted" style="margin-top:4px">${att.length} pontos · role a lista para ver todos</div>`:''}`:'<div class="small muted">Nenhum ponto de atenção na base ativa.</div>');
   }else if(aba==='paises'){
     const G=por(cad,u=>u.pais),nomes=Object.keys(G).sort((a,b)=>G[b].length-G[a].length),br=G['Brasil']||[],fora=cad.filter(u=>u.pais!=='Brasil'),brA=br.filter(u=>u.ativo),foraA=fora.filter(u=>u.ativo);
     const mo={};fora.forEach(u=>{const p=PAISES.find(x=>x[1]===u.pais);if(p)mo[p[2]]=(mo[p[2]]||0)+1});const moTop=Object.keys(mo).sort((a,b)=>mo[b]-mo[a])[0];
@@ -5263,12 +5302,13 @@ async function indicRender(box,aba,recarrega){
       ['3 maiores juntos',pc(nomes.slice(0,3).reduce((s,k)=>s+G[k].length,0),tot),nomes.slice(0,3).join(', ')||'—'],['Maior taxa de uso',tx[0]?tx[0][0]:'—',tx[0]?pc(tx[0][1],tx[0][2])+' salvaram registro ('+tx[0][1]+' de '+tx[0][2]+')':'—'],['Menor taxa de uso',tx.length?tx[tx.length-1][0]:'—',tx.length?pc(tx[tx.length-1][1],tx[tx.length-1][2])+' ('+tx[tx.length-1][1]+' de '+tx[tx.length-1][2]+')':'—']])
       +card('Usuários por estado (Brasil)','O estado vem do DDD do WhatsApp. Cidade não é coletada hoje; para ter cidade seria preciso pedir a localização ou perguntar no cadastro, e isso exigiria atualizar Termos e Política.',tabela('Estado',G));
   }
-  box.innerHTML=`<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><div class="admTabs" style="margin:10px 0 0;flex:1">${[['geral','Geral'],['perfil','Perfil de habilitação'],['paises','Por países'],['estados','Por estados (BR)']].map(([k,t])=>`<button type="button" class="chip${aba===k?' on':''}" data-indab="${k}">${t}</button>`).join('')}</div><button type="button" class="btn sec sm" id="indAtu" style="margin-top:10px">↻ Atualizar</button></div>${h}
-  <div class="note small" style="margin-top:10px"><b>Como funciona</b>: cada pessoa gera no máximo 1 registro por evento por dia, só com “abriu a tela” e “salvou um registro nela” (sem conteúdo e sem valores), os avisos vistos e o tipo de aparelho. “Só consultou” = ativo nos últimos 30 dias e sem registro salvo. Este painel só soma; registros com mais de 90 dias são apagados. Contas de administrador não entram nos números.</div>`;
+  box.innerHTML=`<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><div class="admTabs" style="margin:10px 0 0;flex:1">${[['geral','Geral'],['perfil','Perfil'],['paises','Por países'],['estados','Por estados (BR)']].map(([k,t])=>`<button type="button" class="chip${aba===k?' on':''}" data-indab="${k}">${t}</button>`).join('')}</div><button type="button" class="btn sec sm" id="indAtu" style="margin-top:10px">↻ Atualizar</button></div>${h}
+  <div class="note small" style="margin-top:10px"><b>Como funciona</b>: cada pessoa gera no máximo 1 registro por evento por dia, só com “abriu a tela” e “salvou um registro nela” (sem conteúdo e sem valores), os avisos vistos e o tipo de aparelho. “Só consultou” = ativo nos últimos 30 dias e sem registro salvo. Este painel só soma; registros com mais de 90 dias são apagados. Contas de administrador contam como usuários em todos os números.</div>`;
   const liga=(el,key)=>{if(!el)return;el.style.cssText+=';cursor:pointer;position:relative;border:1px dashed #2563eb';el.setAttribute('role','button');el.setAttribute('tabindex','0');el.insertAdjacentHTML('beforeend','<span style="position:absolute;bottom:6px;right:8px;font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;background:#1e3a8a;color:#fff">👆</span>');el.onclick=()=>indLista(key,()=>indicRender(box,aba));el.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();el.onclick()}}};
   box.querySelectorAll('.kpi').forEach(k=>{const l=(k.querySelector('.l')||{}).textContent||'';if(l==='Inativos há 30+ dias')liga(k,'inativos');else if(l==='Ativação')liga(k,'ativacao');else if(l==='Só consultaram')liga(k,'consultaram')});
   box.querySelectorAll('h3').forEach(x=>{const t=x.textContent;if(t.indexOf('Conversão do convite')===0)liga(x.parentElement,'convites');else if(t.indexOf('Apoio e alerta')===0)liga(x.parentElement,'agoranao')});
   box.querySelectorAll('[data-indab]').forEach(b=>b.onclick=()=>indicRender(box,b.dataset.indab));
+  box.querySelectorAll('[data-indf]').forEach(b=>{const go=()=>{USR_PF.clear();USR_PF.add(b.dataset.indf);UI.usuSub='ativos';UI.voltaInd=1;abrirAdmin('usuarios')};b.onclick=go;b.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go()}}});
   box.querySelectorAll('[data-indp]').forEach(b=>b.onclick=()=>{UI.indPais=b.dataset.indp;indicRender(box,'paises')});
   const at2=box.querySelector('#indAtu');if(at2)at2.onclick=async()=>{IND_R=null;await indicRender(box,aba,true)}}
 
@@ -5314,7 +5354,7 @@ async function montaAdmin(){const box=$('#admBox');if(!box)return;const sub=UI.a
       ${PFMAP?(()=>{const n=pfNorm(PFMAP[u.user_id]),at=pfAtencao(n);return `<div class="uLin">🪪 Perfil: <b>${esc(pfResumo(n))}</b>${at.length?` · <span class="tag a">⚠ ${esc(at.join('; '))}</span>`:''}</div>`})():''}
       <div class="uLin">Cadastro: ${admData(u.criado_em)}${exc?` · <b>Excluído em ${admData(u.excluido_em)}</b>`:` · Último login: ${admData(u.ultimo_login)} · Último uso: ${admData(u.ultimo_uso)}`}</div>
       <div class="ivActs" style="margin-top:8px"><button type="button" class="btn sm" data-pdf="${esc(u.user_id||u.email)}">📄 Dados desta pessoa</button><a class="btn sm" href="${esc(invMailLink(u.email,'Seus dados pessoais no Rodaliq',txt))}" target="_blank" rel="noopener">✉ Responder o pedido</a><button type="button" class="btn sm" data-zp="${esc(u.user_id||u.email)}">💬 WhatsApp</button>${!exc&&ehMaster()&&u.user_id&&u.user_id!==UID&&u.user_id!=='hmo'&&!ADM_IDS.has(u.user_id)?(dsAna?`<button type="button" class="btn sm" data-uree="${esc(u.user_id)}">▶ Reativar acesso</button>`:`<button type="button" class="btn sm warn" data-uana="${esc(u.user_id)}">⏸ Desativar para análise</button>`):''}${!exc&&invProd()&&ehMaster()&&u.user_id&&!ADM_IDS.has(u.user_id)?`${emAviso(u)?`<a class="btn sm" href="${esc(invMailLink(u.email,'Sua conta no Rodaliq',inatTexto(nm.split(' ')[0],inatDias(u,INAT),false)))}" target="_blank" rel="noopener">✉ Avisar da inatividade</a><button type="button" class="btn sm" data-zi="${esc(u.user_id)}">💬 Avisar no WhatsApp</button>`:''}${emAviso(u)&&inatDias(u,INAT)>=INAT_DIAS&&invProd()&&ehMaster()&&!(EXC_CACHE||[]).some(x=>x.user_id===u.user_id&&['novo','desativado'].includes(x.status))?`<button type="button" class="btn sm warn" data-uina="${esc(u.user_id)}">🔒 Desativar por inatividade</button>`:''}<button type="button" class="btn sm warn" data-udel="${esc(u.user_id)}">🗑 Excluir usuário</button>`:''}</div></div></div>`};
-  box.innerHTML=`<h3 style="margin:0">${exc?'🗑 Usuários excluídos':'👥 Usuários ativos'} (${lst.length})</h3>
+  box.innerHTML=`${sub==='ativos'&&UI.voltaInd&&USR_PF.size>0?'<button type="button" class="btn sm" id="uVoltaInd" style="margin:0 0 8px">← Voltar aos Indicadores</button>':''}<h3 style="margin:0">${exc?'🗑 Usuários excluídos':'👥 Usuários ativos'} (${lst.length})</h3>
     <p class="small muted" style="margin:4px 0 0">${exc?'Usuários apagados (pelo app ou pelo painel do Supabase), com a data da exclusão.':'Ordem: admin supremo, admins master, admins, colaboradores e depois os demais, cada grupo de A a Z. Toque no nome para ver os detalhes. “Último uso” muda sempre que a pessoa abre o app; “Último login”, só quando ela digita a senha.'} Para apagar uma pessoa, use “🗑 Excluir usuário” (definitivo).${invProd()?'':' <b>No HMO aparece só o usuário de teste; os dados reais aparecem em produção.</b>'}</p>
     ${sub==='ativos'&&invProd()?`<div class="admTabs" style="margin:8px 0"><button type="button" class="chip${ativF==='todos'?' on':''}" data-ativf="todos">Todos (${lstAll.length})</button><button type="button" class="chip${ativF==='aviso'?' on':''}" data-ativf="aviso">Sem lançar há ${INAT_DIAS-INAT_AVISO}+ dias (${lstAll.filter(emAviso).length})</button></div><p class="small muted" style="margin:0 0 8px">Só entrar no app não conta: vale o último lançamento. Aos ${INAT_DIAS-INAT_AVISO} dias você pode avisar a pessoa; aos ${INAT_DIAS} dias aparece “🔒 Desativar por inatividade” (mesma carência de ${EXC_DIAS} dias e mesma reativação dos pedidos de exclusão).</p>`:''}
     ${sub==='ativos'&&ehPrincipal()?`<details style="margin:2px 0 8px"${pfOnA?' open':''}><summary class="small muted" style="cursor:pointer;padding:4px 0"><b>Filtros do perfil de motorista</b> (combináveis)${pfOnA?` · <b style="color:var(--ink)">${lst.length} de ${lst0.length}</b>`:' · toque para abrir'}</summary><div class="chips" style="margin:6px 0">${PF_FILTROS.map(([k,t])=>`<button type="button" data-upf="${k}" class="chip${USR_PF.has(k)?' on':''}">${USR_PF.has(k)?'✔ ':''}${t}</button>`).join('')}</div>${pfOnA?'<button type="button" class="lnk" data-upfx="1">limpar filtros</button>':''}</details>`:''}
@@ -5326,6 +5366,7 @@ async function montaAdmin(){const box=$('#admBox');if(!box)return;const sub=UI.a
   box.querySelectorAll('[data-ativf]').forEach(b=>b.onclick=()=>{UI.ativF=b.dataset.ativf;montaAdmin()});
   box.querySelectorAll('[data-upf]').forEach(b=>b.onclick=()=>{const k=b.dataset.upf;USR_PF.has(k)?USR_PF.delete(k):USR_PF.add(k);montaAdmin()});
   box.querySelectorAll('[data-upfx]').forEach(b=>b.onclick=()=>{USR_PF.clear();montaAdmin()});
+  const vi=box.querySelector('#uVoltaInd');if(vi)vi.onclick=()=>{UI.voltaInd=0;USR_PF.clear();abrirAdmin('indicadores')};
   box.querySelectorAll('[data-zi]').forEach(b=>b.onclick=()=>{const z=ZAP_PES['i:'+b.dataset.zi];if(z)abreZap(z.fone,z.txt)});
   box.querySelectorAll('[data-uana],[data-uree]').forEach(b=>b.onclick=async()=>{const id=b.dataset.uana||b.dataset.uree,u=lst.find(v=>v.user_id===id);if(!u)return;
     if(await(b.dataset.uana?usrDesativarAnalise(u):usrReativar(u))){await excAdminCache(true);atualizaSino();montaAdmin();admContagens()}});
@@ -5613,7 +5654,7 @@ function pfAtencao(n){const a=[];if(!n.inf||!n.ear)return a;
   if(n.veic.includes('moto')&&!n.moto)a.push('Usa moto sem CNH de moto');
   if(n.ear!=='sim'&&(pfPass(n)||(pfEnt(n)&&n.veic.includes('moto'))))a.push('Passageiros ou entrega de moto sem EAR');
   return a}
-const PF_FILTROS=[['pessoal','Uso pessoal e família',n=>!!n.usos&&n.usos.includes('pessoal')],['spessoal','Só uso pessoal',n=>!!n.usos&&!n.trab],['app','Trabalha por app',n=>n.trab===true],['pass','Passageiros',pfPass],['ent','Entregas',pfEnt],['cnh','Com CNH',n=>!!n.ear&&!n.sem],['ear','Com EAR',n=>n.ear==='sim'],['semear','CNH sem EAR',n=>n.ear==='nao'],['semcnh','Sem CNH',n=>n.sem],
+const PF_FILTROS=[['pessoal','Uso pessoal e família',n=>!!n.usos&&n.usos.includes('pessoal')],['spessoal','Só uso pessoal',n=>!!n.usos&&n.usos.includes('pessoal')&&!n.trab],['ptrab','Pessoal + trabalho',n=>!!n.usos&&n.usos.includes('pessoal')&&n.trab===true],['strab','Só trabalho',n=>!!n.usos&&!n.usos.includes('pessoal')&&n.trab===true],['carona','Viagens e caronas',n=>!!n.usos&&n.usos.includes('carona')],['app','Trabalha por app',n=>n.trab===true],['pass','Passageiros',pfPass],['ent','Entregas',pfEnt],['cnh','Com CNH',n=>!!n.ear&&!n.sem],['ear','Com EAR',n=>n.ear==='sim'],['semear','CNH sem EAR',n=>n.ear==='nao'],['semcnh','Sem CNH',n=>n.sem],
   ['carro','CNH de carro',n=>n.carro],['moto','CNH de moto',n=>n.moto],['scarro','Sem CNH de carro',n=>!n.carro],['smoto','Sem CNH de moto',n=>!n.moto],
   ['vcarro','Usa carro',n=>n.veic.includes('carro')],['vmoto','Usa moto',n=>n.veic.includes('moto')],['vbici','Usa bicicleta',n=>n.veic.includes('bicicleta')],['vnenhum','Sem veículo',n=>n.veic.includes('nenhum')],
   ['atenc','Pontos de atenção',n=>pfAtencao(n).length>0],['ninf','Perfil não informado',n=>!n.inf]];
@@ -5733,6 +5774,11 @@ async function openInvitesModal(host){ // V48: com host, a tela é montada dentr
   try{list=await invAutoLimpa(await invList());invCache=list;invCacheAt=Date.now()}catch(e){body.innerHTML='<div class="err">Não foi possível carregar os pedidos: '+esc((e&&e.message)||e)+'</div>';return}
   draw();
 }
+// V130: funil anônimo do pedido de convite (só contagem; um evento de cada tipo por aparelho por dia; o código muda todo dia e não guarda nada da pessoa)
+function funilPedido(ev){try{if(!invProd()||!DB)return;const d=new Date(),dia=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');let o=null;try{o=JSON.parse(localStorage.getItem('rq_fv')||'null')}catch(e){}
+  if(!o||o.d!==dia){const a=new Uint8Array(12);(window.crypto||{getRandomValues:x=>x.forEach((_,i)=>x[i]=Math.random()*256)}).getRandomValues(a);o={d:dia,t:[...a].map(x=>x.toString(16).padStart(2,'0')).join(''),e:[]};}
+  if(o.e.indexOf(ev)>=0)return;o.e.push(ev);try{localStorage.setItem('rq_fv',JSON.stringify(o))}catch(e){}
+  Promise.resolve(DB.rpc('rodaliq_funil_pedido',{p_token:o.t,p_evento:ev})).catch(()=>{})}catch(e){}}
 // Formulário "Peça um convite" na tela de login
 (function(){
   const link=$('#invOpen'),form=$('#invForm'),lf=$('#fLogin'),msg=$('#invMsg');if(!link)return;
@@ -5744,9 +5790,9 @@ async function openInvitesModal(host){ // V48: com host, a tela é montada dentr
   const isMinor=b=>{const lim=new Date();lim.setFullYear(lim.getFullYear()-18);return /^\d{4}-\d{2}-\d{2}$/.test(b)&&b>ymd(lim)};
   const checkMinor=()=>{const m=isMinor($('#invBirth').value);if(m)msg.textContent='';$('#invMinor').classList.toggle('hidden',!m);$('#invBtn').classList.toggle('hidden',m);return m};
   const view=(on,doGesto)=>{form.classList.toggle('hidden',!on);if(on&&!NAV_ON&&!invGuarda){try{history.pushState({rq:'inv'},'');invGuarda=true}catch(e){}}if(!on&&invGuarda&&!doGesto){invGuarda=false;navIgnora=true;try{history.back()}catch(e){navIgnora=false}}if(!on&&doGesto)invGuarda=false;lf.classList.toggle('hidden',on);link.parentElement.classList.toggle('hidden',on);if(so0)so0.parentElement.classList.toggle('hidden',on);
-    info('');if(!on){form.reset();$('#invUf').textContent=''}
+    info('');if(!on){form.reset();$('#invUf').textContent='';try{acTm=null;acRef()}catch(e){}}
     if(on){$('#invDone').classList.add('hidden');$('#invFields').classList.remove('hidden');checkMinor();setTimeout(()=>$('#invName').focus(),50)}};
-  form.__fechar=g=>view(false,g);form.__sujo=()=>['#invName','#invEmail','#invEmail2','#invBirth','#invDdd','#invPhone','#invDdi','#invPhoneI','#invHow'].some(k=>$(k).value.trim()!=='')||$('#invOk').checked||!!form.querySelector('#invUso input:checked')||!!form.querySelector('input[name=invEar]:checked')||!!form.querySelector('#invVeic input:checked');
+  form.__fechar=g=>view(false,g);form.__sujo=()=>acTm==='ok'||['#invName','#invEmail','#invEmail2','#invBirth','#invDdd','#invPhone','#invDdi','#invPhoneI','#invHow'].some(k=>$(k).value.trim()!=='')||$('#invOk').checked||!!form.querySelector('#invUso input:checked')||!!form.querySelector('input[name=invEar]:checked')||!!form.querySelector('#invVeic input:checked');
   $('#invBirth').max=ymd(new Date());
   // V122: perguntas do perfil (tipo de trabalho, EAR, CNH carro/moto, veículo)
   const pfSync=()=>{const us=[...$('#invUso').querySelectorAll('input:checked')].map(x=>x.value),trab=us.includes('corridas')||us.includes('entregas');
@@ -5769,7 +5815,17 @@ form.querySelectorAll('input[name=invEar]').forEach(x=>x.addEventListener('chang
   form.addEventListener('reset',()=>setTimeout(paisSync,0));
   $('#invPhone').addEventListener('input',()=>{const i=$('#invPhone');const d=invDigits(i.value).slice(0,9);i.value=d.length>5?d.slice(0,5)+'-'+d.slice(5):d});
   ['input','change'].forEach(ev=>$('#invBirth').addEventListener(ev,checkMinor));
-  link.addEventListener('click',()=>view(true));
+  // V130: o aceite dos Termos é dado aqui, no pedido (De acordo / Não concordo); “Enviar pedido” só habilita com o De acordo
+  let acTm=null; // null = ainda não decidiu · 'ok' = de acordo · 'no' = não concordou
+  const acRef=()=>{const bt=$('#invBtn');bt.disabled=acTm!=='ok';$('#invCancW').classList.toggle('hidden',acTm!=='no');
+    const st=$('#invTmSt');st.className='small '+(acTm==='ok'?'':'muted');st.style.color=acTm==='ok'?'#166534':(acTm==='no'?'#b91c1c':'');
+    st.textContent=acTm==='ok'?'✔ De acordo. Você já pode enviar o pedido.':(acTm==='no'?'Você não concordou, então o pedido não pode seguir. Se mudar de ideia, toque em “Ler e dar o aceite”.':'Leia e dê o seu “De acordo” para poder enviar o pedido.');
+    $('#invTmBtn').textContent=acTm?'Ler de novo':'Ler e dar o aceite'};
+  const acAbre=()=>{funilPedido('leu');verTermos('termos',{onDe:()=>{acTm='ok';funilPedido('deacordo');acRef()},onNao:()=>{acTm='no';funilPedido('naoconcordo');acRef();termosRecusa(()=>{})}})};
+  $('#invTmBtn').addEventListener('click',acAbre);
+  $('#invCanc').addEventListener('click',()=>{funilPedido('cancelou');acTm=null;view(false)});
+  const view0=view;
+  link.addEventListener('click',()=>{view(true);acTm=null;acRef();funilPedido('abriu')});
   $('#invClose').addEventListener('click',async()=>{if(form.__sujo()&&!await confirma('Você começou a preencher o pedido. Se voltar agora, <b>o que você digitou será perdido</b>.','Voltar e perder',{titulo:'Voltar para o login?',voltar:'Continuar preenchendo',perigo:1}))return;view(false)});
   $('#invDoneBack').addEventListener('click',()=>view(false));
   const DUP={email:'Já recebemos um pedido com este e-mail. Em breve entraremos em contato pelo e-mail ou WhatsApp informado.',whatsapp:'Já recebemos um pedido com este WhatsApp. Em breve entraremos em contato.',again:'Seu pedido já foi enviado. Em breve entraremos em contato pelo e-mail ou WhatsApp informado.'};
@@ -5797,6 +5853,7 @@ form.querySelectorAll('input[name=invEar]').forEach(x=>x.addEventListener('chang
     if(rec.cnh_ear!=='sem_cnh'&&!rec.cnh_categoria)return info(trab?'Informe a categoria da sua CNH.':'Informe a categoria da sua CNH ou marque “Não tenho CNH”.');
     if(!rec.veiculos.length)return info('Informe qual veículo você usa (ou “Não tenho veículo”).');
     if(rec.how_known.length<2)return info('Conte como soube do app.');
+    if(acTm!=='ok')return info('Leia os Termos de uso e a Política de privacidade e dê o “De acordo” para enviar o pedido.');
     if(!$('#invOk').checked)return info('Marque a autorização para continuar.');
     let last=0;try{last=+localStorage.getItem('rodaliq_inv_last')||0}catch(x){}
     if(Date.now()-last<60000)return info(DUP.again,true);
@@ -5804,9 +5861,9 @@ form.querySelectorAll('input[name=invEar]').forEach(x=>x.addEventListener('chang
     const btn=$('#invBtn');btn.disabled=true;btn.textContent='Enviando…';msg.textContent='';
     try{const r=await invSubmit(rec);
       if(r.dup)info(DUP[r.dup]||DUP.again,true);
-      else{try{localStorage.setItem('rodaliq_inv_last',String(Date.now()))}catch(x){}form.reset();$('#invUf').textContent='';$('#invFields').classList.add('hidden');$('#invDone').classList.remove('hidden')}
+      else{try{localStorage.setItem('rodaliq_inv_last',String(Date.now()))}catch(x){}funilPedido('enviou');acTm=null;form.reset();$('#invUf').textContent='';$('#invFields').classList.add('hidden');$('#invDone').classList.remove('hidden')}
     }catch(ex){info('Não foi possível enviar agora. Tente de novo em instantes.')}
-    btn.disabled=false;btn.textContent='Enviar pedido';
+    acRef();btn.textContent='Enviar pedido';
   });
 })();
 
@@ -5908,19 +5965,28 @@ const TXT_PRIV=`<h3>Política de privacidade do Rodaliq</h3><p class="small mute
 <p><b>9. Seus direitos (art. 18).</b> Confirmar se tratamos seus dados, acessar, corrigir, pedir a exclusão, a portabilidade (o backup em ⚙ Opções &gt; Exportar já entrega seus dados) e revogar o consentimento. A exclusão da conta é pedida pelo app, em ⚙ Opções &gt; Excluir minha conta (veja o item 8). Os demais pedidos, pelo e-mail ${TERMOS_MAIL}.</p>
 <p><b>10. Menores de idade.</b> O app não é destinado a menores de 18 anos e não aceita pedidos deles (LGPD, art. 14).</p>
 <p><b>11. Mudanças.</b> Esta política pode ser atualizada; o app pedirá um novo aceite quando isso acontecer.</p>`;
-function verTermos(aba){
+function verTermos(aba,op){
   const ov=document.createElement('div');ov.className='ov';ov.style.zIndex='70';let at=aba||'termos';
   const draw=()=>{ov.innerHTML=`<div class="modal termos"><div class="chips" style="margin-bottom:10px"><button class="chip${at==='termos'?' on':''}" data-ta="termos">Termos de uso</button><button class="chip${at==='priv'?' on':''}" data-ta="priv">Privacidade</button></div>
-    <div class="termosTxt">${at==='termos'?TXT_TERMOS:TXT_PRIV}</div><div class="mfoot"><button class="btn" id="tmF">Fechar</button></div></div>`};
+    <div class="termosTxt">${at==='termos'?TXT_TERMOS:TXT_PRIV}</div><div class="mfoot">${op?'<button class="btn sec" id="tmNo">Não concordo</button><button class="btn" id="tmDe">De acordo</button>':'<button class="btn" id="tmF">Fechar</button>'}</div></div>`};
   draw();document.body.appendChild(ov);ov.__fechar=()=>ov.remove();
-  ov.addEventListener('click',e=>{e.stopPropagation();if(e.target.dataset.ta){at=e.target.dataset.ta;draw()}else if(e.target.id==='tmF'||e.target===ov)ov.remove()});
+  ov.addEventListener('click',e=>{e.stopPropagation();if(e.target.dataset.ta){at=e.target.dataset.ta;draw()}else if(op&&e.target.id==='tmDe'){ov.remove();op.onDe()}else if(op&&e.target.id==='tmNo'){ov.remove();op.onNao()}else if(e.target.id==='tmF'||e.target===ov)ov.remove()});
 }
+function termosRecusa(cb){const o=document.createElement('div');o.className='ov';o.style.zIndex='75';
+  o.innerHTML='<div class="modal" style="max-width:440px"><h2>Você tem o direito de não concordar</h2><p class="small">Respeitamos a sua decisão. Sem o “De acordo” nos Termos de uso e na Política de privacidade, o seu pedido de convite <b>não pode seguir</b>, porque não teríamos como tratar os seus dados sem a sua autorização. Nada do que você preencheu foi enviado.</p><div class="mfoot"><button class="btn" id="trF">Fechar</button></div></div>';
+  document.body.appendChild(o);o.__fechar=()=>{o.remove();cb()};o.querySelector('#trF').onclick=()=>{o.remove();cb()}}
 function termosAvisoAtualizado(previa){const o=document.createElement('div');o.className='ov';o.style.zIndex='75';
   o.innerHTML=`<div class="modal" style="max-width:440px"><h2>📄 Atualizamos os Termos e a Política</h2><p class="small">Ajustamos só o nome: onde os textos falavam de <b>carona</b>, agora está <b>Viagens e caronas</b>, o novo nome da aba. Nada muda no que você pode fazer nem em como cuidamos dos seus dados. Você continua usando o app normalmente, e qualquer dúvida é só falar com a gente pelo e-mail <b>${TERMOS_MAIL}</b>.</p><div class="mfoot"><button class="btn sec" id="tvL">Ler os Termos</button><button class="btn" id="tvO">Entendi</button></div></div>`;
   document.body.appendChild(o);
   o.querySelector('#tvO').onclick=()=>{if(!previa){cfg().termosVisto=TERMOS_V;salvar('tb_config');audit('Termos atualizados','Configurações','📄 Aviso de atualização visto · versão '+TERMOS_V)}o.remove()};
   o.querySelector('#tvL').onclick=()=>{if(!previa){cfg().termosVisto=TERMOS_V;salvar('tb_config');audit('Termos atualizados','Configurações','📄 Aviso de atualização visto (leu os Termos) · versão '+TERMOS_V)}o.remove();verTermos('termos')}}
-function checarTermos(){return new Promise(res=>{
+async function aceiteDoPedido(){ // V130: se a pessoa já aceitou no pedido de convite, o aceite vale (com data e hora do envio) e não pede de novo
+  try{if(cfg().aceite&&cfg().aceite.versao)return;if(!invProd()||!DB)return;const {data,error}=await DB.rpc('rodaliq_meu_aceite');if(error||!data||!data.v||!data.em)return;
+    cfg().aceite={versao:data.v,em:data.em,origem:'pedido'};salvar('tb_config');
+    const d=new Date(data.em),p=n=>String(n).padStart(2,'0');
+    audit('Termos aceitos','Configurações','📄 Termos aceitos no pedido de convite em '+p(d.getDate())+'/'+p(d.getMonth()+1)+'/'+d.getFullYear()+' '+p(d.getHours())+':'+p(d.getMinutes())+' · versão '+data.v)}catch(e){}}
+function checarTermos(){return aceiteDoPedido().then(()=>checarTermos0())}
+function checarTermos0(){return new Promise(res=>{
   const a=cfg().aceite;if(a&&a.versao===TERMOS_V)return res(true);
   if(a&&a.versao){ // já aceitou antes: atualização vira aviso, sem bloquear
     if(cfg().termosVisto!==TERMOS_V)termosAvisoAtualizado(false);
@@ -6732,7 +6798,7 @@ function formTrajeto(r){
       {k:'ida',l:'Km de ida',t:'num',req:1,calc:1,help:'Digite só a ida. Se tiver paradas, toque em 🧮 para somar os trechos.'},{k:'dias',l:'Dias por mês',t:'int',req:1,help:'Quantos dias no mês você faz esse trajeto.'}],
     val:Object.assign({},r,{ida:ida0}),onSave:o=>{const nome=String(o.nome||'').trim();if(!nome)return 'Escolha o trajeto ou dê um nome a ele.';if(!o.veiculo)return 'Cadastre o veículo para salvar o trajeto.';if(!(o.ida>0))return 'Informe os km de ida.';if(!(o.dias>0))return 'Informe quantos dias por mês.';
       const l=cfg().trajetos||(cfg().trajetos=[]),reg={id:r.id||uid('tj'),nome,veiculo:o.veiculo,km:o.ida*(volta?2:1),ida:o.ida,volta,dias:o.dias},i=l.findIndex(x=>x.id===reg.id);if(i>=0)l[i]=reg;else l.push(reg);
-      salvar('tb_config');render()},
+      rastro('salvou:meuveiculo');salvar('tb_config');render()},
     onDel:r.id?()=>{cfg().trajetos=mvTrajetos().filter(x=>x.id!==r.id);salvar('tb_config');render()}:null});
   try{const mod=f.ov.querySelector('.modal'),fg=mod.querySelector('.fgrid'),W=k=>mod.querySelector('[data-w='+k+']');
     const chips=(id,rot)=>{const d=document.createElement('div');d.className='full';d.id=id;d.style.marginTop='10px';d.innerHTML=`<label class="small" style="display:block;font-weight:700;margin-bottom:6px">${rot}</label><div class="tjCh" style="display:flex;flex-wrap:wrap;gap:7px"></div>`;return d};
@@ -6795,7 +6861,7 @@ function formViagem(r,modo){
         if(lanc){const base={data:o.data,veiculo:o.veiculo,uso,obs:'Viagem: '+nome};
           [['Combustível',reg.comb,'Combustível da viagem'],['Estacionamento',reg.ped,'Pedágio e estacionamento da viagem'],['Outros',reg.outros,'Outros gastos da viagem']].forEach(([cat,v,desc])=>{if(v>0){const id=uid('k');reg.custoIds.push(id);upsert('tb_custos',Object.assign({id,cat,valor:v,desc:desc+' · '+nome},base))}})}}
       if(i>=0)l[i]=reg;else l.push(reg);
-      salvar('tb_config');render();toast(modo==='plan'?'Viagem planejada salva':lanc?'Viagem salva e lançada em Custos':'Viagem salva')},
+      rastro('salvou:meuveiculo');salvar('tb_config');render();toast(modo==='plan'?'Viagem planejada salva':lanc?'Viagem salva e lançada em Custos':'Viagem salva')},
     onDel:r.id?async()=>{await viagemApagaCustos(r);cfg().viagens=mvViagens().filter(x=>x.id!==r.id);salvar('tb_config');render()}:null});
   try{const mod=f.ov.querySelector('.modal'),fg=mod.querySelector('.fgrid'),W=k=>mod.querySelector('[data-w='+k+']'),h2=mod.querySelector('h2'),sub=mod.querySelector('form>.small.muted'),sv=mod.querySelector('button[type=submit]');
     const sw=document.createElement('div');sw.className='full';fg.insertBefore(sw,W('nome'));
@@ -6865,7 +6931,7 @@ function formLembrete(r){
       {k:'anual',l:'Repetir',t:'check',txt:'Repetir todo ano',full:1}],
     val:r,onSave:o=>{const nome=String(o.nome||'').trim();if(!nome)return 'Diga o que lembrar.';if(!o.data)return 'Informe a data.';
       const l=cfg().lembretes||(cfg().lembretes=[]),reg={id:r.id||uid('lb'),nome,data:o.data,veiculo:o.veiculo||'',anual:!!o.anual},i=l.findIndex(x=>x.id===reg.id);if(i>=0)l[i]=reg;else l.push(reg);
-      salvar('tb_config');render()},
+      rastro('salvou:meuveiculo');salvar('tb_config');render()},
     onDel:r.id?()=>{cfg().lembretes=mvLembretesCad().filter(x=>x.id!==r.id);salvar('tb_config');render()}:null})}
 // ---- telas
 function vMeuVeiculo(){
