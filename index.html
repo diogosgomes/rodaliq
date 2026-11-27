@@ -5742,11 +5742,15 @@ async function exportaDadosApp(){
     toast('Dados exportados: '+Object.keys(T).filter(k=>k!=='estrutura').length+' tabelas, '+n+' registros'+(T.estrutura?' e a estrutura do banco':''))
   }catch(e){toast('Não foi possível exportar agora.')}}
 function supaAlerta(){
-  const d=new Date();if(d.getDay()!==5)return null;const k=isoOf(d);
-  const backup=ehMaster()?' Aproveite e faça o backup do Rodaliq: use 💾 Exportar dados do app (Gestão Admin) e guarde o arquivo fora do computador, além do repositório do GitHub. No plano gratuito não há backup diário nem point-in-time recovery, então esse é hoje o único jeito de recuperar os dados em caso de perda.':'';
+  // Só avisa se o robô diário (Cloudflare) que mantém o Supabase acordado parar de registrar o ping (mais de 48 h).
+  // Enquanto o robô não gravar o primeiro ping (ultimo_ping vazio), não cobra nada.
+  const pg=typeof BKP_ST!=='undefined'&&BKP_ST&&BKP_ST.ultimo_ping?new Date(BKP_ST.ultimo_ping):null;
+  if(!pg||isNaN(pg))return null;
+  const h=(Date.now()-pg.getTime())/36e5;if(h<=48)return null;
+  const k=isoOf(pg),dd=pg.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})+' às '+pg.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
   return {n:'r',crit:1,tab:'supa',sup:k,lida:NOT.reads.supaLida===k,
-    t:'Lembrete semanal: use o Rodaliq em produção (rodaliq.com.br) para o Supabase não pausar o projeto.',
-    nota:'No plano gratuito, o Supabase pausa o projeto após 7 dias seguidos sem atividade. Basta entrar no app e abrir o Painel ou fazer um lançamento. Se pausar, reative em supabase.com > projeto rodaliq > Restore project.'+backup};
+    t:'O robô que mantém o Supabase acordado não registrou atividade desde '+dd+'.',
+    nota:'No plano gratuito, o Supabase pausa o projeto após 7 dias seguidos sem atividade. Enquanto isso não for resolvido, entre no app e abra o Painel ou faça um lançamento para manter o projeto ativo. Confira o Worker rodaliq-acordado na Cloudflare (Workers › Logs). Se o Supabase pausar, reative em supabase.com > projeto rodaliq > Restore project.'};
 }
 function invAlerts(){
   if(!invIsAdmin)return [];
