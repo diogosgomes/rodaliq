@@ -275,6 +275,7 @@ select.inp hr{border-color:var(--line)}
 .ivOk{color:#15803D;font-weight:600}.ivBad{color:var(--red);font-weight:600}
 html[data-tema="escuro"] .ivOk{color:#4ADE80}
 .ivInfo{color:var(--amberInk);font-size:13px;margin-top:10px;min-height:18px;font-weight:600}
+.invFalta{outline:2px solid #ef4444;outline-offset:3px;border-radius:8px;transition:outline-color .3s}
 .pfOpts{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:2px}.pfOpts label{display:inline-flex;gap:6px;align-items:center;font-weight:500;margin:0}.pfOpts input{width:auto;margin:0}.pfSub{margin-top:10px}
 .ivCheck{display:flex;gap:8px;align-items:flex-start;font-size:12px;color:var(--muted);margin-top:12px;line-height:1.4}.ivCheck input{margin-top:2px;width:auto}
 .ivDone{text-align:center;padding:14px 0}.ivDone .big{font-size:30px}
@@ -540,7 +541,7 @@ body:has(#admPage) .fab,body:has(#ajuPage) .fab{z-index:61}body:has(#admPage) .f
         <label class="ivCheck"><input type="checkbox" id="invOk"><span>Em conformidade com a Lei Geral de Proteção de Dados (LGPD, Lei nº 13.709/2018), autorizo o contato por e-mail e WhatsApp sobre o meu acesso e o uso dos meus dados somente para essa finalidade.</span></label>
         <div id="invTm" class="ivCheck" style="display:block;border:1px solid var(--line,#e5e7eb);border-radius:10px;padding:10px 12px;margin-top:8px"><div style="display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap"><span><b>📄 Termos de uso e Política de privacidade</b><br><span class="small muted" id="invTmSt">Leia e dê o seu “De acordo” para poder enviar o pedido.</span></span><button type="button" class="btn sec sm" id="invTmBtn">Ler e dar o aceite</button></div></div>
         <div id="invMsg" class="err" role="alert"></div>
-        <div style="display:flex;gap:10px"><button type="button" class="btn sec" id="invClose" style="flex:1">Voltar</button><button type="submit" class="btn" id="invBtn" style="flex:1" disabled>Enviar pedido</button></div>
+        <div style="display:flex;gap:10px"><button type="button" class="btn sec" id="invClose" style="flex:1">Voltar</button><button type="submit" class="btn" id="invBtn" style="flex:1">Enviar pedido</button></div>
         <div id="invCancW" class="hidden" style="margin-top:10px"><button type="button" class="btn sec block" id="invCanc">Cancelar pedido de convite</button></div>
       </div>
       <div id="invDone" class="ivDone hidden">
@@ -6068,7 +6069,7 @@ function funilPedido(ev){try{if(!invProd()||!DB)return;const d=new Date(),dia=d.
   // V71: links dos Termos e da Política dentro da caixa de autorização (não marcam o checkbox)
   document.querySelectorAll('[data-tt]').forEach(b2=>b2.addEventListener('click',ev=>{ev.preventDefault();ev.stopPropagation();verTermos(b2.dataset.tt)}));
   const ymd=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-  const info=(t,neutro)=>{msg.className=neutro?'ivInfo':'err';msg.textContent=t};
+  const info=(t,neutro,sel)=>{msg.className=neutro?'ivInfo':'err';msg.textContent=t;if(sel){const el=typeof sel==='string'?form.querySelector(sel):sel;if(el){const bx=el.closest('.field')||el.closest('.pfOpts')||el;try{bx.scrollIntoView({block:'center',behavior:'smooth'})}catch(e){}try{el.focus({preventScroll:true})}catch(e){}bx.classList.add('invFalta');setTimeout(()=>bx.classList.remove('invFalta'),2600)}}};
   const isMinor=b=>{const lim=new Date();lim.setFullYear(lim.getFullYear()-18);return /^\d{4}-\d{2}-\d{2}$/.test(b)&&b>ymd(lim)};
   const checkMinor=()=>{const m=isMinor($('#invBirth').value);if(m)msg.textContent='';$('#invMinor').classList.toggle('hidden',!m);$('#invBtn').classList.toggle('hidden',m);return m};
   const view=(on,doGesto)=>{form.classList.toggle('hidden',!on);if(on&&!NAV_ON&&!invGuarda){try{history.pushState({rq:'inv'},'');invGuarda=true}catch(e){}}if(!on&&invGuarda&&!doGesto){invGuarda=false;navIgnora=true;try{history.back()}catch(e){navIgnora=false}}if(!on&&doGesto)invGuarda=false;lf.classList.toggle('hidden',on);link.parentElement.classList.toggle('hidden',on);if(so0)so0.parentElement.classList.toggle('hidden',on);
@@ -6104,7 +6105,7 @@ form.querySelectorAll('input[name=invEar]').forEach(x=>x.addEventListener('chang
   ['input','change'].forEach(ev=>$('#invBirth').addEventListener(ev,checkMinor));
   // V130: o aceite dos Termos é dado aqui, no pedido (De acordo / Não concordo); “Enviar pedido” só habilita com o De acordo
   let acTm=null; // null = ainda não decidiu · 'ok' = de acordo · 'no' = não concordou
-  const acRef=()=>{const bt=$('#invBtn');bt.disabled=acTm!=='ok';$('#invCancW').classList.toggle('hidden',acTm!=='no');
+  const acRef=()=>{const bt=$('#invBtn');bt.disabled=false;$('#invCancW').classList.toggle('hidden',acTm!=='no');
     const st=$('#invTmSt');st.className='small '+(acTm==='ok'?'':'muted');st.style.color=acTm==='ok'?'#166534':(acTm==='no'?'#b91c1c':'');
     st.textContent=acTm==='ok'?'✔ De acordo. Você já pode enviar o pedido.':(acTm==='no'?'Você não concordou, então o pedido não pode seguir. Se mudar de ideia, toque em “Ler e dar o aceite”.':'Leia e dê o seu “De acordo” para poder enviar o pedido.');
     $('#invTmBtn').textContent=acTm?'Ler de novo':'Ler e dar o aceite'};
@@ -6129,21 +6130,21 @@ form.querySelectorAll('input[name=invEar]').forEach(x=>x.addEventListener('chang
     rec.veiculos=[...$('#invVeic').querySelectorAll('input:checked')].map(x=>x.value);
     const parts=rec.name.split(' ');
     if(checkMinor())return info('Menores de 18 anos não podem pedir convite.');
-    if(parts.length<2||parts[0].length<2||parts[1].length<1)return info('Informe nome e sobrenome.');
-    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(rec.email)||rec.email.length>120)return info('Informe um e-mail válido.');
-    if($('#invEmail2').value.trim().toLowerCase()!==rec.email.toLowerCase())return info('Os e-mails informados não são iguais. Confira o campo “Confirmar e-mail”.');
-    if(!/^\d{4}-\d{2}-\d{2}$/.test(birth)||birth<'1900-01-01')return info('Informe a data de nascimento.');
+    if(parts.length<2||parts[0].length<2||parts[1].length<1)return info('Informe nome e sobrenome.',0,'#invName');
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(rec.email)||rec.email.length>120)return info('Informe um e-mail válido.',0,'#invEmail');
+    if($('#invEmail2').value.trim().toLowerCase()!==rec.email.toLowerCase())return info('Os e-mails informados não são iguais. Confira o campo “Confirmar e-mail”.',0,'#invEmail2');
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(birth)||birth<'1900-01-01')return info('Informe a data de nascimento.',0,'#invBirth');
     if(intl){if(!/^[1-9]\d{9,14}$/.test(rec.whatsapp)||invDigits($('#invDdi').value).length<1)return info('Informe o código do país e o número com código de área (de 10 a 15 algarismos no total).')}
-    else{if(!DDD_UF[ddd])return info('Informe um DDD válido.');
-    if(!/^9\d{8}$/.test(num))return info('Informe o número do WhatsApp com 9 dígitos (começa com 9).');}
-    if(!rec.usos.length)return info('Informe como você usa seu veículo.');
-    if(trab&&NIVP.impostos&&!rec.regime)return info('Informe se você recebe como autônomo (pessoa física, CPF) ou como MEI (CNPJ).');
-    if(trab&&!rec.cnh_ear)return info('Informe se a sua CNH tem EAR (ou marque “Não possuo CNH”).');
-    if(rec.cnh_ear!=='sem_cnh'&&!rec.cnh_categoria)return info(trab?'Informe a categoria da sua CNH.':'Informe a categoria da sua CNH ou marque “Não tenho CNH”.');
-    if(!rec.veiculos.length)return info('Informe qual veículo você usa (ou “Não tenho veículo”).');
-    if(rec.how_known.length<2)return info('Conte como soube do app.');
-    if(acTm!=='ok')return info('Leia os Termos de uso e a Política de privacidade e dê o “De acordo” para enviar o pedido.');
-    if(!$('#invOk').checked)return info('Marque a autorização para continuar.');
+    else{if(!DDD_UF[ddd])return info('Informe um DDD válido.',0,'#invDdd');
+    if(!/^9\d{8}$/.test(num))return info('Informe o número do WhatsApp com 9 dígitos (começa com 9).',0,'#invPhone');}
+    if(!rec.usos.length)return info('Informe como você usa seu veículo.',0,'#invUso');
+    if(trab&&NIVP.impostos&&!rec.regime)return info('Informe se você recebe como autônomo (pessoa física, CPF) ou como MEI (CNPJ).',0,'input[name=invReg]');
+    if(trab&&!rec.cnh_ear)return info('Informe se a sua CNH tem EAR (ou marque “Não possuo CNH”).',0,'input[name=invEar]');
+    if(rec.cnh_ear!=='sem_cnh'&&!rec.cnh_categoria)return info(trab?'Informe a categoria da sua CNH.':'Informe a categoria da sua CNH ou marque “Não tenho CNH”.',0,'input[name=invCat]');
+    if(!rec.veiculos.length)return info('Informe qual veículo você usa (ou “Não tenho veículo”).',0,'#invVeic');
+    if(rec.how_known.length<2)return info('Conte como soube do app.',0,'#invHow');
+    if(acTm!=='ok')return info('Leia os Termos de uso e a Política de privacidade e dê o “De acordo” para enviar o pedido.',0,'#invTmBtn');
+    if(!$('#invOk').checked)return info('Marque a autorização (LGPD) para continuar.',0,'#invOk');
     let last=0;try{last=+localStorage.getItem('rodaliq_inv_last')||0}catch(x){}
     if(Date.now()-last<60000)return info(DUP.again,true);
     if(!DB){return info('Não foi possível enviar agora. Tente de novo em instantes.')}
