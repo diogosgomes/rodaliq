@@ -179,8 +179,12 @@ body{-webkit-user-select:text;user-select:text;-webkit-touch-callout:default}
 .tag.r{background:var(--redSoft);color:var(--red)}
 .tag.g{background:#eef0f4;color:var(--muted)}
 .subtabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.relPend{margin:10px 0;padding:10px 12px;border:1px dashed var(--blue);border-radius:10px;background:var(--blueSoft)}.relPendL{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:6px 0;border-top:1px solid var(--line)}.relPendL>span:nth-child(2){flex:1 1 160px}
+.cusBusca{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;margin:0 0 12px}.cusBusca .inp{min-height:40px}
 .chip{border:1px solid var(--line);background:#fff;border-radius:99px;padding:6px 12px;font-weight:600;cursor:pointer}
 .chip.on{background:var(--blue);border-color:var(--blue);color:#fff}
+.rvPer{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 6px}.rvChips{display:flex;gap:6px;flex-wrap:wrap}.rvPer .chip,.rvChips .chip{white-space:nowrap;padding:5px 11px;font-size:13px}
+.relBar{position:fixed;z-index:15;display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:7px 12px;background:var(--card);border:1px solid var(--line);border-radius:10px;box-shadow:var(--sh);font-size:13px}.relBar .sp{flex:1}
 .rvVer{margin:10px 0}.rvVer .admTabs{display:flex;gap:6px;margin:6px 0 6px;flex-wrap:wrap}.rvVer .chip{white-space:nowrap}
 .empty{padding:26px;text-align:center;color:var(--muted)}
 .note{background:var(--blueSoft);border-radius:10px;padding:10px 12px;font-size:13px;color:#16336b}
@@ -416,6 +420,7 @@ body.sheetAb .menu.bell{visibility:visible}
 .menu,.fabMenu{overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
 .fgrid{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
 .fgrid .full{grid-column:1/-1}
+.kmBox{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:0 12px;padding:0 12px 12px;border-radius:12px;margin-top:12px;border:2px solid transparent}.kmBox.dest{border-color:var(--blue);background:var(--blueSoft)}.kmBox .kmTx{grid-column:1/-1;margin-top:10px;font-weight:600;color:var(--ink)}.kmBox .field.full{grid-column:1/-1}.kmBox .field.hidden{display:none}@media(max-width:520px){.kmBox{grid-template-columns:1fr}}
 .fgrid.fg2{grid-template-columns:1fr 1fr}.fgrid .secT{margin:12px 0 4px;padding-top:10px;border-top:1px solid var(--line);font-weight:700;font-size:13px;color:var(--ink)}.fgrid .secT:first-child{margin-top:4px;border-top:0;padding-top:0}
 @media(max-width:520px){.fgrid{grid-template-columns:1fr}}
 .mfoot{display:flex;gap:8px;justify-content:flex-end;margin-top:18px}
@@ -643,7 +648,7 @@ body:has(#admPage) .fab,body:has(#ajuPage) .fab{z-index:61}body:has(#admPage) .f
 
 <script>
 "use strict";
-const VERSAO='V130';
+const VERSAO='V131';
 /* ---------- utilidades ---------- */
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -1306,7 +1311,10 @@ const kmMes=(ym,G)=>(+(G&&G.km)||0)+kmCarona(ym)+ifoodMes(ym).km;
 // multas pagas viram despesa no mês da data de pagamento (gerenciadas só na aba Multas)
 const valorMulta=r=>+(r.vPago??r.vDesc??r.vOrig)||0;
 const multasDesp=()=>S.tb_multas.filter(r=>r.pagto).map(r=>({id:'multa_'+r.id,ref:r.id,virtual:1,data:r.pagto,cat:'Multa',veiculo:r.veiculo,valor:valorMulta(r),desc:r.motivo||'Multa',fornecedor:r.orgao||''}));
-const todasDespesas=()=>[...S.tb_custos,...multasDesp()];
+// V131: Alimentação (motorista/entregador) é lançada em Custos, mas fica fora do custo do veículo, do custo por km e do Carnê-Leão: aparece à parte
+const ehAlim=r=>r.cat==='Alimentação';
+const alimDesp=()=>(S.tb_custos||[]).filter(ehAlim);
+const todasDespesas=()=>[...S.tb_custos.filter(r=>!ehAlim(r)),...multasDesp()];
 const custosMes=ym=>doMes(todasDespesas(),ym).filter(fVeic);
 function porDiaApps(ym){const m={};doMes(S.tb_corridas,ym).filter(fVeic).filter(fPlat).forEach(r=>{m[r.data]=(m[r.data]||0)+(+r.valor||0)});return m}
 function porDiaCar(ym){const m={};caronaMes(ym).forEach(r=>{m[r.data]=(m[r.data]||0)+(+r.valor||0)});return m}
@@ -1395,6 +1403,10 @@ function openForm({titulo,sub,campos,val={},onSave,onDel}){
   avisar();
   ov.querySelectorAll('[data-calc]').forEach(b=>b.onclick=()=>calcKm(g(b.dataset.calc),avisar));
   ov.querySelectorAll('[data-cal]').forEach(b=>b.onclick=()=>{const el=ov.querySelector('#'+b.dataset.cal);if(!el)return;el.focus();try{el.showPicker();return}catch(e){}abreCal(el)});
+  // V131: Enter num campo não salva nem fecha o lançamento: passa para o próximo campo; só o botão Salvar grava
+  ov.querySelector('form').addEventListener('keydown',e=>{if(e.key!=='Enter'||e.isComposing)return;const t=e.target;
+    if(t.tagName==='TEXTAREA'||t.tagName==='BUTTON'||(t.tagName==='INPUT'&&['button','submit','checkbox'].includes(t.type)))return;
+    e.preventDefault();const els=[...ov.querySelectorAll('input:not([type=hidden]):not([disabled]):not([readonly]),select:not([disabled]),textarea')].filter(x=>x.offsetParent!==null),i=els.indexOf(t);if(i>=0&&i<els.length-1)els[i+1].focus()});
   ov.querySelector('form').onsubmit=e=>{e.preventDefault();const o=ler();
     for(const c of campos){if(c.req&&(o[c.k]===''||o[c.k]==null)){ov.querySelector('#fErr').textContent='Preencha: '+c.l;return}
       if(c.t==='date'&&!c.allowFuture&&o[c.k]&&o[c.k]>hoje()){ov.querySelector('#fErr').textContent='Data futura não é permitida.';return}}
@@ -1668,28 +1680,39 @@ const ehBikeV=n=>simEnt()||(!!n&&veicTipo(n)==='bicicleta');
 const CATS_BIKE=['Manutenção','Parcela/Aluguel','Seguro'];
 const catsAtivas=nome=>{
   const n=nome===undefined?cfg().veiculoPadrao:nome;
-  if(ehBikeV(n)){const l=[...CATS_BIKE,...CATS_ENT];if(simEnt()||motorDe(n)==='eletrico')l.push('Combustível');
+  if(ehBikeV(n)){const l=[...CATS_BIKE,...CATS_ENT];if(usoTrab())l.push('Alimentação');if(simEnt()||motorDe(n)==='eletrico')l.push('Combustível');
     (S.tb_custos||[]).forEach(r=>{if(r.veiculo===n&&r.cat&&!l.includes(r.cat))l.push(r.cat)});
     return ordCats([...new Set(l)].filter(c=>c!=='Outros')).concat('Outros')}
-  return ifoodOn()?ordCats([...CATS.slice(0,-1),...CATS_ENT,'Outros']):CATS};
+  if(!ifoodOn()&&!usoTrab())return CATS;
+  return ordCats([...CATS.slice(0,-1),...(ifoodOn()?CATS_ENT:[]),...(usoTrab()?['Alimentação']:[]),'Outros'])};
 const CATS_FORM=CATS.filter(c=>c!=='Multa');
 // V127: lista de categorias do formulário de custo (acompanha o veículo escolhido; mantém a categoria do registro que está sendo editado)
 function catsCusto(nome,atual){let l=catsAtivas(nome).filter(c=>c!=='Multa'||atual==='Multa');if(atual&&!l.includes(atual))l=ordCats(l.filter(c=>c!=='Outros').concat(atual)).concat('Outros');return l}
 const usoOpcoesCusto=r=>[...(usoTrab()?[USO_LBL.trabalho]:[]),USO_LBL.pessoal,USO_LBL.familia,USO_LBL.dividir,...(r&&r.id&&!r.uso?[USO_LBL.sem]:[])];
+// V131: sugestões de posto/fornecedor: os já usados (mais frequentes primeiro) e os principais postos; o que o usuário digitar passa a compor a lista
+const POSTOS_BASE=['Shell','Ipiranga','Petrobras','Ale','Texaco','Atem'];
+const fornList=cat=>{const al=cat==='Alimentação',cb=cat==='Combustível',m={};(S.tb_custos||[]).forEach(r=>{if((r.cat==='Alimentação')!==al||(!al&&(r.cat==='Combustível')!==cb))return;const f=String(r.fornecedor||'').trim();if(f){const k=f.toLowerCase();(m[k]=m[k]||{n:f,c:0}).c++}});
+  const past=Object.values(m).sort((a,b)=>b.c-a.c).map(x=>x.n),low=new Set(past.map(x=>x.toLowerCase()));return cb?[...past,...POSTOS_BASE.filter(p=>!low.has(p.toLowerCase()))]:past};
+const fornRot=cat=>cat==='Combustível'?'Posto':cat==='Alimentação'?'Local (restaurante, padaria…)':'Fornecedor / oficina / loja';
+// V131: tipos de alimentação sugeridos (refeições e bebidas); o que o usuário digitar passa a compor a lista
+const TIPOS_ALIM=['Café da manhã','Almoço','Lanche','Janta','Ceia','Água','Café puro','Suco','Energético','Refrigerante'];
+const tipoAlList=()=>{const m={};(S.tb_custos||[]).forEach(r=>{const f=String(r.tipoAl||'').trim();if(f){const k=f.toLowerCase();(m[k]=m[k]||{n:f,c:0}).c++}});const low=new Set(TIPOS_ALIM.map(x=>x.toLowerCase()));return[...TIPOS_ALIM,...Object.values(m).filter(x=>!low.has(x.n.toLowerCase())).sort((a,b)=>b.c-a.c).map(x=>x.n)]};
 function formCusto(r){
   if(!(r&&r.id)&&semVeiculo())return;
   r=r||{data:hoje(),cat:ehBikeV(cfg().veiculoPadrao)&&motorDe(cfg().veiculoPadrao)!=='eletrico'?'Manutenção':'Combustível',veiculo:cfg().veiculoPadrao,combustivel:''};
   const f=openForm({titulo:r.id?'Editar custo':'Novo custo do veículo',
     campos:[{k:'data',l:'Data',t:'date',req:1},{k:'cat',l:'Categoria',t:'select',op:comSep(catsCusto(r.veiculo||cfg().veiculoPadrao,r.cat)),help:'Parcela/Aluguel: parcela da compra do veículo ou aluguel do veículo. Multas são lançadas na aba Multas e entram aqui sozinhas quando pagas.'},
-      {k:'veiculo',l:'Veículo',t:'select',op:VEICS()},{k:'valor',l:'Valor (R$)',t:'money',req:1},
+      {k:'veiculo',l:'Veículo',t:'select',op:VEICS()},{k:'valor',l:'Valor (R$)',t:'money',req:1},{k:'tipoAl',l:'Tipo de alimentação',t:'text',list:tipoAlList(),ph:'Ex.: Almoço, Água, Café puro'},
       {k:'combustivel',l:'Combustível',t:'select',op:['Etanol','Gasolina']},{k:'litros',l:'Litros',t:'num',help:' '},
-      {k:'desc',l:'Descrição',t:'text',full:1,help:' '},{k:'km',l:'Km do veículo (opcional)',t:'num'},{k:'interv',l:'Trocar com (km de intervalo)',t:'num',help:'Ex.: 10.000. A próxima troca é calculada somando ao km do veículo.'},{k:'proxKm',l:'Próxima troca/revisão (km)',t:'num'},
-      {k:'pgto',l:'Forma de pagamento',t:'text',list:['Pix','Crédito','Débito','KMV Crédito','Nubank Crédito','Dinheiro']},{k:'fornecedor',l:'Fornecedor/Posto',t:'text'},
+      {k:'desc',l:'Descrição',t:'text',full:1,help:' '},{k:'kmModo',l:'Informar o km como',t:'select',op:['Odômetro','Km desde o último abastecimento']},{k:'km',l:'Km do veículo (opcional)',t:'num',help:' '},{k:'kmT',l:'Km rodados desde o último abastecimento',t:'num',help:' '},{k:'cheio',l:'Tanque',t:'check',txt:'Completou o tanque',full:1,def:true,help:'Desmarque se abasteceu só uma parte. O consumo é calculado entre abastecimentos com o tanque completo.'},{k:'interv',l:'Trocar com (km de intervalo)',t:'num',help:'Ex.: 10.000. A próxima troca é calculada somando ao km do veículo.'},{k:'proxKm',l:'Próxima troca/revisão (km)',t:'num'},
+      {k:'pgto',l:'Forma de pagamento',t:'text',list:['Pix','Crédito','Débito','KMV Crédito','Nubank Crédito','Dinheiro']},{k:'fornecedor',l:fornRot(r.cat),t:'text',list:fornList(r.cat)},
       {k:'obs',l:'Observação',t:'text',full:1},
       ...(nivelVe('pessoal')?[{k:'uso',l:'Uso do gasto',t:'select',op:usoOpcoesCusto(r),full:1,help:'Para onde foi este gasto. Ajuda a separar o custo do trabalho do pessoal e da família.'},
       {k:'upT',l:'% trabalho',t:'num',hide:1},{k:'upP',l:'% pessoal',t:'num',hide:1},{k:'upF',l:'% família',t:'num',hide:1}]:[])],
-    val:Object.assign({},r,{uso:nivelVe('pessoal')?USO_LBL[r.uso||(r.id?'sem':usoPadrao())]:undefined,upT:(r.usoPct||{}).t,upP:(r.usoPct||{}).p,upF:(r.usoPct||{}).f,litros:ehRec2(r)&&r.kwh?r.kwh:r.litros,combustivel:r.combustivel||(r.id?(/gasolina/i.test(r.desc||'')?'Gasolina':'Etanol'):'')}),
-    onSave:o=>{if(o.cat==='Combustível'){if(!o.desc)o.desc=o.combustivel;if(ehRec2(o)){o.kwh=o.litros;delete o.litros}else delete o.kwh}else{delete o.kwh}
+    val:Object.assign({},r,{uso:nivelVe('pessoal')?USO_LBL[r.uso||(r.id?'sem':usoPadrao())]:undefined,upT:(r.usoPct||{}).t,upP:(r.usoPct||{}).p,upF:(r.usoPct||{}).f,litros:ehRec2(r)&&r.kwh?r.kwh:r.litros,combustivel:r.combustivel||(r.id?(/gasolina/i.test(r.desc||'')?'Gasolina':'Etanol'):''),kmModo:(+r.kmTrecho>0&&!(+r.km>0))?'Km desde o último abastecimento':'Odômetro',kmT:r.kmTrecho,cheio:r.cheio!==false}),
+    onSave:o=>{{const cb=o.cat==='Combustível';if(cb&&o.kmModo!=='Odômetro'){if(o.kmT>0)o.kmTrecho=o.kmT;else delete o.kmTrecho;delete o.km}else delete o.kmTrecho;if(!cb||o.cheio)delete o.cheio;delete o.kmModo;delete o.kmT}
+      if(o.cat==='Alimentação'){delete o.km;delete o.uso;delete o.usoPct;delete o.upT;delete o.upP;delete o.upF;if(!o.desc)o.desc=o.tipoAl||'Alimentação'}else delete o.tipoAl;
+      if(o.cat==='Combustível'){if(!o.desc)o.desc=o.combustivel;if(ehRec2(o)){o.kwh=o.litros;delete o.litros}else delete o.kwh}else{delete o.kwh}
       if(CATS_KM.includes(o.cat)){if(!o.desc)o.desc=o.cat;if(o.km&&o.interv&&!o.proxKm)o.proxKm=o.km+o.interv;if(o.km&&o.proxKm&&!o.interv)o.interv=Math.max(0,o.proxKm-o.km)}else delete o.interv;
       if(nivelVe('pessoal')){const cod=usoCod(o.uso);if(cod==='dividir'){const t=+o.upT||0,p=+o.upP||0,f2=+o.upF||0;if(!(t+p+f2>0))return 'Informe a divisão do gasto entre os usos.';if(t+p+f2>100.01)return 'A soma da divisão passa de 100%.';o.usoPct={t,p,f:f2}}else delete o.usoPct;if(cod==='sem')delete o.uso;else o.uso=cod;delete o.upT;delete o.upP;delete o.upF}
       upsert('tb_custos',Object.assign({id:r.id||uid('k')},o))},
@@ -1702,7 +1725,10 @@ function formCusto(r){
     const lbc=f.ov.querySelector('[data-w=combustivel] label');if(lbc)lbc.textContent=usaRec(m)||m==='eletrico'?'Combustível ou recarga':'Combustível';if(m==='eletrico'&&lbc)lbc.textContent='Onde recarregou';
     const rec=ehRec2({combustivel:el.value}),ll=f.ov.querySelector('[data-w=litros] label');if(ll)ll.textContent=rec?'kWh':(el.value==='GNV'?'m³':'Litros');
     [...f.g('cat').options].forEach(o=>{if(o.value==='Troca de óleo'){const off=m==='eletrico'&&r.cat!=='Troca de óleo';o.hidden=off;o.disabled=off}})};
-  const tog=()=>{const comb=f.g('cat').value==='Combustível',nk=CATS_KM.includes(f.g('cat').value),man=f.g('cat').value==='Manutenção'||nk;
+  const hcat=f.ov.querySelector('#h_cat'),hcat0=hcat?hcat.textContent:'';
+  const tog=()=>{const comb=f.g('cat').value==='Combustível',nk=CATS_KM.includes(f.g('cat').value),man=f.g('cat').value==='Manutenção'||nk,al=f.g('cat').value==='Alimentação';
+    ['veiculo','uso','upT','upP','upF'].forEach(k=>{const w=f.ov.querySelector('[data-w='+k+']');if(w)w.classList.toggle('hidden',al)});if(al&&f.ov.querySelector('[data-w=uso]'))f.ov.querySelector('[data-w=uso]').classList.add('hidden');if(hcat){if(al)hcat.innerHTML='Alimentação (café, almoço, janta) fica fora do custo do veículo, do custo por km e do Carnê-Leão. <b>Onde ver: Relatórios, item 3. Alimentação (fora do custo do veículo)</b>, logo abaixo do Resumo do período.';else hcat.textContent=hcat0}
+    {const ct=f.g('cat').value,wl=f.ov.querySelector('[data-w=fornecedor] label'),dl=f.ov.querySelector('#dl_fornecedor');if(wl)wl.textContent=fornRot(ct);if(dl)dl.innerHTML=fornList(ct).map(o=>`<option value="${esc(o)}">`).join('');const wt=f.ov.querySelector('[data-w=tipoAl]');if(wt)wt.classList.toggle('hidden',!al)}
     f.ov.querySelector('[data-w=combustivel]').classList.toggle('hidden',!comb);f.ov.querySelector('[data-w=litros]').classList.toggle('hidden',!comb);
     f.ov.querySelector('[data-w=proxKm]').classList.toggle('hidden',!man);f.ov.querySelector('[data-w=interv]').classList.toggle('hidden',!nk);const hd=f.ov.querySelector('#h_desc');if(hd)hd.textContent=f.g('cat').value==='Revisão'?'Ex.: Correia dentada, Bomba de combustível, Velas, Filtros, Pastilhas de freio.':''};
   const ppl=()=>{const v=parseBRL(f.g('valor').value),l=parseFloat(String(f.g('litros').value).replace(',','.'));const h=f.ov.querySelector('#h_litros'),rec=ehRec2({combustivel:f.g('combustivel').value});if(h)h.textContent=v&&l?(rec?'Preço por kWh: ':(f.g('combustivel').value==='GNV'?'Preço por m³: ':'Preço por litro: '))+brl(v/l):''};
@@ -1710,7 +1736,18 @@ function formCusto(r){
   const pxAuto=()=>{if(pxMan||!CATS_KM.includes(f.g('cat').value))return;const k=nI(f.g('km').value),i=nI(f.g('interv').value);if(k&&i)f.g('proxKm').value=fmtNum(k+i)};
   ['km','interv'].forEach(c=>{f.g(c).addEventListener('input',pxAuto);f.g(c).addEventListener('blur',pxAuto)});
   const usoTog=()=>{if(!f.g('uso'))return;const d=f.g('uso').value===USO_LBL.dividir;['upT','upP','upF'].forEach(k=>f.ov.querySelector('[data-w='+k+']').classList.toggle('hidden',!d||(k==='upT'&&!usoTrab())))};if(f.g('uso'))f.g('uso').addEventListener('change',usoTog);usoTog();
-  f.g('cat').onchange=tog;f.g('litros').oninput=ppl;f.g('valor').addEventListener('blur',ppl);f.g('veiculo').addEventListener('change',()=>{curC='';enRot();tog();ppl()});f.g('combustivel').addEventListener('change',()=>{curC=f.g('combustivel').value;enRot();ppl()});enRot();tog();ppl();
+  // V131: bloco do km em destaque (Combustível/Recarga): odômetro ou km do trecho, e tanque completo
+  const Wk=k=>f.ov.querySelector('[data-w='+k+']'),kb=document.createElement('div');kb.id='kmBox';kb.className='kmBox';
+  Wk('kmModo').parentNode.insertBefore(kb,Wk('kmModo'));const kt=document.createElement('div');kt.className='small kmTx';kt.id='kmTx';kb.appendChild(kt);['kmModo','km','kmT','cheio'].forEach(k=>kb.appendChild(Wk(k)));
+  const ultKm=(v,d)=>{let b=null;S.tb_custos.forEach(x=>{if(x.id===r.id||x.veiculo!==v||!(+x.km>0)||!x.data||x.data>d)return;if(!b||x.data>b.d||(x.data===b.d&&+x.km>b.km))b={d:x.data,km:+x.km}});return b};
+  const kmUi=()=>{const cb=f.g('cat').value==='Combustível',tr=cb&&f.g('kmModo').value!=='Odômetro';kb.classList.toggle('hidden',f.g('cat').value==='Alimentação');
+    Wk('kmModo').classList.toggle('hidden',!cb);Wk('km').classList.toggle('hidden',tr);Wk('kmT').classList.toggle('hidden',!tr);Wk('cheio').classList.toggle('hidden',!cb);
+    const vz=cb&&!(tr?f.g('kmT').value.trim():f.g('km').value.trim());kb.classList.toggle('dest',cb);
+    kt.style.display=cb&&vz?'':'none';kt.textContent='Informe o km no abastecimento para ver quantos km rodou com o combustível, o consumo e o custo por km.';
+    const h=f.ov.querySelector('#h_km');if(h){let t='';if(cb&&!tr){const u=ultKm(f.g('veiculo').value,f.g('data').value||hoje()),k=nI(f.g('km').value);if(u)t='Último km informado: '+fmtNum(u.km)+' em '+fmtBR(u.d)+(k>u.km?'. Rodados desde então: '+fmtNum(k-u.km)+' km':'')+'.'}h.textContent=t}
+    const h2=f.ov.querySelector('#h_kmT');if(h2)h2.textContent=tr?'Do seu hodômetro parcial (trip), desde o abastecimento anterior.':''};
+  ['km','kmT'].forEach(k=>{f.g(k).addEventListener('input',kmUi);f.g(k).addEventListener('blur',kmUi)});f.g('kmModo').addEventListener('change',kmUi);f.g('data').addEventListener('change',kmUi);
+  f.g('cat').onchange=()=>{tog();kmUi()};f.g('litros').oninput=ppl;f.g('valor').addEventListener('blur',ppl);f.g('veiculo').addEventListener('change',()=>{curC='';enRot();tog();ppl();kmUi()});f.g('combustivel').addEventListener('change',()=>{curC=f.g('combustivel').value;enRot();ppl()});enRot();tog();ppl();kmUi();
 }
 function formMulta(r){
   // V126: sem veículo cadastrado, a multa abre normalmente e o veículo é cadastrado por cima dela (nada do que foi digitado se perde)
@@ -1794,12 +1831,12 @@ function fab(){const m=$('#fabMenu');m.classList.toggle('hidden');if(!m.classLis
 function monthPicker(){return `<div class="mpick"><button data-mp="-1" aria-label="Mês anterior">‹</button><span>${mesNome(UI.mes)}</span><button data-mp="1" aria-label="Próximo mês">›</button></div>`}
 function veicPicker(){return `<select class="inp auto" id="vPick">${['Todos',...VEICS()].map(v=>`<option${v===UI.veic?' selected':''}>${v==='Todos'?'Todos os veículos':esc(v)}</option>`).join('')}</select>`}
 function kpi(l,v,s,cls=''){return `<div class="card kpi ${cls}"><div class="l">${moRot(l)}</div><div class="v num">${v}</div>${s?`<div class="s">${s}</div>`:''}</div>`}
-function groups(lista,{key,chave,cab,linha,vazio}){
+function groups(lista,{key,chave,cab,linha,vazio,todos}){
   if(!lista.length)return `<div class="card empty">${vazio}</div>`;
   const g={};lista.forEach(r=>{const m=(r[key]||'0000-00').slice(0,7);(g[m]=g[m]||[]).push(r)});
   const meses=Object.keys(g).sort().reverse();
   if(UI.open[chave]===undefined)UI.open[chave]=g[mesAtual()]?mesAtual():null;
-  return meses.map(m=>{const rows=g[m].sort((a,b)=>(b[key]||'').localeCompare(a[key]||''));const op=UI.open[chave]===m;
+  return meses.map(m=>{const rows=g[m].sort((a,b)=>(b[key]||'').localeCompare(a[key]||''));const op=todos||UI.open[chave]===m;
     return `<div class="mgroup"><div class="mhead" data-grp="${chave}" data-m="${m}"><span class="sg">${op?'−':'+'}</span><span class="t">${mesNome(m)}</span><span class="sp"></span>${cab(rows,m)}</div>${op?`<div class="mbody">${rows.map(linha).join('')}</div>`:''}</div>`}).join('');
 }
 function chartDias(ym,pa,pcr){
@@ -1926,8 +1963,8 @@ function totaisGerais(){
   const meses=new Set([...corVis(),...repVis()].map(r=>(r.data||'').slice(0,7)));let apps=0,ifd=0;
   meses.forEach(m=>{const c=S.tb_corridas.filter(r=>fPlat(r)&&r.data.startsWith(m));apps+=c.length?sum(c,r=>r.valor):sum(S.tb_repasses.filter(r=>fPlat(r)&&r.data.startsWith(m)),r=>r.valor);
     if(ifoodOn()){const ci=S.tb_corridas.filter(r=>fIfood(r)&&r.data.startsWith(m));ifd+=ci.length?sum(ci,r=>r.valor):sum(S.tb_repasses.filter(r=>fIfood(r)&&r.data.startsWith(m)),r=>r.valor)}});
-  const car=sum(carVis(),r=>r.valor),cus=sum(S.tb_custos,r=>r.valor),mul=sum(S.tb_multas.filter(r=>r.pagto),r=>r.vPago??r.vDesc??r.vOrig);
-  const datas=[...corVis(),...repVis(),...carVis(),...S.tb_custos].map(r=>r.data).filter(Boolean).sort();
+  const car=sum(carVis(),r=>r.valor),cus=sum(S.tb_custos.filter(r=>!ehAlim(r)),r=>r.valor),mul=sum(S.tb_multas.filter(r=>r.pagto),r=>r.vPago??r.vDesc??r.vOrig);
+  const datas=[...corVis(),...repVis(),...carVis(),...S.tb_custos.filter(r=>!ehAlim(r))].map(r=>r.data).filter(Boolean).sort();
   return{apps:r2(apps),ifd:r2(ifd),car:r2(car),ganho:r2(apps+ifd+car),cus:r2(cus),mul:r2(mul),desp:r2(cus+mul),lucro:r2(apps+ifd+car-cus-mul),desde:datas[0]||''};
 }
 function proximasManut(){
@@ -2092,23 +2129,39 @@ function vCarona(){
   return h;
 }
 function caronaWire(){const c=document.getElementById('carCa');if(!c)return;c.onchange=()=>{cfg().carneCarona=c.checked;salvar('tb_config');audit('Edição','Carona',c.checked?'Viagens e caronas incluídas na base do Carnê-Leão':'Viagens e caronas fora da base do Carnê-Leão');toast(c.checked?'Viagens e caronas entram no Carnê-Leão':'Viagens e caronas fora do Carnê-Leão');render()}}
+function cusWire(){const B=UI.cB;if(!B)return;const foco=(id,pos)=>{const n=document.getElementById(id);if(n){n.focus();try{n.setSelectionRange(pos,pos)}catch(e){}}};
+  const q=document.getElementById('cusQ');if(q){let t=null;q.addEventListener('input',()=>{B.q=q.value;const pos=q.selectionStart;clearTimeout(t);t=setTimeout(()=>{render();foco('cusQ',pos)},250)});q.addEventListener('keydown',e=>{if(e.key==='Escape'&&q.value){B.q='';render();foco('cusQ',0)}})}
+  const pe=document.getElementById('cusPer');if(pe)pe.onchange=()=>{B.per=pe.value;render()};
+  [['cusDe','de'],['cusAte','ate']].forEach(([id,k])=>{const n=document.getElementById(id);if(n)n.onchange=()=>{B[k]=n.value;render()}});
+  const l=document.getElementById('cusLimpa');if(l)l.onclick=()=>{UI.cB={q:'',per:'todos',de:'',ate:''};render()}}
 function impWire(){document.querySelectorAll('[data-irtab]').forEach(b=>b.onclick=()=>{UI.tab=b.dataset.irtab;render();window.scrollTo(0,0)});const d=document.getElementById('impDs');if(d)d.onchange=()=>{cfg().descontoSimplificado=d.checked;salvar('tb_config');audit('Edição','Impostos',d.checked?'Desconto simplificado ligado':'Desconto simplificado desligado');toast(d.checked?'Desconto simplificado ligado':'Desconto simplificado desligado');render()}}
 function vCustos(){
-  const c=UI.sub.custos;const L=todasDespesas().filter(fVeic).filter(r=>c==='Todos'||r.cat===c);
+  const c=UI.sub.custos;let L=[...todasDespesas().filter(fVeic),...(usoTrab()||c==='Alimentação'?alimDesp():[])].filter(r=>c==='Todos'||r.cat===c);
+  // V131: busca em qualquer mês/ano (texto + período), respeitando categoria e veículo escolhidos
+  const B=UI.cB=UI.cB||{q:'',per:'todos',de:'',ate:''},anoH=hoje().slice(0,4),perOk=B.per!=='todos'&&!(B.per==='int'&&!B.de&&!B.ate),busca=!!B.q.trim()||perOk;
+  if(perOk){const [d0,d1]=B.per==='ano'?[anoH+'-01-01',anoH+'-12-31']:B.per==='anoAnt'?[(anoH-1)+'-01-01',(anoH-1)+'-12-31']:[B.de||'0000-01-01',B.ate||'9999-12-31'];L=L.filter(r=>r.data>=d0&&r.data<=d1)}
+  if(B.q.trim()){const nz=t=>String(t==null?'':t).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase(),tk=nz(B.q).split(/\s+/).filter(Boolean);
+    L=L.filter(r=>{const v=+r.valor||0,hay=nz([r.desc,r.fornecedor,r.cat==='Combustível'&&ehRec2(r)?'recarga':'',r.cat,r.veiculo,r.pgto,r.obs,r.tipoAl,r.combustivel,String(v),v.toFixed(2).replace('.',','),brl(v)].join(' | '));return tk.every(t=>hay.includes(t))})}
   const ym=UI.mes,m=custosMes(ym);const comb=m.filter(r=>r.cat==='Combustível');const lt=sum(comb.filter(ehLt),r=>r.litros),vl=sum(comb.filter(ehLt),r=>r.valor);
   let h=`<div class="toolbar">${monthPicker()}${veicPicker()}<span class="sp"></span><button class="btn sm" data-new="custo">＋ Custos</button></div>
   <div class="grid cards" style="margin-bottom:12px">
     ${kpi('Custos no mês',brl(sum(m,r=>r.valor)),m.length+(m.length===1?' lançamento':' lançamentos'),'hl')}
+    ${usoTrab()?(()=>{const al=alimDesp().filter(r=>String(r.data).startsWith(ym));return kpi('🍽 Alimentação',brl(sum(al,r=>r.valor)),'fora do custo do veículo · veja em Relatórios, item 3'+(al.length?' · '+al.length+(al.length===1?' lançamento':' lançamentos'):''))})():''}
     ${kpi('Multas pagas',brl(sum(m.filter(r=>r.virtual),r=>r.valor)),'pelo mês do pagamento · lance na aba Multas')}
     ${kpi(nomeEn(1),brl(sum(comb,r=>r.valor)),detEn(comb)||'Nenhum lançamento')}
     ${escopoEn().c?kpi('Preço médio do litro',lt?brl(vl/lt):'—',lt?'nos abastecimentos com litros':'Informe os litros'):''}${escopoEn().r?(()=>{const ck=comb.filter(r=>+r.kwh>0),kw=sum(ck,r=>r.kwh);return kpi('⚡ Preço médio do kWh',kw?brl(sum(ck,r=>r.valor)/kw):'—',kw?'nas recargas com kWh':'Informe os kWh')})():''}
     ${kpi('Manutenção',brl(sum(m.filter(r=>r.cat==='Manutenção'),r=>r.valor)),'')}
     ${kpi('Seguro + estacionamento',brl(sum(m.filter(r=>r.cat==='Seguro'||r.cat==='Estacionamento'),r=>r.valor)),'')}
   </div>
+  <div class="cusBusca"><div class="field" style="margin:0;flex:1 1 220px"><label for="cusQ">Buscar despesa</label><input class="inp" type="search" id="cusQ" placeholder="Posto, oficina, descrição, valor…" autocomplete="off" value="${esc(B.q)}"></div>
+    <div class="field" style="margin:0"><label for="cusPer">Período</label><select class="inp" id="cusPer">${[['todos','Todos os períodos'],['ano','Este ano'],['anoAnt','Ano passado'],['int','Intervalo de datas']].map(([v,t])=>`<option value="${v}"${B.per===v?' selected':''}>${t}</option>`).join('')}</select></div>
+    ${B.per==='int'?`<div class="field" style="margin:0"><label for="cusDe">De</label><input class="inp" type="date" id="cusDe" value="${esc(B.de)}"></div><div class="field" style="margin:0"><label for="cusAte">Até</label><input class="inp" type="date" id="cusAte" value="${esc(B.ate)}"></div>`:''}
+    ${busca?'<button class="btn sm ghost" id="cusLimpa" type="button">Limpar busca</button>':''}</div>
+  ${busca?(()=>{const al=L.filter(ehAlim),sv=L.filter(r=>!ehAlim(r));return `<div class="note small" style="margin-bottom:10px" role="status"><b>${L.length} ${L.length===1?'lançamento encontrado':'lançamentos encontrados'}</b>${L.length?' · '+brl(sum(sv,r=>r.valor))+(al.length?' · alimentação '+brl(sum(al,r=>r.valor))+' à parte':''):''}${c!=='Todos'||UI.veic!=='Todos'?'<br><span class="muted">A busca respeita a categoria e o veículo escolhidos abaixo.</span>':''}</div>`})():''}
   <div class="subtabs">${['Todos',...catsAtivas()].map(x=>`${x==='Outros'?'<span class="subSep" aria-hidden="true"></span>':''}<button class="chip${x===c?' on':''}" data-sub="custos:${x}">${x}</button>`).join('')}</div>`;
-  h+=groups(L,{key:'data',chave:'cus'+c,vazio:'Nenhum custo nesta categoria.',
-    cab:rows=>`<span class="small muted">${rows.length} lanç.</span><b class="num">${brl(sum(rows,r=>r.valor))}</b>`,
-    linha:r=>`<div class="row"><div class="dt">${fmtD(r.data)}<small>${wdOf(r.data)}</small></div><div class="main"><span class="tag b">${esc(r.cat==='Combustível'&&ehRec2(r)?'Recarga':r.cat)}</span>${r.virtual?'<span class="tag a">paga · gerenciada na aba Multas</span>':''}<span class="tag g">${esc(r.veiculo)}</span> ${esc(r.desc||'')}<div class="small muted">${[(r.litros||r.kwh)?fmtNum(r.kwh||r.litros)+' '+unEn(r)+' · '+brl(r.valor/(r.kwh||r.litros))+'/'+unEn(r):'',r.km?(+r.km).toLocaleString('pt-BR')+' km':'',r.proxKm?'próx. em '+(+r.proxKm).toLocaleString('pt-BR')+' km':'',r.pgto,r.fornecedor].filter(Boolean).map(esc).join(' · ')}</div>${r.obs?`<div class="obs">${esc(r.obs)}</div>`:''}</div><div class="val num">${brl(r.valor)}</div><div class="act">${r.virtual?`<button class="ib" data-ed="tb_multas:${r.ref}" aria-label="Editar na aba Multas" title="Gerenciada na aba Multas">✎</button>`:`<button class="ib" data-ed="tb_custos:${r.id}" aria-label="Editar">✎</button><button class="ib" data-del="tb_custos:${r.id}" aria-label="Excluir" title="Excluir">🗑</button>`}</div></div>`});
+  h+=groups(L,{key:'data',chave:'cus'+c,todos:busca,vazio:busca?'Nenhum lançamento encontrado. Tente outra palavra, outro período ou a categoria Todos.':'Nenhum custo nesta categoria.',
+    cab:rows=>{const al=rows.filter(ehAlim);return `<span class="small muted">${rows.length} lanç.${al.length?' · alimentação '+brl(sum(al,r=>r.valor))+' à parte':''}</span><b class="num">${brl(sum(rows.filter(r=>!ehAlim(r)),r=>r.valor))}</b>`},
+    linha:r=>`<div class="row"><div class="dt">${fmtD(r.data)}<small>${wdOf(r.data)}</small></div><div class="main"><span class="tag b">${esc(r.cat==='Combustível'&&ehRec2(r)?'Recarga':r.cat)}</span>${r.virtual?'<span class="tag a">paga · gerenciada na aba Multas</span>':''}${ehAlim(r)?(r.tipoAl?`<span class="tag g">${esc(r.tipoAl)}</span> `:''):`<span class="tag g">${esc(r.veiculo)}</span> `}${esc(r.desc||'')}<div class="small muted">${[(r.litros||r.kwh)?fmtNum(r.kwh||r.litros)+' '+unEn(r)+' · '+brl(r.valor/(r.kwh||r.litros))+'/'+unEn(r):'',r.km?(+r.km).toLocaleString('pt-BR')+' km':'',r.proxKm?'próx. em '+(+r.proxKm).toLocaleString('pt-BR')+' km':'',r.pgto,r.fornecedor].filter(Boolean).map(esc).join(' · ')}</div>${r.cat==='Combustível'&&!r.virtual&&!(+r.litros>0||+r.kwh>0)?`<div class="small"><button type="button" class="lnk" data-ed="tb_custos:${r.id}">⚠ sem ${ehRec2(r)?'kWh':'litros'} · completar</button></div>`:''}${r.obs?`<div class="obs">${esc(r.obs)}</div>`:''}</div><div class="val num">${brl(r.valor)}</div><div class="act">${r.virtual?`<button class="ib" data-ed="tb_multas:${r.ref}" aria-label="Editar na aba Multas" title="Gerenciada na aba Multas">✎</button>`:`<button class="ib" data-ed="tb_custos:${r.id}" aria-label="Editar">✎</button><button class="ib" data-del="tb_custos:${r.id}" aria-label="Excluir" title="Excluir">🗑</button>`}</div></div>`});
   return h;
 }
 function statusMulta(r){
@@ -2251,12 +2304,71 @@ function simWire(){
   simular()}
 
 /* ---------- relatórios ---------- */
-const relPadrao=()=>({de:mesAtual()+'-01',ate:hoje(),veic:'Todos',plat:'Todas'});
-UI.rel=Object.assign(relPadrao(),{f1:true,aberto:'',ver:false});
-const relAtivo=()=>{const p=relPadrao(),f=UI.rel;return f.de!==p.de||f.ate!==p.ate||f.veic!==p.veic||f.plat!==p.plat};
+const relPadrao=()=>({de:mesAtual()+'-01',ate:hoje(),vs:[],plat:'Todas'});
+UI.rel=Object.assign(relPadrao(),{f1:true,aberto:'',ab:['resumo'],ver:false});
+const relAtivo=()=>{const p=relPadrao(),f=UI.rel;return f.de!==p.de||f.ate!==p.ate||relVsSel(f).length>0||f.plat!==p.plat};
+// V131: vários veículos (lista vazia = todos), atalhos de período, barra fixa e bloco de combustível
+const relVsSel=F=>(F.vs||[]).filter(v=>VEICS().includes(v));
+const relFv=F=>{const l=relVsSel(F);return r=>!l.length||l.includes(r.veiculo)};
+const relVeics=F=>{const l=relVsSel(F);return l.length?l:VEICS()};
+const relVTxt=F=>{const l=relVsSel(F);return(l.length>1?'Veículos: ':'Veículo: ')+(l.length?l.join(', '):'todos')};
+const relPer=k=>{const h=hoje(),d=new Date(h+'T12:00:00');
+  if(k==='mes')return[mesAtual()+'-01',h];
+  if(k==='ant'){const a=new Date(d.getFullYear(),d.getMonth()-1,1,12),b=new Date(d.getFullYear(),d.getMonth(),0,12);return[isoOf(a),isoOf(b)]}
+  if(k==='30'){const a=new Date(d);a.setDate(a.getDate()-29);return[isoOf(a),h]}
+  return[d.getFullYear()+'-01-01',h]};
+const REL_PERS=[['mes','Este mês'],['ant','Mês passado'],['30','Últimos 30 dias'],['ano','Este ano']];
+const relPerAtual=F=>{const x=REL_PERS.find(([k])=>{const [a,b]=relPer(k);return F.de===a&&F.ate===b});return x?x[0]:'pers'};
+// segmentos entre abastecimentos com o tanque completo: km medidos e litros gastos nesse trecho
+function relFuelSegs(veic){
+  const L=S.tb_custos.filter(r=>r.veiculo===veic&&r.cat==='Combustível'&&r.data&&((+r.litros>0)||(+r.kwh>0))).sort((a,b)=>a.data.localeCompare(b.data)||((+a.km||0)-(+b.km||0))||String(a.id).localeCompare(String(b.id)));
+  const segs=[];let anc=null,acc=[];
+  L.forEach(r=>{acc.push(r);if(r.cheio===false)return;
+    if(anc){let km=0;
+      if(+r.km>0&&+anc.km>0&&+r.km>+anc.km)km=+r.km-+anc.km;
+      else if(acc.every(x=>+x.kmTrecho>0))km=sum(acc,x=>+x.kmTrecho);
+      const lt=sum(acc,x=>+x.litros||+x.kwh||0),cu=sum(acc,x=>x.valor);
+      if(km>0&&lt>0)segs.push({d:r.data,km,lt,cu,parc:acc.length>1})}
+    anc=r;acc=[]});
+  return segs}
+function relSecAlim(F){
+  const L=alimDesp().filter(r=>r.data>=F.de&&r.data<=F.ate).sort((a,b)=>b.data.localeCompare(a.data)),t=sum(L,r=>r.valor);
+  const T={};L.forEach(r=>{const k=String(r.tipoAl||'').trim()||'Sem tipo';(T[k]=T[k]||{v:0,n:0});T[k].v+=+r.valor||0;T[k].n++});
+  const tp=Object.entries(T).sort((a,b)=>b[1].v-a[1].v).map(([k,o])=>['Por tipo · '+k,brl(o.v)+' ('+o.n+(o.n===1?' lançamento':' lançamentos')+')']);
+  return{id:'alim',t:'Alimentação (fora do custo do veículo)',kpis:[['Total',brl(t)],['Lançamentos',L.length],['Média por lançamento',L.length?brl(t/L.length):'—'],...tp],
+    nota:'A alimentação não entra no custo do veículo, no custo por km nem no Carnê-Leão. O filtro de veículos não se aplica a esta seção.',
+    cols:[['Data','date'],['Tipo'],['Descrição'],['Local'],['Pagamento'],['Valor','money']],rows:L.map(r=>[r.data,r.tipoAl||'',r.desc||'',r.fornecedor||'',r.pgto||'',r.valor])}}
+// V131: período anterior de igual duração, para o comparativo do Resumo
+function relPrevPer(F){const n=Math.round((new Date(F.ate+'T12:00:00')-new Date(F.de+'T12:00:00'))/864e5)+1,a=new Date(F.de+'T12:00:00');a.setDate(a.getDate()-1);const b=new Date(a);b.setDate(b.getDate()-(n-1));return[isoOf(b),isoOf(a)]}
+function relPrev(F){const [d0,d1]=relPrevPer(F),orig=UI.rel;let D;try{UI.rel=Object.assign({},orig,{de:d0,ate:d1});D=relDados()}finally{UI.rel=orig}
+  return{de:d0,ate:d1,apps:sum(D.cor,r=>r.valor),ifo:sum(D.ifc,r=>r.valor),car:sum(D.car,r=>r.valor),cus:sum(D.cus,r=>r.valor),fx:sum(D.cus.filter(r=>MV_FIXAS.includes(r.cat)),r=>r.valor),alim:usoTrab()?sum(alimDesp().filter(r=>r.data>=d0&&r.data<=d1),r=>r.valor):0}}
+// texto "▲ 12% em relação ao período anterior" (seta e palavra, nunca só a cor)
+const relCmp=(a,b)=>{a=+a||0;b=+b||0;let t;if(!a&&!b)return'';if(Math.abs(a-b)<0.005)t='= igual ao período anterior';else if(!b)t='sem lançamentos no período anterior';else{const pc=(Math.round(Math.abs(a-b)/Math.abs(b)*1000)/10).toLocaleString('pt-BR');t=(a>b?'▲ ':'▼ ')+pc+'% '+(a>b?'a mais':'a menos')+' que no período anterior ('+brl(b)+')'}
+  return ' <small style="display:block;font-size:12px;font-weight:400;margin-top:2px"> '+t+'</small>'};
+const relPrevNota=P=>'Comparação com o período anterior de mesma duração ('+fmtBR(P.de)+' a '+fmtBR(P.ate)+'). ▲ = valor maior que o anterior, ▼ = menor.';
+function relSecComb(F){
+  const nf=x=>(Math.round(x*10)/10).toLocaleString('pt-BR');
+  const rows=[];let K=0,Lt=0,C=0,Gasto=0,Lit=0,nAb=0,parc=false,todosRec=true,semLit=0,semKm=0;const pend=[];
+  relVeics(F).forEach(v=>{
+    const f=S.tb_custos.filter(r=>r.veiculo===v&&r.cat==='Combustível'&&r.data>=F.de&&r.data<=F.ate);if(!f.length)return;
+    f.forEach(r=>{const a=!(+r.litros>0||+r.kwh>0),b=!(+r.km>0||+r.kmTrecho>0);if(a)semLit++;if(b)semKm++;if(a||b)pend.push({id:r.id,d:r.data,v,val:+r.valor||0,falta:[a?(ehRec2(r)?'kWh':'litros'):'',b?'km':''].filter(Boolean).join(' e ')})});
+    
+    const g=sum(f,r=>r.valor),l=sum(f,r=>+r.litros||+r.kwh||0),sg=relFuelSegs(v).filter(x=>x.d>=F.de&&x.d<=F.ate),k=sum(sg,x=>x.km),sl=sum(sg,x=>x.lt),sc=sum(sg,x=>x.cu);
+    rows.push([v,g,l?nf(l):null,k?fmtNum(k):null,k&&sl?nf(k/sl):null,k&&sc?sc/k:null]);
+    Gasto+=g;Lit+=l;nAb+=f.length;K+=k;Lt+=sl;C+=sc;if(sg.some(x=>x.parc))parc=true;if(!f.every(ehRec2))todosRec=false});
+  const un=todosRec&&nAb?'kWh':'l',lbl=un==='kWh'?'kWh':'litro';
+  const kp=[['Gasto',brl(Gasto)],['Abastecimentos',nAb],[un==='kWh'?'kWh recarregados':'Litros abastecidos',Lit?nf(Lit)+(un==='kWh'?' kWh':' L'):'—'],['Preço médio do '+lbl,Lit?brl(Gasto/Lit):'—'],
+    ['Km medidos (tanque completo)',K?fmtNum(K)+' km':'—'],['Consumo',K&&Lt?nf(K/Lt)+' km/'+un:'—'],[(un==='kWh'?'Energia':'Combustível')+' por km',K&&C?brl(C/K):'—'],['Os '+brl(C)+' medidos renderam',K&&C?fmtNum(K)+' km':'—']];
+  let nota='';
+  if(!nAb)nota='Nenhum abastecimento no período.';
+  else if(!K)nota='Para ver o consumo e os km, informe o km do veículo (ou o km desde o último abastecimento) em abastecimentos com o tanque completo, na aba Custos. Hoje não há dois abastecimentos completos com km no período.';
+  else nota='Consumo calculado só entre abastecimentos com o tanque completo, com o km do odômetro ou do trecho informado.'+(parc?' Estimado: há abastecimento parcial entre eles.':'')+(C<Gasto*0.99?' Os km medidos cobrem '+brl(C)+' dos '+brl(Gasto)+' gastos no período.':'');
+  if(nAb&&(semLit||semKm)){const un2=un==='kWh'?'kWh':'litros',pl=n=>n+(n===1?' abastecimento':' abastecimentos');nota+=' ⚠ Dados incompletos: '+[semLit?pl(semLit)+' sem '+un2:'',semKm?pl(semKm)+' sem km':''].filter(Boolean).join(' e ')+' no período. Complete pela lista abaixo: melhora o consumo e o custo por km.'}
+  pend.sort((a,b)=>b.d.localeCompare(a.d));
+  return{id:'comb',t:'Consumo e km rodados',kpis:kp,nota,pend,cols:[['Veículo'],['Gasto','money'],[un==='kWh'?'kWh':'Litros'],['Km medidos'],['km/'+un],['R$/km','money']],rows}}
 const fmtCell=(v,t)=>v==null||v===''?'—':t==='money'?brl(v):t==='date'?fmtBR(v):t==='pct'?(Math.round(v*1000)/10).toLocaleString('pt-BR')+'%':t==='int'?Number(v).toLocaleString('pt-BR'):t==='hm'?minToHM(v):String(v);
 function relDados(){
-  const F=UI.rel,ok=d=>d&&d>=F.de&&d<=F.ate,fv=r=>F.veic==='Todos'||r.veiculo===F.veic;
+  const F=UI.rel,ok=d=>d&&d>=F.de&&d<=F.ate,fv=relFv(F);
   const pl=F.plat;
   const cor=S.tb_corridas.filter(r=>ok(r.data)&&fv(r)&&fPlat(r)&&(pl==='Todas'||pl===r.plataforma));
   const ifc=(ifoodOn()&&(pl==='Todas'||pl==='iFood'))?S.tb_corridas.filter(r=>ok(r.data)&&fv(r)&&fIfood(r)):[];
@@ -2281,9 +2393,9 @@ function relModelo(){
     ...car.map(r=>({d:r.data,tp:'Viagens e caronas',pl:r.sentido,v:r.veiculo,det:`${r.passageiros||0} passageiros${r.obs?' · '+r.obs:''}`,val:+r.valor})),
     ...rep.map(r=>({d:r.data,tp:'Repasse',pl:r.plataforma,v:r.veiculo,det:`Período ${r.ini?fmtBR(r.ini)+' a '+fmtBR(r.fim):'—'} · ${r.viagens||0} viagens`,val:+r.valor})),
     ...cus.map(r=>({d:r.data,tp:'Custo',pl:r.cat,v:r.veiculo,det:[r.desc,(r.litros||r.kwh)?fmtNum(r.kwh||r.litros)+' '+unEn(r):'',r.pgto,r.fornecedor].filter(Boolean).join(' · '),val:-(+r.valor||0)}))].sort((a,b)=>b.d.localeCompare(a.d));
-  const sec=[];
+  const P=relPrev(F),sec=[];
   sec.push({id:'lanc',t:'Lançamentos filtrados',cols:[['Data','date'],['Tipo'],['Plataforma / categoria'],['Veículo'],['Detalhes'],['Valor (R$)','money']],rows:lanc.map(x=>[x.d,x.tp,x.pl,x.v,x.det,x.val]),nota:'Custos aparecem com valor negativo.'});
-  sec.push({id:'resumo',t:'Resumo do período',kpis:[['Uber + 99 (diário)',brl(vApps)],...(ifOn?[['iFood (diário)',brl(vIf)]]:[]),...(caronaOn()?[['Viagens e caronas',brl(vCar)]]:[]),['Total para a meta',brl(vApps+vIf+vCar)],['Meta prevista no período',brl(metaPrev)],['Meta atingida',metaPrev?fmtCell((vApps+vIf+vCar)/metaPrev,'pct'):'—'],['Custos do veículo',brl(vCus)],['Resultado líquido',brl(vApps+vIf+vCar-vCus)],['Repasses recebidos',brl(sum(rep,r=>r.valor))],['Viagens (Uber + 99)',vg],['Tempo online',minToHM(mn)],['R$ por hora',mn?brl(vApps/(mn/60)):'—'],['R$ por viagem',vg?brl(vApps/vg):'—']]});
+  sec.push({id:'resumo',t:'Resumo do período',kpis:[['Uber + 99 (diário)',brl(vApps)+relCmp(vApps,P.apps)],...(ifOn?[['iFood (diário)',brl(vIf)+relCmp(vIf,P.ifo)]]:[]),...(caronaOn()?[['Viagens e caronas',brl(vCar)+relCmp(vCar,P.car)]]:[]),['Total para a meta',brl(vApps+vIf+vCar)+relCmp(vApps+vIf+vCar,P.apps+P.ifo+P.car)],['Meta prevista no período',brl(metaPrev)],['Meta atingida',metaPrev?fmtCell((vApps+vIf+vCar)/metaPrev,'pct'):'—'],['Custos do veículo',brl(vCus)+relCmp(vCus,P.cus)],['Resultado líquido',brl(vApps+vIf+vCar-vCus)+relCmp(vApps+vIf+vCar-vCus,P.apps+P.ifo+P.car-P.cus)],...(usoTrab()?[['Alimentação (à parte, fora do resultado)',brl(sum(alimDesp().filter(r=>r.data>=F.de&&r.data<=F.ate),r=>r.valor))+relCmp(sum(alimDesp().filter(r=>r.data>=F.de&&r.data<=F.ate),r=>r.valor),P.alim)]]:[]),['Repasses recebidos',brl(sum(rep,r=>r.valor))],['Viagens (Uber + 99)',vg],['Tempo online',minToHM(mn)],['R$ por hora',mn?brl(vApps/(mn/60)):'—'],['R$ por viagem',vg?brl(vApps/vg):'—']],nota:relPrevNota(P)});
   const meses=[...new Set(dias.map(d=>d.slice(0,7)))];
   sec.push({id:'mensal',t:'Mês a mês',nota:'Uber + 99 vem do diário de corridas; os repasses são o que caiu na conta e não somam na meta.',cols:[['Mês'],['Uber + 99','money'],...(ifOn?[['iFood','money']]:[]),...(caronaOn()?[['Carona','money']]:[]),['Total meta','money'],['Meta prevista','money'],['% da meta','pct'],['Repasses','money'],['Custos','money'],['Resultado','money']],
     rows:meses.map(m=>{const a=sum(cor.filter(r=>r.data.startsWith(m)),r=>r.valor),fi=sum(ifc.filter(r=>r.data.startsWith(m)),r=>r.valor),c=sum(car.filter(r=>r.data.startsWith(m)),r=>r.valor),k=sum(cus.filter(r=>r.data.startsWith(m)),r=>r.valor),mp=dias.filter(d=>d.startsWith(m)&&diaConta(d)).length*meta;return[mesNome(m),a,...(ifOn?[fi]:[]),...(caronaOn()?[c]:[]),a+fi+c,mp,mp?(a+fi+c)/mp:null,sum(rep.filter(r=>r.data.startsWith(m)),r=>r.valor),k,a+fi+c-k]})});
@@ -2297,6 +2409,8 @@ function relModelo(){
   const comb=cus.filter(r=>r.cat==='Combustível'),cl=comb.filter(ehLt),lt=sum(cl,r=>r.litros);
   sec.push({id:'custos',t:'Custos por categoria',kpis:[['Total de custos',brl(vCus)],[nomeEn(1),brl(sum(comb,r=>r.valor))],...(escopoEn().c?[['Litros abastecidos',lt?lt.toLocaleString('pt-BR')+' L':'—'],['Preço médio do litro',lt?brl(sum(cl,r=>r.valor)/lt):'—']]:[]),...(escopoEn().r?(()=>{const ck=comb.filter(r=>+r.kwh>0),kw=sum(ck,r=>r.kwh);return[['kWh recarregados',kw?kw.toLocaleString('pt-BR')+' kWh':'—'],['Preço médio do kWh',kw?brl(sum(ck,r=>r.valor)/kw):'—']]})():[]),['Custo por R$ 1 ganho',tot?brl(vCus/tot):'—']],
     cols:[['Categoria'],['Valor','money'],['% dos custos','pct'],['Lançamentos','int']],rows:Object.entries(cats).sort((a,b)=>b[1].v-a[1].v).map(([c,o])=>[c==='Combustível'?nomeEn(1):c,o.v,vCus?o.v/vCus:null,o.n])});
+  if(F.plat==='Todas')sec.push(relSecComb(F));
+  if(usoTrab()){const i=sec.findIndex(x=>x.id==='resumo');sec.splice(i<0?sec.length:i+1,0,relSecAlim(F))}
   sec.push({id:'veic',t:'Custo-benefício por veículo',cols:[['Veículo'],['Uber + 99','money'],...(ifOn?[['iFood','money']]:[]),...(caronaOn()?[['Carona','money']]:[]),['Custos','money'],['Saldo','money']],
     rows:VEICS().map(v=>{const f=r=>r.veiculo===v;const a=sum(cor.filter(f),r=>r.valor),fi=sum(ifc.filter(f),r=>r.valor),c=sum(car.filter(f),r=>r.valor),k=sum(cus.filter(f),r=>r.valor);return[v,a,...(ifOn?[fi]:[]),...(caronaOn()?[c]:[]),k,a+fi+c-k]}).filter(r=>r.slice(1,-2).some(x=>x)||r[r.length-2])});
   if(ifOn){const mi=sum(ifc,r=>r.min),gi=sum(ifc,r=>r.viagens),di=new Set(ifc.map(r=>r.data)).size,rpi=rep.filter(fIfood),tr=ifoodTrib();
@@ -2310,7 +2424,7 @@ function relModelo(){
     rows:lc.map(l=>[mesNome(l.ym),l.apps,l.carBase,l.ifB,l.bruto,l.trib,l.base,l.irT,l.red,l.darf,l.venc,l.reg.pago?'Sim'+(l.reg.valorPago?' ('+brl(l.reg.valorPago)+')':''):'Não'])});
   sec.push({id:'multas',t:'Multas e pontos na CNH',nota:'Filtradas pela data da infração. Os pontos expiram 12 meses após a data da infração. '+TXT_SEM_ORGAO_TXT,cols:[['Data da infração','date'],['Descrição da Infração'],['Veículo'],['Responsável pela Infração'],['Pontuação Infração','int'],['Pontos expiram em','date'],['Pontos'],['Valor','money'],['Situação'],['Hora da Infração'],['Local da Infração'],['Velocidade Permitida','int'],['Velocidade Aferida','int']],
     rows:mul.map(r=>{const st=statusMulta(r);return[r.ocorr,r.motivo,r.veiculo,r.infrator||'',r.pontos||0,r.pontos?st.exp:null,!r.pontos?'Sem pontos':st.ativa?'Ativos':'Expirados',r.vPago??r.vDesc??r.vOrig,r.pagto?'Paga em '+fmtBR(r.pagto):'A pagar',r.hora||'',r.local||'',r.vperm||null,r.vaf||null]})});
-  return{F,sec,lanc,filtroTxt:`Período ${fmtBR(F.de)} a ${fmtBR(F.ate)} · Veículo: ${F.veic==='Todos'?'todos':F.veic} · Plataforma: ${F.plat==='Todas'?'todas':F.plat}`};
+  return{F,sec,lanc,filtroTxt:`Período ${fmtBR(F.de)} a ${fmtBR(F.ate)} · ${relVTxt(F)} · Plataforma: ${F.plat==='Todas'?'todas':F.plat}`};
 }
 function tabelaHTML(s){
   if(!s.rows||!s.rows.length)return '<div class="empty">Sem dados para o filtro.</div>';
@@ -2321,7 +2435,7 @@ function tabelaHTML(s){
 function rcMedias(veic){
   const d=new Date();d.setDate(d.getDate()-90);const ini=isoOf(d);
   const ok=r=>r.data>=ini&&(veic==='Todos'||r.veiculo===veic);
-  const cor=S.tb_corridas.filter(ok),car=S.tb_carona.filter(ok),cus=S.tb_custos.filter(ok);
+  const cor=S.tb_corridas.filter(ok),car=S.tb_carona.filter(ok),cus=S.tb_custos.filter(r=>ok(r)&&!ehAlim(r));
   const km=sum(cor,r=>r.km)+sum(car,r=>r.km),min=sum(cor,r=>r.min);
   return{custoKm:km>0&&cus.length?sum(cus,r=>r.valor)/km:0,ganhoKm:km>0?(sum(cor,r=>r.valor)+sum(car,r=>r.valor))/km:0,ganhoH:min>0?sum(cor,r=>r.valor)/(min/60):0}}
 function vRodaCalc(){
@@ -2471,14 +2585,15 @@ function vRelatorios(){
   const M=relModeloAtivo(),F=UI.rel,at=relAtivo();
   const kp=s=>s.kpis?`<div class="grid cards" style="margin-bottom:10px">${s.kpis.map(([l,v])=>kpi(esc(l),v)).join('')}</div>`:'';
   const lanc=M.sec[0];
-  let h=`<div class="mgroup"><div class="mhead" data-rel="f1"><span class="sg">${F.f1?'−':'+'}</span><span class="t">1. Filtros e exportação</span><span class="sp"></span>${!F.f1?`<span class="tag ${at?'a':'g'}">${at?'Filtro ativo':'Filtro desativado'}</span>`:''}<span class="small muted">${lanc.rows.length} lançamentos</span></div>
+  let h=`<div id="relBar" class="relBar hidden"><span>📅 <b>${fmtBR(F.de)} a ${fmtBR(F.ate)}</b></span><span>·</span><span>${esc(relVTxt(F))}</span>${usoTrab()&&F.plat!=='Todas'?`<span>·</span><span>${esc(F.plat)}</span>`:''}<span class="sp"></span><button type="button" class="btn sec sm" data-rel="topo">Alterar filtro</button></div><div class="mgroup" id="relFil"><div class="mhead" data-rel="f1"><span class="sg">${F.f1?'−':'+'}</span><span class="t">1. Filtros e exportação</span><span class="sp"></span>${!F.f1?`<span class="tag ${at?'a':'g'}">${at?'Filtro ativo':'Filtro desativado'}</span>`:''}<span class="small muted">${lanc.rows.length} lançamentos</span></div>
   ${F.f1?`<div class="mbody" style="padding:14px">
+    <div class="rvPer" role="group" aria-label="Período">${REL_PERS.map(([k,t])=>`<button type="button" class="chip${relPerAtual(F)===k?' on':''}" data-rel="per:${k}" aria-pressed="${relPerAtual(F)===k}">${relPerAtual(F)===k?'✓ ':''}${t}</button>`).join('')}<button type="button" class="chip${relPerAtual(F)==='pers'?' on':''}" data-rel="per:pers" aria-pressed="${relPerAtual(F)==='pers'}">${relPerAtual(F)==='pers'?'✓ ':''}Personalizado</button></div>
     <div class="fgrid" style="grid-template-columns:repeat(auto-fit,minmax(160px,1fr))">
       <div class="field"><label for="rDe">De</label><div class="dtW"><input class="inp" type="date" id="rDe" value="${F.de}" max="${hoje()}"><button type="button" class="dtB" data-rel="cal:rDe" aria-label="Abrir calendário">📅</button></div></div>
       <div class="field"><label for="rAte">Até</label><div class="dtW"><input class="inp" type="date" id="rAte" value="${F.ate}" max="${hoje()}"><button type="button" class="dtB" data-rel="cal:rAte" aria-label="Abrir calendário">📅</button></div></div>
-      <div class="field"><label>Veículo</label><select class="inp" id="rVe">${['Todos',...VEICS()].map(v=>`<option${v===F.veic?' selected':''}>${esc(v)}</option>`).join('')}</select></div>
       <div class="field${usoTrab()?'':' hidden'}"><label>Plataforma</label><select class="inp" id="rPl">${['Todas','Uber','99',...(ifoodOn()?['iFood']:[]),...(caronaOn()?['Viagens e caronas']:[])].map(v=>`<option${v===F.plat?' selected':''}>${v}</option>`).join('')}</select></div>
     </div>
+    ${VEICS().length>1?`<div class="rvVe"><div class="small muted" style="margin:10px 0 4px">Veículos (${relVsSel(F).length?relVsSel(F).length+' de '+VEICS().length:'todos'})</div><div class="rvChips"><button type="button" class="chip${relVsSel(F).length?'':' on'}" data-rel="ve:all" aria-pressed="${!relVsSel(F).length}">${relVsSel(F).length?'':'✓ '}Todos</button>${VEICS().map((v,i)=>{const on=relVsSel(F).includes(v);return `<button type="button" class="chip${on?' on':''}" data-rel="ve:${i}" aria-pressed="${on}">${on?'✓ ':''}${esc(v)}</button>`}).join('')}</div></div>`:''}
     <div class="small muted" style="margin-top:8px">${esc(M.filtroTxt)}${F.plat!=='Todas'?' · custos só entram com “Todas” as plataformas':''}</div>
     <div class="toolbar" style="margin:12px 0 0">
       <button class="btn sec sm" data-rel="ver">${F.ver?'Ocultar dados filtrados':'Ver dados filtrados'}</button>
@@ -2489,23 +2604,33 @@ function vRelatorios(){
     </div>
     ${F.ver?`<div style="margin-top:12px">${tabelaHTML(lanc)}<div class="small muted" style="margin-top:6px">${lanc.nota}</div></div>`:''}
   </div>`:''}</div>`;
-  M.sec.slice(1).forEach((s,i)=>{const op=F.aberto===s.id;
-    h+=`<div class="mgroup"><div class="mhead" data-rel="sec:${s.id}"><span class="sg">${op?'−':'+'}</span><span class="t">${i+2}. ${esc(s.t)}</span></div>${op?`<div class="mbody" style="padding:14px">${kp(s)}${s.cols?tabelaHTML(s):''}${s.nota?`<div class="small muted" style="margin-top:6px">${esc(s.nota)}</div>${s.refs?`<div class="small" style="margin-top:6px"><b>📚 Referências oficiais</b>${refImpHtml()}</div>`:''}`:''}</div>`:''}</div>`});
+  M.sec.slice(1).forEach((s,i)=>{const op=(F.ab||[]).includes(s.id);
+    h+=`<div class="mgroup"><div class="mhead" data-rel="sec:${s.id}"><span class="sg">${op?'−':'+'}</span><span class="t">${i+2}. ${esc(s.t)}</span></div>${op?`<div class="mbody" style="padding:14px">${kp(s)}${s.cols?tabelaHTML(s):''}${s.pend&&s.pend.length?`<div class="relPend" role="region" aria-label="Lançamentos incompletos"><b>Lançamentos para completar (${s.pend.length})</b><div class="small muted">Toque em 👆 Abrir para ajustar o lançamento. Ao salvar, você volta aqui e a lista já aparece atualizada.</div>${s.pend.slice(0,30).map(x=>`<div class="relPendL"><span class="num">${fmtBR(x.d)}</span><span>${esc(x.v)} · ${brl(x.val)}</span><span class="small">falta: <b>${esc(x.falta)}</b></span><button type="button" class="btn sm sec" data-ed="tb_custos:${x.id}">👆 Abrir</button></div>`).join('')}${s.pend.length>30?`<div class="small muted">Mostrando os 30 mais recentes de ${s.pend.length}.</div>`:''}</div>`:''}${s.nota?`<div class="small muted" style="margin-top:6px">${esc(s.nota)}</div>${s.refs?`<div class="small" style="margin-top:6px"><b>📚 Referências oficiais</b>${refImpHtml()}</div>`:''}`:''}</div>`:''}</div>`});
+  setTimeout(relBarSync,40);
   return `<div class="toolbar"><h2 style="margin:0">Relatórios</h2><span class="sp"></span></div>`+h;
 }
+function relBarSync(){const b=document.getElementById('relBar');if(!b||UI.tab!=='relatorios')return;
+  const hd=document.querySelector('header'),hb=hd?hd.getBoundingClientRect().bottom:0,fl=document.getElementById('relFil'),vw=document.getElementById('view').getBoundingClientRect();
+  b.style.top=Math.max(0,hb)+'px';b.style.left=vw.left+'px';b.style.width=vw.width+'px';
+  b.classList.toggle('hidden',!(fl&&fl.getBoundingClientRect().bottom<hb+6))}
+window.addEventListener('scroll',()=>{if(UI.tab==='relatorios')relBarSync()},{passive:true});window.addEventListener('resize',()=>{if(UI.tab==='relatorios')relBarSync()});
 function relAcao(t){
   const a=t.dataset.rel,F=UI.rel;
-  const lerF=()=>{const de=$('#rDe'),at=$('#rAte'),ve=$('#rVe'),pl=$('#rPl');if(de){F.de=de.value||F.de;F.ate=at.value||F.ate;F.veic=ve.value;F.plat=pl.value}};
+  const lerF=()=>{const de=$('#rDe'),at=$('#rAte'),pl=$('#rPl');if(de){F.de=de.value||F.de;F.ate=at.value||F.ate;if(pl)F.plat=pl.value}};
   if(a.startsWith('cal:')){abreCal($('#'+a.slice(4)));return}
   if(a==='f1')F.f1=!F.f1;
-  else if(a.startsWith('sec:')){const id=a.slice(4);F.aberto=F.aberto===id?'':id}
+  else if(a.startsWith('sec:')){const id=a.slice(4);F.ab=(F.ab||[]).includes(id)?[]:[id]}
+  else if(a.startsWith('per:')){const k=a.slice(4);if(k!=='pers'){[F.de,F.ate]=relPer(k)}else{F.f1=true;setTimeout(()=>{const e=$('#rDe');if(e)e.focus()},50)}}
+  else if(a==='ve:all')F.vs=[];
+  else if(a.startsWith('ve:')){const v=VEICS()[+a.slice(3)],l=relVsSel(F),i=l.indexOf(v);if(v){if(i>=0)l.splice(i,1);else l.push(v);F.vs=l.length>=VEICS().length?[]:l}}
+  else if(a==='topo'){F.f1=true;render();window.scrollTo({top:0,behavior:'smooth'});return}
   else if(a==='ver')F.ver=!F.ver;
   else if(a==='limpar')Object.assign(F,relPadrao());
   else if(['pdf','docx','xlsx','csv'].includes(a)){lerF();exportarRel(a,t);return}
   render();
 }
-document.addEventListener('change',e=>{if(UI.tab!=='relatorios'||!['rDe','rAte','rVe','rPl'].includes(e.target.id))return;const F=UI.rel;
-  F.de=$('#rDe').value||F.de;F.ate=$('#rAte').value||F.ate;if(F.de>F.ate){toast('A data inicial é depois da final.');F.ate=F.de}F.veic=$('#rVe').value;F.plat=$('#rPl').value;
+document.addEventListener('change',e=>{if(UI.tab!=='relatorios'||!['rDe','rAte','rPl'].includes(e.target.id))return;const F=UI.rel;
+  F.de=$('#rDe').value||F.de;F.ate=$('#rAte').value||F.ate;if(F.de>F.ate){toast('A data inicial é depois da final.');F.ate=F.de}if($('#rPl'))F.plat=$('#rPl').value;
   // V64: enquanto a pessoa estiver digitando a data, não redesenha — espera ela terminar ou sair do campo
   if(['rDe','rAte'].includes(e.target.id)){
     clearTimeout(window.__relT);
@@ -2533,7 +2658,7 @@ async function exportarRel(fmt,btn,M0,fn0){
     if(fmt==='csv'){const s=M.sec[0];const q=v=>{v=String(v??'');return /[;"\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v};
       data='﻿'+[s.cols.map(c=>q(c[0])).join(';'),...s.rows.map(r=>r.map((v,i)=>{const t=s.cols[i][1];return q(t==='money'?brl(v,1):t==='date'?fmtBR(v):v)}).join(';'))].join('\r\n')}
     else if(fmt==='xlsx'){await carregaLib('xlsx');const wb=XLSX.utils.book_new();const usados=new Set();
-      const resumo=[['Relatório – Rodaliq'],[M.filtroTxt],[geradoEm],[]];M.sec.filter(s=>s.kpis).forEach(s=>{resumo.push([s.t]);s.kpis.forEach(k=>resumo.push([k[0],String(k[1]).replace(/<[^>]+>/g,'')]));resumo.push([])});
+      const resumo=[[M.titulo||'Relatório – Rodaliq'],[M.filtroTxt],[geradoEm],[]];M.sec.filter(s=>s.kpis).forEach(s=>{resumo.push([s.t]);s.kpis.forEach(k=>resumo.push([k[0],String(k[1]).replace(/<[^>]+>/g,'')]));resumo.push([])});
       const ws0=XLSX.utils.aoa_to_sheet(resumo);ws0['!cols']=[{wch:32},{wch:24}];XLSX.utils.book_append_sheet(wb,ws0,'Resumo');
       M.sec.filter(s=>s.cols).forEach(s=>{let nm=s.t.replace(/[\\/?*\[\]:]/g,' ').slice(0,31);while(usados.has(nm))nm=nm.slice(0,29)+'_2';usados.add(nm);
         const aoa=[s.cols.map(c=>c[0]),...s.rows.map(r=>r.map((v,i)=>{const t=s.cols[i][1];return v==null?'':t==='date'?fmtBR(v):t==='hm'?minToHM(v):t==='money'?r2(v):t==='pct'?Math.round(v*1000)/1000:v}))];
@@ -2562,7 +2687,7 @@ async function gerarDocx(M,geradoEm){
   const cel=(t,{h,r}={})=>`<w:tc><w:tcPr>${h?'<w:shd w:val="clear" w:color="auto" w:fill="1F6FEB"/>':''}</w:tcPr><w:p><w:pPr>${r?'<w:jc w:val="right"/>':''}<w:spacing w:before="20" w:after="20"/></w:pPr><w:r><w:rPr>${h?'<w:b/><w:color w:val="FFFFFF"/>':''}<w:sz w:val="17"/></w:rPr><w:t xml:space="preserve">${x(t)}</w:t></w:r></w:p></w:tc>`;
   const bd='<w:tblBorders>'+['top','left','bottom','right','insideH','insideV'].map(k=>`<w:${k} w:val="single" w:sz="4" w:space="0" w:color="D0D5DD"/>`).join('')+'</w:tblBorders>';
   const tbl=(head,rows,al)=>`<w:tbl><w:tblPr><w:tblW w:w="5000" w:type="pct"/>${bd}</w:tblPr>${head?`<w:tr>${head.map((c,i)=>cel(c,{h:1,r:al&&al[i]})).join('')}</w:tr>`:''}${rows.map(r=>`<w:tr>${r.map((c,i)=>cel(c,{r:al&&al[i]})).join('')}</w:tr>`).join('')}</w:tbl>`;
-  let b=par('Relatório – Rodaliq',{b:1,sz:36,cor:'14213D'})+par(M.filtroTxt,{sz:18,cor:'5B6478'})+par(geradoEm,{sz:18,cor:'5B6478'});
+  let b=par(M.titulo||'Relatório – Rodaliq',{b:1,sz:36,cor:'14213D'})+par(M.filtroTxt,{sz:18,cor:'5B6478'})+par(geradoEm,{sz:18,cor:'5B6478'});
   M.sec.forEach((s,i)=>{b+=par('')+par((i+1)+'. '+s.t,{b:1,sz:26,cor:'1F6FEB'});
     if(s.kpis)b+=tbl(null,s.kpis.map(k=>[k[0],String(k[1]).replace(/<[^>]+>/g,'')]),[0,1]);
     if(s.cols){if(s.kpis)b+=par('');const al=s.cols.map(c=>['money','int','pct','hm'].includes(c[1]));b+=s.rows.length?tbl(s.cols.map(c=>c[0]),s.rows.map(r=>r.map((v,ci)=>fmtCell(v,s.cols[ci][1]))),al):par('Sem dados para o filtro.',{sz:18,cor:'5B6478'})}
@@ -3177,6 +3302,9 @@ const PERF_REQ={corridas:'t',ifood:'t',rodacalc:'t',agenda:'t',impostos:'tc',car
 function perfVe(k){const r=PERF_REQ[k];if(!r)return true;const u=usosAtual();if(!u)return true;const t=u.includes('corridas')||u.includes('entregas');return r==='t'?t:(t||u.includes('carona'))}
 const recVe=k=>nivelVe(k)&&perfVe(k);
 const recOff=k=>!recVe(k);
+// V131: quem também vê Corridas, iFood ou Viagens e caronas usa o Meu veículo para o uso pessoal; quem só usa o veículo continua com "Meu veículo"
+const mvAmplo=()=>recVe('corridas')||recVe('ifood')||recVe('carona');
+const mvNome=()=>'Meu veículo'+(mvAmplo()?' · uso pessoal':'');
 // V93: o copo "Ajude a manter o Rodaliq" também tem os 3 níveis (antes só ligado/desligado; desligado = só o master)
 const apoNivel=()=>AJU.nivel||(AJU.ativo===false?'master':'todos');
 const apoVe=()=>{const n=apoNivel();if(VISAO)return visVe(n);return n==='todos'||ehMaster()||(n==='equipe'&&(invIsAdmin||SOU_COLAB))||(n==='apoiadores'&&(invIsAdmin||SOU_COLAB||SOU_APOIADOR))};
@@ -3300,6 +3428,7 @@ const foraBR=()=>{try{if(SIM_FORA)return true;if(ehPrincipal())return false;cons
 function aplicaAjustes(){{const mc=document.getElementById('mCfg');if(mc)mc.textContent=usoTrab()?'🎯 Metas e preferências':'🎯 Preferências'}const b=document.querySelector('.menu [data-m="apoio"]');if(b)b.classList.toggle('hidden',!apoVe());
   {const fb=document.querySelector('.menu [data-m="foto"]');if(fb)fb.classList.toggle('hidden',!fotoOn());if(fotoOn()&&!FOTO_CARREGADA&&UID){FOTO_CARREGADA=true;fotoCarregar()}else perfIniciais()}
   donoAtualiza();
+  {const tb=document.querySelector('[data-t="meuveiculo"]');if(tb)tb.textContent='🚗 '+mvNome()}
   [['agenda','[data-t="agenda"],[data-fab="agenda"]'],['pessoal','[data-t="meuveiculo"]'],['reservas','[data-t="reservas"],[data-fab="despesa"]'],['impostos','[data-t="impostos"]'],['relatorios','[data-t="relatorios"]'],['carona','[data-t="carona"],[data-fab="carona"]'],['ifood','[data-t="ifood"],[data-fab="ifood"],[data-fab="ifoodRep"]'],['rodacalc','[data-t="rodacalc"],[data-fab="rodacalc"]'],['corridas','[data-t="corridas"],[data-fab="corrida"],[data-fab="dia"],[data-fab="repasse"]']].forEach(([k,sel])=>document.querySelectorAll(sel).forEach(e=>e.classList.toggle('hidden',recOff(k))));
   {const vb=document.querySelector('.menu [data-m="prevap"]');if(vb)vb.classList.toggle('hidden',!ehPrincipalReal())}
   {const ab=document.querySelector('.menu [data-m="avisos"]');if(ab)ab.classList.toggle('hidden',!ehPrincipalReal())}
@@ -6026,7 +6155,7 @@ const GUIA=[
  {t:'🚗 Seu veículo',cfg:'veic'},
  {t:'👤 Seu perfil',x:()=>`O <b>círculo com as suas iniciais</b>, no topo da tela, abre o seu perfil: mostra com qual conta você está conectado e reúne o que é seu: ${recVe('foto')?'<b>Alterar foto</b>, ':''}<b>Corrigir meus dados</b>, <b>Trocar senha</b>, <b>Verificação em duas etapas</b> (para quem administra), <b>Meu perfil</b> e <b>Sair</b>. Em <b>⚙ Opções</b> ficam as coisas do app: backup, tema, veículos, metas e termos.${recVe('foto')?'<br><br><b>📷 Foto de perfil:</b> em <b>Alterar foto</b>, escolha uma imagem, ajuste o zoom e a posição arrastando, e toque em <b>Salvar foto</b>. Ela aparece no círculo do topo. Para tirar, use <b>Remover foto</b>.':''}`},
  {t:'🎯 Sua meta diária',rec:'corridas',x:()=>`Defina a sua meta de ganho por dia e em quais dias da semana você roda, em <b>⚙ Opções › Metas e preferências</b>. É de lá que saem a meta do dia e a do mês. Ali você também escolhe o <b>país</b> e a <b>moeda de exibição</b> (só muda o símbolo e o formato, sem converter valores); fora do Brasil, as telas só do Brasil (${rv('impostos','Impostos, ')}Multas e CNH) ficam ocultas.${rv('impostos',`<br><br>As escolhas que mexem no imposto ficam nas abas: o <b>desconto simplificado</b> mensal, em <b>Impostos › Opções do Carnê-Leão</b>${rv('carona',', e a escolha de <b>Viagens e caronas entrarem no Carnê-Leão</b>, na aba <b>Viagens e caronas</b>')}. Elas seguem as referências oficiais listadas na aba <b>🧮 Impostos</b>.`)}`,cfg:'meta'},
- {t:'🌎 Brasil e fora do Brasil',x:()=>`Em <b>⚙ Opções › ${usoTrab()?'Metas e preferências':'Preferências'}</b>, o campo <b>País onde você roda</b> muda o que o app mostra. A <b>moeda de exibição</b> é separada: só troca o símbolo e o formato dos valores, sem converter nada.<br><br><b>🇧🇷 No Brasil</b>, você vê tudo: ${rv('impostos','Impostos (Carnê-Leão e simulador), ')}Multas, Meu perfil e os atalhos de ${rv('impostos','Carnê-Leão e ')}multa.<br><br><b>🌍 Fora do Brasil</b> (<b>Outro país</b> ou outro país da lista), ficam ocultos o que só existe no Brasil: ${rv('impostos','as abas <b>Impostos</b> e <b>Multas</b>','a aba <b>Multas</b>')}, o <b>Meu perfil</b> e os atalhos de ${rv('impostos','Carnê-Leão e ')}multa.${recVe('carona')&&recVe('impostos')?' Na aba Viagens e caronas, o card de imposto de Viagens e caronas também some.':''}${recVe('ifood')?(recVe('impostos')?' Na aba iFood, o card de imposto some e o iFood continua para lançar o dia e os repasses.':''):''} ${recVe('corridas')?rv('relatorios','Corridas, Custos, Painel e Relatórios','Corridas, Custos e Painel'):rv('relatorios','Meu veículo, Custos, Painel e Relatórios','Meu veículo, Custos e Painel')} continuam funcionando.<br><br>Nada é apagado ao trocar o país: seus lançamentos continuam guardados, e voltar para <b>Brasil</b> traz tudo de volta.`,
+ {t:'🌎 Brasil e fora do Brasil',x:()=>`Em <b>⚙ Opções › ${usoTrab()?'Metas e preferências':'Preferências'}</b>, o campo <b>País onde você roda</b> muda o que o app mostra. A <b>moeda de exibição</b> é separada: só troca o símbolo e o formato dos valores, sem converter nada.<br><br><b>🇧🇷 No Brasil</b>, você vê tudo: ${rv('impostos','Impostos (Carnê-Leão e simulador), ')}Multas, Meu perfil e os atalhos de ${rv('impostos','Carnê-Leão e ')}multa.<br><br><b>🌍 Fora do Brasil</b> (<b>Outro país</b> ou outro país da lista), ficam ocultos o que só existe no Brasil: ${rv('impostos','as abas <b>Impostos</b> e <b>Multas</b>','a aba <b>Multas</b>')}, o <b>Meu perfil</b> e os atalhos de ${rv('impostos','Carnê-Leão e ')}multa.${recVe('carona')&&recVe('impostos')?' Na aba Viagens e caronas, o card de imposto de Viagens e caronas também some.':''}${recVe('ifood')?(recVe('impostos')?' Na aba iFood, o card de imposto some e o iFood continua para lançar o dia e os repasses.':''):''} ${recVe('corridas')?rv('relatorios','Corridas, Custos, Painel e Relatórios','Corridas, Custos e Painel'):rv('relatorios',mvNome()+', Custos, Painel e Relatórios',mvNome()+', Custos e Painel')} continuam funcionando.<br><br>Nada é apagado ao trocar o país: seus lançamentos continuam guardados, e voltar para <b>Brasil</b> traz tudo de volta.`,
    m:'Quais telas aparecem; o resto do Painel não muda.'},
  {t:'🚕 Seus ganhos (Uber e 99)',rec:'corridas',x:`Lance o ganho de cada dia em <b>Corridas &gt; ＋ Corridas</b> ou, mais rápido, em <b>⚡ Atalhos &gt; Lançar o dia (Uber + 99)</b>.<br>Preencha também viagens, tempo online e <b>km rodados</b>: sem km, os indicadores por km não aparecem.<br><br>A Uber e a 99 mostram o km <b>viagem por viagem</b>. Por isso o campo de km tem o botão <b>🧮</b> ao lado: digite (ou cole) um km por linha, que ele soma e devolve o total, com a opção de <b>Usar</b> ou de <b>Somar ao campo</b> se você já tinha lançado parte do dia.${refBloco(REF_GANHOS)}`,
    m:()=>'Meta do dia e do mês, calendário, ganhos, R$/hora, R$/viagem, R$/km, previsão do mês'+rv('impostos',' e Carnê-Leão')+'.',acts:[['⚡ Lançar meu primeiro dia',()=>fecharDia()],['＋ Corridas',()=>formCorrida()]]},
@@ -6036,10 +6165,10 @@ const GUIA=[
    m:()=>'Card de Viagens e caronas, meta do dia e do mês'+rv('impostos',', Carnê-Leão')+'.',acts:[['＋ Viagem ou carona',()=>formCarona()]]},
  {t:'🛵 iFood (entregador)',rec:'ifood',x:()=>`Se você faz entregas pelo <b>iFood</b>, lance o ganho de cada dia na aba <b>🛵 iFood</b> (<b>＋ iFood</b>) ou em <b>⚡ Atalhos &gt; iFood (lançar o dia)</b>: valor do dia, entregas, tempo online, <b>km rodados</b> (com a calculadora 🧮) e o veículo. Cada dia pode ter um lançamento por veículo.<br><br><b>Repasses semanais:</b> é o que o iFood deposita na sua conta. Lance em <b>⚡ Atalhos &gt; iFood (repasse semanal)</b> (ou na subaba <b>Repasses semanais</b>) para <b>conferir</b> com a soma dos dias. Os repasses <b>não somam na meta</b>, para não contar o mesmo dinheiro duas vezes: servem para conferir${rv('impostos',' e para o Carnê-Leão')}.<br><br><b>Veículo:</b> em ⚙ Opções &gt; Veículos você pode cadastrar <b>Carro, Moto ou Bicicleta</b> (comum ou elétrica). Em Custos há categorias para quem entrega: bag/mochila térmica, celular e plano de dados e equipamento de proteção. Quando o veículo escolhido é uma <b>bicicleta</b>, a lista de categorias mostra só o que serve para ela (manutenção, seguro, parcela/aluguel, bag, celular e plano de dados, equipamento e, na elétrica, <b>recarga da bateria</b>); combustível, troca de óleo, revisão, IPVA, estacionamento, lavagem e multa saem da lista. Carro e moto continuam com tudo.<br><br><b>Primeiros passos:</b> se você marcou <b>Entregas</b> em ⚙ Meu perfil, o card do Painel passa a mostrar os passos de entregador (veículo, meta, primeiro lançamento no iFood, % de tributação, primeiro custo e perfil); quem anda de bicicleta não precisa lançar abastecimento nem km.<br><br><b>Meta:</b> o iFood soma na meta do dia junto com Uber, 99${rv('carona',' e Viagens e caronas')}, e entra no Painel${rv('relatorios',', nos relatórios')} e no custo-benefício por veículo.${foraBR()||!recVe('impostos')?'':`<br><br><b>Imposto:</b> na própria aba iFood, o card <b>🧾 Imposto do iFood</b> tem o <b>% de Tributação</b> (padrão 10%, nunca abaixo de 10%): altere só conforme a orientação do seu <b>Contador</b>. O valor é salvo ao apertar Enter ou sair do campo. A chave <b>Enviar iFood para o Carnê-Leão</b> liga ou desliga o iFood na base do imposto: desligue se a sua operadora logística já desconta o imposto na fonte.<br><br>${TXT_IFOOD_EST}<br><br>${TXT_IFOOD_OL}${refBloco(REF_IFOOD)}`}`,
    m:()=>'Meta do dia e do mês, card do iFood, calendário, resultado líquido, R$/hora e R$/entrega'+rv('relatorios',', relatórios')+rv('impostos',' e Carnê-Leão (se a chave estiver ligada)')+'.',acts:[['＋ iFood (lançar o dia)',()=>formIfood()],['＋ Repasse semanal',()=>formRepasseIfood()]]},
- {t:'⛽ Custos do veículo',x:()=>`Lance tudo o que gasta com o carro em <b>Custos &gt; ＋ Custos</b>.<br>• <b>Combustível e recarga:</b> informe os litros (ou os kWh, se o veículo for elétrico ou híbrido plug-in) para ver o preço médio${rv('corridas',' e quanto os ganhos cobrem','')}. A lista de combustíveis segue a motorização do veículo escolhido. Recarga em casa só entra se você lançar: lance o kWh e o valor pela tarifa de casa.<br>• <b>Manutenção:</b> serviço avulso; informe o km da próxima troca para receber o alerta.<br>• <b>Troca de óleo</b> (não aparece para veículo elétrico) e <b>Revisão:</b> informe o km do veículo e de quantos em quantos km trocar; o Rodaliq calcula a próxima, estima o km atual ${rv('corridas','pelas corridas'+rv('carona',' e viagens e caronas'),'pelo km que você informa nos custos')} e avisa no sino quando faltar 10% do intervalo (mínimo 100 km). Em <b>⚙ Veículos</b> informe o <b>tipo</b>, a <b>marca</b>, o <b>modelo</b> e a <b>motorização</b> (flex, elétrico, híbrido...) e o <b>Km atual</b> e, depois, atualize no Painel em <b>Corrigir km</b>. Ao tocar em <b>Já troquei</b> no aviso, ${recVe('reservas')?'o Rodaliq pergunta se você quer <b>✔️ e abrir nova DP</b> (DP = Despesa programada, já com o km e o intervalo da próxima troca) ou <b>✔️ e fechar</b> (só encerra o aviso, sem lançar custo).':'o Rodaliq encerra o aviso, sem lançar custo.'}<br>• <b>Parcela/Aluguel</b>, seguro, IPVA, lavagem e estacionamento também entram.${nivelVe('pessoal')?`<br>• <b>Uso do gasto:</b> marque se o gasto foi ${usoTrab()?'de <b>Trabalho</b>, ':''}<b>Pessoal</b>, <b>Família</b> ou se vai ser dividido entre usos (<b>Dividir</b>, com a porcentagem de cada um). Os gastos antigos ficam sem marcação, fora da proporção, e você marca quando quiser.`:''}`,
+ {t:'⛽ Custos do veículo',x:()=>`Lance tudo o que gasta com o carro em <b>Custos &gt; ＋ Custos</b>.<br>• <b>Buscar despesa:</b> a caixa no topo de Custos procura em todos os meses e anos (descrição, posto ou fornecedor, categoria, veículo, pagamento, observação e valor). Use o período (Este ano, Ano passado ou intervalo de datas) para restringir; o total da busca aparece no topo da lista.<br>• <b>Combustível e recarga:</b> informe os litros (ou os kWh, se o veículo for elétrico ou híbrido plug-in) para ver o preço médio${rv('corridas',' e quanto os ganhos cobrem','')}. Informe também o <b>km do veículo</b> (odômetro) ou os <b>km desde o último abastecimento</b> (o trip do painel) e deixe marcado <b>Completou o tanque</b> quando encher até o topo: assim o Rodaliq calcula o consumo (km por litro) e quanto o combustível custa por km, nos Relatórios. Se abastecer só uma parte, desmarque. A lista de combustíveis segue a motorização do veículo escolhido. Recarga em casa só entra se você lançar: lance o kWh e o valor pela tarifa de casa.${usoTrab()?'<br>• <b>Alimentação:</b> café, almoço e janta de quem roda. Escolha o <b>Tipo de alimentação</b> (almoço, água, café puro…; o que você digitar entra na lista). Fica fora do custo do veículo, do custo por km e do Carnê-Leão. Nos <b>Relatórios</b>, os lançamentos ficam no <b>item 3. Alimentação (fora do custo do veículo)</b>, logo abaixo do Resumo do período; o total também aparece no Resumo como "Alimentação (à parte)".':""}<br>• <b>Manutenção:</b> serviço avulso; informe o km da próxima troca para receber o alerta.<br>• <b>Troca de óleo</b> (não aparece para veículo elétrico) e <b>Revisão:</b> informe o km do veículo e de quantos em quantos km trocar; o Rodaliq calcula a próxima, estima o km atual ${rv('corridas','pelas corridas'+rv('carona',' e viagens e caronas'),'pelo km que você informa nos custos')} e avisa no sino quando faltar 10% do intervalo (mínimo 100 km). Em <b>⚙ Veículos</b> informe o <b>tipo</b>, a <b>marca</b>, o <b>modelo</b> e a <b>motorização</b> (flex, elétrico, híbrido...) e o <b>Km atual</b> e, depois, atualize no Painel em <b>Corrigir km</b>. Ao tocar em <b>Já troquei</b> no aviso, ${recVe('reservas')?'o Rodaliq pergunta se você quer <b>✔️ e abrir nova DP</b> (DP = Despesa programada, já com o km e o intervalo da próxima troca) ou <b>✔️ e fechar</b> (só encerra o aviso, sem lançar custo).':'o Rodaliq encerra o aviso, sem lançar custo.'}<br>• <b>Parcela/Aluguel</b>, seguro, IPVA, lavagem e estacionamento também entram.${nivelVe('pessoal')?`<br>• <b>Uso do gasto:</b> marque se o gasto foi ${usoTrab()?'de <b>Trabalho</b>, ':''}<b>Pessoal</b>, <b>Família</b> ou se vai ser dividido entre usos (<b>Dividir</b>, com a porcentagem de cada um). Os gastos antigos ficam sem marcação, fora da proporção, e você marca quando quiser.`:''}`,
    m:'Custos do veículo e comparação com o mês passado, resultado líquido, combustível, custo e lucro por km, alertas de manutenção.',acts:[['＋ Custos',()=>formCusto()]]},
- {t:'🚗 Meu veículo',rec:'pessoal',x:()=>`Na aba <b>Meu veículo</b> você vê quanto o veículo custa: no <b>mês</b>, por <b>dia</b>, por <b>km</b> e o total registrado, com a divisão entre custos <b>fixos</b> (parcela, seguro, IPVA, estacionamento) e <b>variáveis</b> (combustível, manutenção). O custo por km precisa de ao menos 2 leituras de km do veículo, informadas nos custos.<br><br>• <b>Trajetos da rotina:</b> toque em <b>＋ Trajeto</b>, escolha o tipo (casa ↔ trabalho, casa ↔ escola, academia...), digite só os km de ida (a volta é marcada) e escolha os dias por mês. O Rodaliq mostra quanto cada trajeto custa por mês.<br>• <b>Viagens pessoais:</b> toque em <b>＋ Simular</b> para ver quanto uma viagem vai custar antes de viajar (o combustível é estimado pelo consumo médio do veículo e pelo último preço pago; informe as pessoas para ver o valor por pessoa) ou em <b>＋ Registrar viagem feita</b> para guardar o que gastou. Ao registrar, o app lança o combustível e o pedágio em Custos por você. O desgaste é só uma estimativa. É só o seu custo, sem ganhos e sem divisão com passageiros.<br>• <b>Lembretes:</b> IPVA, seguro, revisão ou o que quiser, com repetição anual. As despesas programadas, a CNH e a troca de óleo e revisão por km aparecem sozinhas. A urgência aparece em cor e também em texto.<br>• <b>Uso do veículo:</b> a proporção do mês entre ${usoTrab()?'trabalho, ':''}pessoal e família, pelo que você marcou em cada custo, inclusive ao marcar como paga uma despesa programada.`,
-   m:()=>recVe('corridas')?'Nada: o Meu veículo só lê os custos. A parte de trabalho dos custos marcados entra no resultado do Painel.':'É a base do seu Painel: custo do mês, por dia e por km.',acts:[['🚗 Abrir Meu veículo',()=>{UI.tab='meuveiculo';render()}]]},
+ {get t(){return '🚗 '+mvNome()},rec:'pessoal',x:()=>`Na aba <b>${mvNome()}</b> você vê quanto o veículo custa: no <b>mês</b>, por <b>dia</b>, por <b>km</b> e o total registrado, com a divisão entre custos <b>fixos</b> (parcela, seguro, IPVA, estacionamento) e <b>variáveis</b> (combustível, manutenção). O custo por km precisa de ao menos 2 leituras de km do veículo, informadas nos custos.<br><br>• <b>Trajetos da rotina:</b> toque em <b>＋ Trajeto</b>, escolha o tipo (casa ↔ trabalho, casa ↔ escola, academia...), digite só os km de ida (a volta é marcada) e escolha os dias por mês. O Rodaliq mostra quanto cada trajeto custa por mês.<br>• <b>Viagens pessoais:</b> toque em <b>＋ Simular</b> para ver quanto uma viagem vai custar antes de viajar (o combustível é estimado pelo consumo médio do veículo e pelo último preço pago; informe as pessoas para ver o valor por pessoa) ou em <b>＋ Registrar viagem feita</b> para guardar o que gastou. Ao registrar, o app lança o combustível e o pedágio em Custos por você. O desgaste é só uma estimativa. É só o seu custo, sem ganhos e sem divisão com passageiros.<br>• <b>Lembretes:</b> IPVA, seguro, revisão ou o que quiser, com repetição anual. As despesas programadas, a CNH e a troca de óleo e revisão por km aparecem sozinhas. A urgência aparece em cor e também em texto.<br>• <b>Uso do veículo:</b> a proporção do mês entre ${usoTrab()?'trabalho, ':''}pessoal e família, pelo que você marcou em cada custo, inclusive ao marcar como paga uma despesa programada.`,
+   m:()=>recVe('corridas')?'Nada: o '+mvNome()+' só lê os custos. A parte de trabalho dos custos marcados entra no resultado do Painel.':'É a base do seu Painel: custo do mês, por dia e por km.',acts:[['🚗 Abrir Meu veículo',()=>{UI.tab='meuveiculo';render()}]]},
  {t:'🚨 Multas',x:`Lance cada multa na aba <b>Multas</b>, com data, descrição, pontuação e vencimento. Hora, local e velocidades (permitida e aferida) são opcionais. O <b>Responsável pela Infração</b> vem com o seu nome e pode ser trocado. Quando preencher a data de pagamento, ela entra sozinha nos custos do mês.<br><br>⚠ ${TXT_SEM_ORGAO}`,
    m:'Pontos da CNH, alertas de vencimento e de limite de pontos, custos do mês (quando paga).',acts:[['＋ Multas',()=>formMulta()]]},
  {t:'🧮 RodaCalc (preço da corrida particular)',rec:'rodacalc',x:`Na aba <b>RodaCalc</b>, informe o km e o tempo da corrida particular e o app calcula o <b>preço sugerido</b>, o mínimo (abaixo dele dá prejuízo) e uma contraproposta quando o passageiro propõe um valor. Nada do que você digita ali é gravado.<br><br><b>Custo por km:</b> vem dos seus Custos. Se você ainda não tem lançamentos, toque em <b>🧮 Estimar meu custo por km</b>: o painel já vem preenchido com médias de mercado do seu veículo, de acordo com o cadastro dele: combustível ou recarga, com o preço da sua região. Sem veículo cadastrado, a RodaCalc mostra <b>＋ Cadastrar veículo</b> e, ao salvar, volta para a calculadora com o veículo escolhido, você ajusta o que souber e toca em <b>Usar este valor</b>. É só uma estimativa: quando lançar os seus custos reais, a RodaCalc usa os seus dados.`,
@@ -6052,10 +6181,10 @@ const GUIA=[
    m:'Avisos no sino, 1 dia antes de cada evento.',acts:[['＋ Novo evento',()=>formEvento()]]},
  {t:'🤝 Parceiros do Rodaliq',rec:'parceiros',x:`Em <b>⚙ Opções › Parceiros do Rodaliq</b> ficam empresas e profissionais que oferecem condições para motoristas. São <b>parcerias</b>: o Rodaliq pode receber pela divulgação. A lista segue a <b>ordem alfabética, sem destaque pago</b>, e você filtra por categoria. Cada cartão mostra a oferta, a cidade e os botões de contato (WhatsApp, e-mail, site e redes) e <b>Como chegar</b>, quando há endereço. Alguns têm <b>oferta exclusiva para apoiadores</b>.<br><br>🔒 Seus dados não são enviados aos parceiros; o Rodaliq só conta quantos toques cada parceiro recebe, sem saber quem tocou. O Rodaliq não se responsabiliza pelos serviços dos parceiros: combine tudo direto com eles.`,
    m:'Nada: é uma lista de consulta.',acts:[['🤝 Ver parceiros',()=>formParceiros()]]},
- {t:'📑 Relatórios',rec:'relatorios',x:()=>!recVe('corridas')?`Na aba <b>Relatórios</b>, escolha o período (<b>De</b> e <b>Até</b>) e o <b>veículo</b> para ver o <b>Custo do meu veículo</b>: lançamentos, resumo, mês a mês, custos por categoria, uso (pessoal e família), custo por veículo, trajetos da rotina, viagens pessoais e multas.<br><br>Para levar os dados, baixe em <b>PDF, Word, Excel ou CSV</b>.`:`Na aba <b>Relatórios</b>, escolha o período (<b>De</b> e <b>Até</b>), o <b>veículo</b> e a <b>plataforma</b> (Uber, 99${ifoodOn()?', iFood':''}${caronaOn()?', Viagens e caronas':''}) e veja as seções: lançamentos, resumo, mensal, meta, por plataforma, custos, veículos, conciliação, multas${recVe('impostos')&&!foraBR()?' e Carnê-Leão':''}${ifoodOn()?', além da seção do iFood':''}.<br><br>Para levar os dados, baixe em <b>PDF, Word, Excel ou CSV</b>. O cabeçalho do arquivo informa o período e os filtros usados.`,
+ {t:'📑 Relatórios',rec:'relatorios',x:()=>!recVe('corridas')?`Na aba <b>Relatórios</b>, escolha o período (um atalho como <b>Este mês</b> ou <b>Mês passado</b>, ou <b>De</b> e <b>Até</b>) e os <b>veículos</b> (um, vários ou todos) para ver o <b>Custo do meu veículo${mvAmplo()?' · uso pessoal':''}</b>: lançamentos, resumo, mês a mês, custos por categoria, consumo e km rodados, uso (pessoal e família), custo por veículo, trajetos da rotina, viagens pessoais e multas.<br><br>O <b>Resumo</b> compara cada número com o período anterior de mesma duração (▲ maior, ▼ menor). Para levar os dados, baixe em <b>PDF, Word, Excel ou CSV</b>.`:`Na aba <b>Relatórios</b>, escolha o período (um atalho como <b>Este mês</b> ou <b>Mês passado</b>, ou <b>De</b> e <b>Até</b>), os <b>veículos</b> (um, vários ou todos) e a <b>plataforma</b> (Uber, 99${ifoodOn()?', iFood':''}${caronaOn()?', Viagens e caronas':''}) e veja as seções: 1. lançamentos, 2. resumo, <b>3. Alimentação (fora do custo do veículo)</b>, depois mensal, meta, por plataforma, custos, consumo e km rodados, veículos, conciliação, multas${recVe('impostos')&&!foraBR()?' e Carnê-Leão':''}${ifoodOn()?', além da seção do iFood':''}.<br><br>O <b>Resumo</b> compara cada número com o período anterior de mesma duração (▲ maior, ▼ menor), e a seção de consumo avisa quando há abastecimentos sem litros ou sem km. Para levar os dados, baixe em <b>PDF, Word, Excel ou CSV</b>. O cabeçalho do arquivo informa o período e os filtros usados. Ao rolar a página, uma barra no topo lembra o período e os veículos do filtro.`,
    m:'Nada: só lê o que você já lançou.'},
  {t:'🚗 Meu perfil (opcional)',x:`Conte <b>como você usa o seu veículo</b> (${nivelVe('pessoal')?'uso pessoal e família, ':''}corridas, entregas) e, se quiser, se a sua CNH tem <b>EAR</b>, qual veículo você usa e, se quiser, a <b>validade</b> e a categoria da CNH: o app avisa quando a renovação se aproximar e quando os pontos chegarem perto do limite. Você muda tudo quando quiser, em <b>⚙ Opções › Meu perfil</b>.<br><br>⚠ ${TXT_SEM_ORGAO}`,acts:[['🚗 Abrir Meu perfil de motorista',()=>formCnh()]]},
- {t:'📊 Para acompanhar',x:()=>`${recVe('corridas')?`<b>Painel:</b> meta, ganhos, custos, resultado, previsão${rv('reservas',' e despesas programadas',' do mês')}. Troque o mês e o veículo no topo.<br><br><b>Abas:</b> o Painel, as Corridas${rv('ifood',', o iFood')}${rv('carona',' e as Viagens e caronas')} vêm primeiro, nessa ordem`:`<b>Painel:</b> o custo do veículo no mês, por dia e por km, a divisão entre custos fixos e variáveis, o uso (pessoal e família) e os lembretes. Troque o mês e o veículo no topo.<br><br><b>Abas:</b> o Painel e o Meu veículo vêm primeiro`}; as demais seguem em ordem alfabética${rv('relatorios',' e Relatórios fica por último')}. O campo <b>🔎 Buscar aba</b> filtra pelo nome: digite e toque Enter para abrir a primeira.<br><br><b>🔔 Sino:</b> alertas (${rv('impostos','DARF, ')}multas, CNH, manutenção e lembrete de backup), os mais urgentes primeiro, e as novidades. Toque num cartão para abrir; ele vira lido. Roda cheia = não lida, vazada = lida, vermelha com “!” = importante.<br><br><b>⚡ Atalhos:</b> todos os lançamentos num toque. Arraste o botão para onde preferir.`,m:'Tudo o que você lança aparece no Painel.'},
+ {t:'📊 Para acompanhar',x:()=>`${recVe('corridas')?`<b>Painel:</b> meta, ganhos, custos, resultado, previsão${rv('reservas',' e despesas programadas',' do mês')}. Troque o mês e o veículo no topo.<br><br><b>Abas:</b> o Painel, as Corridas${rv('ifood',', o iFood')}${rv('carona',' e as Viagens e caronas')} vêm primeiro, nessa ordem`:`<b>Painel:</b> o custo do veículo no mês, por dia e por km, a divisão entre custos fixos e variáveis, o uso (pessoal e família) e os lembretes. Troque o mês e o veículo no topo.<br><br><b>Abas:</b> o Painel e o ${mvNome()} vêm primeiro`}; as demais seguem em ordem alfabética${rv('relatorios',' e Relatórios fica por último')}. O campo <b>🔎 Buscar aba</b> filtra pelo nome: digite e toque Enter para abrir a primeira.<br><br><b>🔔 Sino:</b> alertas (${rv('impostos','DARF, ')}multas, CNH, manutenção e lembrete de backup), os mais urgentes primeiro, e as novidades. Toque num cartão para abrir; ele vira lido. Roda cheia = não lida, vazada = lida, vermelha com “!” = importante.<br><br><b>⚡ Atalhos:</b> todos os lançamentos num toque. Arraste o botão para onde preferir.`,m:'Tudo o que você lança aparece no Painel.'},
  {t:'⚙ Opções, backup e conta',x:()=>`Em <b>⚙ Opções</b> ficam veículos, ${usoTrab()?'metas, ':'preferências, '}tema, backup e este guia.<br><br><b>🌓 Tema:</b> claro, escuro ou automático (segue o aparelho). Vale só para o aparelho em que você escolheu.<br><br>${canalLigado()?'<b>✉️ Falar com o Rodaliq:</b> canal direto com o responsável pelo app. A resposta chega em até 2 dias úteis, com aviso no sino. Lá também há <b>🐞 Reportar problema</b>. Não escreva CPF, número da CNH nem dados bancários.<br><br>':''}<b>💾 Backup:</b> exporte pelo menos a cada 30 dias e guarde o arquivo fora do aparelho; o sino avisa quando passar disso. Ao importar um backup, o app baixa antes um arquivo com os seus dados atuais e guarda uma cópia por 7 dias: se mudar de ideia, use <b>↩ Desfazer última importação</b>.<br><br><b>🔑 Senha:</b> esqueceu? Use “Esqueci minha senha”, na tela de entrada.<br><br><b>🔄 Atualizar a página:</b> o app volta para a mesma tela em que você estava, sem ir para o início.<br><br><b>🗑 Sair do app:</b> se um dia quiser, use ⚙ Opções &gt; Excluir minha conta.`}
 ];
 function primeiroAcesso(auto,ini){
@@ -6115,7 +6244,7 @@ function cardPassos(){
   if(simEnt()?SIM_ENT.off:cfg().passosOk)return '';const st=passosLista().map(p=>({...p,feito:!!p.ok()})),n=st.filter(p=>p.feito).length;
   const pn=pfNorm(simEnt()?PERFIL_SIM_ENT:(PERFIL_MOT||{})),ent=ifoodOn()&&pn.inf&&pfEnt(pn);
   // V127: o entregador que termina os passos recebe um fechamento (e não só o sumiço do cartão)
-  if(n===st.length&&!usoTrab())return `<div class="card passos"><div class="passosHd"><h2 style="margin:0">✅ Primeiros passos concluídos</h2></div><div style="margin:6px 0">Tudo pronto: veículo, custos, trajeto e lembrete já estão configurados. Daqui para frente é só lançar os custos; o Meu veículo mostra quanto ele custa por mês, por dia e por km.</div><div class="small muted"><button class="btn sm" data-acao="passos-fim">Concluir</button> <button class="lnk" data-acao="guia">Ver o guia completo</button></div></div>`;
+  if(n===st.length&&!usoTrab())return `<div class="card passos"><div class="passosHd"><h2 style="margin:0">✅ Primeiros passos concluídos</h2></div><div style="margin:6px 0">Tudo pronto: veículo, custos, trajeto e lembrete já estão configurados. Daqui para frente é só lançar os custos; o ${mvNome()} mostra quanto ele custa por mês, por dia e por km.</div><div class="small muted"><button class="btn sm" data-acao="passos-fim">Concluir</button> <button class="lnk" data-acao="guia">Ver o guia completo</button></div></div>`;
   if(n===st.length)return ent?`<div class="card passos"><div class="passosHd"><h2 style="margin:0">✅ Primeiros passos concluídos</h2></div><div style="margin:6px 0">Tudo pronto para as suas entregas: veículo, meta, iFood e custos já estão configurados. Daqui para frente é só lançar o dia no iFood e os custos do veículo; o Painel, a meta e o Carnê-Leão acompanham sozinhos.</div><div class="small muted"><button class="btn sm" data-acao="passos-fim">Concluir</button> <button class="lnk" data-acao="guia-ifood">Ver o guia do iFood</button></div></div>`:'';
   const sub=!usoTrab()?'Para quem usa o veículo no dia a dia':!ent?'':pfPass(pn)?'Para quem faz passageiros e entregas':ehBikeV(cfg().veiculoPadrao)?'Para quem faz entregas de bicicleta':'Para quem faz entregas';
   return `<div class="card passos"><div class="passosHd"><h2 style="margin:0">🚀 Primeiros passos</h2><span class="small muted"><b>${n} de ${st.length}</b> concluídos</span></div>${sub?`<div class="small muted" style="margin:-2px 0 6px">${sub}</div>`:''}
@@ -6586,7 +6715,7 @@ function guiaEntregas(){
   const nxt=()=>{i=Math.min(passosLista().length,i+1)};
   const fim=()=>{ov.remove();render()};
   const draw=()=>{const l=passosLista(),n=l.length;
-    if(i>=n){ov.innerHTML=`<div class="modal" style="max-width:440px"><h2>✅ Tudo pronto!</h2><div style="margin:6px 0">${PES?'Veículo, custos, trajeto e lembrete já estão configurados. Daqui para frente é só lançar os custos; o Meu veículo mostra quanto ele custa por mês, por dia e por km.':'Você concluiu os primeiros passos: veículo, meta, iFood e custos já estão configurados. Daqui para frente é só lançar o dia no iFood e os custos do veículo; o Painel, a meta e o Carnê-Leão acompanham sozinhos.'}</div><div class="mfoot"><button type="button" class="btn" id="gdFim">Concluir</button></div></div>`;return}
+    if(i>=n){ov.innerHTML=`<div class="modal" style="max-width:440px"><h2>✅ Tudo pronto!</h2><div style="margin:6px 0">${PES?'Veículo, custos, trajeto e lembrete já estão configurados. Daqui para frente é só lançar os custos; o '+mvNome()+' mostra quanto ele custa por mês, por dia e por km.':'Você concluiu os primeiros passos: veículo, meta, iFood e custos já estão configurados. Daqui para frente é só lançar o dia no iFood e os custos do veículo; o Painel, a meta e o Carnê-Leão acompanham sozinhos.'}</div><div class="mfoot"><button type="button" class="btn" id="gdFim">Concluir</button></div></div>`;return}
     const p=l[i],ok=!!p.ok(),nf=l.filter(x=>x.ok()).length;
     ov.innerHTML=`<div class="modal" style="max-width:460px"><div class="small muted">Passo ${i+1} de ${n} · ${nf} concluído${nf===1?'':'s'}</div><div class="onbBar"><i style="width:${(nf/n)*100}%"></i></div>
       <h2 style="margin-top:8px">${esc(p.t)}</h2><div style="margin:6px 0 10px">${TX[p.k]()}</div>${exemplo(p.k)}
@@ -6931,7 +7060,7 @@ function mvLembretesHtml(max){
   let h=`<div class="card"><div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><h2 style="margin:0">Lembretes</h2><span style="flex:1"></span>${max?'':'<button class="btn sm" data-mv="novo-lembrete">＋ Lembrete</button>'}</div>`;
   if(!M.length)return h+`<div class="small muted">Nada vencendo por agora. Crie lembretes de IPVA, seguro, revisão ou o que quiser. As despesas programadas, a CNH e a troca de óleo e revisão por km aparecem aqui sozinhas.</div></div>`;
   h+=M.map(mvLembreteLinha).join('');
-  return h+(max&&L.length>max?`<div class="small muted" style="margin-top:6px">Mais ${L.length-max} em <button class="lnk" data-mv="ir-mv">Meu veículo</button>.</div>`:'')+'</div>'}
+  return h+(max&&L.length>max?`<div class="small muted" style="margin-top:6px">Mais ${L.length-max} em <button class="lnk" data-mv="ir-mv">${esc(mvNome())}</button>.</div>`:'')+'</div>'}
 function formLembrete(r){
   r=r||{nome:'',data:'',veiculo:'',anual:false};
   openForm({titulo:r.id?'Editar lembrete':'Novo lembrete',sub:'O Rodaliq avisa quando o prazo chegar.',
@@ -6943,7 +7072,7 @@ function formLembrete(r){
     onDel:r.id?()=>{cfg().lembretes=mvLembretesCad().filter(x=>x.id!==r.id);salvar('tb_config');render()}:null})}
 // ---- telas
 function vMeuVeiculo(){
-  if(!VEICS().length)return `<div class="card"><h2>Meu veículo</h2><div class="small muted" style="margin:6px 0 10px">Cadastre o seu veículo para ver quanto ele custa por mês, por dia e por km.</div><button class="btn" data-mv="veicform">＋ Cadastrar veículo</button></div>`;
+  if(!VEICS().length)return `<div class="card"><h2>${esc(mvNome())}</h2><div class="small muted" style="margin:6px 0 10px">Cadastre o seu veículo para ver quanto ele custa por mês, por dia e por km.</div><button class="btn" data-mv="veicform">＋ Cadastrar veículo</button></div>`;
   const ym=UI.mes;
   return `<div class="toolbar">${monthPicker()}<span class="sp"></span><button class="btn sm" data-new="custo">＋ Custos</button></div>${mvChips()}
     ${mvKpis(ym)}${mvDistribuicao(ym)}<div style="height:12px"></div>${mvUsoHtml(ym)}<div style="height:12px"></div>${mvTrajetosHtml()}<div style="height:12px"></div>${mvViagensHtml()}<div style="height:12px"></div>${mvLembretesHtml()}
@@ -6954,7 +7083,7 @@ function vPainelPessoal(){ // Painel de quem usa o veículo só no dia a dia: cu
   const ym=UI.mes;
   return `${cardPassos()}<div class="toolbar">${monthPicker()}<span class="sp"></span><button class="btn sm" data-new="custo">＋ Custos</button></div>${mvChips()}
     ${mvKpis(ym)}${mvDistribuicao(ym)}<div style="height:12px"></div>${mvUsoHtml(ym)}<div style="height:12px"></div>${mvLembretesHtml(4)}
-    <div class="small muted" style="margin:10px 0"><button class="lnk" data-mv="ir-mv">Ver Meu veículo completo</button></div>`}
+    <div class="small muted" style="margin:10px 0"><button class="lnk" data-mv="ir-mv">Ver ${esc(mvNome())} completo</button></div>`}
 $('#view').addEventListener('click',e=>{
   const b=e.target.closest('[data-mv]');if(!b)return;const [a,x]=b.dataset.mv.split(/:(.*)/s);
   if(a==='veic'){UI.mv=x;render();return}
@@ -6978,29 +7107,30 @@ $('#view').addEventListener('click',e=>{
 function relModeloPessoal(){
   const D=relDados(),{F,cus,mul}=D,tot=sum(cus,r=>r.valor);
   const lanc=cus.map(r=>{const u=usoPct(r);return{d:r.data,cat:r.cat==='Combustível'&&ehRec2(r)?'Recarga':r.cat,v:r.veiculo,uso:r.virtual?'—':USO_LBL[r.uso||'sem'],det:[r.desc,(r.litros||r.kwh)?fmtNum(r.kwh||r.litros)+' '+unEn(r):'',r.pgto,r.fornecedor].filter(Boolean).join(' · '),val:+r.valor||0}}).sort((a,b)=>b.d.localeCompare(a.d));
-  const sec=[];
+  const P=relPrev(F),sec=[];
   sec.push({id:'lanc',t:'Custos filtrados',cols:[['Data','date'],['Categoria'],['Veículo'],['Uso'],['Detalhes'],['Valor (R$)','money']],rows:lanc.map(x=>[x.d,x.cat,x.v,x.uso,x.det,x.val])});
   const dias=[];for(let d=new Date(F.de+'T12:00:00');isoOf(d)<=F.ate;d.setDate(d.getDate()+1))dias.push(isoOf(d));
   const meses=[...new Set(dias.map(d=>d.slice(0,7)))],fx=sum(cus.filter(r=>MV_FIXAS.includes(r.cat)),r=>r.valor);
-  const veics=F.veic==='Todos'?VEICS():[F.veic],ck=mvCustoKm(veics),km=sum(veics,v=>mvKmEntre(v,F.de,F.ate));
-  sec.push({id:'resumo',t:'Resumo do período',kpis:[['Total no período',brl(tot)],['Média por mês',meses.length?brl(tot/meses.length):'—'],['Custos fixos',brl(fx)],['Custos variáveis',brl(tot-fx)],['Km rodados (pelo odômetro)',km>0?fmtNum(km):'—'],['Custo por km',km>0?brl(tot/km):(ck?brl(ck.v)+' (12 meses)':'—')]]});
+  const veics=relVeics(F),ck=mvCustoKm(veics),km=sum(veics,v=>mvKmEntre(v,F.de,F.ate));
+  sec.push({id:'resumo',t:'Resumo do período',nota:relPrevNota(P),kpis:[['Total no período',brl(tot)+relCmp(tot,P.cus)],['Média por mês',meses.length?brl(tot/meses.length):'—'],['Custos fixos',brl(fx)+relCmp(fx,P.fx)],['Custos variáveis',brl(tot-fx)+relCmp(tot-fx,P.cus-P.fx)],['Km rodados (pelo odômetro)',km>0?fmtNum(km):'—'],['Custo por km',km>0?brl(tot/km):(ck?brl(ck.v)+' (12 meses)':'—')]]});
   sec.push({id:'mensal',t:'Mês a mês',cols:[['Mês'],['Custos fixos','money'],['Custos variáveis','money'],['Total','money']],rows:meses.map(m=>{const l=cus.filter(r=>r.data.startsWith(m)),f=sum(l.filter(r=>MV_FIXAS.includes(r.cat)),r=>r.valor),t=sum(l,r=>r.valor);return[mesNome(m),f,t-f,t]})});
   const cats={};cus.forEach(r=>{cats[r.cat]=cats[r.cat]||{v:0,n:0};cats[r.cat].v+=+r.valor||0;cats[r.cat].n++});
   sec.push({id:'custos',t:'Custos por categoria',cols:[['Categoria'],['Valor','money'],['% dos custos','pct'],['Lançamentos','int']],rows:Object.entries(cats).sort((a,b)=>b[1].v-a[1].v).map(([c,o])=>[c==='Combustível'?nomeEn(1):c,o.v,tot?o.v/tot:null,o.n])});
+  if(F.plat==='Todas')sec.push(relSecComb(F));
   const U={t:0,p:0,f:0,sem:0};cus.forEach(r=>{const u=usoPct(r),v=+r.valor||0;if(!u){U.sem+=v;return}U.t+=v*u.t;U.p+=v*u.p;U.f+=v*u.f});const mc=U.t+U.p+U.f;
   sec.push({id:'uso',t:'Uso do veículo',nota:'Só entram os custos em que você marcou o uso. Os sem marcação ficam fora da proporção.',cols:[['Uso'],['Valor','money'],['% do marcado','pct']],
     rows:[...(usoTrab()||U.t>0?[['Trabalho',U.t,mc?U.t/mc:null]]:[]),['Pessoal',U.p,mc?U.p/mc:null],['Família',U.f,mc?U.f/mc:null],['Sem marcação',U.sem,null]]});
   sec.push({id:'veic',t:'Custo por veículo',cols:[['Veículo'],['Custos','money'],['Km rodados'],['Custo por km','money']],
     rows:VEICS().map(v=>{const c=sum(cus.filter(r=>r.veiculo===v),r=>r.valor),k=mvKmEntre(v,F.de,F.ate);return[v,c,k>0?fmtNum(k):'—',k>0?c/k:null]}).filter(r=>r[1])});
-  const tj=mvTrajetos().filter(t=>F.veic==='Todos'||t.veiculo===F.veic);
+  const tj=mvTrajetos().filter(relFv(F));
   if(tj.length)sec.push({id:'trajetos',t:'Trajetos da rotina',nota:'Custo mensal = km por dia × dias por mês × custo por km do veículo (últimos 12 meses).',cols:[['Trajeto'],['Veículo'],['Km por dia'],['Dias por mês','int'],['Custo por mês','money']],
     rows:tj.map(t=>{const c=mvCustoKm([t.veiculo]);return[t.nome,t.veiculo,fmtNum(t.km),t.dias,c?c.v*t.km*t.dias:null]})});
-  const vg=mvViagens().filter(v=>v.status!=='plan'&&v.data>=F.de&&v.data<=F.ate&&(F.veic==='Todos'||v.veiculo===F.veic)).sort((a,b)=>b.data.localeCompare(a.data));
+  const vg=mvViagens().filter(v=>v.status!=='plan'&&v.data>=F.de&&v.data<=F.ate&&relFv(F)(v)).sort((a,b)=>b.data.localeCompare(a.data));
   if(vg.length)sec.push({id:'viagens',t:'Viagens pessoais',nota:'Só o custo da viagem. Desgaste estimado = (manutenção + depreciação dos últimos 12 meses) ÷ km do período.',cols:[['Data','date'],['Viagem'],['Veículo'],['Km'],['Combustível','money'],['Pedágio e estac.','money'],['Outros','money'],['Desgaste','money'],['Total','money']],
     rows:vg.map(v=>{const T=mvViagemTotal(v);return[v.data,v.nome,v.veiculo,fmtNum(v.km),v.comb||0,v.ped||0,v.outros||0,T.desg||null,T.total]})});
   sec.push({id:'multas',t:'Multas e pontos na CNH',nota:'Filtradas pela data da infração. Os pontos expiram 12 meses após a data da infração. '+TXT_SEM_ORGAO_TXT,cols:[['Data da infração','date'],['Descrição da Infração'],['Veículo'],['Responsável pela Infração'],['Pontuação Infração','int'],['Pontos expiram em','date'],['Situação dos pontos'],['Valor pago/devido','money'],['Pagamento']],
     rows:mul.map(r=>{const st=statusMulta(r);return[r.ocorr,r.motivo,r.veiculo,r.infrator||'',r.pontos||0,r.pontos?st.exp:null,!r.pontos?'Sem pontos':st.ativa?'Ativos':'Expirados',r.vPago??r.vDesc??r.vOrig,r.pagto?'Paga em '+fmtBR(r.pagto):'A pagar']})});
-  return{F,sec,lanc:sec[0],filtroTxt:`Período ${fmtBR(F.de)} a ${fmtBR(F.ate)} · Veículo: ${F.veic==='Todos'?'todos':F.veic}`};
+  return{F,sec,lanc:sec[0],titulo:'Rodaliq — Custo do meu veículo'+(mvAmplo()?' · uso pessoal':''),filtroTxt:`Período ${fmtBR(F.de)} a ${fmtBR(F.ate)} · ${relVTxt(F)}`};
 }
 
 /* ---------- render e eventos ---------- */
@@ -7016,7 +7146,7 @@ function render(){
   let v={painel:usoTrab()?vPainel:vPainelPessoal,corridas:vCorridas,ifood:vIfood,carona:vCarona,custos:vCustos,meuveiculo:vMeuVeiculo,multas:vMultas,impostos:vImpostos,relatorios:vRelatorios,rodacalc:vRodaCalc,reservas:vReservas,agenda:vAgenda}[UI.tab];
   if(recOff(UI.tab))v=()=>'<div class="note am" style="margin-top:12px">🔧 <b>Esta funcionalidade está temporariamente indisponível.</b> Estamos ajustando e ele volta em breve. Seus dados continuam guardados e nada foi apagado.</div>';
   navRegistraAba();
-  $('#view').innerHTML=v();if(UI.tab==='ifood')ifoodWire();if(UI.tab==='carona')caronaWire();if(UI.tab==='impostos')impWire();
+  $('#view').innerHTML=v();if(UI.tab==='ifood')ifoodWire();if(UI.tab==='carona')caronaWire();if(UI.tab==='impostos')impWire();if(UI.tab==='custos')cusWire();
   if(window.__tabScroll!==UI.tab){window.__tabScroll=UI.tab;window.scrollTo(0,0)} // V102: tela que reabre começa no topo
   document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.dataset.t===UI.tab));
   const vp=$('#vPick');if(vp)vp.onchange=()=>{UI.veic=vp.value.startsWith('Todos')?'Todos':vp.value;render()};
