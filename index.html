@@ -628,6 +628,7 @@ body:has(#admPage) .fab,body:has(#ajuPage) .fab{z-index:61}body:has(#admPage) .f
   <button data-fab="ifood" class="hidden">🛵 iFood (lançar o dia)</button>
   <button data-fab="ifoodRep" class="hidden">🛵 iFood (repasse semanal)</button>
   <button data-fab="custo">⛽ Custos</button>
+  <button data-fab="meuveiculo">🚗 Meu veículo</button>
   <button data-fab="dia">⚡ Lançar o dia (Uber + 99)</button>
   <button data-fab="multa">🚨 Multas</button>
   <button data-fab="despesa">📅 Programar despesa</button>
@@ -3428,8 +3429,8 @@ const foraBR=()=>{try{if(SIM_FORA)return true;if(ehPrincipal())return false;cons
 function aplicaAjustes(){{const mc=document.getElementById('mCfg');if(mc)mc.textContent=usoTrab()?'🎯 Metas e preferências':'🎯 Preferências'}const b=document.querySelector('.menu [data-m="apoio"]');if(b)b.classList.toggle('hidden',!apoVe());
   {const fb=document.querySelector('.menu [data-m="foto"]');if(fb)fb.classList.toggle('hidden',!fotoOn());if(fotoOn()&&!FOTO_CARREGADA&&UID){FOTO_CARREGADA=true;fotoCarregar()}else perfIniciais()}
   donoAtualiza();
-  {const tb=document.querySelector('[data-t="meuveiculo"]');if(tb)tb.textContent='🚗 '+mvNome()}
-  [['agenda','[data-t="agenda"],[data-fab="agenda"]'],['pessoal','[data-t="meuveiculo"]'],['reservas','[data-t="reservas"],[data-fab="despesa"]'],['impostos','[data-t="impostos"]'],['relatorios','[data-t="relatorios"]'],['carona','[data-t="carona"],[data-fab="carona"]'],['ifood','[data-t="ifood"],[data-fab="ifood"],[data-fab="ifoodRep"]'],['rodacalc','[data-t="rodacalc"],[data-fab="rodacalc"]'],['corridas','[data-t="corridas"],[data-fab="corrida"],[data-fab="dia"],[data-fab="repasse"]']].forEach(([k,sel])=>document.querySelectorAll(sel).forEach(e=>e.classList.toggle('hidden',recOff(k))));
+  {const tb=document.querySelector('[data-t="meuveiculo"]');if(tb)tb.textContent='🚗 '+mvNome();const fb=document.querySelector('[data-fab="meuveiculo"]');if(fb)fb.textContent='🚗 '+mvNome()}
+  [['agenda','[data-t="agenda"],[data-fab="agenda"]'],['pessoal','[data-t="meuveiculo"],[data-fab="meuveiculo"]'],['reservas','[data-t="reservas"],[data-fab="despesa"]'],['impostos','[data-t="impostos"]'],['relatorios','[data-t="relatorios"]'],['carona','[data-t="carona"],[data-fab="carona"]'],['ifood','[data-t="ifood"],[data-fab="ifood"],[data-fab="ifoodRep"]'],['rodacalc','[data-t="rodacalc"],[data-fab="rodacalc"]'],['corridas','[data-t="corridas"],[data-fab="corrida"],[data-fab="dia"],[data-fab="repasse"]']].forEach(([k,sel])=>document.querySelectorAll(sel).forEach(e=>e.classList.toggle('hidden',recOff(k))));
   {const vb=document.querySelector('.menu [data-m="prevap"]');if(vb)vb.classList.toggle('hidden',!ehPrincipalReal())}
   {const ab=document.querySelector('.menu [data-m="avisos"]');if(ab)ab.classList.toggle('hidden',!ehPrincipalReal())}
   {const ov=document.getElementById('optVer');if(ov){const eu=String(LOGADO||'').toLowerCase()===ADMIN_MASTER;ov.classList.toggle('hidden',!eu);const n=document.getElementById('optVerN');if(n)n.textContent=VERSAO}} // versão no fim de Opções: só para o admin principal
@@ -7225,7 +7226,7 @@ let fabDrag=null,fabArrastou=false;
     try{localStorage.setItem(FABK,JSON.stringify(p))}catch(er){}aplicaFab(p)};
   window.addEventListener('pointerup',solta);window.addEventListener('pointercancel',solta)})();
 $('#fab').onclick=e=>{e.stopPropagation();if(fabArrastou){fabArrastou=false;return}fab()};
-$('#fabMenu').onclick=e=>{const b=e.target.closest('[data-fab]');if(!b)return;$('#fabMenu').classList.add('hidden');if(b.dataset.fab==='tema'){formTema();return}if(b.dataset.fab==='dia'){fecharDia();return}if(b.dataset.fab==='sair'){sair();return}if(b.dataset.fab==='ajustes'){formAjustes();return}if(b.dataset.fab==='funcoes'){abrirAdmin('funcoes');return}if(b.dataset.fab==='indic'){abrirAdmin('indicadores');return}if(b.dataset.fab==='admin'){abrirAdmin('convites');return}NOVO[b.dataset.fab]()};
+$('#fabMenu').onclick=e=>{const b=e.target.closest('[data-fab]');if(!b)return;$('#fabMenu').classList.add('hidden');if(b.dataset.fab==='tema'){formTema();return}if(b.dataset.fab==='dia'){fecharDia();return}if(b.dataset.fab==='sair'){sair();return}if(b.dataset.fab==='meuveiculo'){UI.tab='meuveiculo';try{history.replaceState(history.state,'','#meuveiculo')}catch(er){}render();window.scrollTo(0,0);return}if(b.dataset.fab==='ajustes'){formAjustes();return}if(b.dataset.fab==='funcoes'){abrirAdmin('funcoes');return}if(b.dataset.fab==='indic'){abrirAdmin('indicadores');return}if(b.dataset.fab==='admin'){abrirAdmin('convites');return}NOVO[b.dataset.fab]()};
 document.addEventListener('click',e=>{if(!e.target.closest('#fabWrap'))$('#fabMenu').classList.add('hidden')});
 $('#optBtn').onclick=e=>{e.stopPropagation();$('#bellMenu').classList.add('hidden');$('#perfMenu').classList.add('hidden');const m=$('#optMenu');m.classList.toggle('hidden');if(!m.classList.contains('hidden'))posMenu(m,$('#optBtn'))};
 window.addEventListener('scroll',()=>{['bellMenu','optMenu','perfMenu'].forEach(id=>{const m=document.getElementById(id);if(m&&!m.classList.contains('hidden')&&window.innerWidth<=640)posMenu(m,document.getElementById(id==='bellMenu'?'bellBtn':id==='perfMenu'?'perfBtn':'optBtn'))})},{passive:true});
