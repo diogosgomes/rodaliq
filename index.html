@@ -179,6 +179,8 @@ body{-webkit-user-select:text;user-select:text;-webkit-touch-callout:default}
 .tag.r{background:var(--redSoft);color:var(--red)}
 .tag.g{background:#eef0f4;color:var(--muted)}
 .subtabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.rvFil{margin:14px 0 4px;padding:10px 12px;border:2px solid var(--ink);border-radius:10px;background:var(--card)}.rvFilT{font-weight:800;margin-bottom:4px}.rvFilO{margin-bottom:8px;line-height:1.5}.rvFilB{display:flex;gap:8px;flex-wrap:wrap}.rvFilA{display:flex;gap:16px;flex-wrap:wrap;margin-top:8px}.fsv{border:2px solid var(--ink);background:var(--card);color:var(--ink);border-radius:6px;padding:6px 12px;font-weight:700;cursor:pointer;font:inherit;font-weight:700}.fsv.on{background:var(--ink);color:var(--card)}.rvFilG{margin-top:8px}.rvFilL{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:6px 0;border-top:1px solid var(--line)}.rvFilL b{min-width:110px}.rvFilL .small{flex:1 1 180px}
+.relChart{margin:4px 0 12px}.relChart svg{display:block}
 .relPend{margin:10px 0;padding:10px 12px;border:1px dashed var(--blue);border-radius:10px;background:var(--blueSoft)}.relPendL{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:6px 0;border-top:1px solid var(--line)}.relPendL>span:nth-child(2){flex:1 1 160px}
 .cusBusca{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;margin:0 0 12px}.cusBusca .inp{min-height:40px}
 .chip{border:1px solid var(--line);background:#fff;border-radius:99px;padding:6px 12px;font-weight:600;cursor:pointer}
@@ -649,7 +651,7 @@ body:has(#admPage) .fab,body:has(#ajuPage) .fab{z-index:61}body:has(#admPage) .f
 
 <script>
 "use strict";
-const VERSAO='V131';
+const VERSAO='V132';
 /* ---------- utilidades ---------- */
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -2336,13 +2338,89 @@ function relSecAlim(F){
   const L=alimDesp().filter(r=>r.data>=F.de&&r.data<=F.ate).sort((a,b)=>b.data.localeCompare(a.data)),t=sum(L,r=>r.valor);
   const T={};L.forEach(r=>{const k=String(r.tipoAl||'').trim()||'Sem tipo';(T[k]=T[k]||{v:0,n:0});T[k].v+=+r.valor||0;T[k].n++});
   const tp=Object.entries(T).sort((a,b)=>b[1].v-a[1].v).map(([k,o])=>['Por tipo · '+k,brl(o.v)+' ('+o.n+(o.n===1?' lançamento':' lançamentos')+')']);
-  return{id:'alim',t:'Alimentação (fora do custo do veículo)',kpis:[['Total',brl(t)],['Lançamentos',L.length],['Média por lançamento',L.length?brl(t/L.length):'—'],...tp],
+  const tpE=Object.entries(T).sort((a,b)=>b[1].v-a[1].v).slice(0,8);
+  return{id:'alim',t:'Alimentação (fora do custo do veículo)',chart:tpE.length&&t>0?{tipo:'barh',titulo:'Alimentação por tipo',cats:tpE.map(x=>x[0]),vals:tpE.map(x=>x[1].v),pct:1,tot:t,nota:''}:null,kpis:[['Total',brl(t)],['Lançamentos',L.length],['Média por lançamento',L.length?brl(t/L.length):'—'],...tp],
     nota:'A alimentação não entra no custo do veículo, no custo por km nem no Carnê-Leão. O filtro de veículos não se aplica a esta seção.',
     cols:[['Data','date'],['Tipo'],['Descrição'],['Local'],['Pagamento'],['Valor','money']],rows:L.map(r=>[r.data,r.tipoAl||'',r.desc||'',r.fornecedor||'',r.pgto||'',r.valor])}}
+
+// V132: gráficos dos relatórios (tela, PDF e Word). Valor escrito em cada barra; séries se distinguem por padrão (liso x listrado), não só por cor.
+const relRs=v=>'R$ '+Math.round(+v||0).toLocaleString('pt-BR');
+let __chN=0;
+function relChartSvg(ch,o={}){
+  const png=!!o.png,K=png?{ink:'#14213d',blue:'#1f6feb',amb:'#d98a00',line:'#e3e7ef',bg:'#ffffff',mut:'#5b6478',barh:'#dbe7ff'}:{ink:'var(--ink)',blue:'var(--blue)',amb:'#d98a00',line:'var(--line)',bg:'var(--card)',mut:'var(--muted)',barh:'var(--blueSoft)'};
+  const W=700,id='hp'+(++__chN),ff='font-family="Arial,Helvetica,sans-serif"';let H,body='';
+  const defs=`<defs><pattern id="${id}" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="7" height="7" fill="${K.bg}"/><line x1="0" y1="0" x2="0" y2="7" stroke="${K.amb}" stroke-width="3"/></pattern></defs>`;
+  if(ch.tipo==='bar2'){
+    const n=ch.cats.length;H=250;const L=20,R=20,T=44,B=28,pw=W-L-R,ph=H-T-B,mx=Math.max(1,...ch.series.flatMap(x=>x.v))*1.18,gw=pw/n,bw=Math.min(64,gw*.34);
+    ch.series.forEach((sr,si)=>{body+=`<rect x="${20+si*210}" y="10" width="16" height="12" ${si?`fill="url(#${id})" stroke="${K.amb}"`:`fill="${K.blue}" stroke="${K.ink}"`} stroke-width="1.2"/><text x="${42+si*210}" y="21" font-size="12" style="fill:${K.ink}" ${ff}>${esc(sr.n)} (${si?'listrado':'liso'})</text>`});
+    ch.cats.forEach((c,i)=>{const cx=L+gw*i+gw/2;ch.series.forEach((sr,si)=>{const v=sr.v[i]||0,h=ph*v/mx,x=cx+(si?2:-bw-2),y=T+ph-h;
+      body+=`<rect x="${x}" y="${y}" width="${bw}" height="${Math.max(h,1)}" ${si?`fill="url(#${id})" stroke="${K.amb}"`:`fill="${K.blue}" stroke="${K.ink}"`} stroke-width="1.2"><title>${esc(sr.n)} · ${esc(c)}: ${relRs(v)}</title></rect><text x="${x+bw/2}" y="${y-4}" text-anchor="middle" font-size="11" font-weight="700" style="fill:${K.ink}" ${ff}>${relRs(v)}</text>`});
+      body+=`<text x="${cx}" y="${H-8}" text-anchor="middle" font-size="12" style="fill:${K.ink}" ${ff}>${esc(c)}</text>`});
+    body+=`<line x1="${L}" x2="${W-R}" y1="${T+ph}" y2="${T+ph}" style="stroke:${K.ink}" stroke-width="1"/>`;
+  }else{
+    const n=ch.cats.length,rh=30,T=8,lw=170,vmax=Math.max(1,...ch.vals);H=T*2+n*rh;const bwMax=W-lw-150;
+    ch.cats.forEach((c,i)=>{const y=T+i*rh,v=ch.vals[i]||0,w=Math.max(2,bwMax*v/vmax);
+      body+=`<text x="${lw-8}" y="${y+rh/2+4}" text-anchor="end" font-size="12" style="fill:${K.ink}" ${ff}>${esc(String(c).slice(0,26))}</text><rect x="${lw}" y="${y+4}" width="${w}" height="${rh-10}" fill="${K.barh}" stroke="${K.ink}" stroke-width="1.2"><title>${esc(c)}: ${relRs(v)}</title></rect><text x="${lw+w+6}" y="${y+rh/2+4}" font-size="11.5" font-weight="700" style="fill:${K.ink}" ${ff}>${relRs(v)}${ch.pct&&ch.tot?'  ('+Math.round(v/ch.tot*100)+'%)':''}</text>`});
+    body+=`<line x1="${lw}" x2="${lw}" y1="${T}" y2="${H-T}" style="stroke:${K.ink}" stroke-width="1"/>`;
+  }
+  const cap=ch.titulo?`<title>${esc(ch.titulo)}</title>`:'';
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" ${png?`width="${W}" height="${H}"`:'width="100%" style="max-width:700px;height:auto"'} role="img" aria-label="${esc(ch.titulo||'Gráfico')}">${cap}${defs}<rect width="${W}" height="${H}" fill="${K.bg}"/>${body}</svg>`}
+const relChartBox=ch=>`<div class="relChart">${relChartSvg(ch)}<div class="small muted">${esc(ch.nota||'')}</div></div>`;
+function relChartPng(ch){return new Promise((res,rej)=>{const svg=relChartSvg(ch,{png:1}),m=svg.match(/viewBox="0 0 (\d+) (\d+)"/),w=+m[1],h=+m[2],im=new Image();
+  im.onload=()=>{try{const c=document.createElement('canvas');c.width=w*2;c.height=h*2;const g=c.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,c.width,c.height);g.drawImage(im,0,0,c.width,c.height);const b=atob(c.toDataURL('image/png').split(',')[1]),u=new Uint8Array(b.length);for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i);res({png:u,w,h})}catch(e){rej(e)}};
+  im.onerror=()=>rej(new Error('grafico'));im.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg)})}
+function relChartPdf(doc,ch,y){const pg=doc.internal.pageSize,pw=pg.getWidth(),x0=40,W=pw-80,ink=[20,33,61],blue=[31,111,235],amb=[217,138,0];
+  const hatch=(x,yy,w,h)=>{doc.setDrawColor(...amb);doc.setLineWidth(.8);for(let i=-h;i<w;i+=5){let x1=x+i,y1=yy+h,x2=x+i+h,y2=yy;if(x1<x){y1-=x-x1;x1=x}if(x2>x+w){y2+=x2-(x+w);x2=x+w}if(x2>x1)doc.line(x1,y1,x2,y2)}doc.setLineWidth(1)};
+  const need=ch.tipo==='bar2'?170:ch.cats.length*17+14;if(y+need>pg.getHeight()-40){doc.addPage();y=40}
+  doc.setFontSize(8);
+  if(ch.tipo==='bar2'){const n=ch.cats.length,H=120,T=y+22,mx=Math.max(1,...ch.series.flatMap(x=>x.v))*1.18,gw=W/n,bw=Math.min(38,gw*.34);
+    ch.series.forEach((sr,si)=>{const lx=x0+si*190;doc.setDrawColor(...(si?amb:ink));doc.setFillColor(...(si?[255,255,255]:blue));doc.rect(lx,y+2,12,9,si?'S':'FD');if(si)hatch(lx,y+2,12,9);doc.setTextColor(...ink);doc.text(pdfTxt(sr.n+' ('+(si?'listrado':'liso')+')'),lx+16,y+10)});
+    ch.cats.forEach((c,i)=>{const cx=x0+gw*i+gw/2;ch.series.forEach((sr,si)=>{const v=sr.v[i]||0,h=Math.max(1,H*v/mx),x=cx+(si?2:-bw-2),yy=T+H-h;doc.setDrawColor(...(si?amb:ink));doc.setFillColor(...(si?[255,255,255]:blue));doc.rect(x,yy,bw,h,si?'S':'FD');if(si)hatch(x,yy,bw,h);doc.setTextColor(...ink);doc.text(pdfTxt(relRs(v)),x+bw/2,yy-3,{align:'center'})});doc.setTextColor(...ink);doc.text(pdfTxt(String(c)),cx,T+H+11,{align:'center'})});
+    doc.setDrawColor(...ink);doc.line(x0,T+H,x0+W,T+H);return y+need}
+  const vmax=Math.max(1,...ch.vals),lw=120,bwMax=W-lw-120;
+  ch.cats.forEach((c,i)=>{const yy=y+i*17,v=ch.vals[i]||0,w=Math.max(2,bwMax*v/vmax);doc.setTextColor(...ink);doc.text(pdfTxt(String(c).slice(0,26)),x0+lw-6,yy+11,{align:'right'});doc.setDrawColor(...ink);doc.setFillColor(219,231,255);doc.rect(x0+lw,yy+2,w,11,'FD');doc.text(pdfTxt(relRs(v)+(ch.pct&&ch.tot?'  ('+Math.round(v/ch.tot*100)+'%)':'')),x0+lw+w+5,yy+11)});
+  return y+need}
+// monta os gráficos a partir das seções já prontas
+function relGraficos(sec){
+  sec.forEach(s=>{if(!s.rows||!s.cols)return;const ci=n=>s.cols.findIndex(c=>c[0]===n);
+    if(s.id==='mensal'&&s.rows.length){const r=s.rows.slice(-12),t=s.cols.findIndex(c=>c[0]==='Total meta')>=0?ci('Total meta'):-1;
+      if(t>=0){s.chart={tipo:'bar2',titulo:'Ganho e custo mês a mês',cats:r.map(x=>x[0]),series:[{n:'Ganho (total da meta)',v:r.map(x=>+x[t]||0)},{n:'Custos do veículo',v:r.map(x=>+x[ci('Custos')]||0)}],nota:s.rows.length>12?'Mostra os 12 meses mais recentes do período.':''}}
+      else if(ci('Custos fixos')>=0){s.chart={tipo:'bar2',titulo:'Custos fixos e variáveis mês a mês',cats:r.map(x=>x[0]),series:[{n:'Custos fixos',v:r.map(x=>+x[ci('Custos fixos')]||0)},{n:'Custos variáveis',v:r.map(x=>+x[ci('Custos variáveis')]||0)}],nota:s.rows.length>12?'Mostra os 12 meses mais recentes do período.':''}}}
+    if(s.id==='custos'&&s.rows.length&&ci('Categoria')===0&&ci('Valor')===1){const r=s.rows.slice(0,8),tot=sum(s.rows,x=>+x[1]||0);s.chart={tipo:'barh',titulo:'Custos por categoria',cats:r.map(x=>x[0]),vals:r.map(x=>+x[1]||0),pct:1,tot,nota:s.rows.length>8?'Mostra as 8 maiores categorias.':''}}
+  })}
+
+
+// V132: filtros salvos dos Relatórios (ficam na configuração da própria conta; período como atalho quando for atalho)
+const REL_FIL_MAX=8,relFilList=()=>{const c=cfg();return Array.isArray(c.relFiltros)?c.relFiltros:[]};
+const relPerNome=k=>(REL_PERS.find(x=>x[0]===k)||[,'Personalizado'])[1];
+function relFilAtual(F){const k=relPerAtual(F);return{per:k,de:k==='pers'?F.de:'',ate:k==='pers'?F.ate:'',vs:relVsSel(F).slice().sort(),plat:usoTrab()?F.plat:'Todas'}}
+function relFilIgual(f,F){const a=relFilAtual(F);return f.per===a.per&&(f.per!=='pers'||(f.de===a.de&&f.ate===a.ate))&&[...(f.vs||[])].sort().join('|')===a.vs.join('|')&&(f.plat||'Todas')===a.plat}
+function relFilDesc(f){return (f.per==='pers'?fmtBR(f.de)+' a '+fmtBR(f.ate):relPerNome(f.per))+' · '+((f.vs||[]).length?f.vs.join(', '):'todos os veículos')+(usoTrab()&&f.plat&&f.plat!=='Todas'?' · '+f.plat:'')}
+function relFilAplica(f){const F=UI.rel;if(f.per!=='pers')[F.de,F.ate]=relPer(f.per);else{F.de=f.de;F.ate=f.ate}F.vs=(f.vs||[]).filter(v=>VEICS().includes(v));if(F.vs.length>=VEICS().length)F.vs=[];F.plat=usoTrab()&&f.plat?f.plat:'Todas'}
+function relFilForm(f){const nova=!f;
+  openForm({titulo:nova?'Salvar este filtro':'Renomear filtro',sub:nova?'Guarda o período, os veículos e a plataforma que estão na tela. “Este mês” e os outros atalhos valem como atalho: no mês seguinte já mostram o período novo.':'',
+    campos:[{k:'nome',l:'Nome do filtro',t:'text',req:1,full:1,ph:'Ex.: Meu mês'}],val:{nome:f?f.nome:''},
+    onSave:o=>{const nome=String(o.nome||'').trim().slice(0,30);if(!nome)return 'Dê um nome ao filtro.';const L=relFilList();
+      if(L.some(x=>x.nome.toLowerCase()===nome.toLowerCase()&&(!f||x.id!==f.id)))return 'Já existe um filtro com este nome.';
+      if(nova&&L.length>=REL_FIL_MAX)return 'Você já tem '+REL_FIL_MAX+' filtros salvos. Exclua algum para salvar outro.';
+      const c=cfg();if(!Array.isArray(c.relFiltros))c.relFiltros=[];
+      if(nova)c.relFiltros.push(Object.assign({id:uid('rf'),nome},relFilAtual(UI.rel)));else{const x=c.relFiltros.find(y=>y.id===f.id);if(x)x.nome=nome}
+      salvar('tb_config');render()}})}
+async function relFilExcluir(f){if(!(await confirma('Excluir o filtro “'+f.nome+'”? Os lançamentos e relatórios não mudam.','Excluir')))return;const c=cfg();c.relFiltros=relFilList().filter(x=>x.id!==f.id);salvar('tb_config');render()}
+function relFilHtml(F){const L=relFilList();
+  return `<div class="rvFil" role="group" aria-label="Meus filtros salvos"><div class="rvFilT">★ Meus filtros salvos</div>
+  <div class="small muted rvFilO">Guarde o filtro que você usa sempre e volte a ele com um toque.<br>1. Ajuste o período, a plataforma e os veículos acima.<br>2. Toque em <b>＋ Salvar este filtro</b> e dê um nome.<br>3. Depois, é só tocar no nome para aplicar.</div>
+  <div class="rvFilB">${L.map(f=>{const on=relFilIgual(f,F);return `<button type="button" class="fsv${on?' on':''}" data-rel="fil:${f.id}" aria-pressed="${on}" title="${esc(relFilDesc(f))}">${on?'✓ ':''}★ ${esc(f.nome)}</button>`}).join('')}</div>
+  ${!L.length?'<div class="small" style="margin-top:6px"><b>Nenhum filtro salvo ainda.</b></div>':''}
+  <div class="rvFilA"><button type="button" class="lnk" data-rel="fsalvar">＋ Salvar este filtro</button>${L.length?`<button type="button" class="lnk" data-rel="fger" aria-expanded="${!!F.gerFil}">${F.gerFil?'Fechar gerenciar':'Gerenciar filtros salvos'}</button>`:''}</div>
+  ${F.gerFil&&L.length?`<div class="rvFilG">${L.map(f=>`<div class="rvFilL"><b>${esc(f.nome)}</b><span class="small muted">${esc(relFilDesc(f))}</span><button type="button" class="lnk" data-rel="frn:${f.id}">✎ Renomear</button><button type="button" class="lnk" data-rel="fex:${f.id}">✕ Excluir</button></div>`).join('')}<div class="small muted">Limite de ${REL_FIL_MAX} filtros.</div></div>`:''}</div>`}
+
 // V131: período anterior de igual duração, para o comparativo do Resumo
 function relPrevPer(F){const n=Math.round((new Date(F.ate+'T12:00:00')-new Date(F.de+'T12:00:00'))/864e5)+1,a=new Date(F.de+'T12:00:00');a.setDate(a.getDate()-1);const b=new Date(a);b.setDate(b.getDate()-(n-1));return[isoOf(b),isoOf(a)]}
-function relPrev(F){const [d0,d1]=relPrevPer(F),orig=UI.rel;let D;try{UI.rel=Object.assign({},orig,{de:d0,ate:d1});D=relDados()}finally{UI.rel=orig}
-  return{de:d0,ate:d1,apps:sum(D.cor,r=>r.valor),ifo:sum(D.ifc,r=>r.valor),car:sum(D.car,r=>r.valor),cus:sum(D.cus,r=>r.valor),fx:sum(D.cus.filter(r=>MV_FIXAS.includes(r.cat)),r=>r.valor),alim:usoTrab()?sum(alimDesp().filter(r=>r.data>=d0&&r.data<=d1),r=>r.valor):0}}
+// V132: km do período para o ganho por km — odômetro dos Custos; sem odômetro, o campo km dos lançamentos de ganhos
+function relKmBase(F,D){const od=sum(relVeics(F),v=>mvKmEntre(v,F.de,F.ate));if(od>0)return{km:od,base:'odômetro dos Custos'};const kc=sum(D.cor,r=>+r.km||0)+sum(D.ifc,r=>+r.km||0)+sum(D.car,r=>+r.km||0);return kc>0?{km:kc,base:'km dos lançamentos de ganhos'}:{km:0,base:''}}
+function relPrev(F){const [d0,d1]=relPrevPer(F),orig=UI.rel;let D,KB;try{UI.rel=Object.assign({},orig,{de:d0,ate:d1});D=relDados();KB=relKmBase(UI.rel,D)}finally{UI.rel=orig}
+  return{de:d0,ate:d1,km:KB,apps:sum(D.cor,r=>r.valor),ifo:sum(D.ifc,r=>r.valor),car:sum(D.car,r=>r.valor),cus:sum(D.cus,r=>r.valor),fx:sum(D.cus.filter(r=>MV_FIXAS.includes(r.cat)),r=>r.valor),alim:usoTrab()?sum(alimDesp().filter(r=>r.data>=d0&&r.data<=d1),r=>r.valor):0}}
 // texto "▲ 12% em relação ao período anterior" (seta e palavra, nunca só a cor)
 const relCmp=(a,b)=>{a=+a||0;b=+b||0;let t;if(!a&&!b)return'';if(Math.abs(a-b)<0.005)t='= igual ao período anterior';else if(!b)t='sem lançamentos no período anterior';else{const pc=(Math.round(Math.abs(a-b)/Math.abs(b)*1000)/10).toLocaleString('pt-BR');t=(a>b?'▲ ':'▼ ')+pc+'% '+(a>b?'a mais':'a menos')+' que no período anterior ('+brl(b)+')'}
   return ' <small style="display:block;font-size:12px;font-weight:400;margin-top:2px"> '+t+'</small>'};
@@ -2379,7 +2457,7 @@ function relDados(){
   const mul=S.tb_multas.filter(r=>ok(r.ocorr)&&fv(r));
   return{F,cor,ifc,car,rep,cus,mul};
 }
-const relModeloAtivo=()=>usoTrab()?relModelo():relModeloPessoal();
+const relModeloAtivo=()=>{const M=usoTrab()?relModelo():relModeloPessoal();relGraficos(M.sec);return M};
 function relModelo(){
   const D=relDados(),{F,cor,ifc,car,rep,cus,mul}=D,meta=cfg().metaDiaria;
   const vIf=sum(ifc,r=>r.valor),ifOn=ifoodOn();
@@ -2394,9 +2472,10 @@ function relModelo(){
     ...car.map(r=>({d:r.data,tp:'Viagens e caronas',pl:r.sentido,v:r.veiculo,det:`${r.passageiros||0} passageiros${r.obs?' · '+r.obs:''}`,val:+r.valor})),
     ...rep.map(r=>({d:r.data,tp:'Repasse',pl:r.plataforma,v:r.veiculo,det:`Período ${r.ini?fmtBR(r.ini)+' a '+fmtBR(r.fim):'—'} · ${r.viagens||0} viagens`,val:+r.valor})),
     ...cus.map(r=>({d:r.data,tp:'Custo',pl:r.cat,v:r.veiculo,det:[r.desc,(r.litros||r.kwh)?fmtNum(r.kwh||r.litros)+' '+unEn(r):'',r.pgto,r.fornecedor].filter(Boolean).join(' · '),val:-(+r.valor||0)}))].sort((a,b)=>b.d.localeCompare(a.d));
-  const P=relPrev(F),sec=[];
+  const P=relPrev(F),KB=relKmBase(F,D),gT=vApps+vIf+vCar,lq=gT-vCus,pgT=P.apps+P.ifo+P.car,
+    kmK=KB.km>0?[['Km rodados ('+KB.base+')',fmtNum(KB.km)+' km'],['Ganho por km (bruto)',brl(gT/KB.km)+(P.km.km>0?relCmp(gT/KB.km,pgT/P.km.km):'')],['Resultado líquido por km',brl(lq/KB.km)+(P.km.km>0?relCmp(lq/KB.km,(pgT-P.cus)/P.km.km):'')]]:[['Ganho por km','— informe o km nos Custos']],sec=[];
   sec.push({id:'lanc',t:'Lançamentos filtrados',cols:[['Data','date'],['Tipo'],['Plataforma / categoria'],['Veículo'],['Detalhes'],['Valor (R$)','money']],rows:lanc.map(x=>[x.d,x.tp,x.pl,x.v,x.det,x.val]),nota:'Custos aparecem com valor negativo.'});
-  sec.push({id:'resumo',t:'Resumo do período',kpis:[['Uber + 99 (diário)',brl(vApps)+relCmp(vApps,P.apps)],...(ifOn?[['iFood (diário)',brl(vIf)+relCmp(vIf,P.ifo)]]:[]),...(caronaOn()?[['Viagens e caronas',brl(vCar)+relCmp(vCar,P.car)]]:[]),['Total para a meta',brl(vApps+vIf+vCar)+relCmp(vApps+vIf+vCar,P.apps+P.ifo+P.car)],['Meta prevista no período',brl(metaPrev)],['Meta atingida',metaPrev?fmtCell((vApps+vIf+vCar)/metaPrev,'pct'):'—'],['Custos do veículo',brl(vCus)+relCmp(vCus,P.cus)],['Resultado líquido',brl(vApps+vIf+vCar-vCus)+relCmp(vApps+vIf+vCar-vCus,P.apps+P.ifo+P.car-P.cus)],...(usoTrab()?[['Alimentação (à parte, fora do resultado)',brl(sum(alimDesp().filter(r=>r.data>=F.de&&r.data<=F.ate),r=>r.valor))+relCmp(sum(alimDesp().filter(r=>r.data>=F.de&&r.data<=F.ate),r=>r.valor),P.alim)]]:[]),['Repasses recebidos',brl(sum(rep,r=>r.valor))],['Viagens (Uber + 99)',vg],['Tempo online',minToHM(mn)],['R$ por hora',mn?brl(vApps/(mn/60)):'—'],['R$ por viagem',vg?brl(vApps/vg):'—']],nota:relPrevNota(P)});
+  sec.push({id:'resumo',t:'Resumo do período',kpis:[['Uber + 99 (diário)',brl(vApps)+relCmp(vApps,P.apps)],...(ifOn?[['iFood (diário)',brl(vIf)+relCmp(vIf,P.ifo)]]:[]),...(caronaOn()?[['Viagens e caronas',brl(vCar)+relCmp(vCar,P.car)]]:[]),['Total para a meta',brl(vApps+vIf+vCar)+relCmp(vApps+vIf+vCar,P.apps+P.ifo+P.car)],['Meta prevista no período',brl(metaPrev)],['Meta atingida',metaPrev?fmtCell((vApps+vIf+vCar)/metaPrev,'pct'):'—'],['Custos do veículo',brl(vCus)+relCmp(vCus,P.cus)],['Resultado líquido',brl(vApps+vIf+vCar-vCus)+relCmp(vApps+vIf+vCar-vCus,P.apps+P.ifo+P.car-P.cus)],...kmK,...(usoTrab()?[['Alimentação (à parte, fora do resultado)',brl(sum(alimDesp().filter(r=>r.data>=F.de&&r.data<=F.ate),r=>r.valor))+relCmp(sum(alimDesp().filter(r=>r.data>=F.de&&r.data<=F.ate),r=>r.valor),P.alim)]]:[]),['Repasses recebidos',brl(sum(rep,r=>r.valor))],['Viagens (Uber + 99)',vg],['Tempo online',minToHM(mn)],['R$ por hora',mn?brl(vApps/(mn/60)):'—'],['R$ por viagem',vg?brl(vApps/vg):'—']],nota:relPrevNota(P)+(KB.km>0?' Ganho por km = total para a meta ÷ km rodados; resultado líquido por km = resultado líquido ÷ km rodados. Km pelo '+KB.base+(KB.base.startsWith('od')?' (entre a primeira e a última leitura do período)':'')+'.':' Para ver o ganho por km, informe o km do veículo nos Custos ou o km nos lançamentos de ganhos.')});
   const meses=[...new Set(dias.map(d=>d.slice(0,7)))];
   sec.push({id:'mensal',t:'Mês a mês',nota:'Uber + 99 vem do diário de corridas; os repasses são o que caiu na conta e não somam na meta.',cols:[['Mês'],['Uber + 99','money'],...(ifOn?[['iFood','money']]:[]),...(caronaOn()?[['Carona','money']]:[]),['Total meta','money'],['Meta prevista','money'],['% da meta','pct'],['Repasses','money'],['Custos','money'],['Resultado','money']],
     rows:meses.map(m=>{const a=sum(cor.filter(r=>r.data.startsWith(m)),r=>r.valor),fi=sum(ifc.filter(r=>r.data.startsWith(m)),r=>r.valor),c=sum(car.filter(r=>r.data.startsWith(m)),r=>r.valor),k=sum(cus.filter(r=>r.data.startsWith(m)),r=>r.valor),mp=dias.filter(d=>d.startsWith(m)&&diaConta(d)).length*meta;return[mesNome(m),a,...(ifOn?[fi]:[]),...(caronaOn()?[c]:[]),a+fi+c,mp,mp?(a+fi+c)/mp:null,sum(rep.filter(r=>r.data.startsWith(m)),r=>r.valor),k,a+fi+c-k]})});
@@ -2596,6 +2675,7 @@ function vRelatorios(){
     </div>
     ${VEICS().length>1?`<div class="rvVe"><div class="small muted" style="margin:10px 0 4px">Veículos (${relVsSel(F).length?relVsSel(F).length+' de '+VEICS().length:'todos'})</div><div class="rvChips"><button type="button" class="chip${relVsSel(F).length?'':' on'}" data-rel="ve:all" aria-pressed="${!relVsSel(F).length}">${relVsSel(F).length?'':'✓ '}Todos</button>${VEICS().map((v,i)=>{const on=relVsSel(F).includes(v);return `<button type="button" class="chip${on?' on':''}" data-rel="ve:${i}" aria-pressed="${on}">${on?'✓ ':''}${esc(v)}</button>`}).join('')}</div></div>`:''}
     <div class="small muted" style="margin-top:8px">${esc(M.filtroTxt)}${F.plat!=='Todas'?' · custos só entram com “Todas” as plataformas':''}</div>
+    ${relFilHtml(F)}
     <div class="toolbar" style="margin:12px 0 0">
       <button class="btn sec sm" data-rel="ver">${F.ver?'Ocultar dados filtrados':'Ver dados filtrados'}</button>
       <button class="btn sec sm" data-rel="limpar"${at?'':' disabled title="Nenhum filtro ativo" style="opacity:.55;cursor:default"'}>Limpar filtro</button>
@@ -2606,7 +2686,7 @@ function vRelatorios(){
     ${F.ver?`<div style="margin-top:12px">${tabelaHTML(lanc)}<div class="small muted" style="margin-top:6px">${lanc.nota}</div></div>`:''}
   </div>`:''}</div>`;
   M.sec.slice(1).forEach((s,i)=>{const op=(F.ab||[]).includes(s.id);
-    h+=`<div class="mgroup"><div class="mhead" data-rel="sec:${s.id}"><span class="sg">${op?'−':'+'}</span><span class="t">${i+2}. ${esc(s.t)}</span></div>${op?`<div class="mbody" style="padding:14px">${kp(s)}${s.cols?tabelaHTML(s):''}${s.pend&&s.pend.length?`<div class="relPend" role="region" aria-label="Lançamentos incompletos"><b>Lançamentos para completar (${s.pend.length})</b><div class="small muted">Toque em 👆 Abrir para ajustar o lançamento. Ao salvar, você volta aqui e a lista já aparece atualizada.</div>${s.pend.slice(0,30).map(x=>`<div class="relPendL"><span class="num">${fmtBR(x.d)}</span><span>${esc(x.v)} · ${brl(x.val)}</span><span class="small">falta: <b>${esc(x.falta)}</b></span><button type="button" class="btn sm sec" data-ed="tb_custos:${x.id}">👆 Abrir</button></div>`).join('')}${s.pend.length>30?`<div class="small muted">Mostrando os 30 mais recentes de ${s.pend.length}.</div>`:''}</div>`:''}${s.nota?`<div class="small muted" style="margin-top:6px">${esc(s.nota)}</div>${s.refs?`<div class="small" style="margin-top:6px"><b>📚 Referências oficiais</b>${refImpHtml()}</div>`:''}`:''}</div>`:''}</div>`});
+    h+=`<div class="mgroup"><div class="mhead" data-rel="sec:${s.id}"><span class="sg">${op?'−':'+'}</span><span class="t">${i+2}. ${esc(s.t)}</span></div>${op?`<div class="mbody" style="padding:14px">${kp(s)}${s.chart?relChartBox(s.chart):''}${s.cols?tabelaHTML(s):''}${s.pend&&s.pend.length?`<div class="relPend" role="region" aria-label="Lançamentos incompletos"><b>Lançamentos para completar (${s.pend.length})</b><div class="small muted">Toque em 👆 Abrir para ajustar o lançamento. Ao salvar, você volta aqui e a lista já aparece atualizada.</div>${s.pend.slice(0,30).map(x=>`<div class="relPendL"><span class="num">${fmtBR(x.d)}</span><span>${esc(x.v)} · ${brl(x.val)}</span><span class="small">falta: <b>${esc(x.falta)}</b></span><button type="button" class="btn sm sec" data-ed="tb_custos:${x.id}">👆 Abrir</button></div>`).join('')}${s.pend.length>30?`<div class="small muted">Mostrando os 30 mais recentes de ${s.pend.length}.</div>`:''}</div>`:''}${s.nota?`<div class="small muted" style="margin-top:6px">${esc(s.nota)}</div>${s.refs?`<div class="small" style="margin-top:6px"><b>📚 Referências oficiais</b>${refImpHtml()}</div>`:''}`:''}</div>`:''}</div>`});
   setTimeout(relBarSync,40);
   return `<div class="toolbar"><h2 style="margin:0">Relatórios</h2><span class="sp"></span></div>`+h;
 }
@@ -2627,6 +2707,11 @@ function relAcao(t){
   else if(a==='topo'){F.f1=true;render();window.scrollTo({top:0,behavior:'smooth'});return}
   else if(a==='ver')F.ver=!F.ver;
   else if(a==='limpar')Object.assign(F,relPadrao());
+  else if(a.startsWith('fil:')){const f=relFilList().find(x=>x.id===a.slice(4));if(f)relFilAplica(f)}
+  else if(a==='fsalvar'){lerF();relFilForm();return}
+  else if(a==='fger')F.gerFil=!F.gerFil;
+  else if(a.startsWith('frn:')){const f=relFilList().find(x=>x.id===a.slice(4));if(f){relFilForm(f);return}}
+  else if(a.startsWith('fex:')){const f=relFilList().find(x=>x.id===a.slice(4));if(f){relFilExcluir(f);return}}
   else if(['pdf','docx','xlsx','csv'].includes(a)){lerF();exportarRel(a,t);return}
   render();
 }
@@ -2671,12 +2756,13 @@ async function exportarRel(fmt,btn,M0,fn0){
       let y=90;const blue=[31,111,235];
       M.sec.forEach((s,i)=>{if(y>500){doc.addPage();y=44}doc.setFontSize(12);doc.setTextColor(20,33,61);doc.text(pdfTxt((i+1)+'. '+s.t),40,y);y+=8;
         if(s.kpis){doc.autoTable({startY:y,body:s.kpis.map(k=>[pdfTxt(k[0]),pdfTxt(String(k[1]).replace(/<[^>]+>/g,''))]),theme:'grid',styles:{fontSize:8},columnStyles:{0:{fontStyle:'bold',cellWidth:200}},margin:{left:40,right:40},tableWidth:420});y=doc.lastAutoTable.finalY+8}
+        if(s.chart){y=relChartPdf(doc,s.chart,y)+6}
         if(s.cols){doc.autoTable({startY:y,head:[s.cols.map(c=>pdfTxt(c[0]))],body:s.rows.length?s.rows.map(r=>r.map((v,ci)=>pdfTxt(fmtCell(v,s.cols[ci][1])))):[[{content:'Sem dados para o filtro.',colSpan:s.cols.length}]],theme:'striped',headStyles:{fillColor:blue},styles:{fontSize:8,cellPadding:3},
           columnStyles:Object.fromEntries(s.cols.map((c,ci)=>[ci,['money','int','pct','hm'].includes(c[1])?{halign:'right',cellWidth:'wrap'}:c[1]==='date'?{cellWidth:'wrap'}:{}])),margin:{left:40,right:40}});y=doc.lastAutoTable.finalY+(s.nota?4:18)}
         if(s.nota){doc.setFontSize(8);doc.setTextColor(91,100,120);const tx=pdfTxt(s.nota+(s.refs?'\n'+refImpTxt():'')),ln=doc.splitTextToSize(tx,doc.internal.pageSize.getWidth()-80);if(y+12+ln.length*10>doc.internal.pageSize.getHeight()-40){doc.addPage();y=40}doc.text(ln,40,y+8);y+=14+ln.length*10}});
       const n=doc.getNumberOfPages();for(let p=1;p<=n;p++){doc.setPage(p);doc.setFontSize(8);doc.setTextColor(140);doc.text('© 2026 Rodaliq · Todos os direitos reservados. · Página '+p+' de '+n,40,doc.internal.pageSize.getHeight()-20)}
       data=doc.output('arraybuffer')}
-    else if(fmt==='docx'){await carregaLib('jszip');data=await gerarDocx(M,geradoEm)}
+    else if(fmt==='docx'){await carregaLib('jszip');for(const sc of M.sec){if(sc.chart){try{sc.__png=await relChartPng(sc.chart)}catch(e){sc.__png=null}}}data=await gerarDocx(M,geradoEm)}
     if(DL){await DL.save({filename:fn,data});audit('Exportação',M.area||'Relatórios',fn+' · '+M.filtroTxt);toast('Relatório gerado')}
     else toast('Download indisponível nesta visualização.');
   }catch(e){if(!(e&&e.code==='declined'))toast(e&&e.message&&e.message.startsWith('lib')?'Não consegui carregar a biblioteca de exportação.':'Não foi possível gerar o arquivo ('+(e&&e.code||e&&e.message||'erro')+').')}
@@ -2688,17 +2774,21 @@ async function gerarDocx(M,geradoEm){
   const cel=(t,{h,r}={})=>`<w:tc><w:tcPr>${h?'<w:shd w:val="clear" w:color="auto" w:fill="1F6FEB"/>':''}</w:tcPr><w:p><w:pPr>${r?'<w:jc w:val="right"/>':''}<w:spacing w:before="20" w:after="20"/></w:pPr><w:r><w:rPr>${h?'<w:b/><w:color w:val="FFFFFF"/>':''}<w:sz w:val="17"/></w:rPr><w:t xml:space="preserve">${x(t)}</w:t></w:r></w:p></w:tc>`;
   const bd='<w:tblBorders>'+['top','left','bottom','right','insideH','insideV'].map(k=>`<w:${k} w:val="single" w:sz="4" w:space="0" w:color="D0D5DD"/>`).join('')+'</w:tblBorders>';
   const tbl=(head,rows,al)=>`<w:tbl><w:tblPr><w:tblW w:w="5000" w:type="pct"/>${bd}</w:tblPr>${head?`<w:tr>${head.map((c,i)=>cel(c,{h:1,r:al&&al[i]})).join('')}</w:tr>`:''}${rows.map(r=>`<w:tr>${r.map((c,i)=>cel(c,{r:al&&al[i]})).join('')}</w:tr>`).join('')}</w:tbl>`;
+  let imgN=0;const imgs=[];
   let b=par(M.titulo||'Relatório – Rodaliq',{b:1,sz:36,cor:'14213D'})+par(M.filtroTxt,{sz:18,cor:'5B6478'})+par(geradoEm,{sz:18,cor:'5B6478'});
   M.sec.forEach((s,i)=>{b+=par('')+par((i+1)+'. '+s.t,{b:1,sz:26,cor:'1F6FEB'});
     if(s.kpis)b+=tbl(null,s.kpis.map(k=>[k[0],String(k[1]).replace(/<[^>]+>/g,'')]),[0,1]);
-    if(s.cols){if(s.kpis)b+=par('');const al=s.cols.map(c=>['money','int','pct','hm'].includes(c[1]));b+=s.rows.length?tbl(s.cols.map(c=>c[0]),s.rows.map(r=>r.map((v,ci)=>fmtCell(v,s.cols[ci][1]))),al):par('Sem dados para o filtro.',{sz:18,cor:'5B6478'})}
+    if(s.__png){const n=++imgN,cx=Math.round(Math.min(s.__png.w,640)*9525),cy=Math.round(cx*s.__png.h/s.__png.w);imgs.push({n,png:s.__png.png});
+      b+=par('')+`<w:p><w:r><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0"><wp:extent cx="${cx}" cy="${cy}"/><wp:docPr id="${n}" name="Grafico ${n}" descr="${x(s.chart.titulo||'Gráfico')}"/><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="${n}" name="g${n}.png"/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip r:embed="rIdG${n}"/><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="${cx}" cy="${cy}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r></w:p>`}
+    if(s.cols){if(s.kpis||s.__png)b+=par('');const al=s.cols.map(c=>['money','int','pct','hm'].includes(c[1]));b+=s.rows.length?tbl(s.cols.map(c=>c[0]),s.rows.map(r=>r.map((v,ci)=>fmtCell(v,s.cols[ci][1]))),al):par('Sem dados para o filtro.',{sz:18,cor:'5B6478'})}
     if(s.nota)b+=par(s.nota,{sz:16,cor:'5B6478'});if(s.refs)b+=par(refImpTxt(),{sz:16,cor:'5B6478'})});
   b+=par('')+par('© 2026 Rodaliq · Todos os direitos reservados.',{sz:16,cor:'5B6478'});
-  const doc=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body>${b}<w:sectPr><w:pgSz w:w="16838" w:h="11906" w:orient="landscape"/><w:pgMar w:top="720" w:right="720" w:bottom="720" w:left="720" w:header="0" w:footer="0" w:gutter="0"/></w:sectPr></w:body></w:document>`;
+  const doc=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><w:body>${b}<w:sectPr><w:pgSz w:w="16838" w:h="11906" w:orient="landscape"/><w:pgMar w:top="720" w:right="720" w:bottom="720" w:left="720" w:header="0" w:footer="0" w:gutter="0"/></w:sectPr></w:body></w:document>`;
   const z=new JSZip();
-  z.file('[Content_Types].xml','<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/></Types>');
+  z.file('[Content_Types].xml','<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Default Extension="png" ContentType="image/png"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/></Types>');
   z.file('_rels/.rels','<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>');
   z.file('word/document.xml',doc);
+  if(imgs.length){z.file('word/_rels/document.xml.rels','<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'+imgs.map(i=>`<Relationship Id="rIdG${i.n}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/g${i.n}.png"/>`).join('')+'</Relationships>');imgs.forEach(i=>z.file('word/media/g'+i.n+'.png',i.png))}
   return await z.generateAsync({type:'uint8array'});
 }
 
@@ -6182,7 +6272,7 @@ const GUIA=[
    m:'Avisos no sino, 1 dia antes de cada evento.',acts:[['＋ Novo evento',()=>formEvento()]]},
  {t:'🤝 Parceiros do Rodaliq',rec:'parceiros',x:`Em <b>⚙ Opções › Parceiros do Rodaliq</b> ficam empresas e profissionais que oferecem condições para motoristas. São <b>parcerias</b>: o Rodaliq pode receber pela divulgação. A lista segue a <b>ordem alfabética, sem destaque pago</b>, e você filtra por categoria. Cada cartão mostra a oferta, a cidade e os botões de contato (WhatsApp, e-mail, site e redes) e <b>Como chegar</b>, quando há endereço. Alguns têm <b>oferta exclusiva para apoiadores</b>.<br><br>🔒 Seus dados não são enviados aos parceiros; o Rodaliq só conta quantos toques cada parceiro recebe, sem saber quem tocou. O Rodaliq não se responsabiliza pelos serviços dos parceiros: combine tudo direto com eles.`,
    m:'Nada: é uma lista de consulta.',acts:[['🤝 Ver parceiros',()=>formParceiros()]]},
- {t:'📑 Relatórios',rec:'relatorios',x:()=>!recVe('corridas')?`Na aba <b>Relatórios</b>, escolha o período (um atalho como <b>Este mês</b> ou <b>Mês passado</b>, ou <b>De</b> e <b>Até</b>) e os <b>veículos</b> (um, vários ou todos) para ver o <b>Custo do meu veículo${mvAmplo()?' · uso pessoal':''}</b>: lançamentos, resumo, mês a mês, custos por categoria, consumo e km rodados, uso (pessoal e família), custo por veículo, trajetos da rotina, viagens pessoais e multas.<br><br>O <b>Resumo</b> compara cada número com o período anterior de mesma duração (▲ maior, ▼ menor). Para levar os dados, baixe em <b>PDF, Word, Excel ou CSV</b>.`:`Na aba <b>Relatórios</b>, escolha o período (um atalho como <b>Este mês</b> ou <b>Mês passado</b>, ou <b>De</b> e <b>Até</b>), os <b>veículos</b> (um, vários ou todos) e a <b>plataforma</b> (Uber, 99${ifoodOn()?', iFood':''}${caronaOn()?', Viagens e caronas':''}) e veja as seções: 1. lançamentos, 2. resumo, <b>3. Alimentação (fora do custo do veículo)</b>, depois mensal, meta, por plataforma, custos, consumo e km rodados, veículos, conciliação, multas${recVe('impostos')&&!foraBR()?' e Carnê-Leão':''}${ifoodOn()?', além da seção do iFood':''}.<br><br>O <b>Resumo</b> compara cada número com o período anterior de mesma duração (▲ maior, ▼ menor), e a seção de consumo avisa quando há abastecimentos sem litros ou sem km. Para levar os dados, baixe em <b>PDF, Word, Excel ou CSV</b>. O cabeçalho do arquivo informa o período e os filtros usados. Ao rolar a página, uma barra no topo lembra o período e os veículos do filtro.`,
+ {t:'📑 Relatórios',rec:'relatorios',x:()=>!recVe('corridas')?`Na aba <b>Relatórios</b>, escolha o período (um atalho como <b>Este mês</b> ou <b>Mês passado</b>, ou <b>De</b> e <b>Até</b>) e os <b>veículos</b> (um, vários ou todos) para ver o <b>Custo do meu veículo${mvAmplo()?' · uso pessoal':''}</b>: lançamentos, resumo, mês a mês, custos por categoria, consumo e km rodados, uso (pessoal e família), custo por veículo, trajetos da rotina, viagens pessoais e multas.<br><br>O <b>Resumo</b> compara cada número com o período anterior de mesma duração (▲ maior, ▼ menor). Os <b>Mês a mês</b> e <b>Custos por categoria</b> ganham gráficos, também no PDF e no Word, e em <b>Meus filtros</b> você salva a combinação de período e veículos para voltar a ela com um toque. Para levar os dados, baixe em <b>PDF, Word, Excel ou CSV</b>.`:`Na aba <b>Relatórios</b>, escolha o período (um atalho como <b>Este mês</b> ou <b>Mês passado</b>, ou <b>De</b> e <b>Até</b>), os <b>veículos</b> (um, vários ou todos) e a <b>plataforma</b> (Uber, 99${ifoodOn()?', iFood':''}${caronaOn()?', Viagens e caronas':''}) e veja as seções: 1. lançamentos, 2. resumo, <b>3. Alimentação (fora do custo do veículo)</b>, depois mensal, meta, por plataforma, custos, consumo e km rodados, veículos, conciliação, multas${recVe('impostos')&&!foraBR()?' e Carnê-Leão':''}${ifoodOn()?', além da seção do iFood':''}.<br><br>O <b>Resumo</b> compara cada número com o período anterior de mesma duração (▲ maior, ▼ menor) e mostra o <b>ganho por km</b> e o <b>resultado líquido por km</b> (km pelo odômetro dos Custos). Os <b>Mês a mês</b>, <b>Custos por categoria</b> e <b>Alimentação</b> ganham gráficos, também no PDF e no Word. Salve a combinação de período, veículos e plataforma em <b>Meus filtros</b> e volte a ela com um toque. A seção de consumo avisa quando há abastecimentos sem litros ou sem km. Para levar os dados, baixe em <b>PDF, Word, Excel ou CSV</b>. O cabeçalho do arquivo informa o período e os filtros usados. Ao rolar a página, uma barra no topo lembra o período e os veículos do filtro.`,
    m:'Nada: só lê o que você já lançou.'},
  {t:'🚗 Meu perfil (opcional)',x:`Conte <b>como você usa o seu veículo</b> (${nivelVe('pessoal')?'uso pessoal e família, ':''}corridas, entregas) e, se quiser, se a sua CNH tem <b>EAR</b>, qual veículo você usa e, se quiser, a <b>validade</b> e a categoria da CNH: o app avisa quando a renovação se aproximar e quando os pontos chegarem perto do limite. Você muda tudo quando quiser, em <b>⚙ Opções › Meu perfil</b>.<br><br>⚠ ${TXT_SEM_ORGAO}`,acts:[['🚗 Abrir Meu perfil de motorista',()=>formCnh()]]},
  {t:'📊 Para acompanhar',x:()=>`${recVe('corridas')?`<b>Painel:</b> meta, ganhos, custos, resultado, previsão${rv('reservas',' e despesas programadas',' do mês')}. Troque o mês e o veículo no topo.<br><br><b>Abas:</b> o Painel, as Corridas${rv('ifood',', o iFood')}${rv('carona',' e as Viagens e caronas')} vêm primeiro, nessa ordem`:`<b>Painel:</b> o custo do veículo no mês, por dia e por km, a divisão entre custos fixos e variáveis, o uso (pessoal e família) e os lembretes. Troque o mês e o veículo no topo.<br><br><b>Abas:</b> o Painel e o ${mvNome()} vêm primeiro`}; as demais seguem em ordem alfabética${rv('relatorios',' e Relatórios fica por último')}. O campo <b>🔎 Buscar aba</b> filtra pelo nome: digite e toque Enter para abrir a primeira.<br><br><b>🔔 Sino:</b> alertas (${rv('impostos','DARF, ')}multas, CNH, manutenção e lembrete de backup), os mais urgentes primeiro, e as novidades. Toque num cartão para abrir; ele vira lido. Roda cheia = não lida, vazada = lida, vermelha com “!” = importante.<br><br><b>⚡ Atalhos:</b> todos os lançamentos num toque. Arraste o botão para onde preferir.`,m:'Tudo o que você lança aparece no Painel.'},
