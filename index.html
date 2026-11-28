@@ -1187,7 +1187,7 @@ function animIniciar(){
 }
 
 /* ---------- login (Supabase Auth: e-mail e senha) ---------- */
-document.querySelectorAll('[data-eye]').forEach(b=>b.onclick=()=>{const i=document.getElementById(b.dataset.eye);i.type=i.type==='password'?'text':'password';b.textContent=i.type==='password'?'👁':'🙈'});
+document.querySelectorAll('[data-eye]').forEach(b=>b.onclick=()=>{const i=document.getElementById(b.dataset.eye);i.type=i.type==='password'?'text':'password';b.textContent=i.type==='password'?'👁':'🙈';b.setAttribute('aria-label',i.type==='password'?'Mostrar senha':'Ocultar senha')});
 DL={save:async({filename,data})=>{const ext=filename.split('.').pop().toLowerCase();
   // V47: backup (.json) no computador abre "Salvar como" quando o navegador permite; cancelar avisa o app (nada é gravado e o alerta continua)
   if(ext==='json'&&window.showSaveFilePicker){let h;try{h=await window.showSaveFilePicker({suggestedName:filename,types:[{description:'Backup do Rodaliq',accept:{'application/json':['.json']}}]})}catch(e){if(e&&e.name==='AbortError')throw{code:'declined'};h=null}
@@ -2519,8 +2519,8 @@ function relModelo(){
   sec.push({id:'conc',t:'Conciliação de repasses',cols:[['Repasse','date'],['Plataforma'],['Período'],['Repasse','money'],['Soma do diário','money'],['Diferença','money']],
     rows:rep.slice().sort((a,b)=>b.data.localeCompare(a.data)).map(r=>{const d=r.ini&&r.fim?S.tb_corridas.filter(x=>x.plataforma===r.plataforma&&x.data>=r.ini&&x.data<=r.fim):[];const sd=sum(d,x=>x.valor);return[r.data,r.plataforma,r.ini?fmtBR(r.ini)+' a '+fmtBR(r.fim):'—',r.valor,d.length?sd:null,d.length?r2(r.valor-sd):null]})});
   const anos=[...new Set(meses.map(m=>+m.slice(0,4)))];const lc=anos.flatMap(a=>linhasAno(a)).filter(l=>meses.includes(l.ym));
-  if(recVe('impostos'))sec.push({id:'carne',t:'Carnê-Leão',refs:1,nota:TXT_MEI_CURTO+' Recebido = Uber/99 (extrato, repasses ou diário)'+(ifoodOn()&&ifoodCarneOn()?' + iFood (tributável a '+ifoodTrib()+'%)':'')+(caronaOn()?(caronaNoImposto()?' + Viagens e caronas':' — Viagens e caronas estão fora da base, por opção nas preferências'):'')+'. Não depende dos filtros de veículo e plataforma. '+TXT_EST_IMP,cols:[['Mês'],['Apps','money'],['Carona','money'],['iFood','money'],['Recebido','money'],['Tributável','money'],['Base','money'],['IR tabela','money'],['Redução','money'],['DARF','money'],['Vencimento','date'],['Pago']],
-    rows:lc.map(l=>[mesNome(l.ym),l.apps,l.carBase,l.ifB,l.bruto,l.trib,l.base,l.irT,l.red,l.darf,l.venc,l.reg.pago?'Sim'+(l.reg.valorPago?' ('+brl(l.reg.valorPago)+')':''):'Não'])});
+  if(recVe('impostos'))sec.push({id:'carne',t:'Carnê-Leão',refs:1,nota:TXT_MEI_CURTO+' Recebido = Uber/99 (extrato, repasses ou diário)'+(ifoodOn()&&ifoodCarneOn()?' + iFood (tributável a '+ifoodTrib()+'%)':'')+(caronaOn()?(caronaNoImposto()?' + Viagens e caronas':' — Viagens e caronas estão fora da base, por opção nas preferências'):'')+'. Não depende dos filtros de veículo e plataforma. '+TXT_EST_IMP,cols:[['Mês'],['Apps','money'],...(caronaOn()?[['Carona','money']]:[]),...(ifoodOn()?[['iFood','money']]:[]),['Recebido','money'],['Tributável','money'],['Base','money'],['IR tabela','money'],['Redução','money'],['DARF','money'],['Vencimento','date'],['Pago']],
+    rows:lc.map(l=>[mesNome(l.ym),l.apps,...(caronaOn()?[l.carBase]:[]),...(ifoodOn()?[l.ifB]:[]),l.bruto,l.trib,l.base,l.irT,l.red,l.darf,l.venc,l.reg.pago?'Sim'+(l.reg.valorPago?' ('+brl(l.reg.valorPago)+')':''):'Não'])});
   sec.push({id:'multas',t:'Multas e pontos na CNH',nota:'Filtradas pela data da infração. Os pontos expiram 12 meses após a data da infração. '+TXT_SEM_ORGAO_TXT,cols:[['Data da infração','date'],['Descrição da Infração'],['Veículo'],['Responsável pela Infração'],['Pontuação Infração','int'],['Pontos expiram em','date'],['Pontos'],['Valor','money'],['Situação'],['Hora da Infração'],['Local da Infração'],['Velocidade Permitida','int'],['Velocidade Aferida','int']],
     rows:mul.map(r=>{const st=statusMulta(r);return[r.ocorr,r.motivo,r.veiculo,r.infrator||'',r.pontos||0,r.pontos?st.exp:null,!r.pontos?'Sem pontos':st.ativa?'Ativos':'Expirados',r.vPago??r.vDesc??r.vOrig,r.pagto?'Paga em '+fmtBR(r.pagto):'A pagar',r.hora||'',r.local||'',r.vperm||null,r.vaf||null]})});
   return{F,sec,lanc,filtroTxt:`Período ${fmtBR(F.de)} a ${fmtBR(F.ate)} · ${relVTxt(F)} · Plataforma: ${F.plat==='Todas'?'todas':F.plat}`};
@@ -3320,7 +3320,7 @@ async function checarTrocaSenha(){if(!await precisoTrocarSenha())return;
       <div class="field"><label for="csN2">Repita a nova senha</label><div class="pw"><input class="inp" type="password" id="csN2" autocomplete="new-password"><button type="button" data-eye="csN2" aria-label="Mostrar senha">👁</button></div></div>
       <div class="err" id="csErr"></div><div class="mfoot"><button class="btn sec" id="csSair">↩ Sair</button><button class="btn" id="csOk">Salvar e continuar</button></div></div>`;
     document.body.appendChild(ov);const q=x=>ov.querySelector(x),err=t=>{q('#csErr').textContent=t};
-    ov.querySelectorAll('[data-eye]').forEach(b=>b.onclick=()=>{const i=q('#'+b.dataset.eye);i.type=i.type==='password'?'text':'password'});
+    ov.querySelectorAll('[data-eye]').forEach(b=>b.onclick=()=>{const i=q('#'+b.dataset.eye);i.type=i.type==='password'?'text':'password';b.setAttribute('aria-label',i.type==='password'?'Mostrar senha':'Ocultar senha')});
     q('#csSair').onclick=()=>sairSemAudit();
     q('#csOk').onclick=async()=>{const n=q('#csN').value,n2=q('#csN2').value;if(n.length<8)return err('A senha precisa de 8 caracteres ou mais.');if(n!==n2)return err('As senhas não conferem.');
       q('#csOk').disabled=true;
